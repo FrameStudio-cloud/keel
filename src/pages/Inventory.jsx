@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
 import AddProductModal from "../components/AddProductModal";
+import EditProductModal from "../components/EditProductModal";
 import { supabase } from "../lib/supabase";
 
 function getStatus(stock) {
@@ -11,9 +12,11 @@ function getStatus(stock) {
 }
 
 export default function Inventory() {
+  const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     fetchProducts();
@@ -33,10 +36,22 @@ export default function Inventory() {
     setLoading(false);
   }
 
+  const filteredProducts = products.filter(
+    (p) =>
+      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.category.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
   return (
-    <PageLayout title="Inventory">
+    <PageLayout
+      title="Inventory"
+      searchQuery={searchQuery}
+      setSearchQuery={setSearchQuery}
+    >
       <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-gray-400">{products.length} products</p>
+        <p className="text-sm text-gray-400">
+          {filteredProducts.length} products
+        </p>
         <button
           onClick={() => setShowModal(true)}
           className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all"
@@ -67,10 +82,13 @@ export default function Inventory() {
                 <th className="text-left text-xs font-medium text-gray-400 px-4 py-3">
                   Status
                 </th>
+                <th className="text-left text-xs font-medium text-gray-400 px-4 py-3">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
-              {products.map((p) => {
+              {filteredProducts.map((p) => {
                 const status = getStatus(p.stock);
                 return (
                   <tr
@@ -88,6 +106,14 @@ export default function Inventory() {
                     <td className="px-4 py-3">
                       <Badge label={status.label} color={status.color} />
                     </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => setSelectedProduct(p)}
+                        className="text-xs text-blue-600 hover:underline"
+                      >
+                        Edit
+                      </button>
+                    </td>
                   </tr>
                 );
               })}
@@ -100,6 +126,14 @@ export default function Inventory() {
         <AddProductModal
           onClose={() => setShowModal(false)}
           onAdded={fetchProducts}
+        />
+      )}
+
+      {selectedProduct && (
+        <EditProductModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          onUpdated={fetchProducts}
         />
       )}
     </PageLayout>

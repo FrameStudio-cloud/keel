@@ -1,74 +1,54 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
 
-export default function AddProductModal({ onClose, onAdded }) {
+export default function EditProductModal({ product, onClose, onUpdated }) {
   const [form, setForm] = useState({
-    name: "",
-    category: "",
-    price: "",
-    stock: "",
+    name: product.name,
+    category: product.category,
+    price: product.price,
+    stock: product.stock,
   });
   const [loading, setLoading] = useState(false);
-  const [existingProduct, setExistingProduct] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
-    if (existingProduct) setExistingProduct(null); // reset warning if they edit
-  }
-
-  async function handleSubmit() {
-    if (!form.name || !form.category || !form.price || !form.stock) return;
-
-    setLoading(true);
-
-    // Check if product already exists
-    // Check if product already exists
-    const { data: matches } = await supabase
-      .from("products")
-      .select("*")
-      .ilike("name", form.name);
-
-    if (matches && matches.length > 0) {
-      setExistingProduct(matches[0]);
-      setLoading(false);
-      return;
-    }
-    // No match — insert as new
-    const { error } = await supabase.from("products").insert({
-      name: form.name,
-      category: form.category,
-      price: parseInt(form.price),
-      stock: parseInt(form.stock),
-    });
-
-    if (error) {
-      console.error(error);
-    } else {
-      onAdded();
-      onClose();
-    }
-
-    setLoading(false);
   }
 
   async function handleUpdate() {
     setLoading(true);
-
     const { error } = await supabase
       .from("products")
       .update({
-        stock: parseInt(form.stock),
+        name: form.name,
+        category: form.category,
         price: parseInt(form.price),
+        stock: parseInt(form.stock),
       })
-      .eq("id", existingProduct.id);
+      .eq("id", product.id);
 
     if (error) {
       console.error(error);
     } else {
-      onAdded();
+      onUpdated();
       onClose();
     }
+    setLoading(false);
+  }
 
+  async function handleDelete() {
+    setLoading(true);
+    const { error } = await supabase
+      .from("products")
+      .delete()
+      .eq("id", product.id);
+
+    if (error) {
+      console.error(error);
+    } else {
+      onUpdated();
+      onClose();
+    }
     setLoading(false);
   }
 
@@ -76,7 +56,7 @@ export default function AddProductModal({ onClose, onAdded }) {
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl border border-gray-100 p-6 w-full max-w-md mx-4">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-sm font-medium text-gray-800">Add product</h2>
+          <h2 className="text-sm font-medium text-gray-800">Edit product</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 text-lg"
@@ -94,7 +74,6 @@ export default function AddProductModal({ onClose, onAdded }) {
               name="name"
               value={form.name}
               onChange={handleChange}
-              placeholder="e.g. iPhone 15 case"
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
             />
           </div>
@@ -104,7 +83,6 @@ export default function AddProductModal({ onClose, onAdded }) {
               name="category"
               value={form.category}
               onChange={handleChange}
-              placeholder="e.g. Cases"
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
             />
           </div>
@@ -117,7 +95,6 @@ export default function AddProductModal({ onClose, onAdded }) {
                 name="price"
                 value={form.price}
                 onChange={handleChange}
-                placeholder="350"
                 type="number"
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
               />
@@ -130,47 +107,43 @@ export default function AddProductModal({ onClose, onAdded }) {
                 name="stock"
                 value={form.stock}
                 onChange={handleChange}
-                placeholder="10"
                 type="number"
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
               />
             </div>
           </div>
 
-          {/* Existing product warning */}
-          {existingProduct && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-700">
-              <p className="font-medium mb-1">
-                "{existingProduct.name}" already exists
-              </p>
-              <p>
-                Current stock: {existingProduct.stock} &nbsp;·&nbsp; Price: KSh{" "}
-                {existingProduct.price.toLocaleString()}
-              </p>
-              <p className="mt-1 text-amber-500">
-                Your new stock and price values will replace these.
-              </p>
+          {confirmDelete && (
+            <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-600">
+              Are you sure? This will permanently delete{" "}
+              <strong>{product.name}</strong>.
             </div>
           )}
         </div>
 
         <div className="flex gap-2 mt-5">
+          {!confirmDelete ? (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="flex-1 border border-red-200 text-red-500 text-sm py-2 rounded-lg hover:bg-red-50 transition-all"
+            >
+              Delete
+            </button>
+          ) : (
+            <button
+              onClick={handleDelete}
+              disabled={loading}
+              className="flex-1 bg-red-500 text-white text-sm py-2 rounded-lg hover:bg-red-600 transition-all disabled:opacity-50"
+            >
+              {loading ? "Deleting..." : "Confirm delete"}
+            </button>
+          )}
           <button
-            onClick={onClose}
-            className="flex-1 border border-gray-200 text-gray-500 text-sm py-2 rounded-lg hover:bg-gray-50 transition-all"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={existingProduct ? handleUpdate : handleSubmit}
+            onClick={handleUpdate}
             disabled={loading}
             className="flex-1 bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50"
           >
-            {loading
-              ? "Saving..."
-              : existingProduct
-                ? "Update product"
-                : "Add product"}
+            {loading ? "Saving..." : "Save changes"}
           </button>
         </div>
       </div>

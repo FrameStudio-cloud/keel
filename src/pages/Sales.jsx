@@ -5,6 +5,7 @@ import LogSaleModal from "../components/LogSaleModal";
 import { supabase } from "../lib/supabase";
 
 export default function Sales() {
+  const [searchQuery, setSearchQuery] = useState("");
   const [sales, setSales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -35,12 +36,18 @@ export default function Sales() {
       hour: "2-digit",
       minute: "2-digit",
     });
-  }
 
+      
+  }
+const filteredSales = sales.filter(
+  (s) =>
+    s.product_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.method.toLowerCase().includes(searchQuery.toLowerCase()),
+);
   return (
-    <PageLayout title="Sales">
+    <PageLayout title="Sales" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-gray-400">{sales.length} transactions</p>
+        <p className="text-sm text-gray-400">{filteredSales.length} transactions</p>
         <button
           onClick={() => setShowModal(true)}
           className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all"
@@ -81,7 +88,7 @@ export default function Sales() {
               </tr>
             </thead>
             <tbody>
-              {sales.map((s) => (
+              {filteredSales.map((s) => (
                 <tr
                   key={s.id}
                   className="border-b border-gray-50 hover:bg-gray-50 transition-all"

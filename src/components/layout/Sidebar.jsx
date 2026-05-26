@@ -4,10 +4,13 @@ import { FaBoxOpen } from "react-icons/fa";
 import { FcSalesPerformance } from "react-icons/fc";
 import { MdOutlinePhoneIphone } from "react-icons/md";
 import { BsBuildingsFill } from "react-icons/bs";
+import { useEffect, useState } from "react";
+import { supabase } from "../../lib/supabase";
+
 
 const navItems = [
   { label: "Overview", icon: <GoGraph />, path: "/" },
-  { label: "Inventory", icon: <FaBoxOpen />, path: "/inventory", badge: 3 },
+  { label: "Inventory", icon: <FaBoxOpen />, path: "/inventory" },
   { label: "Sales", icon: <FcSalesPerformance />, path: "/sales" },
   { label: "Social Media", icon: <MdOutlinePhoneIphone />, path: "/social" },
 ];
@@ -18,6 +21,22 @@ const comingSoon = [
 ];
 
 export default function Sidebar() {
+
+  
+const [lowStockCount, setLowStockCount] = useState(0);
+
+useEffect(() => {
+  async function fetchLowStock() {
+    const { count } = await supabase
+      .from("products")
+      .select("*", { count: "exact", head: true })
+      .lte("stock", 6);
+
+    setLowStockCount(count);
+  }
+  fetchLowStock();
+}, []);
+
   return (
     <aside className="w-56 h-screen bg-white border-r border-gray-100 flex flex-col flex-shrink-0">
       {/* Logo */}
@@ -53,9 +72,9 @@ export default function Sidebar() {
           >
             <span>{item.icon}</span>
             <span className="flex-1">{item.label}</span>
-            {item.badge && (
+            {item.label === "Inventory" && lowStockCount > 0 && (
               <span className="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 leading-none">
-                {item.badge}
+                {lowStockCount}
               </span>
             )}
           </NavLink>
