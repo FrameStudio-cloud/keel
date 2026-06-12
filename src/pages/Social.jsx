@@ -108,7 +108,7 @@ export default function Social() {
       {/* Account card */}
       <div className="grid grid-cols-3 gap-3 mb-6">
         <div className="col-span-2 bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-pink-500 flex items-center justify-center text-white font-medium">
+          <div className="w-12 h-12 rounded-full bg-pink-500 flex items-center justify-center text-[var(--text-primary)] font-medium">
             IG
           </div>
           <div className="flex-1">
@@ -154,7 +154,7 @@ export default function Social() {
 
       {/* TikTok connect */}
       <div className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-4 mb-6">
-        <div className="w-10 h-10 rounded-lg bg-gray-900 flex items-center justify-center text-white text-sm font-bold">
+        <div className="w-10 h-10 rounded-lg bg-gray-900 flex items-center justify-center text-[var(--text-primary)] text-sm font-bold">
           TT
         </div>
         <div className="flex-1">

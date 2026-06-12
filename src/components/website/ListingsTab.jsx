@@ -1,0 +1,521 @@
+import { useState, useEffect } from "react";
+import { supabase } from "../../lib/supabase";
+import { getShopId, withShop } from "../../lib/shop";
+import { formatPrice } from "../../lib/format";
+
+const EMPTY_FORM = {
+  type: "product",
+  category: "",
+  name: "",
+  description: "",
+  image: "",
+  price: "",
+  price_label: "",
+  badge: "",
+  available: true,
+  specs: "",
+  includes: "",
+};
+
+export default function ListingsTab() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editItem, setEditItem] = useState(null);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+  const [toast, setToast] = useState(null);
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  async function fetchItems() {
+    const shopId = await getShopId();
+    const { data, error } = await supabase
+      .from("catalogue")
+      .select("*")
+      .eq("shop_id", shopId)
+      .order("created_at", { ascending: false });
+    if (!error) setItems(data || []);
+    setLoading(false);
+  }
+
+  function showToast(msg, type = "success") {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  }
+
+  function openAdd() {
+    setForm(EMPTY_FORM);
+    setEditItem(null);
+    setShowForm(true);
+  }
+
+  function openEdit(item) {
+    setForm({
+      ...item,
+      specs: Array.isArray(item.specs) ? item.specs.join("\n") : "",
+      includes: Array.isArray(item.includes) ? item.includes.join("\n") : "",
+    });
+    setEditItem(item);
+    setShowForm(true);
+  }
+
+  async function handleSave() {
+    if (!form.name || !form.category || !form.type) {
+      showToast("Name, category and type are required", "error");
+      return;
+    }
+    setSaving(true);
+
+    const payload = {
+      ...form,
+      price: parseInt(form.price) || 0,
+      specs:
+        form.type === "product" && form.specs
+          ? form.specs.split("\n").map((s) => s.trim()).filter(Boolean)
+          : null,
+      includes:
+        form.type === "service" && form.includes
+          ? form.includes.split("\n").map((s) => s.trim()).filter(Boolean)
+          : null,
+      badge: form.badge || null,
+    };
+
+    let error;
+    if (editItem) {
+      ({ error } = await supabase
+        .from("catalogue")
+        .update(payload)
+        .eq("id", editItem.id)
+        .eq("shop_id", await getShopId()));
+    } else {
+      ({ error } = await supabase.from("catalogue").insert([withShop(payload)]));
+    }
+
+    setSaving(false);
+    if (error) {
+      showToast("Something went wrong", "error");
+      return;
+    }
+    showToast(editItem ? "Item updated!" : "Item added!");
+    setShowForm(false);
+    fetchItems();
+  }
+
+  async function handleDelete(id) {
+    setDeletingId(id);
+    const { error } = await supabase
+      .from("catalogue")
+      .delete()
+      .eq("id", id)
+      .eq("shop_id", await getShopId());
+    setDeletingId(null);
+    if (error) {
+      showToast("Delete failed", "error");
+      return;
+    }
+    showToast("Item deleted");
+    fetchItems();
+  }
+
+  async function toggleAvailable(item) {
+    await supabase
+      .from("catalogue")
+      .update({ available: !item.available })
+      .eq("id", item.id)
+      .eq("shop_id", await getShopId());
+    fetchItems();
+  }
+
+  return (
+    <div>
+      {toast && (
+        <div
+          className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold shadow-xl ${
+            toast.type === "error"
+              ? "bg-red-500 text-white"
+              : "bg-blue-600 text-white"
+          }`}
+        >
+          {toast.msg}
+        </div>
+      )}
+
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm text-[var(--text-secondary)]">{items.length} items</p>
+        <button
+          onClick={openAdd}
+          className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-4 py-2 rounded-xl transition-all"
+          style={{ fontFamily: "var(--font-display, inherit)" }}
+        >
+          + Add Item
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="space-y-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-16 bg-white/5 rounded-xl animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div className="border border-[var(--border)] rounded-2xl overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[var(--border)] bg-[var(--bg-page)]">
+                <th className="px-4 py-3 text-xs font-semibold text-left text-[var(--text-secondary)] uppercase">
+                  Item
+                </th>
+                <th className="hidden px-4 py-3 text-xs font-semibold text-left text-[var(--text-secondary)] uppercase sm:table-cell">
+                  Category
+                </th>
+                <th className="hidden px-4 py-3 text-xs font-semibold text-left text-[var(--text-secondary)] uppercase md:table-cell">
+                  Type
+                </th>
+                <th className="px-4 py-3 text-xs font-semibold text-left text-[var(--text-secondary)] uppercase">
+                  Price
+                </th>
+                <th className="hidden px-4 py-3 text-xs font-semibold text-left text-[var(--text-secondary)] uppercase sm:table-cell">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-xs font-semibold text-right text-[var(--text-secondary)] uppercase">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item, i) => (
+                <tr
+                  key={item.id}
+                  className={`border-b border-white/5 hover:bg-[var(--hover)] transition-colors ${
+                    i === items.length - 1 ? "border-0" : ""
+                  }`}
+                >
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      {item.image && (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-10 h-10 rounded-lg object-cover bg-white/10 flex-shrink-0"
+                        />
+                      )}
+                      <div>
+                        <p className="text-sm font-semibold text-[var(--text-primary)] line-clamp-1">
+                          {item.name}
+                        </p>
+                        {item.badge && (
+                          <span className="text-xs text-blue-400">
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="hidden px-4 py-3 sm:table-cell">
+                    <span className="text-xs text-[var(--text-primary)]">
+                      {item.category}
+                    </span>
+                  </td>
+                  <td className="hidden px-4 py-3 md:table-cell">
+                    <span
+                      className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                        item.type === "service"
+                          ? "bg-blue-500/20 text-blue-300"
+                          : "bg-green-500/20 text-green-300"
+                      }`}
+                    >
+                      {item.type}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="text-sm font-bold text-blue-400">
+                      {item.price_label || formatPrice(item.price)}
+                    </span>
+                  </td>
+                  <td className="hidden px-4 py-3 sm:table-cell">
+                    <button
+                      onClick={() => toggleAvailable(item)}
+                      className={`text-xs font-semibold px-3 py-1 rounded-full transition-all ${
+                        item.available
+                          ? "bg-green-500/20 text-green-300 hover:bg-red-500/20 hover:text-red-300"
+                          : "bg-red-500/20 text-red-300 hover:bg-green-500/20 hover:text-green-300"
+                      }`}
+                    >
+                      {item.available ? "Available" : "Hidden"}
+                    </button>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => openEdit(item)}
+                        className="px-2 py-1 text-xs text-[var(--text-secondary)]hover:text-[var(--text-primary)] hover:bg-[var(--hover)] rounded-lg transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        disabled={deletingId === item.id}
+                        className="px-2 py-1 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+                      >
+                        {deletingId === item.id ? "..." : "Delete"}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {items.length === 0 && (
+            <div className="py-16 text-center text-[var(--text-secondary)]">
+              <p className="text-sm">No items found</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {showForm && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm"
+            onClick={() => setShowForm(false)}
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+                <h2
+       text-[var(--text-primary)] className="font-bold text-[var(--text-primary)]"
+                  style={{ fontFamily: "var(--font-display, inherit)" }}
+                >
+                  {editItem ? "Edit Item" : "Add New Item"}
+                </h2>
+                <button
+                  onClick={() => setShowForm(false)}
+                text-[var(--text-primary)]e="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                >
+                  âœ•
+                </button>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+                      Type *
+                    </label>
+                    <select
+                      value={form.type}
+                      onChange={(e) =>
+                        setForm({ ...form, type: e.target.value })
+                      }
+                      className="w-full bg-[var(--bg-pagetext-[var(--text-primary)]border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] focus:outline-none focus:border-blue-500/50"
+                    >
+                      <option value="product">Product</option>
+                      <option value="service">Service</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+                      Category *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. CCTV"
+                      value={form.category}
+                      onChange={(e) =>
+                        setForm({ ...form, category: e.target.value })
+                      }
+                      className="w-full btext-[var(--text-primary)]g-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+                    Name *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Product or service name"
+                    value={form.name}
+                    onChange={(e) =>
+                      setForm({ ...form, name: e.target.value })
+                    }
+                    clatext-[var(--text-primary)]full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+                    Description
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Describe the product or service..."
+                    value={form.description}
+                    onChange={(e) =>
+                      setForm({ ...form, description: e.target.value })
+                    }
+       text-[var(--text-primary)]   className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50 resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+                    Image URL
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="https://..."
+                    value={form.image}
+                    onChange={(e) =>
+                      setForm({ ...form, image: e.target.value })
+             text-[var(--text-primary)]                   className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50"
+                  />
+                  {form.image && (
+                    <img
+                      src={form.image}
+                      alt="preview"
+                      className="object-cover w-full h-24 mt-2 rounded-lg"
+                    />
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+                      Price (KSh)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="25000"
+                      value={form.price}
+                      onChange={(e) =>
+                        setForm({ ...form, price: e.target.value })
+ text-[var(--text-primary)]           }
+                      className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+                      Price Label
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="From KSh 25,000"
+                      value={form.price_label}
+                      onChange={(e) =>
+                        setForm({ ...form, price_label: e.ttext-[var(--text-primary)]e })
+                      }
+                      className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+                      Badge
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Best Seller"
+                      value={form.badge}
+                      onChange={(e) =>
+                        setForm({ ...text-[var(--text-primary)]e: e.target.value })
+                      }
+                      className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+                      Status
+                    </label>
+                    <select
+                      value={form.available}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          available: e.targetext-[var(--text-primary)]= "true",
+                        })
+                      }
+                      className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] focus:outline-none focus:border-blue-500/50"
+                    >
+                      <option value="true">Available</option>
+                      <option value="false">Hidden</option>
+                    </select>
+                  </div>
+                </div>
+
+                {form.type === "product" && (
+                  <div>
+                    <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+                      Specs (one per line)
+                    </label>
+                    <textarea
+                      rows={4}
+                      placeholder={
+                        "4K Resolution\n30m Night Vision\nIP67 Weatherproof"
+                      }
+                      value={form.specs}
+                      onChange={(e) =>
+     text-[var(--text-primary)]         setForm({ ...form, specs: e.target.value })
+                      }
+                      className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50 resize-none font-mono"
+                    />
+                  </div>
+                )}
+
+                {form.type === "service" && (
+                  <div>
+                    <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+                      What's Included (one per line)
+                    </label>
+                    <textarea
+                      rows={4}
+                      placeholder={
+                        "4 cameras supplied & installed\nDVR + 1TB storage\n1 year warranty"
+                      }
+                      value={form.includes}
+                      onChange=text-[var(--text-primary)]                      setForm({ ...form, includes: e.target.value })
+                      }
+                      className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50 resize-none font-mono"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="text-[var(--text-primary)] px-6 py-4 border-t border-[var(--border)]">
+                <button
+                  onClick={() => setShowForm(false)}
+                  className="flex-1 py-2.5 border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-xl text-sm font-semibold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition-all disabled:opacity-50"
+                  style={{ fontFamily: "var(--font-display, inherit)" }}
+                >
+                  {saving
+                    ? "Saving..."
+                    : editItem
+                      ? "Save Changes"
+                      : "Add Item"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

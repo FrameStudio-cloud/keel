@@ -1,1 +1,30 @@
 @import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg-page: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border: rgba(0,0,0,0.08);
+  --hover: rgba(0,0,0,0.03);
+}
+
+.dark {
+  --bg-page: #1a1a2e;
+  --bg-card: #16213e;
+  --bg-input: #1a1a2e;
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border: rgba(255,255,255,0.1);
+  --hover: rgba(255,255,255,0.05);
+}
+
+body {
+  background: var(--bg-page);
+  color: var(--text-primary);
+}
