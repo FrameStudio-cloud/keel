@@ -131,7 +131,7 @@ const filteredSales = sales.filter(
                   <tr
                     key={s.id}
                     onClick={() => setReceiptSale(s)}
-                    className="border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all cursor-pointer"
+                    className="border-b border-gray-50 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all cursor-pointer"
                   >
                     <td className="px-4 py-3 font-medium text-gray-800 dark:text-white">
                       {s.product_name}

@@ -142,7 +142,7 @@ export default function Inventory() {
                   return (
                     <tr
                       key={p.id}
-                      className="border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+                      className="border-b border-gray-50 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
                     >
                       <td className="px-4 py-3 font-medium text-gray-800 dark:text-white">{p.name}</td>
                       <td className="px-4 py-3 text-gray-400 dark:text-slate-500">{p.category}</td>
