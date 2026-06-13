@@ -3,56 +3,95 @@ import { GoGraph } from "react-icons/go";
 import { FaBoxOpen } from "react-icons/fa";
 import { FcSalesPerformance } from "react-icons/fc";
 import { MdOutlinePhoneIphone } from "react-icons/md";
+import { IoGlobeOutline, IoRocketOutline, IoSettingsOutline, IoPersonOutline, IoTimeOutline } from "react-icons/io5";
 import { BsBuildingsFill } from "react-icons/bs";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
-
+import { getShopId } from "../../lib/shop";
 
 const navItems = [
   { label: "Overview", icon: <GoGraph />, path: "/" },
   { label: "Inventory", icon: <FaBoxOpen />, path: "/inventory" },
   { label: "Sales", icon: <FcSalesPerformance />, path: "/sales" },
   { label: "Social Media", icon: <MdOutlinePhoneIphone />, path: "/social" },
+  { label: "Bots", icon: <IoRocketOutline />, path: "/bots" },
+  { label: "Website", icon: <IoGlobeOutline />, path: "/website" },
+  { label: "Stock History", icon: <IoTimeOutline />, path: "/stock-history" },
 ];
 
-const comingSoon = [
-  { label: "WhatsApp Bot", icon: "🤖" },
-  { label: "My Website", icon: "🌐" },
-];
+export default function Sidebar({ open, onClose }) {
+  const [lowStockCount, setLowStockCount] = useState(0);
+  const [storeName, setStoreName] = useState("");
 
-export default function Sidebar() {
+  useEffect(() => {
+    (async () => {
+      const shopId = await getShopId();
+      if (!shopId) return;
+      const { data } = await supabase
+        .from("store_settings")
+        .select("store_name")
+        .eq("shop_id", shopId)
+        .maybeSingle();
+      if (data?.store_name) setStoreName(data.store_name);
+    })();
+  }, []);
 
-  
-const [lowStockCount, setLowStockCount] = useState(0);
+  useEffect(() => {
+    async function fetchLowStock() {
+      const shopId = await getShopId();
 
-useEffect(() => {
-  async function fetchLowStock() {
-    const { count } = await supabase
-      .from("products")
-      .select("*", { count: "exact", head: true })
-      .lte("stock", 6);
+      const { data: settings } = await supabase
+        .from("store_settings")
+        .select("low_stock_threshold")
+        .eq("shop_id", shopId)
+        .maybeSingle();
 
-    setLowStockCount(count);
-  }
-  fetchLowStock();
-}, []);
+      const threshold = settings?.low_stock_threshold ?? 6;
+
+      const { count } = await supabase
+        .from("products")
+        .select("*", { count: "exact", head: true })
+        .eq("shop_id", shopId)
+        .lte("stock", threshold);
+
+      setLowStockCount(count);
+    }
+    fetchLowStock();
+  }, []);
 
   return (
-    <aside className="w-56 h-screen bg-white border-r border-gray-100 flex flex-col flex-shrink-0">
+    <>
+      {open && (
+        <div
+          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
+          onClick={onClose}
+          aria-label="Close sidebar"
+        />
+      )}
+
+      <aside
+        className={`
+          w-56 h-screen bg-white dark:bg-[#16213e] border-r border-gray-100 dark:border-white/10
+          flex flex-col flex-shrink-0
+          fixed lg:static z-40 inset-y-0 left-0
+          transition-transform duration-200
+          ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+        `}
+      >
       {/* Logo */}
-      <div className="h-14 flex items-center gap-3 px-4 border-b border-gray-100">
+      <div className="h-14 flex items-center gap-3 px-4 border-b border-gray-100 dark:border-white/10">
         <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center text-white text-sm">
           <BsBuildingsFill />
         </div>
         <div>
-          <p className="text-sm font-medium text-gray-800">MithoDash</p>
-          <p className="text-xs text-gray-400">Shop Manager</p>
+          <p className="text-sm font-medium text-gray-800 dark:text-white">Keel</p>
+          <p className="text-xs text-gray-400 dark:text-slate-500">Shop Manager</p>
         </div>
       </div>
 
       {/* Nav */}
       <nav className="flex-1 p-3 flex flex-col gap-1">
-        <p className="text-xs font-medium text-gray-400 px-2 pt-2 pb-1 uppercase tracking-wider">
+        <p className="text-xs font-medium text-gray-400 dark:text-slate-500 px-2 pt-2 pb-1 uppercase tracking-wider">
           Main
         </p>
 
@@ -61,12 +100,13 @@ useEffect(() => {
             key={item.path}
             to={item.path}
             end={item.path === "/"}
+            onClick={onClose}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
               ${
                 isActive
-                  ? "bg-blue-50 text-blue-600 font-medium"
-                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
+                  ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium"
+                  : "text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.05] hover:text-gray-800 dark:hover:text-white"
               }`
             }
           >
@@ -80,39 +120,59 @@ useEffect(() => {
           </NavLink>
         ))}
 
-        <p className="text-xs font-medium text-gray-400 px-2 pt-4 pb-1 uppercase tracking-wider">
-          Connect
+        <p className="text-xs font-medium text-gray-400 dark:text-slate-500 px-2 pt-4 pb-1 uppercase tracking-wider">
+          Other
         </p>
 
-        {comingSoon.map((item) => (
-          <div
-            key={item.label}
-            className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 cursor-not-allowed"
-          >
-            <span>{item.icon}</span>
-            <span className="flex-1">{item.label}</span>
-            <span className="text-xs bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full">
-              Soon
-            </span>
-          </div>
-        ))}
+        <NavLink
+          key="/settings"
+          to="/settings"
+          onClick={onClose}
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
+            ${
+              isActive
+                ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium"
+                : "text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.05] hover:text-gray-800 dark:hover:text-white"
+            }`
+          }
+        >
+          <IoSettingsOutline />
+          <span className="flex-1">Settings</span>
+        </NavLink>
+        <NavLink
+          key="/profile"
+          to="/profile"
+          onClick={onClose}
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
+            ${
+              isActive
+                ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium"
+                : "text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.05] hover:text-gray-800 dark:hover:text-white"
+            }`
+          }
+        >
+          <IoPersonOutline />
+          <span className="flex-1">Profile</span>
+        </NavLink>
       </nav>
 
       {/* User */}
-      <div className="p-3 border-t border-gray-100">
-        <div className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+      <div className="p-3 border-t border-gray-100 dark:border-white/10">
+        <div className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] cursor-pointer">
           <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-medium">
-            SH
+            {storeName ? storeName[0].toUpperCase() : "S"}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-800 truncate">
-              Shop Owner
+            <p className="text-sm font-medium text-gray-800 dark:text-white truncate">
+              {storeName || "My Store"}
             </p>
-            <p className="text-xs text-gray-400">Phone Accessories</p>
           </div>
         </div>
       </div>
     </aside>
+    </>
   );
 }
 

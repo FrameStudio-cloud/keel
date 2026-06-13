@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getCurrency } from "../lib/format";
 
 export function IntaSendCheckout({
   amount,
@@ -9,6 +10,8 @@ export function IntaSendCheckout({
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const currency = getCurrency();
 
   async function handleSubmit() {
     if (!phone || phone.length < 10) {
@@ -51,10 +54,11 @@ export function IntaSendCheckout({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+        <label htmlFor="inta-phone" className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
           M-Pesa Phone Number
         </label>
         <input
+          id="inta-phone"
           type="tel"
           value={phone}
           onChange={(e) => {
@@ -62,17 +66,18 @@ export function IntaSendCheckout({
             setError("");
           }}
           placeholder="0712345678"
-          className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50"
+          className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500/50"
         />
       </div>
 
-      {error && <p className="text-red-400 text-xs">{error}</p>}
+      {error && <p className="text-red-400 text-xs" role="alert">{error}</p>}
 
       <div className="flex gap-2">
         {onClose && (
           <button
             onClick={onClose}
-            className="flex-1 border border-[var(--border)] text-[var(--text-secondary)] text-sm py-2.5 rtext-[var(--text-primary)]hover:text-[var(--text-primary)] transition-colors"
+            aria-label="Cancel payment"
+            className="flex-1 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 text-sm py-2.5 rounded-xl hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/[0.05] transition-colors"
           >
             Cancel
           </button>
@@ -80,9 +85,10 @@ export function IntaSendCheckout({
         <button
           onClick={handleSubmit}
           disabled={loading}
+          aria-label="Pay now"
           className="flex-1 bg-blue-600 text-white font-bold text-sm py-2.5 rounded-xl hover:bg-blue-500 transition-all disabled:opacity-50"
         >
-          {loading ? "Processing..." : `Pay KSh ${amount?.toLocaleString()}`}
+          {loading ? "Processing..." : `Pay ${currency} ${amount?.toLocaleString()}`}
         </button>
       </div>
     </div>

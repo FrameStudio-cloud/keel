@@ -15,15 +15,15 @@ export default function Profile() {
     <PageLayout title="Store Profile">
       <div className="max-w-2xl">
         {/* Header */}
-        <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-6 mb-6">
+        <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-6 mb-6">
           <div className="w-16 h-16 rounded-2xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mb-4">
             <span className="text-2xl font-bold text-blue-400">
               {(storeName || "K")[0]}
             </span>
           </div>
           <h2
-            className="text-[var(--text-primary)] font-bold text-xl"
-            style={{ fontFamily: "var(--font-display, inherit)" }}
+            className="text-slate-900 dark:text-white font-bold text-xl"
+            style={{ fontFamily: "inherit" }}
           >
             {storeName || "Keel Shop"}
           </h2>
@@ -36,28 +36,29 @@ export default function Profile() {
         {/* Details */}
         <div className="space-y-3">
           {storePhone && (
-            <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl px-4 py-3 flex items-center justify-between">
-              <span className="text-[var(--text-secondary)] text-sm">Phone</span>
-              <text-[var(--text-primary)]Name="text-[var(--text-primary)] text-sm">{storePhone}</span>
+            <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 flex items-center justify-between">
+              <span className="text-slate-600 dark:text-slate-400 text-sm">Phone</span>
+              <span className="text-slate-900 dark:text-white text-sm">{storePhone}</span>
             </div>
           )}
           {storeAddress && (
-            <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl px-4 py-3 flex items-center justify-between">
-              <span className="text-[var(--text-secondary)] text-sm">Address</span>text-[var(--text-primary)]     <span className="text-[var(--text-primary)] text-sm text-right max-w-[60%]">
+            <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 flex items-center justify-between">
+              <span className="text-slate-600 dark:text-slate-400 text-sm">Address</span>
+              <span className="text-slate-900 dark:text-white text-sm text-right max-w-[60%]">
                 {storeAddress}
               </span>
             </div>
           )}
           {whatsapp && (
-            <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl px-4 py-3 flex items-center justify-between">
-              <span className="text-[var(--text-secondary)] text-sm"text-[var(--text-primary)]/span>
-              <span className="text-[var(--text-primary)] text-sm">{whatsapp}</span>
+            <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 flex items-center justify-between">
+              <span className="text-slate-600 dark:text-slate-400 text-sm">WhatsApp</span>
+              <span className="text-slate-900 dark:text-white text-sm">{whatsapp}</span>
             </div>
           )}
           {websiteUrl && (
-            <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl px-4 py-3 flex items-center justify-between">
-              <span className="text-[var(--text-sectext-[var(--text-primary)]ext-sm">Website</span>
-              <span className="text-[var(--text-primary)] text-sm text-right max-w-[60%] truncate">
+            <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 flex items-center justify-between">
+              <span className="text-slate-600 dark:text-slate-400 text-sm">Website</span>
+              <span className="text-slate-900 dark:text-white text-sm text-right max-w-[60%] truncate">
                 {websiteUrl}
               </span>
             </div>

@@ -3,6 +3,8 @@ import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
 import AddProductModal from "../components/AddProductModal";
 import EditProductModal from "../components/EditProductModal";
+import StockAdjustModal from "../components/StockAdjustModal";
+import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 
 function getStatus(stock) {
@@ -17,15 +19,18 @@ export default function Inventory() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [adjustProduct, setAdjustProduct] = useState(null);
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
   async function fetchProducts() {
+    const shopId = await getShopId();
     const { data, error } = await supabase
       .from("products")
       .select("*")
+      .eq("shop_id", shopId)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -49,7 +54,7 @@ export default function Inventory() {
       setSearchQuery={setSearchQuery}
     >
       <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-gray-400 dark:text-slate-500">
           {filteredProducts.length} products
         </p>
         <button
@@ -60,65 +65,112 @@ export default function Inventory() {
         </button>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden">
         {loading ? (
-          <p className="text-sm text-gray-400 p-6">Loading products...</p>
+          <p className="text-sm text-gray-400 dark:text-slate-500 p-6">Loading products...</p>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100">
-                <th className="text-left text-xs font-medium text-gray-400 px-4 py-3">
-                  Product
-                </th>
-                <th className="text-left text-xs font-medium text-gray-400 px-4 py-3">
-                  Category
-                </th>
-                <th className="text-left text-xs font-medium text-gray-400 px-4 py-3">
-                  Price
-                </th>
-                <th className="text-left text-xs font-medium text-gray-400 px-4 py-3">
-                  Stock
-                </th>
-                <th className="text-left text-xs font-medium text-gray-400 px-4 py-3">
-                  Status
-                </th>
-                <th className="text-left text-xs font-medium text-gray-400 px-4 py-3">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+          <>
+            <div className="sm:hidden space-y-2 p-3">
               {filteredProducts.map((p) => {
                 const status = getStatus(p.stock);
                 return (
-                  <tr
+                  <div
                     key={p.id}
-                    className="border-b border-gray-50 hover:bg-gray-50 transition-all"
+                    className="flex items-center justify-between bg-slate-50 dark:bg-[#1a1a2e] rounded-xl px-4 py-3"
                   >
-                    <td className="px-4 py-3 font-medium text-gray-800">
-                      {p.name}
-                    </td>
-                    <td className="px-4 py-3 text-gray-400">{p.category}</td>
-                    <td className="px-4 py-3 text-gray-800">
-                      KSh {p.price.toLocaleString()}
-                    </td>
-                    <td className="px-4 py-3 text-gray-800">{p.stock}</td>
-                    <td className="px-4 py-3">
-                      <Badge label={status.label} color={status.color} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <button
-                        onClick={() => setSelectedProduct(p)}
-                        className="text-xs text-blue-600 hover:underline"
-                      >
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-slate-900 dark:text-white text-sm font-medium truncate">{p.name}</p>
+                      <p className="text-slate-500 dark:text-slate-400 text-xs">{p.category}</p>
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <Badge label={status.label} color={status.color} />
+                        <span className="text-xs text-slate-600 dark:text-slate-400">Stock: {p.stock}</span>
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0 ml-3">
+                      <p className="text-blue-600 dark:text-blue-400 text-sm font-semibold">
+                        KSh {p.price.toLocaleString()}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1.5 justify-end">
+                        <button
+                          onClick={() => setSelectedProduct(p)}
+                          className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => setAdjustProduct(p)}
+                          className="text-xs text-slate-600 dark:text-slate-400 hover:underline"
+                        >
+                          Stock
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 );
               })}
-            </tbody>
-          </table>
+            </div>
+            <table className="hidden sm:table w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 dark:border-white/10">
+                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                    Product
+                  </th>
+                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                    Category
+                  </th>
+                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                    Price
+                  </th>
+                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                    Stock
+                  </th>
+                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                    Status
+                  </th>
+                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredProducts.map((p) => {
+                  const status = getStatus(p.stock);
+                  return (
+                    <tr
+                      key={p.id}
+                      className="border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+                    >
+                      <td className="px-4 py-3 font-medium text-gray-800 dark:text-white">{p.name}</td>
+                      <td className="px-4 py-3 text-gray-400 dark:text-slate-500">{p.category}</td>
+                      <td className="px-4 py-3 text-gray-800 dark:text-white">
+                        KSh {p.price.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3 text-gray-800 dark:text-white">{p.stock}</td>
+                      <td className="px-4 py-3">
+                        <Badge label={status.label} color={status.color} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setSelectedProduct(p)}
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => setAdjustProduct(p)}
+                            className="text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:underline"
+                          >
+                            Stock
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </>
         )}
       </div>
 
@@ -134,6 +186,14 @@ export default function Inventory() {
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
           onUpdated={fetchProducts}
+        />
+      )}
+
+      {adjustProduct && (
+        <StockAdjustModal
+          product={adjustProduct}
+          onClose={() => setAdjustProduct(null)}
+          onAdjusted={fetchProducts}
         />
       )}
     </PageLayout>

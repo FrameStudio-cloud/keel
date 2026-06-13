@@ -1,49 +1,48 @@
 export default function Login() {
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-4">
-      <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-8 w-full max-w-sm">
+    <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-8 w-full max-w-sm">
         <div className="text-center mb-6">
           <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center mx-auto mb-3">
-            <span className="text-[var(--text-primary)] font-bold text-lg">K</span>
+            <span className="text-white font-bold text-lg">K</span>
           </div>
-          <h2
-            className="text-[var(--text-primary)] font-bold text-lg"
-            style={{ fontFamily: "var(--font-display, inherit)" }}
-          >
+          <h2 className="text-slate-900 dark:text-white font-bold text-lg">
             Welcome to Keel
           </h2>
-          <p className="text-[var(--text-secondary)] text-sm mt-1">
+          <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
             Sign in to manage your shop
           </p>
         </div>
 
-        <div className="space-y-3">
+        <form className="space-y-3">
           <div>
-            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+            <label htmlFor="login-email" className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
               Email
             </label>
             <input
+              id="login-email"
               type="email"
               placeholder="you@example.com"
-              className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3text-[var(--text-primary)]xt-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50"
+              className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500/50"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+            <label htmlFor="login-password" className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
               Password
             </label>
             <input
+              id="login-password"
               type="password"
-              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
-              className="w-full bg-[var(--bg-page)] border border-[var(--border)]text-[var(--text-primary)]l px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50"
+              placeholder="········"
+              className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500/50"
             />
           </div>
-          <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition-all">
+          <button type="submit" className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition-all">
             Sign In
           </button>
-        </div>
+        </form>
 
-        <p className="text-center text-xs text-[var(--text-muted)] mt-4">
+        <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-4">
           Authentication coming soon
         </p>
       </div>

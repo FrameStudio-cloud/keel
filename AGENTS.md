@@ -6,7 +6,7 @@ Low-stock threshold comes from `settings.lowStockThreshold` (database), not hard
 Critical stock threshold is `CRITICAL_STOCK_THRESHOLD = 2` in `src/lib/constants.js`.
 Payment methods are dynamic — configured via `paymentConfig` singleton, updated by SettingsProvider.
 Currency symbol is a module-level singleton in `src/lib/format.js`, updated by SettingsProvider.
-Dark mode uses `@variant dark` in Tailwind v4 + CSS variables in `index.css`, toggled via `.dark` class on `<html>`.
+Dark mode uses `@variant dark` in Tailwind v4, toggled via `.dark` class on `<html>`. No CSS variables — all colors use `dark:` Tailwind variants with `bg-slate-100 dark:bg-[#1a1a2e]` pattern.
 Settings are fetched once by `SettingsProvider` context and consumed via `useSettings()` hook.
 All Supabase tables have RLS disabled — no auth.
 Tailwind v4 — no `tailwind.config.js`, dark mode via `@variant dark (&:where(.dark, .dark *));`.
@@ -20,7 +20,7 @@ npm run build   # Vite production build
 npm run lint    # ESLint (flat config)
 ```
 
-Current lint: 0 errors, 5 pre-existing `exhaustive-deps` warnings (safe to ignore).
+Current lint: 0 errors, 0 warnings.
 
 ## Renamed
 
@@ -42,7 +42,7 @@ Formerly **mitho-dash**. Renamed to **Keel**.
 ## Key Files
 
 - `src/context/SettingsProvider.jsx` — fetches settings + shop category, applies side-effects (theme, currency, payment config)
-- `src/pages/Settings.jsx` — Store details (name, phone, address, category, WhatsApp, website URL), Sales & Currency, Appearance, Export
+- `src/pages/Settings.jsx` — flat scroll design (no cards), visual sections, removed business_hours field
 - `src/pages/SetupWizard.jsx` — onboarding flow: category → store name → phone/address → currency → payment → threshold
 - `src/pages/Website.jsx` — tabbed website management: Listings, Banners, Business Info, Gallery
 - `src/components/website/` — ListingsTab, BannersTab, BusinessTab, GalleryTab (all use Supabase)
@@ -69,14 +69,14 @@ Formerly **mitho-dash**. Renamed to **Keel**.
 | `/profile` | Profile.jsx | Store info display |
 | `/login` | Login.jsx | Placeholder auth page |
 | `/setup` | SetupWizard.jsx | First-run onboarding |
+| `/stock-history` | StockHistory.jsx | Stock movement log |
 
 ## Conventions
 
 - `react-icons` for all icons (no emojis in UI)
-- `cite-ui` for toast notifications
-- All modals: `role="dialog"`, `aria-modal="true"`, `aria-label`
-- Mobile first: sidebar drawer, collapsing grids, stacking cards
-- Dark mode: `dark:` variant on all elements
+- All modals: `role="dialog"`, `aria-modal="true"`, `aria-label` with close buttons using `FiX`
+- Mobile first: sidebar drawer with hamburger toggle, collapsing grids, stacking cards
+- Dark mode: `dark:` variant on all elements, no CSS variables
 - Lazy imports for all pages except Overview (entry point)
 - No TypeScript, no auth/RLS
-- Every Supabase query uses `getShopId()` for multi-tenant filtering
+- Every Supabase query uses `getShopId()` + `.eq("shop_id", shopId)` for SELECT/UPDATE/DELETE and `withShop()` for INSERT

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { FiX } from "react-icons/fi";
+import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 
 export default function EditProductModal({ product, onClose, onUpdated }) {
@@ -16,6 +18,7 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
   }
 
   async function handleUpdate() {
+    const shopId = await getShopId();
     setLoading(true);
     const { error } = await supabase
       .from("products")
@@ -25,7 +28,8 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
         price: parseInt(form.price),
         stock: parseInt(form.stock),
       })
-      .eq("id", product.id);
+      .eq("id", product.id)
+      .eq("shop_id", shopId);
 
     if (error) {
       console.error(error);
@@ -37,11 +41,13 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
   }
 
   async function handleDelete() {
+    const shopId = await getShopId();
     setLoading(true);
     const { error } = await supabase
       .from("products")
       .delete()
-      .eq("id", product.id);
+      .eq("id", product.id)
+      .eq("shop_id", shopId);
 
     if (error) {
       console.error(error);
@@ -54,41 +60,47 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
 
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 w-full max-w-md mx-4">
+      <div
+        className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-100 dark:border-white/10 p-6 w-full max-w-md mx-4"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Edit product"
+      >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-sm font-medium text-gray-800">Edit product</h2>
+          <h2 className="text-sm font-medium text-gray-800 dark:text-white">Edit product</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-lg"
+            className="text-gray-400 dark:text-slate-500 hover:text-gray-600 text-lg"
+            aria-label="Close"
           >
-            ✕
+            <FiX />
           </button>
         </div>
 
         <div className="flex flex-col gap-3">
           <div>
-            <label className="text-xs text-gray-400 mb-1 block">
+            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
               Product name
             </label>
             <input
               name="name"
               value={form.name}
               onChange={handleChange}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
             />
           </div>
           <div>
-            <label className="text-xs text-gray-400 mb-1 block">Category</label>
+            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Category</label>
             <input
               name="category"
               value={form.category}
               onChange={handleChange}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-gray-400 mb-1 block">
+              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
                 Price (KSh)
               </label>
               <input
@@ -96,11 +108,11 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
                 value={form.price}
                 onChange={handleChange}
                 type="number"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
               />
             </div>
             <div>
-              <label className="text-xs text-gray-400 mb-1 block">
+              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
                 Stock quantity
               </label>
               <input
@@ -108,13 +120,13 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
                 value={form.stock}
                 onChange={handleChange}
                 type="number"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
               />
             </div>
           </div>
 
           {confirmDelete && (
-            <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-600">
+            <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-600 dark:text-red-400">
               Are you sure? This will permanently delete{" "}
               <strong>{product.name}</strong>.
             </div>

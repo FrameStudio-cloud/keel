@@ -1,12 +1,12 @@
 import PageLayout from "../components/layout/PageLayout";
+import { FaWhatsapp, FaTelegramPlane } from "react-icons/fa";
 
 const bots = [
   {
     name: "WhatsApp Bot",
     description:
       "Automate customer enquiries, send order updates, and notify low stock alerts via WhatsApp.",
-    icon: "💬",
-    status: "coming-soon",
+    icon: <FaWhatsapp className="text-3xl text-green-500" />,
     color: "bg-green-500/10 border-green-500/20",
     textColor: "text-green-400",
   },
@@ -14,8 +14,7 @@ const bots = [
     name: "Telegram Bot",
     description:
       "Get daily sales reports, stock alerts, and manage your shop from Telegram.",
-    icon: "✈️",
-    status: "coming-soon",
+    icon: <FaTelegramPlane className="text-3xl text-blue-400" />,
     color: "bg-blue-500/10 border-blue-500/20",
     textColor: "text-blue-400",
   },
@@ -28,25 +27,22 @@ export default function Bots() {
         {bots.map((bot) => (
           <div
             key={bot.name}
-            className={`${bot.color} border rounded-2xl p-6`}
+            className={`${bot.color} border border-white/10 rounded-2xl p-6`}
           >
             <div className="flex items-start gap-4">
-              <span className="text-3xl">{bot.icon}</span>
+              {bot.icon}
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3
-                    className="text-[var(--text-primary)] font-bold text-lg"
-                    style={{ fontFamily: "var(--font-display, inherit)" }}
-                  >
+                  <h3 className="text-slate-900 dark:text-white font-bold text-lg">
                     {bot.name}
                   </h3>
                   <span
-                    className={`text-xs font-semibold px-2 py-0.5 rounded-full ${bot.textColor} bg-white/5`}
+                    className={`text-xs font-semibold px-2 py-0.5 rounded-full ${bot.textColor} bg-white/10 dark:bg-white/5`}
                   >
                     Coming Soon
                   </span>
                 </div>
-                <p className="text-[var(--text-secondary)] text-sm">{bot.description}</p>
+                <p className="text-slate-600 dark:text-slate-400 text-sm">{bot.description}</p>
               </div>
             </div>
           </div>

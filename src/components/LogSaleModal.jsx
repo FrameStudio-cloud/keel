@@ -1,4 +1,7 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from "react";
+import { FiX } from "react-icons/fi";
+import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 
 export default function LogSaleModal({ onClose, onAdded }) {
@@ -10,14 +13,15 @@ export default function LogSaleModal({ onClose, onAdded }) {
   });
   const [loading, setLoading] = useState(false);
 
+  async function fetchProducts() {
+    const shopId = await getShopId();
+    const { data } = await supabase.from("products").select("*").eq("shop_id", shopId).order("name");
+    setProducts(data || []);
+  }
+
   useEffect(() => {
     fetchProducts();
   }, []);
-
-  async function fetchProducts() {
-    const { data } = await supabase.from("products").select("*").order("name");
-    setProducts(data || []);
-  }
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -36,13 +40,13 @@ export default function LogSaleModal({ onClose, onAdded }) {
     setLoading(true);
 
     // 1 — insert the sale
-    const { error: saleError } = await supabase.from("sales").insert({
+    const { error: saleError } = await supabase.from("sales").insert(withShop({
       product_id: selectedProduct.id,
       product_name: selectedProduct.name,
       amount: total,
       quantity: parseInt(form.quantity),
       method: form.method,
-    });
+    }));
 
     if (saleError) {
       console.error(saleError);
@@ -51,10 +55,12 @@ export default function LogSaleModal({ onClose, onAdded }) {
     }
 
     // 2 — reduce the stock
+    const shopId = await getShopId();
     const { error: stockError } = await supabase
       .from("products")
       .update({ stock: selectedProduct.stock - parseInt(form.quantity) })
-      .eq("id", selectedProduct.id);
+      .eq("id", selectedProduct.id)
+      .eq("shop_id", shopId);
 
     if (stockError) {
       console.error(stockError);
@@ -68,25 +74,31 @@ export default function LogSaleModal({ onClose, onAdded }) {
 
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 w-full max-w-md mx-4">
+      <div
+        className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-100 dark:border-white/10 p-6 w-full max-w-md mx-4"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Log a sale"
+      >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-sm font-medium text-gray-800">Log a sale</h2>
+          <h2 className="text-sm font-medium text-gray-800 dark:text-white">Log a sale</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-lg"
+            className="text-gray-400 dark:text-slate-500 hover:text-gray-600 text-lg"
+            aria-label="Close"
           >
-            ✕
+            <FiX />
           </button>
         </div>
 
         <div className="flex flex-col gap-3">
           <div>
-            <label className="text-xs text-gray-400 mb-1 block">Product</label>
+            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Product</label>
             <select
               name="product_id"
               value={form.product_id}
               onChange={handleChange}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
             >
               <option value="">Select a product</option>
               {products.map((p) => (
@@ -99,7 +111,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-gray-400 mb-1 block">
+              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
                 Quantity
               </label>
               <input
@@ -108,18 +120,18 @@ export default function LogSaleModal({ onClose, onAdded }) {
                 onChange={handleChange}
                 type="number"
                 min="1"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
               />
             </div>
             <div>
-              <label className="text-xs text-gray-400 mb-1 block">
+              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
                 Payment method
               </label>
               <select
                 name="method"
                 value={form.method}
                 onChange={handleChange}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
               >
                 <option>Cash</option>
                 <option>M-Pesa</option>
@@ -128,9 +140,9 @@ export default function LogSaleModal({ onClose, onAdded }) {
           </div>
 
           {selectedProduct && (
-            <div className="bg-blue-50 rounded-lg px-4 py-3 flex justify-between items-center">
+            <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg px-4 py-3 flex justify-between items-center">
               <span className="text-xs text-blue-500">Total</span>
-              <span className="text-sm font-medium text-blue-700">
+              <span className="text-sm font-medium text-blue-700 dark:text-blue-400">
                 KSh {total.toLocaleString()}
               </span>
             </div>
@@ -140,7 +152,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
         <div className="flex gap-2 mt-5">
           <button
             onClick={onClose}
-            className="flex-1 border border-gray-200 text-gray-500 text-sm py-2 rounded-lg hover:bg-gray-50 transition-all"
+            className="flex-1 border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 text-sm py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
           >
             Cancel
           </button>

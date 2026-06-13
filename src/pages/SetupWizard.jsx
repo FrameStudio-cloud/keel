@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FiBox, FiShoppingBag, FiMonitor, FiZap } from "react-icons/fi";
 import { supabase } from "../lib/supabase";
 import { getShopId, withShop } from "../lib/shop";
 
 const CATEGORIES = [
-  { id: "general", label: "General", icon: "ðŸ“¦" },
-  { id: "clothing", label: "Clothing", icon: "ðŸ‘•" },
-  { id: "electronics", label: "Electronics", icon: "ðŸ“±" },
-  { id: "electricals", label: "Electricals", icon: "âš¡" },
+  { id: "general", label: "General", icon: <FiBox /> },
+  { id: "clothing", label: "Clothing", icon: <FiShoppingBag /> },
+  { id: "electronics", label: "Electronics", icon: <FiMonitor /> },
+  { id: "electricals", label: "Electricals", icon: <FiZap /> },
 ];
 
 const STEPS = [
@@ -62,8 +63,8 @@ export default function SetupWizard() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-4">
-      <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-8 w-full max-w-lg">
+    <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-8 w-full max-w-lg">
         {/* Progress */}
         <div className="flex items-center gap-1 mb-8">
           {STEPS.map((s, i) => (
@@ -72,7 +73,7 @@ export default function SetupWizard() {
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
                   i <= step
                     ? "bg-blue-600 text-white"
-                    : "bg-white/10 text-[var(--text-muted)]"
+                    : "bg-white/10 text-slate-400 dark:text-slate-500"
                 }`}
               >
                 {i + 1}
@@ -91,10 +92,10 @@ export default function SetupWizard() {
         {/* Category Step */}
         {step === 0 && (
           <div>
-            <h2 className="text-[var(--text-primary)] font-bold text-lg mb-2">
+            <h2 className="text-slate-900 dark:text-white font-bold text-lg mb-2">
               What do you sell?
             </h2>
-            <p className="text-[var(--text-secondary)] text-sm mb-6">
+            <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">
               This helps us set up the right options for your products.
             </p>
             <div className="grid grid-cols-2 gap-3">
@@ -107,11 +108,11 @@ export default function SetupWizard() {
                   className={`p-4 rounded-xl border text-left transition-all ${
                     form.businessCategory === cat.id
                       ? "bg-blue-500/10 border-blue-500"
-                      : "bg-[var(--bg-page)] border-[var(--border)] hover:border-white/20"
+                      : "bg-slate-100 dark:bg-[#1a1a2e] border-slate-200 dark:border-white/10 hover:border-white/20"
                   }`}
                 >
-                  <span className="text-2xl">{cat.icon}</span>
-                text-[var(--text-primary)]Name="text-[var(--text-primary)] font-semibold text-sm mt-2">
+                  <span className="text-2xl text-slate-600 dark:text-slate-400">{cat.icon}</span>
+                <p className="text-slate-900 dark:text-white font-semibold text-sm mt-2">
                     {cat.label}
                   </p>
                 </button>
@@ -122,15 +123,16 @@ export default function SetupWizard() {
 
         {/* Details Step */}
         {step === 1 && (
-          <text-[var(--text-primary)]       <h2 className="text-[var(--text-primary)] font-bold text-lg mb-2">
+          <>
+          <h2 className="text-slate-900 dark:text-white font-bold text-lg mb-2">
               Tell us about your store
             </h2>
-            <p className="text-[var(--text-secondary)] text-sm mb-6">
+            <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">
               Your customers will see this on your website.
             </p>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
                   Store Name
                 </label>
                 <input
@@ -139,12 +141,12 @@ export default function SetupWizard() {
                   onChange={(e) =>
                     setForm({ ...form, storeName: e.target.value })
                   }
-                  className="w-full bg-[var(--bg-page)] border bordertext-[var(--text-primary)]rder)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50"
+                  className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500/50"
                   placeholder="My Shop"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
                   Phone
                 </label>
                 <input
@@ -153,12 +155,12 @@ export default function SetupWizard() {
                   onChange={(e) =>
                     setForm({ ...form, storePhone: e.target.value })
                   }
-                  className="w-full bg-[var(--bg-pagetext-[var(--text-primary)]border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50"
+                  className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500/50"
                   placeholder="+254 700 000 000"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
                   Address
                 </label>
                 <input
@@ -167,20 +169,20 @@ export default function SetupWizard() {
                   onChange={(e) =>
                     setForm({ ...form, storeAddress: e.target.value })
                   }
-                  className="w-full btext-[var(--text-primary)]g-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50"
+                  className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500/50"
                 />
               </div>
             </div>
-          </div>
+          </>
         )}
 
-  text-[var(--text-primary)]Currency Step */}
+        {/* Currency Step */}
         {step === 2 && (
           <div>
-            <h2 className="text-[var(--text-primary)] font-bold text-lg mb-2">
+            <h2 className="text-slate-900 dark:text-white font-bold text-lg mb-2">
               Choose your currency
             </h2>
-            <p className="text-[var(--text-secondary)] text-sm mb-6">
+            <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">
               All prices will be displayed using this symbol.
             </p>
             <div className="grid grid-cols-3 gap-3">
@@ -200,23 +202,24 @@ export default function SetupWizard() {
                   className={`p-3 rounded-xl text-center transition-all ${
                     form.currencySymbol === opt.symbol
                       ? "bg-blue-500/10 border border-blue-500"
-                      : "bg-[var(--bg-page)] border bordertext-[var(--text-primary)]rder)] hover:border-white/20"
+                      : "bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 hover:border-white/20"
                   }`}
                 >
-                  <p className="text-[var(--text-primary)] font-bold text-lg">{opt.symbol}</p>
-                  <p className="text-[var(--text-secondary)] text-xs mt-1">{opt.label}</p>
+                  <p className="text-slate-900 dark:text-white font-bold text-lg">{opt.symbol}</p>
+                  <p className="text-slate-600 dark:text-slate-400 text-xs mt-1">{opt.label}</p>
                 </button>
               ))}
-            </divtext-[var(--text-primary)]  </div>
+            </div>
+          </div>
         )}
 
         {/* Payment Step */}
         {step === 3 && (
           <div>
-            <h2 className="text-[var(--text-primary)] font-bold text-lg mb-2">
+            <h2 className="text-slate-900 dark:text-white font-bold text-lg mb-2">
               Default payment method
             </h2>
-            <p className="text-[var(--text-secondary)] text-sm mb-6">
+            <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">
               Pre-selected when logging a sale.
             </p>
             {["Cash", "M-Pesa", "Bank", "IntaSend"].map((method) => (
@@ -228,13 +231,13 @@ export default function SetupWizard() {
                 className={`w-full p-3 rounded-xl text-left mb-2 transition-all ${
                   form.defaultPayment === method
                     ? "bg-blue-500/10 border border-blue-500"
-                    :text-[var(--text-primary)]--bg-page)] border border-[var(--border)] hover:border-white/20"
+                    : "bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 hover:border-white/20"
                 }`}
               >
-                <span className="text-[var(--text-primary)] font-semibold text-sm">
+                <span className="text-slate-900 dark:text-white font-semibold text-sm">
                   {method}
                 </span>
-        text-[var(--text-primary)]tton>
+              </button>
             ))}
           </div>
         )}
@@ -242,10 +245,10 @@ export default function SetupWizard() {
         {/* Threshold Step */}
         {step === 4 && (
           <div>
-            <h2 className="text-[var(--text-primary)] font-bold text-lg mb-2">
+            <h2 className="text-slate-900 dark:text-white font-bold text-lg mb-2">
               Low stock threshold
             </h2>
-            <p className="text-[var(--text-secondary)] text-sm mb-6">
+            <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">
               Get alerted when stock drops below this number.
             </p>
             <input
@@ -254,19 +257,20 @@ export default function SetupWizard() {
               onChange={(e) =>
                 setForm({
                   ...form,
-                  lowStockThreshold: partext-[var(--text-primary)]rget.value) || 0,
+                  lowStockThreshold: parseInt(e.target.value) || 0,
                 })
               }
-              className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] focus:outline-none focus:border-blue-500/50"
+              className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500/50"
             />
           </div>
         )}
 
         {/* Navigation */}
         <div className="flex gap-2 mt-8">
-          {step > 0 && (text-[var(--text-primary)]   <button
+          {step > 0 && (
+            <button
               onClick={() => setStep(step - 1)}
-              className="flex-1 border border-[var(--border)] text-[var(--text-secondary)] text-sm py-2.5 rounded-xl hover:text-[var(--text-primary)] transition-colors"
+              className="flex-1 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 text-sm py-2.5 rounded-xl hover:text-slate-900 dark:text-white transition-colors"
             >
               Back
             </button>

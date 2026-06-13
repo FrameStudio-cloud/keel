@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import PageLayout from "../components/layout/PageLayout";
 import { supabase } from "../lib/supabase";
-import { getShopId, withShop } from "../lib/shop";
+import { getShopId } from "../lib/shop";
 import { setCurrency } from "../lib/format";
 import { setPaymentConfig } from "../lib/paymentConfig";
-import { FiSave, FiDownload, FiHome, FiDollarSign, FiMonitor, FiFileText } from "react-icons/fi";
+import { FiSave, FiDownload } from "react-icons/fi";
 
 export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
+  const [settingsId, setSettingsId] = useState(null);
   const [form, setForm] = useState({
     store_name: "",
     store_phone: "",
@@ -21,7 +22,6 @@ export default function Settings() {
     theme: "dark",
     website_url: "",
     whatsapp: "",
-    business_hours: "",
   });
 
   useEffect(() => {
@@ -31,23 +31,21 @@ export default function Settings() {
         .from("store_settings")
         .select("*")
         .eq("shop_id", shopId)
-        .single();
+        .maybeSingle();
 
       if (data) {
+        setSettingsId(data.id);
         setForm({
           store_name: data.store_name || "",
           store_phone: data.store_phone || "",
           store_address: data.store_address || "",
           currency_symbol: data.currency_symbol || "KSh",
-          low_stock_threshold: data.low_stock_threshold || 6,
+          low_stock_threshold: data.low_stock_threshold ?? 6,
           default_payment: data.default_payment || "Cash",
           receipt_footer: data.receipt_footer || "",
           theme: data.theme || "dark",
           website_url: data.website_url || "",
           whatsapp: data.whatsapp || "",
-          business_hours: data.business_hours
-            ? JSON.stringify(data.business_hours, null, 2)
-            : "",
         });
       }
       setLoading(false);
@@ -66,24 +64,25 @@ export default function Settings() {
 
   async function handleSave() {
     setSaving(true);
-    let businessHours = null;
-    try {
-      if (form.business_hours) businessHours = JSON.parse(form.business_hours);
-    } catch {
-      showToast("Invalid JSON in business hours", "error");
-      setSaving(false);
-      return;
-    }
 
-    const { error } = await supabase
+    const shopId = await getShopId();
+    const payload = { ...form, shop_id: shopId };
+    if (settingsId) payload.id = settingsId;
+
+    const { data, error } = await supabase
       .from("store_settings")
-      .upsert(withShop({ ...form, business_hours: businessHours }));
+      .upsert(payload)
+      .select()
+      .single();
 
     setSaving(false);
     if (error) {
+      console.error("Settings save error:", error);
       showToast("Something went wrong", "error");
       return;
     }
+
+    if (data && !settingsId) setSettingsId(data.id);
 
     setCurrency(form.currency_symbol);
     setPaymentConfig(null, form.default_payment);
@@ -129,6 +128,8 @@ export default function Settings() {
     );
   }
 
+  const inputClass = "w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500/50 transition-colors";
+
   return (
     <PageLayout title="Settings">
       {toast && (
@@ -143,51 +144,42 @@ export default function Settings() {
         </div>
       )}
 
-      <div className="max-w-lg mx-auto space-y-6 py-4">
-        <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center">
-              <FiHome className="text-blue-400" size={14} />
-            </div>
-            <h3 className="text-[var(--text-primary)] font-semibold text-sm">Store Details</h3>
-          </div>
+      <div className="max-w-lg mx-auto py-4 space-y-8">
+
+        <section>
+          <h3 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-4">Store Details</h3>
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Store Name</label>
-              <input type="text" value={form.store_name} onChange={(e) => setForm({ ...form, store_name: e.target.value })} className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50 transition-colors" />
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Store Name</label>
+              <input type="text" value={form.store_name} onChange={(e) => setForm({ ...form, store_name: e.target.value })} className={inputClass} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Phone</label>
-                <input type="text" value={form.store_phone} onChange={(e) => setForm({ ...form, store_phone: e.target.value })} className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50 transition-colors" />
+                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Phone</label>
+                <input type="text" value={form.store_phone} onChange={(e) => setForm({ ...form, store_phone: e.target.value })} className={inputClass} />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">WhatsApp</label>
-                <input type="text" value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50 transition-colors" />
+                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">WhatsApp</label>
+                <input type="text" value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} className={inputClass} />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Address</label>
-              <input type="text" value={form.store_address} onChange={(e) => setForm({ ...form, store_address: e.target.value })} className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50 transition-colors" />
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Address</label>
+              <input type="text" value={form.store_address} onChange={(e) => setForm({ ...form, store_address: e.target.value })} className={inputClass} />
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center">
-              <FiDollarSign className="text-blue-400" size={14} />
-            </div>
-            <h3 className="text-[var(--text-primary)] font-semibold text-sm">Sales & Currency</h3>
-          </div>
+        <section>
+          <h3 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-4">Sales & Currency</h3>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Currency Symbol</label>
-              <input type="text" value={form.currency_symbol} onChange={(e) => setForm({ ...form, currency_symbol: e.target.value })} className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50 transition-colors" />
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Currency Symbol</label>
+              <input type="text" value={form.currency_symbol} onChange={(e) => setForm({ ...form, currency_symbol: e.target.value })} className={inputClass} />
             </div>
             <div>
-              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Default Payment</label>
-              <select value={form.default_payment} onChange={(e) => setForm({ ...form, default_payment: e.target.value })} className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] focus:outline-none focus:border-blue-500/50 transition-colors">
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Default Payment</label>
+              <select value={form.default_payment} onChange={(e) => setForm({ ...form, default_payment: e.target.value })} className={inputClass}>
                 <option>Cash</option>
                 <option>M-Pesa</option>
                 <option>Bank</option>
@@ -195,30 +187,25 @@ export default function Settings() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Low Stock Threshold</label>
-              <input type="number" value={form.low_stock_threshold} onChange={(e) => setForm({ ...form, low_stock_threshold: parseInt(e.target.value) || 0 })} className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] focus:outline-none focus:border-blue-500/50 transition-colors" />
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Low Stock Threshold</label>
+              <input type="number" value={form.low_stock_threshold} onChange={(e) => setForm({ ...form, low_stock_threshold: parseInt(e.target.value) || 0 })} className={inputClass} />
             </div>
             <div>
-              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Website URL</label>
-              <input type="text" value={form.website_url} onChange={(e) => setForm({ ...form, website_url: e.target.value })} className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50 transition-colors" />
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Website URL</label>
+              <input type="text" value={form.website_url} onChange={(e) => setForm({ ...form, website_url: e.target.value })} className={inputClass} />
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center">
-              <FiMonitor className="text-blue-400" size={14} />
-            </div>
-            <h3 className="text-[var(--text-primary)] font-semibold text-sm">Appearance</h3>
-          </div>
+        <section>
+          <h3 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-4">Appearance</h3>
           <div className="flex gap-3">
             <button
               onClick={() => handleThemeChange("dark")}
               className={`flex-1 py-3 rounded-xl text-sm font-semibold border transition-all ${
                 form.theme === "dark"
                   ? "bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/25"
-                  : "bg-[var(--bg-page)] text-[var(--text-secondary)] border-[var(--border)] hover:text-[var(--text-primary)] hover:border-white/20"
+                  : "bg-slate-100 dark:bg-[#1a1a2e] text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:text-slate-900 dark:hover:text-white hover:border-white/20"
               }`}
             >
               Dark
@@ -228,41 +215,35 @@ export default function Settings() {
               className={`flex-1 py-3 rounded-xl text-sm font-semibold border transition-all ${
                 form.theme === "light"
                   ? "bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/25"
-                  : "bg-[var(--bg-page)] text-[var(--text-secondary)] border-[var(--border)] hover:text-[var(--text-primary)] hover:border-white/20"
+                  : "bg-slate-100 dark:bg-[#1a1a2e] text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:text-slate-900 dark:hover:text-white hover:border-white/20"
               }`}
             >
               Light
             </button>
           </div>
-        </div>
+        </section>
 
-        <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center">
-              <FiFileText className="text-blue-400" size={14} />
-            </div>
-            <h3 className="text-[var(--text-primary)] font-semibold text-sm">Receipt Footer</h3>
-          </div>
-          <textarea rows={2} value={form.receipt_footer} onChange={(e) => setForm({ ...form, receipt_footer: e.target.value })} placeholder="Thank you for your business!" className="w-full bg-[var(--bg-page)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500/50 transition-colors resize-none" />
-        </div>
+        <section>
+          <h3 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-4">Receipt Footer</h3>
+          <textarea rows={2} value={form.receipt_footer} onChange={(e) => setForm({ ...form, receipt_footer: e.target.value })} placeholder="Thank you for your business!" className={`${inputClass} resize-none`} />
+        </section>
 
         <button onClick={handleSave} disabled={saving} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25">
           <FiSave size={14} />
           {saving ? "Saving..." : "Save Settings"}
         </button>
 
-        <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-[var(--text-primary)] font-semibold text-sm">Data Export</h3>
-              <p className="text-[var(--text-secondary)] text-xs mt-0.5">Download all your data as JSON</p>
-            </div>
-            <button onClick={handleExport} className="px-4 py-2 bg-[var(--bg-page)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-white/20 rounded-xl text-sm transition-all flex items-center gap-2">
-              <FiDownload size={14} />
-              Export
-            </button>
+        <section className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider">Data Export</h3>
+            <p className="text-slate-600 dark:text-slate-400 text-xs mt-0.5">Download all your data as JSON</p>
           </div>
-        </div>
+          <button onClick={handleExport} className="px-4 py-2 bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-white/20 rounded-xl text-sm transition-all flex items-center gap-2">
+            <FiDownload size={14} />
+            Export
+          </button>
+        </section>
+
       </div>
     </PageLayout>
   );
