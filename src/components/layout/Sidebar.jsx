@@ -101,6 +101,7 @@ export default function Sidebar({ open, onClose }) {
             to={item.path}
             end={item.path === "/"}
             onClick={onClose}
+            data-tour={`nav-${item.label}`}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
               ${
@@ -128,6 +129,7 @@ export default function Sidebar({ open, onClose }) {
           key="/settings"
           to="/settings"
           onClick={onClose}
+          data-tour="nav-Settings"
           className={({ isActive }) =>
             `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
             ${
@@ -144,6 +146,7 @@ export default function Sidebar({ open, onClose }) {
           key="/profile"
           to="/profile"
           onClick={onClose}
+          data-tour="nav-Profile"
           className={({ isActive }) =>
             `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
             ${

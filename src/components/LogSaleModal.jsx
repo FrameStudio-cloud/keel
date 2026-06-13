@@ -3,13 +3,14 @@ import { useState, useEffect } from "react";
 import { FiX } from "react-icons/fi";
 import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
+import { getPaymentMethods, getDefaultPayment } from "../lib/paymentConfig";
 
 export default function LogSaleModal({ onClose, onAdded }) {
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState({
     product_id: "",
     quantity: 1,
-    method: "Cash",
+    method: getDefaultPayment(),
   });
   const [loading, setLoading] = useState(false);
 
@@ -133,8 +134,9 @@ export default function LogSaleModal({ onClose, onAdded }) {
                 onChange={handleChange}
                 className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
               >
-                <option>Cash</option>
-                <option>M-Pesa</option>
+                {getPaymentMethods().map((m) => (
+                  <option key={m}>{m}</option>
+                ))}
               </select>
             </div>
           </div>

@@ -10,7 +10,7 @@ export default function MostViewedPages() {
   const max = mockPages[0].views;
 
   return (
-    <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
+    <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 shadow-sm p-4">
       <p className="text-xs font-medium text-gray-800 dark:text-white mb-3">Most Viewed Pages</p>
       <div className="flex flex-col gap-2.5">
         {mockPages.map((p) => (

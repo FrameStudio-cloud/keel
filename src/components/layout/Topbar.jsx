@@ -118,6 +118,7 @@ export default function Topbar({ title, searchQuery, setSearchQuery, onToggleSid
             onClick={handleNotifToggle}
             aria-label={notifOpen ? "Close notifications" : `${lowStock.length} low stock alerts`}
             aria-expanded={notifOpen}
+            data-tour="notifications"
             className="w-8 h-8 rounded-lg border border-gray-200 dark:border-white/10 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-400 transition-all relative"
           >
             <CiBellOn />

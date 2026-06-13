@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { FiCheck } from "react-icons/fi";
 import { supabase } from "../../lib/supabase";
-import { getShopId, withShop } from "../../lib/shop";
+import { getShopId } from "../../lib/shop";
 
 const DAYS = [
   { key: "mon", label: "Mon" },
@@ -17,12 +17,6 @@ const defaultHours = () =>
   DAYS.map((d) => ({ key: d.key, label: d.label, active: true, open: "08:00", close: "17:00" }));
 
 export default function BusinessTab() {
-  const [form, setForm] = useState({
-    store_name: "",
-    store_phone: "",
-    store_address: "",
-    whatsapp: "",
-  });
   const [hours, setHours] = useState(defaultHours());
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -33,31 +27,23 @@ export default function BusinessTab() {
       const shopId = await getShopId();
       const { data } = await supabase
         .from("store_settings")
-        .select("*")
+        .select("business_hours")
         .eq("shop_id", shopId)
         .single();
 
-      if (data) {
-        setForm({
-          store_name: data.store_name || "",
-          store_phone: data.store_phone || "",
-          store_address: data.store_address || "",
-          whatsapp: data.whatsapp || "",
-        });
-        if (data.business_hours) {
-          setHours(
-            DAYS.map((d) => {
-              const h = data.business_hours[d.key];
-              return {
-                key: d.key,
-                label: d.label,
-                active: h?.active !== false,
-                open: h?.open || "08:00",
-                close: h?.close || "17:00",
-              };
-            })
-          );
-        }
+      if (data?.business_hours) {
+        setHours(
+          DAYS.map((d) => {
+            const h = data.business_hours[d.key];
+            return {
+              key: d.key,
+              label: d.label,
+              active: h?.active !== false,
+              open: h?.open || "08:00",
+              close: h?.close || "17:00",
+            };
+          })
+        );
       }
       setLoading(false);
     })();
@@ -80,16 +66,17 @@ export default function BusinessTab() {
       businessHours[h.key] = { open: h.open, close: h.close, active: h.active };
     });
 
+    const shopId = await getShopId();
     const { error } = await supabase
       .from("store_settings")
-      .upsert(withShop({
-        ...form,
+      .upsert({
         business_hours: businessHours,
-      }));
+        shop_id: shopId,
+      });
 
     setSaving(false);
     if (error) return showToast("Something went wrong", "error");
-    showToast("Business info saved!");
+    showToast("Business hours saved!");
   }
 
   if (loading) {
@@ -113,26 +100,6 @@ export default function BusinessTab() {
       )}
 
       <div className="space-y-4">
-        <div>
-          <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Store Name</label>
-          <input value={form.store_name} onChange={(e) => setForm({ ...form, store_name: e.target.value })} className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500/50" />
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Phone</label>
-            <input value={form.store_phone} onChange={(e) => setForm({ ...form, store_phone: e.target.value })} className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500/50" />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">WhatsApp</label>
-            <input value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500/50" />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Address</label>
-          <input value={form.store_address} onChange={(e) => setForm({ ...form, store_address: e.target.value })} className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500/50" />
-        </div>
 
         <div>
           <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2 uppercase tracking-wider">Business Hours</label>

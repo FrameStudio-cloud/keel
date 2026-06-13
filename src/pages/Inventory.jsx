@@ -6,14 +6,18 @@ import EditProductModal from "../components/EditProductModal";
 import StockAdjustModal from "../components/StockAdjustModal";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
-
-function getStatus(stock) {
-  if (stock <= 2) return { label: "Critical", color: "red" };
-  if (stock <= 6) return { label: "Low stock", color: "amber" };
-  return { label: "In stock", color: "green" };
-}
+import { useSettings } from "../hooks/useSettings";
+import { CRITICAL_STOCK_THRESHOLD } from "../lib/constants";
 
 export default function Inventory() {
+  const { lowStockThreshold } = useSettings();
+  const threshold = lowStockThreshold || 6;
+
+  function getStatus(stock) {
+    if (stock <= CRITICAL_STOCK_THRESHOLD) return { label: "Critical", color: "red" };
+    if (stock <= threshold) return { label: "Low stock", color: "amber" };
+    return { label: "In stock", color: "green" };
+  }
   const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -9,7 +9,7 @@ export default function TrafficSources() {
   const max = sources[0].pct;
 
   return (
-    <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
+    <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 shadow-sm p-4">
       <p className="text-xs font-medium text-gray-800 dark:text-white mb-3">Traffic Sources</p>
       <div className="flex flex-col gap-3">
         {sources.map((s) => (

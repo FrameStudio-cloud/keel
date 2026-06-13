@@ -41,7 +41,7 @@ export default function PageViewsChart() {
   const barSize = range === "day" ? 8 : range === "month" ? 4 : 24;
 
   return (
-    <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
+    <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 shadow-sm p-4">
       <div className="flex items-center justify-between mb-3">
         <p className="text-xs font-medium text-gray-800 dark:text-white">Page Views</p>
         <div className="flex gap-1 bg-gray-100 dark:bg-[#1a1a2e] rounded-lg p-0.5">

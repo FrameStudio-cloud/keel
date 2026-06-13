@@ -10,8 +10,12 @@ import MostViewedPages from "../components/MostViewedPages";
 import TrafficSources from "../components/TrafficSources";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
+import { useSettings } from "../hooks/useSettings";
 
 export default function Overview() {
+  const { lowStockThreshold } = useSettings();
+  const threshold = lowStockThreshold || 6;
+
   const [stats, setStats] = useState({
     salesToday: 0,
     itemsSold: 0,
@@ -40,7 +44,7 @@ export default function Overview() {
       .from("products")
       .select("id")
       .eq("shop_id", shopId)
-      .lte("stock", 6);
+      .lte("stock", threshold);
 
     const { count } = await supabase
       .from("products")

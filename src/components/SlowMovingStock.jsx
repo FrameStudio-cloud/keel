@@ -43,7 +43,7 @@ export default function SlowMovingStock() {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-5">
+      <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-5">
         <h3 className="text-slate-900 dark:text-white font-semibold text-sm mb-4">
           Slow Moving Stock
         </h3>
@@ -58,7 +58,7 @@ export default function SlowMovingStock() {
 
   if (products.length === 0) {
     return (
-      <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-5">
+      <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-5">
        <h3 className="text-slate-900 dark:text-white font-semibold text-sm mb-1">
            Slow Moving Stock
          </h3>

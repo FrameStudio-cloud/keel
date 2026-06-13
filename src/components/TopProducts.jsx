@@ -1,7 +1,7 @@
 export default function TopProducts({ products = [] }) {
   if (products.length === 0) {
     return (
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
+      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 shadow-sm p-4">
         <p className="text-sm font-medium text-gray-800 dark:text-white mb-4">Top products</p>
         <p className="text-sm text-gray-400 dark:text-slate-500">No sales data yet.</p>
       </div>
@@ -9,7 +9,7 @@ export default function TopProducts({ products = [] }) {
   }
 
   return (
-    <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
+    <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 shadow-sm p-4">
       <p className="text-sm font-medium text-gray-800 dark:text-white mb-4">Top products</p>
       <div className="flex flex-col gap-3">
         {products.map((p) => (
