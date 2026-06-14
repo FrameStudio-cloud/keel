@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useContext } from "react";
 import { CiBellOn, CiSearch, CiMenuBurger } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import { getShopId } from "../../lib/shop";
 import { CRITICAL_STOCK_THRESHOLD } from "../../lib/constants";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function Topbar({ title, searchQuery, setSearchQuery, onToggleSidebar }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -12,6 +13,9 @@ export default function Topbar({ title, searchQuery, setSearchQuery, onToggleSid
   const [storeName, setStoreName] = useState("");
   const notifRef = useRef(null);
 
+  const { logout } = useContext(AuthContext);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -70,12 +74,15 @@ export default function Topbar({ title, searchQuery, setSearchQuery, onToggleSid
       if (notifRef.current && !notifRef.current.contains(e.target)) {
         setNotifOpen(false);
       }
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
+      }
     }
-    if (notifOpen) {
+    if (notifOpen || profileOpen) {
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
-  }, [notifOpen]);
+  }, [notifOpen, profileOpen]);
 
   const handleNotifToggle = useCallback(() => setNotifOpen((v) => !v), []);
 
@@ -184,8 +191,34 @@ export default function Topbar({ title, searchQuery, setSearchQuery, onToggleSid
           )}
         </div>
 
-        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-medium cursor-pointer" aria-label={storeName || "Store"}>
-          {storeName ? storeName[0].toUpperCase() : "S"}
+        <div className="relative" ref={profileRef}>
+          <button
+            onClick={() => setProfileOpen((v) => !v)}
+            className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-medium cursor-pointer hover:bg-blue-500 transition-colors"
+            aria-label={storeName || "Store"}
+            aria-expanded={profileOpen}
+          >
+            {storeName ? storeName[0].toUpperCase() : "S"}
+          </button>
+          {profileOpen && (
+            <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
+              <div className="px-4 py-3 border-b border-slate-100 dark:border-white/10">
+                <p className="text-xs font-medium text-slate-900 dark:text-white truncate">{storeName}</p>
+              </div>
+              <button
+                onClick={() => { navigate("/profile"); setProfileOpen(false); }}
+                className="w-full px-4 py-2.5 text-left text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors"
+              >
+                Profile
+              </button>
+              <button
+                onClick={() => { logout(); setProfileOpen(false); }}
+                className="w-full px-4 py-2.5 text-left text-xs text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors border-t border-slate-100 dark:border-white/10"
+              >
+                Sign out
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

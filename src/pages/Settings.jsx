@@ -43,6 +43,7 @@ export default function Settings() {
   useEffect(() => {
     (async () => {
       const shopId = await getShopId();
+      if (!shopId) { setLoading(false); return; }
 
       const [{ data: shop }, { data: store }] = await Promise.all([
         supabase.from("shops").select("business_category").eq("id", shopId).single(),
@@ -103,6 +104,11 @@ export default function Settings() {
     setSaving(true);
 
     const shopId = await getShopId();
+    if (!shopId) {
+      setSaving(false);
+      showToast("Shop not found. Try signing out and back in.", "error");
+      return;
+    }
 
     const businessHours = {};
     hours.forEach((h) => {
@@ -125,7 +131,7 @@ export default function Settings() {
     };
     if (settingsId) payload.id = settingsId;
 
-    const [storeResult] = await Promise.all([
+    const [storeResult, shopResult] = await Promise.all([
       supabase.from("store_settings").upsert(payload).select().single(),
       supabase.from("shops").update({ business_category: form.business_category }).eq("id", shopId),
     ]);
@@ -135,8 +141,11 @@ export default function Settings() {
     const { data, error } = storeResult;
     if (error) {
       console.error("Settings save error:", error);
-      showToast("Something went wrong", "error");
+      showToast(error.message || "Something went wrong", "error");
       return;
+    }
+    if (shopResult.error) {
+      console.error("Category update error:", shopResult.error);
     }
 
     if (data && !settingsId) setSettingsId(data.id);
@@ -150,6 +159,7 @@ export default function Settings() {
 
   async function handleExport() {
     const shopId = await getShopId();
+    if (!shopId) { showToast("Shop not found.", "error"); return; }
     const tables = ["products", "sales", "stock_movements", "catalogue"];
     const allData = {};
 

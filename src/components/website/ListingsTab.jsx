@@ -3,6 +3,8 @@ import { FiX } from "react-icons/fi";
 import { supabase } from "../../lib/supabase";
 import { getShopId, withShop } from "../../lib/shop";
 import { formatPrice } from "../../lib/format";
+import { uploadImage, deleteImage } from "../../lib/storage";
+import ImageUploader from "../ImageUploader";
 
 const EMPTY_FORM = {
   type: "product",
@@ -32,6 +34,7 @@ export default function ListingsTab() {
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [imageFile, setImageFile] = useState(null);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [toast, setToast] = useState(null);
@@ -63,6 +66,7 @@ export default function ListingsTab() {
   function openAdd() {
     setForm(EMPTY_FORM);
     setEditItem(null);
+    setImageFile(null);
     setShowForm(true);
   }
 
@@ -73,6 +77,7 @@ export default function ListingsTab() {
       includes: Array.isArray(item.includes) ? item.includes.join("\n") : "",
     });
     setEditItem(item);
+    setImageFile(null);
     setShowForm(true);
   }
 
@@ -82,9 +87,24 @@ export default function ListingsTab() {
       return;
     }
     setSaving(true);
+    const shopId = await getShopId();
+
+    let image = editItem ? form.image : null;
+    if (imageFile === null && editItem && form.image) {
+      await deleteImage(form.image).catch(() => {});
+      image = null;
+    } else if (imageFile) {
+      if (editItem && form.image) await deleteImage(form.image).catch(() => {});
+      try {
+        image = await uploadImage(imageFile, shopId);
+      } catch (err) {
+        console.error("Upload failed:", err);
+      }
+    }
 
     const payload = {
       ...form,
+      image,
       price: parseInt(form.price) || 0,
       specs:
         form.type === "product" && form.specs
@@ -103,7 +123,7 @@ export default function ListingsTab() {
         .from("catalogue")
         .update(payload)
         .eq("id", editItem.id)
-        .eq("shop_id", await getShopId()));
+        .eq("shop_id", shopId));
     } else {
       ({ error } = await supabase.from("catalogue").insert([withShop(payload)]));
     }
@@ -118,12 +138,15 @@ export default function ListingsTab() {
     fetchItems();
   }
 
-  async function handleDelete(id) {
-    setDeletingId(id);
+  async function handleDelete(item) {
+    setDeletingId(item.id);
+    if (item.image) {
+      await deleteImage(item.image).catch(() => {});
+    }
     const { error } = await supabase
       .from("catalogue")
       .delete()
-      .eq("id", id)
+      .eq("id", item.id)
       .eq("shop_id", await getShopId());
     setDeletingId(null);
     if (error) {
@@ -199,14 +222,14 @@ export default function ListingsTab() {
                     <div className="flex items-center gap-2 mt-1.5">
                       <span className="text-xs text-slate-500 dark:text-slate-400">{item.category}</span>
                       <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
-                        item.type === "service" ? "bg-blue-500/20 text-blue-300" : "bg-green-500/20 text-green-300"
+                        item.type === "service" ? "bg-blue-500/20 text-blue-800" : "bg-green-500/20 text-green-600"
                       }`}>{item.type}</span>
                       <button
                         onClick={() => toggleAvailable(item)}
                         className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
                           item.available
-                            ? "bg-green-500/20 text-green-300"
-                            : "bg-red-500/20 text-red-300"
+                            ? "bg-green-500/20 text-green-600"
+                            : "bg-red-500/20 text-red-600"
                         }`}
                       >
                         {item.available ? "Available" : "Hidden"}
@@ -217,7 +240,7 @@ export default function ListingsTab() {
                     <p className="text-sm font-bold text-blue-400">{item.price_label || formatPrice(item.price)}</p>
                     <div className="flex items-center gap-2 mt-1.5 justify-end">
                       <button onClick={() => openEdit(item)} className="text-xs text-blue-400 hover:underline">Edit</button>
-                      <button onClick={() => handleDelete(item.id)} disabled={deletingId === item.id} className="text-xs text-red-400 hover:underline">
+                      <button onClick={() => handleDelete(item)} disabled={deletingId === item.id} className="text-xs text-red-400 hover:underline">
                         {deletingId === item.id ? "..." : "Delete"}
                       </button>
                     </div>
@@ -267,7 +290,7 @@ export default function ListingsTab() {
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
                         <button onClick={() => openEdit(item)} className="px-2 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.05] rounded-lg transition-colors">Edit</button>
-                        <button onClick={() => handleDelete(item.id)} disabled={deletingId === item.id} className="px-2 py-1 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors">
+                        <button onClick={() => handleDelete(item)} disabled={deletingId === item.id} className="px-2 py-1 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors">
                           {deletingId === item.id ? "..." : "Delete"}
                         </button>
                       </div>
@@ -369,24 +392,12 @@ export default function ListingsTab() {
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
-                    Image URL
+                    Image
                   </label>
-                  <input
-                    type="text"
-                    placeholder="https://..."
-                    value={form.image}
-                    onChange={(e) =>
-                      setForm({ ...form, image: e.target.value })
-                    }
-                    className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500/50"
+                  <ImageUploader
+                    currentImage={form.image}
+                    onImageChange={setImageFile}
                   />
-                  {form.image && (
-                    <img
-                      src={form.image}
-                      alt="preview"
-                      className="object-cover w-full h-24 mt-2 rounded-lg"
-                    />
-                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

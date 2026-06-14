@@ -2,6 +2,8 @@ import { useState } from "react";
 import { FiX } from "react-icons/fi";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
+import { uploadImage, deleteImage } from "../lib/storage";
+import ImageUploader from "./ImageUploader";
 
 export default function EditProductModal({ product, onClose, onUpdated }) {
   const [form, setForm] = useState({
@@ -10,6 +12,7 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
     price: product.price,
     stock: product.stock,
   });
+  const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -20,6 +23,22 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
   async function handleUpdate() {
     const shopId = await getShopId();
     setLoading(true);
+
+    let image = product.image;
+    if (imageFile === null) {
+      if (product.image) {
+        await deleteImage(product.image).catch(() => {});
+        image = null;
+      }
+    } else if (imageFile) {
+      if (product.image) await deleteImage(product.image).catch(() => {});
+      try {
+        image = await uploadImage(imageFile, shopId);
+      } catch (err) {
+        console.error("Upload failed:", err);
+      }
+    }
+
     const { error } = await supabase
       .from("products")
       .update({
@@ -27,6 +46,7 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
         category: form.category,
         price: parseInt(form.price),
         stock: parseInt(form.stock),
+        image,
       })
       .eq("id", product.id)
       .eq("shop_id", shopId);
@@ -43,6 +63,11 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
   async function handleDelete() {
     const shopId = await getShopId();
     setLoading(true);
+
+    if (product.image) {
+      await deleteImage(product.image).catch(() => {});
+    }
+
     const { error } = await supabase
       .from("products")
       .delete()
@@ -124,6 +149,11 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
               />
             </div>
           </div>
+
+          <ImageUploader
+            currentImage={product.image}
+            onImageChange={setImageFile}
+          />
 
           {confirmDelete && (
             <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-600 dark:text-red-400">

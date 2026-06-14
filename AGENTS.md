@@ -26,6 +26,14 @@ Current lint: 0 errors, 0 warnings.
 
 Formerly **mitho-dash**. Renamed to **Keel**.
 
+## Auth
+
+- Email/password auth via Supabase Auth
+- `AuthContext` wraps the app — provides `user`, `session`, `loading`, `login()`, `logout()`
+- New users sign up via Login page → creates auth user + shop + settings + user record in one flow
+- If email confirmation is enabled, user must confirm before first login
+- `getShopId()` now looks up the auth'd user's shop from `users` table (no longer grabs first shop)
+
 ## Supabase Tables
 
 - `shops` — id, name, slug, business_category, created_at
@@ -38,6 +46,7 @@ Formerly **mitho-dash**. Renamed to **Keel**.
 - `store_settings` — store_name, store_phone, store_address, currency_symbol, low_stock_threshold, default_payment, receipt_footer, theme, website_url, whatsapp, business_hours (jsonb), shop_id
 - `stock_movements` — id, product_id, product_name, change, reason, shop_id, created_at
 - `page_views` — id, page, product_name, referrer, user_agent, shop_id, created_at
+- `users` — id, auth_user_id (UUID, unique), shop_id, name, email, created_at
 
 ## Key Files
 

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { FiX } from "react-icons/fi";
 import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
+import { uploadImage } from "../lib/storage";
+import ImageUploader from "./ImageUploader";
 
 export default function AddProductModal({ onClose, onAdded }) {
   const [form, setForm] = useState({
@@ -10,12 +12,13 @@ export default function AddProductModal({ onClose, onAdded }) {
     price: "",
     stock: "",
   });
+  const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [existingProduct, setExistingProduct] = useState(null);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
-    if (existingProduct) setExistingProduct(null); // reset warning if they edit
+    if (existingProduct) setExistingProduct(null);
   }
 
   async function handleSubmit() {
@@ -25,7 +28,6 @@ export default function AddProductModal({ onClose, onAdded }) {
 
     const shopId = await getShopId();
 
-    // Check if product already exists
     const { data: matches } = await supabase
       .from("products")
       .select("*")
@@ -37,12 +39,22 @@ export default function AddProductModal({ onClose, onAdded }) {
       setLoading(false);
       return;
     }
-    // No match — insert as new
+
+    let image = null;
+    if (imageFile) {
+      try {
+        image = await uploadImage(imageFile, shopId);
+      } catch (err) {
+        console.error("Upload failed:", err);
+      }
+    }
+
     const { error } = await supabase.from("products").insert(withShop({
       name: form.name,
       category: form.category,
       price: parseInt(form.price),
       stock: parseInt(form.stock),
+      image,
     }));
 
     if (error) {
@@ -59,11 +71,21 @@ export default function AddProductModal({ onClose, onAdded }) {
     const shopId = await getShopId();
     setLoading(true);
 
+    let image = existingProduct.image;
+    if (imageFile) {
+      try {
+        image = await uploadImage(imageFile, shopId);
+      } catch (err) {
+        console.error("Upload failed:", err);
+      }
+    }
+
     const { error } = await supabase
       .from("products")
       .update({
         stock: parseInt(form.stock),
         price: parseInt(form.price),
+        image,
       })
       .eq("id", existingProduct.id)
       .eq("shop_id", shopId);
@@ -149,7 +171,11 @@ export default function AddProductModal({ onClose, onAdded }) {
             </div>
           </div>
 
-          {/* Existing product warning */}
+          <ImageUploader
+            currentImage={existingProduct?.image}
+            onImageChange={setImageFile}
+          />
+
           {existingProduct && (
             <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-lg px-3 py-2 text-xs text-amber-700 dark:text-amber-300">
               <p className="font-medium mb-1">

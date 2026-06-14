@@ -4,15 +4,21 @@ let currentShopId = null;
 
 export async function getShopId() {
   if (currentShopId) return currentShopId;
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
   const { data } = await supabase
-    .from("shops")
-    .select("id")
-    .limit(1)
+    .from("users")
+    .select("shop_id")
+    .eq("auth_user_id", user.id)
     .single();
+
   if (data) {
-    currentShopId = data.id;
-    return data.id;
+    currentShopId = data.shop_id;
+    return data.shop_id;
   }
+
   return null;
 }
 

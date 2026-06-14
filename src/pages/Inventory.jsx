@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
+import { FiImage, FiGlobe } from "react-icons/fi";
 import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
 import AddProductModal from "../components/AddProductModal";
 import EditProductModal from "../components/EditProductModal";
 import StockAdjustModal from "../components/StockAdjustModal";
-import { getShopId } from "../lib/shop";
+import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { useSettings } from "../hooks/useSettings";
 import { CRITICAL_STOCK_THRESHOLD } from "../lib/constants";
@@ -24,9 +25,15 @@ export default function Inventory() {
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [adjustProduct, setAdjustProduct] = useState(null);
+  const [publishedMap, setPublishedMap] = useState({});
+  const [publishingId, setPublishingId] = useState(null);
 
   useEffect(() => {
     fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    fetchCatalogue();
   }, []);
 
   async function fetchProducts() {
@@ -43,6 +50,42 @@ export default function Inventory() {
       setProducts(data);
     }
     setLoading(false);
+  }
+
+  async function fetchCatalogue() {
+    const shopId = await getShopId();
+    const { data } = await supabase
+      .from("catalogue")
+      .select("id, name")
+      .eq("shop_id", shopId);
+    if (data) {
+      const map = {};
+      data.forEach((item) => { map[item.name.toLowerCase()] = item; });
+      setPublishedMap(map);
+    }
+  }
+
+  async function handlePublish(product) {
+    setPublishingId(product.id);
+    await supabase.from("catalogue").insert(withShop({
+      name: product.name,
+      category: product.category,
+      type: "product",
+      price: product.price,
+      image: product.image || null,
+      available: true,
+    }));
+    setPublishingId(null);
+    fetchCatalogue();
+  }
+
+  async function handleUnpublish(product) {
+    const item = publishedMap[product.name.toLowerCase()];
+    if (!item) return;
+    setPublishingId(product.id);
+    await supabase.from("catalogue").delete().eq("id", item.id);
+    setPublishingId(null);
+    fetchCatalogue();
   }
 
   const filteredProducts = products.filter(
@@ -82,12 +125,21 @@ export default function Inventory() {
                     key={p.id}
                     className="flex items-center justify-between bg-slate-50 dark:bg-[#1a1a2e] rounded-xl px-4 py-3"
                   >
-                    <div className="min-w-0 flex-1">
-                      <p className="text-slate-900 dark:text-white text-sm font-medium truncate">{p.name}</p>
-                      <p className="text-slate-500 dark:text-slate-400 text-xs">{p.category}</p>
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <Badge label={status.label} color={status.color} />
-                        <span className="text-xs text-slate-600 dark:text-slate-400">Stock: {p.stock}</span>
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      {p.image ? (
+                        <img src={p.image} alt={p.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center flex-shrink-0">
+                          <FiImage size={16} className="text-gray-400" />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="text-slate-900 dark:text-white text-sm font-medium truncate">{p.name}</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-xs">{p.category}</p>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <Badge label={status.label} color={status.color} />
+                          <span className="text-xs text-slate-600 dark:text-slate-400">Stock: {p.stock}</span>
+                        </div>
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0 ml-3">
@@ -107,6 +159,23 @@ export default function Inventory() {
                         >
                           Stock
                         </button>
+                        {publishedMap[p.name.toLowerCase()] ? (
+                          <button
+                            onClick={() => handleUnpublish(p)}
+                            disabled={publishingId === p.id}
+                            className="text-xs text-green-600 dark:text-green-400 hover:underline"
+                          >
+                            {publishingId === p.id ? "..." : "Published"}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handlePublish(p)}
+                            disabled={publishingId === p.id}
+                            className="text-xs text-slate-600 dark:text-slate-400 hover:underline"
+                          >
+                            {publishingId === p.id ? "..." : "Publish"}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -123,6 +192,9 @@ export default function Inventory() {
                     Category
                   </th>
                   <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                    Image
+                  </th>
+                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
                     Price
                   </th>
                   <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
@@ -130,6 +202,9 @@ export default function Inventory() {
                   </th>
                   <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
                     Status
+                  </th>
+                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                    Website
                   </th>
                   <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
                     Actions
@@ -146,12 +221,41 @@ export default function Inventory() {
                     >
                       <td className="px-4 py-3 font-medium text-gray-800 dark:text-white">{p.name}</td>
                       <td className="px-4 py-3 text-gray-400 dark:text-slate-500">{p.category}</td>
+                      <td className="px-4 py-3">
+                        {p.image ? (
+                          <img src={p.image} alt={p.name} className="w-10 h-10 rounded-lg object-cover" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center">
+                            <FiImage size={14} className="text-gray-400" />
+                          </div>
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-gray-800 dark:text-white">
                         KSh {p.price.toLocaleString()}
                       </td>
                       <td className="px-4 py-3 text-gray-800 dark:text-white">{p.stock}</td>
                       <td className="px-4 py-3">
                         <Badge label={status.label} color={status.color} />
+                      </td>
+                      <td className="px-4 py-3">
+                        {publishedMap[p.name.toLowerCase()] ? (
+                          <button
+                            onClick={() => handleUnpublish(p)}
+                            disabled={publishingId === p.id}
+                            className="inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400 hover:text-red-500 dark:hover:text-red-400 transition-colors disabled:opacity-50"
+                          >
+                            <FiGlobe size={12} />
+                            {publishingId === p.id ? "..." : "Unpublish"}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handlePublish(p)}
+                            disabled={publishingId === p.id}
+                            className="text-xs text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors disabled:opacity-50"
+                          >
+                            {publishingId === p.id ? "..." : "Publish"}
+                          </button>
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">

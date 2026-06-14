@@ -1,0 +1,411 @@
+import { useState, useEffect } from "react";
+import { supabase } from "../../lib/supabase";
+import { getShopId } from "../../lib/shop";
+import { FiCheck, FiPlus, FiTrash2, FiChevronUp, FiChevronDown, FiCopy, FiMessageCircle } from "react-icons/fi";
+
+const POSITIONS = [
+  { value: "right", label: "Bottom Right" },
+  { value: "left", label: "Bottom Left" },
+];
+
+export default function ChatWidgetTab() {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [shopId, setShopId] = useState(null);
+  const [config, setConfig] = useState({
+    enabled: true,
+    welcome_message: "Hi! How can we help you today?",
+    widget_color: "#3B82F6",
+    position: "right",
+    whatsapp_number: "",
+  });
+  const [faqs, setFaqs] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [newFaq, setNewFaq] = useState({ question: "", answer: "" });
+  const [editingFaq, setEditingFaq] = useState(null);
+
+  function showToast(msg, type = "success") {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  }
+
+  useEffect(() => {
+    (async () => {
+      const id = await getShopId();
+      if (!id) { setLoading(false); return; }
+      setShopId(id);
+
+      const { data: cfg } = await supabase
+        .from("chat_config")
+        .select("*")
+        .eq("shop_id", id)
+        .maybeSingle();
+
+      if (cfg) {
+        setConfig({
+          enabled: cfg.enabled ?? true,
+          welcome_message: cfg.welcome_message || "Hi! How can we help you today?",
+          widget_color: cfg.widget_color || "#3B82F6",
+          position: cfg.position || "right",
+          whatsapp_number: cfg.whatsapp_number || "",
+        });
+      } else {
+        const { data: settings } = await supabase
+          .from("store_settings")
+          .select("whatsapp")
+          .eq("shop_id", id)
+          .single();
+        if (settings?.whatsapp) {
+          setConfig((prev) => ({ ...prev, whatsapp_number: settings.whatsapp }));
+        }
+      }
+
+      const { data: faqData } = await supabase
+        .from("chat_faqs")
+        .select("*")
+        .eq("shop_id", id)
+        .order("sort_order", { ascending: true });
+
+      if (faqData) setFaqs(faqData);
+
+      const { data: msgData } = await supabase
+        .from("chat_messages")
+        .select("*")
+        .eq("shop_id", id)
+        .eq("status", "unanswered")
+        .order("created_at", { ascending: false });
+
+      if (msgData) setMessages(msgData);
+
+      setLoading(false);
+    })();
+  }, []);
+
+  async function saveConfig() {
+    if (!shopId) return;
+    setSaving(true);
+    const { error } = await supabase.from("chat_config").upsert({
+      shop_id: shopId,
+      enabled: config.enabled,
+      welcome_message: config.welcome_message,
+      widget_color: config.widget_color,
+      position: config.position,
+      whatsapp_number: config.whatsapp_number,
+    }, { onConflict: "shop_id" });
+    setSaving(false);
+    if (error) return showToast(error.message, "error");
+    showToast("Chat widget settings saved!");
+  }
+
+  async function addFaq() {
+    if (!shopId || !newFaq.question.trim() || !newFaq.answer.trim()) return;
+    const maxOrder = faqs.reduce((max, f) => Math.max(max, f.sort_order), -1);
+    const { data, error } = await supabase
+      .from("chat_faqs")
+      .insert({
+        shop_id: shopId,
+        question: newFaq.question.trim(),
+        answer: newFaq.answer.trim(),
+        sort_order: maxOrder + 1,
+      })
+      .select()
+      .single();
+    if (error) return showToast(error.message, "error");
+    setFaqs([...faqs, data]);
+    setNewFaq({ question: "", answer: "" });
+    showToast("FAQ added!");
+  }
+
+  async function deleteFaq(id) {
+    const { error } = await supabase.from("chat_faqs").delete().eq("id", id);
+    if (error) return showToast(error.message, "error");
+    setFaqs(faqs.filter((f) => f.id !== id));
+    showToast("FAQ deleted");
+  }
+
+  async function moveFaq(id, direction) {
+    const idx = faqs.findIndex((f) => f.id === id);
+    if (idx === -1) return;
+    const swapIdx = idx + direction;
+    if (swapIdx < 0 || swapIdx >= faqs.length) return;
+    const updated = [...faqs];
+    const temp = updated[idx].sort_order;
+    updated[idx] = { ...updated[idx], sort_order: updated[swapIdx].sort_order };
+    updated[swapIdx] = { ...updated[swapIdx], sort_order: temp };
+    setFaqs(updated);
+    await supabase.from("chat_faqs").upsert([
+      { id: updated[idx].id, sort_order: updated[idx].sort_order },
+      { id: updated[swapIdx].id, sort_order: updated[swapIdx].sort_order },
+    ]);
+  }
+
+  async function markAnswered(id) {
+    const { error } = await supabase
+      .from("chat_messages")
+      .update({ status: "answered" })
+      .eq("id", id);
+    if (error) return showToast(error.message, "error");
+    setMessages(messages.filter((m) => m.id !== id));
+  }
+
+  async function copyEmbed() {
+    const snippet = `import ChatWidget from "./components/ChatWidget";
+
+// Add this inside your component tree (before closing </>):
+<ChatWidget />`;
+    try {
+      await navigator.clipboard.writeText(snippet);
+      showToast("Copied to clipboard!");
+    } catch {
+      showToast("Press Ctrl+C to copy", "error");
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-3">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-12 bg-white/5 rounded-xl animate-pulse" />
+        ))}
+      </div>
+    );
+  }
+
+  const inputClass = "w-full bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 transition-colors";
+
+  return (
+    <div className="max-w-xl mx-auto space-y-6">
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold shadow-xl ${
+          toast.type === "error" ? "bg-red-500 text-white" : "bg-blue-600 text-white"
+        }`}>
+          {toast.msg}
+        </div>
+      )}
+
+      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-medium text-slate-800 dark:text-white">Widget Settings</h3>
+          <button
+            onClick={() => setConfig({ ...config, enabled: !config.enabled })}
+            className={`relative w-10 h-5 rounded-full transition-all ${
+              config.enabled ? "bg-blue-600" : "bg-slate-300 dark:bg-slate-600"
+            }`}
+          >
+            <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${
+              config.enabled ? "left-5" : "left-0.5"
+            }`} />
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs text-slate-400 dark:text-slate-500 mb-1">Welcome Message</label>
+            <textarea
+              rows={2}
+              value={config.welcome_message}
+              onChange={(e) => setConfig({ ...config, welcome_message: e.target.value })}
+              className={`${inputClass} resize-none`}
+            />
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="block text-xs text-slate-400 dark:text-slate-500 mb-1">Widget Color</label>
+              <input
+                type="color"
+                value={config.widget_color}
+                onChange={(e) => setConfig({ ...config, widget_color: e.target.value })}
+                className="w-full h-9 rounded-lg border border-gray-200 dark:border-white/10 cursor-pointer bg-white dark:bg-[#1a1a2e]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-400 dark:text-slate-500 mb-1">Position</label>
+              <select
+                value={config.position}
+                onChange={(e) => setConfig({ ...config, position: e.target.value })}
+                className={inputClass}
+              >
+                {POSITIONS.map((p) => (
+                  <option key={p.value} value={p.value}>{p.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-slate-400 dark:text-slate-500 mb-1">WhatsApp</label>
+              <input
+                type="text"
+                value={config.whatsapp_number}
+                onChange={(e) => setConfig({ ...config, whatsapp_number: e.target.value })}
+                placeholder="2547..."
+                className={inputClass}
+              />
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={saveConfig}
+          disabled={saving}
+          className="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-lg transition-all disabled:opacity-50"
+        >
+          {saving ? "Saving..." : "Save Settings"}
+        </button>
+      </div>
+
+      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5">
+        <h3 className="text-sm font-medium text-slate-800 dark:text-white mb-4">FAQs</h3>
+
+        {faqs.map((faq, i) => (
+          <div
+            key={faq.id}
+            className="bg-slate-50 dark:bg-[#1a1a2e] rounded-lg border border-slate-200 dark:border-white/10 p-3 mb-2"
+          >
+            {editingFaq === faq.id ? (
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  value={faq.question}
+                  onChange={(e) => {
+                    const updated = [...faqs];
+                    updated[i] = { ...updated[i], question: e.target.value };
+                    setFaqs(updated);
+                  }}
+                  className={inputClass}
+                  placeholder="Question"
+                />
+                <textarea
+                  rows={2}
+                  value={faq.answer}
+                  onChange={(e) => {
+                    const updated = [...faqs];
+                    updated[i] = { ...updated[i], answer: e.target.value };
+                    setFaqs(updated);
+                  }}
+                  className={`${inputClass} resize-none`}
+                  placeholder="Answer"
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => {
+                      const { error } = await supabase
+                        .from("chat_faqs")
+                        .update({ question: faq.question, answer: faq.answer })
+                        .eq("id", faq.id);
+                      if (error) return showToast(error.message, "error");
+                      setEditingFaq(null);
+                      showToast("FAQ updated!");
+                    }}
+                    className="px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-500"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => setEditingFaq(null)}
+                    className="px-3 py-1.5 bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400 text-xs font-semibold rounded-lg"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-start gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-slate-900 dark:text-white">{faq.question}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">{faq.answer}</p>
+                </div>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <button onClick={() => moveFaq(faq.id, -1)} disabled={i === 0} className="p-1 text-slate-400 hover:text-white disabled:opacity-30">
+                    <FiChevronUp size={14} />
+                  </button>
+                  <button onClick={() => moveFaq(faq.id, 1)} disabled={i === faqs.length - 1} className="p-1 text-slate-400 hover:text-white disabled:opacity-30">
+                    <FiChevronDown size={14} />
+                  </button>
+                  <button onClick={() => setEditingFaq(faq.id)} className="p-1 text-slate-400 hover:text-blue-400">
+                    <FiCheck size={14} />
+                  </button>
+                  <button onClick={() => deleteFaq(faq.id)} className="p-1 text-slate-400 hover:text-red-400">
+                    <FiTrash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+
+        <div className="bg-slate-50 dark:bg-[#1a1a2e] rounded-lg border border-slate-200 dark:border-white/10 p-3 mt-2">
+          <div className="space-y-2">
+            <input
+              type="text"
+              value={newFaq.question}
+              onChange={(e) => setNewFaq({ ...newFaq, question: e.target.value })}
+              placeholder="Question"
+              className={inputClass}
+            />
+            <textarea
+              rows={2}
+              value={newFaq.answer}
+              onChange={(e) => setNewFaq({ ...newFaq, answer: e.target.value })}
+              placeholder="Answer"
+              className={`${inputClass} resize-none`}
+            />
+            <button
+              onClick={addFaq}
+              disabled={!newFaq.question.trim() || !newFaq.answer.trim()}
+              className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              <FiPlus size={14} />
+              Add FAQ
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {messages.length > 0 && (
+        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <FiMessageCircle size={14} className="text-slate-400" />
+            <h3 className="text-sm font-medium text-slate-800 dark:text-white">
+              Unanswered Questions ({messages.length})
+            </h3>
+          </div>
+          {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className="bg-slate-50 dark:bg-[#1a1a2e] rounded-lg border border-slate-200 dark:border-white/10 p-3 mb-2"
+            >
+              <p className="text-sm text-slate-900 dark:text-white">{msg.question}</p>
+              {msg.customer_name && (
+                <p className="text-xs text-slate-400 mt-1">— {msg.customer_name}</p>
+              )}
+              <button
+                onClick={() => markAnswered(msg.id)}
+                className="mt-2 px-3 py-1 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-green-500"
+              >
+                Mark Answered
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5">
+        <h3 className="text-sm font-medium text-slate-800 dark:text-white mb-2">Integration</h3>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
+          Import the ChatWidget component into your React website:
+        </p>
+        <div className="bg-slate-900 dark:bg-black rounded-lg p-3 text-xs text-green-400 font-mono overflow-x-auto">
+          import ChatWidget from "./components/ChatWidget";{'\n'}{'\n'}
+          {`<ChatWidget />`}
+        </div>
+        <button
+          onClick={copyEmbed}
+          className="mt-3 w-full py-2 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-white/20 transition-all flex items-center justify-center gap-2"
+        >
+          <FiCopy size={14} />
+          Copy snippet
+        </button>
+      </div>
+    </div>
+  );
+}

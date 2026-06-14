@@ -1,7 +1,8 @@
-import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { lazy, Suspense, useContext } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Overview from "./pages/Overview";
 import SettingsProvider from "./context/SettingsProvider";
+import AuthProvider, { AuthContext } from "./context/AuthContext";
 
 const Inventory = lazy(() => import("./pages/Inventory"));
 const Sales = lazy(() => import("./pages/Sales"));
@@ -22,26 +23,51 @@ function Loading() {
   );
 }
 
+function ProtectedRoute({ children }) {
+  const { user, loading } = useContext(AuthContext);
+  if (loading) return <Loading />;
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+}
+
+function PublicRoute({ children }) {
+  const { user, loading } = useContext(AuthContext);
+  if (loading) return <Loading />;
+  if (user) return <Navigate to="/" replace />;
+  return children;
+}
+
+function AppRoutes() {
+  const { loading } = useContext(AuthContext);
+  if (loading) return <Loading />;
+
+  return (
+    <Suspense fallback={<Loading />}>
+      <Routes>
+        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+        <Route path="/setup" element={<ProtectedRoute><SetupWizard /></ProtectedRoute>} />
+        <Route path="/" element={<ProtectedRoute><Overview /></ProtectedRoute>} />
+        <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
+        <Route path="/sales" element={<ProtectedRoute><Sales /></ProtectedRoute>} />
+        <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} />
+        <Route path="/bots" element={<ProtectedRoute><Bots /></ProtectedRoute>} />
+        <Route path="/website" element={<ProtectedRoute><Website /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/stock-history" element={<ProtectedRoute><StockHistory /></ProtectedRoute>} />
+      </Routes>
+    </Suspense>
+  );
+}
+
 export default function App() {
   return (
-    <SettingsProvider>
-      <BrowserRouter>
-        <Suspense fallback={<Loading />}>
-          <Routes>
-            <Route path="/" element={<Overview />} />
-            <Route path="/inventory" element={<Inventory />} />
-            <Route path="/sales" element={<Sales />} />
-            <Route path="/social" element={<Social />} />
-            <Route path="/bots" element={<Bots />} />
-            <Route path="/website" element={<Website />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/setup" element={<SetupWizard />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/stock-history" element={<StockHistory />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </SettingsProvider>
+    <AuthProvider>
+      <SettingsProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </SettingsProvider>
+    </AuthProvider>
   );
 }

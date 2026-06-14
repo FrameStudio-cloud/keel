@@ -4,12 +4,14 @@ import ListingsTab from "../components/website/ListingsTab";
 import BannersTab from "../components/website/BannersTab";
 import BusinessTab from "../components/website/BusinessTab";
 import GalleryTab from "../components/website/GalleryTab";
+import ChatWidgetTab from "../components/website/ChatWidgetTab";
 
 const TABS = [
   { id: "listings", label: "Listings" },
   { id: "banners", label: "Banners" },
   { id: "business", label: "Business Info" },
   { id: "gallery", label: "Gallery" },
+  { id: "chat", label: "Chat Widget" },
 ];
 
 export default function Website() {
@@ -37,6 +39,7 @@ export default function Website() {
       {activeTab === "banners" && <BannersTab />}
       {activeTab === "business" && <BusinessTab />}
       {activeTab === "gallery" && <GalleryTab />}
+      {activeTab === "chat" && <ChatWidgetTab />}
     </PageLayout>
   );
 }
