@@ -80,6 +80,14 @@ Formerly **mitho-dash**. Renamed to **Keel**.
 | `/setup` | SetupWizard.jsx | First-run onboarding |
 | `/stock-history` | StockHistory.jsx | Stock movement log |
 
+## Barcode Scanning
+- `html5-qrcode` (2.x) — camera-based barcode scanning, all client-side, no API key
+- `src/components/BarcodeScanner.jsx` — reusable modal, auto-detects barcodes, returns via `onScan(code)`
+- Only shown for `electricals` / `electronics` (`useSettings().businessCategory`)
+- Used in: AddProductModal (scan → fill), EditProductModal (same), LogSaleModal (scan → find product), Inventory (column + search)
+- Dynamic import (`await import("html5-qrcode")`) keeps bundle small
+- Migration: `ALTER TABLE public.products ADD COLUMN IF NOT EXISTS barcode text;`
+
 ## Conventions
 
 - `react-icons` for all icons (no emojis in UI)

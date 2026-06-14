@@ -1,18 +1,25 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from "react";
-import { FiX } from "react-icons/fi";
+import { FiX, FiCamera, FiSearch } from "react-icons/fi";
 import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { getPaymentMethods, getDefaultPayment } from "../lib/paymentConfig";
+import { useSettings } from "../hooks/useSettings";
+import BarcodeScanner from "./BarcodeScanner";
 
 export default function LogSaleModal({ onClose, onAdded }) {
+  const { businessCategory } = useSettings();
+  const showBarcode = businessCategory === "electricals" || businessCategory === "electronics";
+
   const [products, setProducts] = useState([]);
+  const [search, setSearch] = useState("");
   const [form, setForm] = useState({
     product_id: "",
     quantity: 1,
     method: getDefaultPayment(),
   });
   const [loading, setLoading] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
 
   async function fetchProducts() {
     const shopId = await getShopId();
@@ -95,6 +102,41 @@ export default function LogSaleModal({ onClose, onAdded }) {
         <div className="flex flex-col gap-3">
           <div>
             <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Product</label>
+            <div className="relative mb-2">
+              <FiSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={showBarcode ? "Search by name or scan barcode..." : "Search by name..."}
+                className="w-full border border-gray-200 dark:border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+              />
+              {showBarcode && (
+                <button
+                  type="button"
+                  onClick={() => setShowScanner(true)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-500 transition-colors"
+                  title="Scan barcode"
+                >
+                  <FiCamera size={16} />
+                </button>
+              )}
+            </div>
+            {showScanner && (
+              <BarcodeScanner
+                onScan={(code) => {
+                  const match = products.find(
+                    (p) => p.barcode && p.barcode.toLowerCase() === code.toLowerCase()
+                  );
+                  if (match) {
+                    setForm((prev) => ({ ...prev, product_id: match.id }));
+                  } else {
+                    alert("No product found with this barcode");
+                  }
+                  setShowScanner(false);
+                }}
+                onClose={() => setShowScanner(false)}
+              />
+            )}
             <select
               name="product_id"
               value={form.product_id}
@@ -102,11 +144,21 @@ export default function LogSaleModal({ onClose, onAdded }) {
               className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
             >
               <option value="">Select a product</option>
-              {products.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} — KSh {p.price.toLocaleString()} (stock: {p.stock})
-                </option>
-              ))}
+              {products
+                .filter((p) => {
+                  const q = search.toLowerCase();
+                  return (
+                    !q ||
+                    p.name.toLowerCase().includes(q) ||
+                    (showBarcode && p.barcode && p.barcode.toLowerCase().includes(q))
+                  );
+                })
+                .map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} — KSh {p.price.toLocaleString()} (stock: {p.stock})
+                    {showBarcode && p.barcode ? ` [${p.barcode}]` : ""}
+                  </option>
+                ))}
             </select>
           </div>
 

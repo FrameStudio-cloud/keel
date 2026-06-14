@@ -1,20 +1,27 @@
 import { useState } from "react";
-import { FiX } from "react-icons/fi";
+import { FiX, FiCamera } from "react-icons/fi";
 import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { uploadImage } from "../lib/storage";
+import { useSettings } from "../hooks/useSettings";
 import ImageUploader from "./ImageUploader";
+import BarcodeScanner from "./BarcodeScanner";
 
 export default function AddProductModal({ onClose, onAdded }) {
+  const { businessCategory } = useSettings();
+  const showBarcode = businessCategory === "electricals" || businessCategory === "electronics";
+
   const [form, setForm] = useState({
     name: "",
     category: "",
     price: "",
     stock: "",
+    barcode: "",
   });
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [existingProduct, setExistingProduct] = useState(null);
+  const [showScanner, setShowScanner] = useState(false);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -49,13 +56,16 @@ export default function AddProductModal({ onClose, onAdded }) {
       }
     }
 
-    const { error } = await supabase.from("products").insert(withShop({
+    const payload = {
       name: form.name,
       category: form.category,
       price: parseInt(form.price),
       stock: parseInt(form.stock),
       image,
-    }));
+    };
+    if (showBarcode && form.barcode) payload.barcode = form.barcode;
+
+    const { error } = await supabase.from("products").insert(withShop(payload));
 
     if (error) {
       console.error(error);
@@ -171,10 +181,45 @@ export default function AddProductModal({ onClose, onAdded }) {
             </div>
           </div>
 
+          {showBarcode && (
+            <div>
+              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+                Barcode
+              </label>
+              <div className="flex gap-2">
+                <input
+                  name="barcode"
+                  value={form.barcode}
+                  onChange={handleChange}
+                  placeholder="Scan or type barcode"
+                  className="flex-1 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowScanner(true)}
+                  className="flex items-center gap-1.5 px-3 border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 text-xs rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+                >
+                  <FiCamera size={14} />
+                  Scan
+                </button>
+              </div>
+            </div>
+          )}
+
           <ImageUploader
             currentImage={existingProduct?.image}
             onImageChange={setImageFile}
           />
+
+          {showScanner && (
+            <BarcodeScanner
+              onScan={(code) => {
+                setForm((prev) => ({ ...prev, barcode: code }));
+                setShowScanner(false);
+              }}
+              onClose={() => setShowScanner(false)}
+            />
+          )}
 
           {existingProduct && (
             <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-lg px-3 py-2 text-xs text-amber-700 dark:text-amber-300">

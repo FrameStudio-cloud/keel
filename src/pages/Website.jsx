@@ -19,12 +19,12 @@ export default function Website() {
 
   return (
     <PageLayout title="Website">
-      <div className="flex gap-1 mb-6 border-b border-slate-200 dark:border-white/10 overflow-x-auto">
+      <div className="flex gap-1 mb-6 border-b border-slate-200 dark:border-white/10 overflow-x-auto overflow-hidden">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-3 sm:px-4 py-2.5 text-sm font-semibold transition-all border-b-2 -mb-px ${
+            className={`px-3 sm:px-4 py-2.5 text-sm font-semibold transition-all border-b-2 -mb-px  ${
               activeTab === tab.id
                 ? "text-blue-400 border-blue-500"
                 : "text-slate-600 dark:text-slate-400 border-transparent hover:text-slate-900 dark:hover:text-white"

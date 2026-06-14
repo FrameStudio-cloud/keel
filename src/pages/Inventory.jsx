@@ -11,8 +11,9 @@ import { useSettings } from "../hooks/useSettings";
 import { CRITICAL_STOCK_THRESHOLD } from "../lib/constants";
 
 export default function Inventory() {
-  const { lowStockThreshold } = useSettings();
+  const { lowStockThreshold, businessCategory } = useSettings();
   const threshold = lowStockThreshold || 6;
+  const showBarcode = businessCategory === "electricals" || businessCategory === "electronics";
 
   function getStatus(stock) {
     if (stock <= CRITICAL_STOCK_THRESHOLD) return { label: "Critical", color: "red" };
@@ -91,7 +92,8 @@ export default function Inventory() {
   const filteredProducts = products.filter(
     (p) =>
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.category.toLowerCase().includes(searchQuery.toLowerCase()),
+      p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (showBarcode && p.barcode && p.barcode.toLowerCase().includes(searchQuery.toLowerCase())),
   );
 
   return (
@@ -139,6 +141,9 @@ export default function Inventory() {
                         <div className="flex items-center gap-2 mt-1.5">
                           <Badge label={status.label} color={status.color} />
                           <span className="text-xs text-slate-600 dark:text-slate-400">Stock: {p.stock}</span>
+                          {showBarcode && p.barcode && (
+                            <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 ml-1">{p.barcode}</span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -191,6 +196,11 @@ export default function Inventory() {
                   <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
                     Category
                   </th>
+                  {showBarcode && (
+                    <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                      Barcode
+                    </th>
+                  )}
                   <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
                     Image
                   </th>
@@ -221,6 +231,11 @@ export default function Inventory() {
                     >
                       <td className="px-4 py-3 font-medium text-gray-800 dark:text-white">{p.name}</td>
                       <td className="px-4 py-3 text-gray-400 dark:text-slate-500">{p.category}</td>
+                      {showBarcode && (
+                        <td className="px-4 py-3 font-mono text-xs text-gray-500 dark:text-slate-400">
+                          {p.barcode || "—"}
+                        </td>
+                      )}
                       <td className="px-4 py-3">
                         {p.image ? (
                           <img src={p.image} alt={p.name} className="w-10 h-10 rounded-lg object-cover" />

@@ -14,6 +14,7 @@
     "@tailwindcss/vite": "^4.3.0",
     "d3-format": "^3.1.2",
     "dotenv": "^17.4.2",
+    "html5-qrcode": "^2.3.8",
     "intasend-checkout-sdk": "^1.0.10",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
