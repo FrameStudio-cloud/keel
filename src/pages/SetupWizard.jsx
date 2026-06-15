@@ -196,7 +196,7 @@ export default function SetupWizard() {
                 <option value="Cash">Cash</option>
                 <option value="M-Pesa">M-Pesa</option>
                 <option value="Bank">Bank</option>
-                <option value="IntaSend">IntaSend</option>
+
               </select>
               <div>
                 <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">

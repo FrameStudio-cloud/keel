@@ -1,6 +1,7 @@
 import { lazy, Suspense, useContext } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Overview from "./pages/Overview";
+import TourGuide from "./components/TourGuide";
 import SettingsProvider from "./context/SettingsProvider";
 import AuthProvider, { AuthContext } from "./context/AuthContext";
 
@@ -14,6 +15,11 @@ const SetupWizard = lazy(() => import("./pages/SetupWizard"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Login = lazy(() => import("./pages/Login"));
 const StockHistory = lazy(() => import("./pages/StockHistory"));
+const Finance = lazy(() => import("./pages/Finance"));
+const Reports = lazy(() => import("./pages/Reports"));
+const Marketing = lazy(() => import("./pages/Marketing"));
+const PublicProduct = lazy(() => import("./pages/PublicProduct"));
+const Terms = lazy(() => import("./pages/Terms"));
 
 function Loading() {
   return (
@@ -43,7 +49,10 @@ function AppRoutes() {
 
   return (
     <Suspense fallback={<Loading />}>
+      <TourGuide />
       <Routes>
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/p/:id" element={<PublicProduct />} />
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/setup" element={<ProtectedRoute><SetupWizard /></ProtectedRoute>} />
         <Route path="/" element={<ProtectedRoute><Overview /></ProtectedRoute>} />
@@ -55,6 +64,9 @@ function AppRoutes() {
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/stock-history" element={<ProtectedRoute><StockHistory /></ProtectedRoute>} />
+        <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
+        <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+        <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
       </Routes>
     </Suspense>
   );

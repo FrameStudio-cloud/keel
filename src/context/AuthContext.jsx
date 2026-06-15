@@ -20,7 +20,7 @@ export default function AuthProvider({ children }) {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-    });
+    }).catch(() => setLoading(false));
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {

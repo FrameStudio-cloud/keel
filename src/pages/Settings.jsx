@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PageLayout from "../components/layout/PageLayout";
+import Skeleton from "../components/Skeleton";
 import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
 import { setCurrency } from "../lib/format";
@@ -37,6 +38,7 @@ export default function Settings() {
     website_url: "",
     whatsapp: "",
     business_category: "general",
+    terms_of_service: "",
   });
   const [hours, setHours] = useState(defaultHours());
 
@@ -64,6 +66,7 @@ export default function Settings() {
           website_url: store.website_url || "",
           whatsapp: store.whatsapp || "",
           business_category: shop?.business_category || "general",
+          terms_of_service: store.terms_of_service || "",
         });
         if (store.business_hours) {
           setHours(
@@ -92,7 +95,7 @@ export default function Settings() {
   }
 
   function handleThemeChange(theme) {
-    setForm({ ...form, theme });
+    setForm((prev) => ({ ...prev, theme }));
     document.documentElement.classList.toggle("dark", theme === "dark");
   }
 
@@ -127,6 +130,7 @@ export default function Settings() {
       website_url: form.website_url,
       whatsapp: form.whatsapp,
       business_hours: businessHours,
+      terms_of_service: form.terms_of_service,
       shop_id: shopId,
     };
     if (settingsId) payload.id = settingsId;
@@ -160,7 +164,7 @@ export default function Settings() {
   async function handleExport() {
     const shopId = await getShopId();
     if (!shopId) { showToast("Shop not found.", "error"); return; }
-    const tables = ["products", "sales", "stock_movements", "catalogue"];
+    const tables = ["products", "sales", "stock_movements", "catalogue", "expenses", "page_views"];
     const allData = {};
 
     for (const table of tables) {
@@ -186,10 +190,15 @@ export default function Settings() {
   if (loading) {
     return (
       <PageLayout title="Settings">
-        <div className="space-y-3">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-12 bg-white/5 rounded-xl animate-pulse" />
-          ))}
+        <div className="max-w-2xl mx-auto py-6 space-y-6">
+          <Skeleton className="h-32 rounded-xl" />
+          <Skeleton className="h-20 rounded-xl" />
+          <Skeleton className="h-28 rounded-xl" />
+          <Skeleton className="h-16 rounded-xl" />
+          <Skeleton className="h-52 rounded-xl" />
+          <Skeleton className="h-24 rounded-xl" />
+          <Skeleton className="h-11 rounded-lg" />
+          <Skeleton className="h-16 rounded-xl" />
         </div>
       </PageLayout>
     );
@@ -282,7 +291,7 @@ export default function Settings() {
                 <option>Cash</option>
                 <option>M-Pesa</option>
                 <option>Bank</option>
-                <option>IntaSend</option>
+
               </select>
             </div>
             <div>
@@ -385,6 +394,23 @@ export default function Settings() {
             <h3 className="text-sm font-medium text-gray-800 dark:text-white">Receipt Footer</h3>
           </div>
           <textarea rows={2} value={form.receipt_footer} onChange={(e) => setForm({ ...form, receipt_footer: e.target.value })} placeholder="Thank you for your business!" className={`${inputClass} resize-none`} />
+        </div>
+
+        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <FiFileText size={14} className="text-gray-400" />
+            <h3 className="text-sm font-medium text-gray-800 dark:text-white">Terms of Service</h3>
+          </div>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mb-3">
+            Use <code className="text-blue-500 bg-blue-500/10 px-1 rounded">{`{store_name}`}</code> to insert your store name. Sections with <code className="text-blue-500 bg-blue-500/10 px-1 rounded">{`## `}</code> become headings.
+          </p>
+          <textarea
+            rows={8}
+            value={form.terms_of_service}
+            onChange={(e) => setForm({ ...form, terms_of_service: e.target.value })}
+            placeholder={`## 1. Use of Service\n\nBy using {store_name}, you agree to these terms...`}
+            className={`${inputClass} resize-none font-mono text-xs`}
+          />
         </div>
 
         <button onClick={handleSave} disabled={saving} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25">

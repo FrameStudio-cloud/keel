@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
+import Skeleton from "../components/Skeleton";
 import LogSaleModal from "../components/LogSaleModal";
 import ReceiptModal from "../components/ReceiptModal";
 import { getShopId } from "../lib/shop";
@@ -63,7 +64,25 @@ const filteredSales = sales.filter(
 
       <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden">
         {loading ? (
-          <p className="text-sm text-gray-400 dark:text-slate-500 p-6">Loading sales...</p>
+          <div className="space-y-2 p-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-slate-50 dark:bg-[#1a1a2e] rounded-xl px-4 py-3">
+                <div className="flex items-start justify-between">
+                  <div className="min-w-0 flex-1 space-y-1.5">
+                    <Skeleton className="h-4 w-3/5" />
+                    <Skeleton className="h-3 w-1/3" />
+                  </div>
+                  <Skeleton className="h-5 w-20 flex-shrink-0 ml-3" />
+                </div>
+                <div className="flex items-center gap-3 mt-2">
+                  <Skeleton className="h-3 w-12" />
+                  <Skeleton className="h-3 w-16" />
+                  <Skeleton className="h-5 w-12 rounded-full" />
+                  <Skeleton className="h-3 w-12 ml-auto" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : sales.length === 0 ? (
           <p className="text-sm text-gray-400 dark:text-slate-500 p-6">
             No sales yet. Log your first one.

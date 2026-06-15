@@ -1,4 +1,4 @@
-let paymentMethods = ["Cash", "M-Pesa", "Bank", "IntaSend"];
+let paymentMethods = ["Cash", "M-Pesa", "Bank"];
 let defaultPayment = "Cash";
 
 export function getPaymentMethods() {

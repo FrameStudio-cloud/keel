@@ -1,11 +1,13 @@
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import PageLayout from "../components/layout/PageLayout";
+import Skeleton from "../components/Skeleton";
 import { useSettings } from "../hooks/useSettings";
 import { AuthContext } from "../context/AuthContext";
 import {
   FiMail, FiPhone, FiMapPin, FiGlobe, FiMessageCircle,
   FiDollarSign, FiMonitor, FiCreditCard, FiSettings, FiLogOut,
+  FiBarChart2, FiGrid, FiFileText,
 } from "react-icons/fi";
 
 export default function Profile() {
@@ -34,9 +36,18 @@ export default function Profile() {
     return (
       <PageLayout title="Store Profile">
         <div className="max-w-2xl mx-auto space-y-3">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-12 bg-white/5 rounded-xl animate-pulse" />
-          ))}
+          <Skeleton className="h-36 rounded-2xl" />
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-12 rounded-xl" />
+          <div className="grid grid-cols-2 gap-3">
+            <Skeleton className="h-12 rounded-xl" />
+            <Skeleton className="h-12 rounded-xl" />
+          </div>
+          <Skeleton className="h-12 rounded-xl" />
+          <div className="flex flex-col gap-2 pt-4">
+            <Skeleton className="h-11 rounded-xl" />
+            <Skeleton className="h-11 rounded-xl" />
+          </div>
         </div>
       </PageLayout>
     );
@@ -132,6 +143,36 @@ export default function Profile() {
           </div>
         )}
 
+        <div className="space-y-3 mb-6">
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider">Quick Access</p>
+          <div className="grid grid-cols-3 gap-3">
+            <button
+              onClick={() => navigate("/finance")}
+              className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl p-4 text-left hover:border-blue-300 dark:hover:border-blue-500/50 transition-all"
+            >
+              <FiDollarSign size={16} className="text-blue-500 mb-2" />
+              <p className="text-xs font-semibold text-slate-900 dark:text-white">Finance</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Track expenses</p>
+            </button>
+            <button
+              onClick={() => navigate("/reports")}
+              className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl p-4 text-left hover:border-blue-300 dark:hover:border-blue-500/50 transition-all"
+            >
+              <FiBarChart2 size={16} className="text-green-500 mb-2" />
+              <p className="text-xs font-semibold text-slate-900 dark:text-white">Reports</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Profit & loss</p>
+            </button>
+            <button
+              onClick={() => navigate("/marketing")}
+              className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl p-4 text-left hover:border-blue-300 dark:hover:border-blue-500/50 transition-all"
+            >
+              <FiGrid size={16} className="text-purple-500 mb-2" />
+              <p className="text-xs font-semibold text-slate-900 dark:text-white">Marketing</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Share & promote</p>
+            </button>
+          </div>
+        </div>
+
         <div className="flex flex-col gap-2">
           <button
             onClick={() => navigate("/settings")}
@@ -146,6 +187,23 @@ export default function Profile() {
           >
             <FiLogOut size={14} />
             Sign Out
+          </button>
+        </div>
+
+        <div className="flex flex-col gap-2 pt-6 border-t border-gray-200 dark:border-white/10">
+          <button
+            onClick={() => window.open("https://framestudio.co.ke/support", "_blank")}
+            className="w-full py-2.5 bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl text-sm text-slate-700 dark:text-slate-300 font-semibold hover:border-blue-300 dark:hover:border-blue-500/50 hover:text-blue-600 dark:hover:text-blue-400 transition-all flex items-center justify-center gap-2"
+          >
+            <FiMessageCircle size={14} />
+            Support
+          </button>
+          <button
+            onClick={() => navigate("/terms")}
+            className="w-full py-2.5 bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl text-sm text-slate-700 dark:text-slate-300 font-semibold hover:border-blue-300 dark:hover:border-blue-500/50 hover:text-blue-600 dark:hover:text-blue-400 transition-all flex items-center justify-center gap-2"
+          >
+            <FiFileText size={14} />
+            Terms of Service
           </button>
         </div>
       </div>

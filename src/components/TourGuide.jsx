@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
+import { AuthContext } from "../context/AuthContext";
 import { FiBox, FiShoppingBag, FiMonitor, FiZap } from "react-icons/fi";
 
 const SETUP_KEY = "keel_setup_done";
@@ -37,7 +38,7 @@ function DefaultForm({ form, setForm }) {
 const firstRunSteps = [
   {
     title: "Welcome to Keel",
-    text: "Let's get your shop set up in a few quick steps. You can skip or change anything later.",
+    text: "Let's get your shop set up. Your sidebar is organised into Operations, Marketing, and Analytics groups to help you navigate faster. You can skip or change anything later.",
     target: null,
   },
   {
@@ -105,7 +106,7 @@ const firstRunSteps = [
     target: null,
     render: ({ form, setForm }) => (
       <div className="flex flex-col gap-1.5">
-        {["Cash", "M-Pesa", "Bank", "IntaSend"].map((method) => (
+        {["Cash", "M-Pesa", "Bank"].map((method) => (
           <button
             key={method}
             onClick={() => setForm({ ...form, defaultPayment: method })}
@@ -130,14 +131,19 @@ const firstRunSteps = [
     ),
   },
   {
-    title: "Your Products",
-    text: "Add, edit, and organise your inventory here. Publish items to your website with one tap.",
-    target: '[data-tour="nav-Inventory"]',
+    title: "Operations",
+    text: "Your core daily tasks live here — Overview, Inventory, Sales, and Finance. Add products, log sales, and track revenue all in one place.",
+    target: '[data-tour="group-Operations"]',
   },
   {
-    title: "Track Sales",
-    text: "Log sales via Cash, M-Pesa, Bank, or IntaSend. Stock is deducted automatically.",
-    target: '[data-tour="nav-Sales"]',
+    title: "Marketing",
+    text: "Reach your customers. Manage Social Media, Bots, Website listings, and generate shareable links, QR codes, and WhatsApp buttons.",
+    target: '[data-tour="group-Marketing"]',
+  },
+  {
+    title: "Analytics",
+    text: "Monitor trends. Review stock movements and view profit margins per product with weekly & monthly P&L reports.",
+    target: '[data-tour="group-Analytics"]',
   },
   {
     title: "Stay Notified",
@@ -149,18 +155,23 @@ const firstRunSteps = [
 const returnSteps = [
   {
     title: "Welcome back to Keel",
-    text: "Here's a quick refresher on your dashboard.",
+    text: "Quick refresher. Your sidebar is organised into Operations, Marketing, and Analytics groups.",
     target: null,
   },
   {
-    title: "Your Products",
-    text: "Add, edit, and organise your inventory here. Publish items to your website with one tap.",
-    target: '[data-tour="nav-Inventory"]',
+    title: "Operations",
+    text: "Daily tasks — Overview, Inventory, Sales, and Finance.",
+    target: '[data-tour="group-Operations"]',
   },
   {
-    title: "Track Sales",
-    text: "Log sales via Cash, M-Pesa, Bank, or IntaSend. Stock is deducted automatically.",
-    target: '[data-tour="nav-Sales"]',
+    title: "Marketing",
+    text: "Customer outreach — Social Media, Bots, Website, and Marketing tools.",
+    target: '[data-tour="group-Marketing"]',
+  },
+  {
+    title: "Analytics",
+    text: "Data & insights — Stock History and Reports with exports.",
+    target: '[data-tour="group-Analytics"]',
   },
   {
     title: "Settings",
@@ -171,6 +182,7 @@ const returnSteps = [
 
 export default function TourGuide() {
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useContext(AuthContext);
   const [step, setStep] = useState(0);
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0, side: "bottom" });
@@ -187,6 +199,8 @@ export default function TourGuide() {
   const tooltipRef = useRef(null);
 
   useEffect(() => {
+    if (authLoading || !user) return;
+
     (async () => {
       const done = localStorage.getItem(SETUP_KEY);
       if (done) {
@@ -205,11 +219,14 @@ export default function TourGuide() {
       setIsFirstRun(needsSetup);
       setVisible(true);
     })();
-  }, []);
+  }, [authLoading, user]);
 
   useEffect(() => {
     if (!visible) return;
     reposition();
+    window.addEventListener("resize", reposition);
+    return () => window.removeEventListener("resize", reposition);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, visible]);
 
   function reposition() {
@@ -260,8 +277,6 @@ export default function TourGuide() {
 
   function repositionNow() {
     reposition();
-    window.addEventListener("resize", reposition);
-    setTimeout(() => window.removeEventListener("resize", reposition), 100);
   }
 
   async function dismiss() {

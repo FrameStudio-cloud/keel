@@ -4,7 +4,9 @@ import StatCard from "../components/StatCard";
 import WeeklySalesChart from "../components/WeeklySalesChart";
 import TopProducts from "../components/TopProducts";
 import SlowMovingStock from "../components/SlowMovingStock";
-import TourGuide from "../components/TourGuide";
+import Skeleton from "../components/Skeleton";
+import { formatPrice } from "../lib/format";
+
 import PageViewsChart from "../components/PageViewsChart";
 import MostViewedPages from "../components/MostViewedPages";
 import TrafficSources from "../components/TrafficSources";
@@ -13,13 +15,15 @@ import { supabase } from "../lib/supabase";
 import { useSettings } from "../hooks/useSettings";
 
 export default function Overview() {
-  const { lowStockThreshold } = useSettings();
-  const threshold = lowStockThreshold || 6;
+  const { lowStockThreshold, websiteUrl } = useSettings();
+  const hasWebsite = !!websiteUrl;
+  const threshold = lowStockThreshold ?? 6;
 
   const [stats, setStats] = useState({
     salesToday: 0,
     itemsSold: 0,
     lowStock: 0,
+    totalProducts: 0,
   });
   const [chartData, setChartData] = useState([]);
   const [timeRange, setTimeRange] = useState("week");
@@ -167,15 +171,25 @@ export default function Overview() {
 
   return (
     <PageLayout title="Overview">
-      <TourGuide />
       {loading ? (
-        <p className="text-sm text-gray-400 dark:text-slate-500">Loading...</p>
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <Skeleton className="h-24 rounded-xl" />
+            <Skeleton className="h-24 rounded-xl" />
+            <Skeleton className="h-24 rounded-xl" />
+            <Skeleton className="h-24 rounded-xl" />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Skeleton className="h-64 rounded-xl" />
+            <Skeleton className="h-64 rounded-xl" />
+          </div>
+        </div>
       ) : (
         <>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
             <StatCard
               label="Sales today"
-              value={`KSh ${stats.salesToday.toLocaleString()}`}
+              value={formatPrice(stats.salesToday)}
               change={
                 stats.salesToday > 0
                   ? "From today's transactions"
@@ -210,27 +224,31 @@ export default function Overview() {
             <WeeklySalesChart data={chartData} timeRange={timeRange} onTimeRangeChange={setTimeRange} />
             <TopProducts products={topProducts} />
           </div>
-          <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-2">
-              <SlowMovingStock />
-            </div>
-            <div className="lg:col-span-1">
-              <div className="grid grid-cols-2 gap-3">
-                <StatCard label="Total Views" value="1,234" change="All time" up />
-                <StatCard label="Today" value="56" change="+12% vs yesterday" up />
-                <StatCard label="Most viewed" value="Home" change="42% of all visits" up />
-                <StatCard label="Top product" value="Phone Case" change="89 views" up />
+          {hasWebsite && (
+            <>
+              <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="lg:col-span-2">
+                  <SlowMovingStock />
+                </div>
+                <div className="lg:col-span-1">
+                  <div className="grid grid-cols-2 gap-3">
+                    <StatCard label="Total Views" value="1,234" change="All time" up />
+                    <StatCard label="Today" value="56" change="+12% vs yesterday" up />
+                    <StatCard label="Most viewed" value="Home" change="42% of all visits" up />
+                    <StatCard label="Top product" value="Phone Case" change="89 views" up />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <div className="mt-6">
-            <p className="text-sm font-semibold text-gray-800 dark:text-white mb-3">Analytics</p>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <PageViewsChart />
-              <MostViewedPages />
-              <TrafficSources />
-            </div>
-          </div>
+              <div className="mt-6">
+                <p className="text-sm font-semibold text-gray-800 dark:text-white mb-3">Analytics</p>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <PageViewsChart />
+                  <MostViewedPages />
+                  <TrafficSources />
+                </div>
+              </div>
+            </>
+          )}
         </>
       )}
     </PageLayout>

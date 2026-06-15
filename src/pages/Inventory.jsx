@@ -2,17 +2,19 @@ import { useEffect, useState } from "react";
 import { FiImage, FiGlobe } from "react-icons/fi";
 import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
+import Skeleton from "../components/Skeleton";
 import AddProductModal from "../components/AddProductModal";
 import EditProductModal from "../components/EditProductModal";
 import StockAdjustModal from "../components/StockAdjustModal";
 import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { useSettings } from "../hooks/useSettings";
+import { formatPrice } from "../lib/format";
 import { CRITICAL_STOCK_THRESHOLD } from "../lib/constants";
 
 export default function Inventory() {
   const { lowStockThreshold, businessCategory } = useSettings();
-  const threshold = lowStockThreshold || 6;
+  const threshold = lowStockThreshold ?? 6;
   const showBarcode = businessCategory === "electricals" || businessCategory === "electronics";
 
   function getStatus(stock) {
@@ -116,7 +118,29 @@ export default function Inventory() {
 
       <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden">
         {loading ? (
-          <p className="text-sm text-gray-400 dark:text-slate-500 p-6">Loading products...</p>
+          <div className="space-y-2 p-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-[#1a1a2e] rounded-xl">
+                <Skeleton className="w-14 h-14 rounded-lg flex-shrink-0" />
+                <div className="flex-1 space-y-2 min-w-0">
+                  <Skeleton className="h-4 w-3/5" />
+                  <Skeleton className="h-3 w-1/4" />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                    <Skeleton className="h-3 w-12" />
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                  <Skeleton className="h-5 w-16" />
+                  <div className="flex gap-1.5">
+                    <Skeleton className="h-7 w-12 rounded-lg" />
+                    <Skeleton className="h-7 w-12 rounded-lg" />
+                    <Skeleton className="h-7 w-16 rounded-lg" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
           <>
             <div className="sm:hidden space-y-2 p-3">
@@ -125,42 +149,43 @@ export default function Inventory() {
                 return (
                   <div
                     key={p.id}
-                    className="flex items-center justify-between bg-slate-50 dark:bg-[#1a1a2e] rounded-xl px-4 py-3"
+                    className="bg-slate-50 dark:bg-[#1a1a2e] rounded-xl px-4 py-3"
                   >
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="flex items-start gap-3 mb-3">
                       {p.image ? (
-                        <img src={p.image} alt={p.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                        <img src={p.image} alt={p.name} className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
                       ) : (
-                        <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center flex-shrink-0">
-                          <FiImage size={16} className="text-gray-400" />
+                        <div className="w-14 h-14 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center flex-shrink-0">
+                          <FiImage size={20} className="text-gray-400" />
                         </div>
                       )}
-                      <div className="min-w-0">
-                        <p className="text-slate-900 dark:text-white text-sm font-medium truncate">{p.name}</p>
-                        <p className="text-slate-500 dark:text-slate-400 text-xs">{p.category}</p>
-                        <div className="flex items-center gap-2 mt-1.5">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-slate-900 dark:text-white text-sm font-semibold">{p.name}</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">{p.category}</p>
+                        <div className="flex flex-wrap items-center gap-1.5 mt-2">
                           <Badge label={status.label} color={status.color} />
                           <span className="text-xs text-slate-600 dark:text-slate-400">Stock: {p.stock}</span>
+                          {p.new_arrival && <span className="text-[10px] font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-500/20 px-1.5 py-0.5 rounded">New</span>}
                           {showBarcode && p.barcode && (
-                            <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 ml-1">{p.barcode}</span>
+                            <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">{p.barcode}</span>
                           )}
                         </div>
                       </div>
                     </div>
-                    <div className="text-right flex-shrink-0 ml-3">
-                      <p className="text-blue-600 dark:text-blue-400 text-sm font-semibold">
-                        KSh {p.price.toLocaleString()}
+                    <div className="flex items-center justify-between border-t border-gray-200 dark:border-white/10 pt-3">
+                      <p className="text-blue-600 dark:text-blue-400 text-base font-bold">
+                        {formatPrice(p.price)}
                       </p>
-                      <div className="flex items-center gap-2 mt-1.5 justify-end">
+                      <div className="flex items-center gap-2">
                         <button
                           onClick={() => setSelectedProduct(p)}
-                          className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                          className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => setAdjustProduct(p)}
-                          className="text-xs text-slate-600 dark:text-slate-400 hover:underline"
+                          className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-gray-200 dark:border-white/10 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
                         >
                           Stock
                         </button>
@@ -168,7 +193,7 @@ export default function Inventory() {
                           <button
                             onClick={() => handleUnpublish(p)}
                             disabled={publishingId === p.id}
-                            className="text-xs text-green-600 dark:text-green-400 hover:underline"
+                            className="px-3 py-1.5 text-xs font-medium bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-100 dark:hover:bg-green-500/20 transition-all disabled:opacity-50"
                           >
                             {publishingId === p.id ? "..." : "Published"}
                           </button>
@@ -176,7 +201,7 @@ export default function Inventory() {
                           <button
                             onClick={() => handlePublish(p)}
                             disabled={publishingId === p.id}
-                            className="text-xs text-slate-600 dark:text-slate-400 hover:underline"
+                            className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-gray-200 dark:border-white/10 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all disabled:opacity-50"
                           >
                             {publishingId === p.id ? "..." : "Publish"}
                           </button>
@@ -229,7 +254,10 @@ export default function Inventory() {
                       key={p.id}
                       className="border-b border-gray-50 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
                     >
-                      <td className="px-4 py-3 font-medium text-gray-800 dark:text-white">{p.name}</td>
+                      <td className="px-4 py-3 font-medium text-gray-800 dark:text-white">
+                        {p.name}
+                        {p.new_arrival && <span className="ml-2 text-[10px] font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-500/20 px-1.5 py-0.5 rounded align-middle">New</span>}
+                      </td>
                       <td className="px-4 py-3 text-gray-400 dark:text-slate-500">{p.category}</td>
                       {showBarcode && (
                         <td className="px-4 py-3 font-mono text-xs text-gray-500 dark:text-slate-400">
@@ -246,7 +274,7 @@ export default function Inventory() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-gray-800 dark:text-white">
-                        KSh {p.price.toLocaleString()}
+                        {formatPrice(p.price)}
                       </td>
                       <td className="px-4 py-3 text-gray-800 dark:text-white">{p.stock}</td>
                       <td className="px-4 py-3">

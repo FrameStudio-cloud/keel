@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FiClock, FiHeart, FiEye } from "react-icons/fi";
 import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
+import Skeleton from "../components/Skeleton";
 import PlanPostModal from "../components/PlanPostModal";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
@@ -186,7 +187,37 @@ export default function Social() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-gray-400 dark:text-slate-500">Loading posts...</p>
+        <div className="flex flex-col gap-3">
+          {[...Array(2)].map((_, i) => (
+            <div key={i} className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="w-5 h-5 rounded-full" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+                <Skeleton className="h-5 w-20 rounded-full" />
+              </div>
+              <div className="space-y-1.5">
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-4/5" />
+              </div>
+              <div className="flex gap-4 pt-2 border-t border-gray-100 dark:border-white/10">
+                <div className="flex flex-col gap-1">
+                  <Skeleton className="h-3 w-10" />
+                  <Skeleton className="h-4 w-6" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Skeleton className="h-3 w-14" />
+                  <Skeleton className="h-4 w-6" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Skeleton className="h-3 w-10" />
+                  <Skeleton className="h-4 w-12" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       ) : posts.length === 0 ? (
         <p className="text-sm text-gray-400 dark:text-slate-500">
           No posts yet. Plan your first one.

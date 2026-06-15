@@ -15,6 +15,7 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
     name: product.name,
     category: product.category,
     price: product.price,
+    cost_price: product.cost_price || "",
     stock: product.stock,
     barcode: product.barcode || "",
   });
@@ -50,6 +51,7 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
       name: form.name,
       category: form.category,
       price: parseInt(form.price),
+      cost_price: parseInt(form.cost_price) || 0,
       stock: parseInt(form.stock),
       image,
     };
@@ -133,7 +135,7 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
               className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
                 Price (KSh)
@@ -148,7 +150,20 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
             </div>
             <div>
               <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
-                Stock quantity
+                Cost price
+              </label>
+              <input
+                name="cost_price"
+                value={form.cost_price}
+                onChange={handleChange}
+                placeholder="200"
+                type="number"
+                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+                Stock
               </label>
               <input
                 name="stock"
