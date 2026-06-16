@@ -1,5 +1,5 @@
 import { lazy, Suspense, useContext } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Overview from "./pages/Overview";
 import TourGuide from "./components/TourGuide";
 import SettingsProvider from "./context/SettingsProvider";
@@ -30,22 +30,24 @@ function Loading() {
 }
 
 function ProtectedRoute({ children }) {
-  const { user, loading } = useContext(AuthContext);
-  if (loading) return <Loading />;
+  const { user } = useContext(AuthContext);
   if (!user) return <Navigate to="/login" replace />;
   return children;
 }
 
 function PublicRoute({ children }) {
-  const { user, loading } = useContext(AuthContext);
-  if (loading) return <Loading />;
+  const { user } = useContext(AuthContext);
   if (user) return <Navigate to="/" replace />;
   return children;
 }
 
 function AppRoutes() {
-  const { loading } = useContext(AuthContext);
-  if (loading) return <Loading />;
+  const { needsSetup } = useContext(AuthContext);
+  const location = useLocation();
+
+  if (needsSetup && location.pathname !== "/setup") {
+    return <Navigate to="/setup" replace />;
+  }
 
   return (
     <Suspense fallback={<Loading />}>

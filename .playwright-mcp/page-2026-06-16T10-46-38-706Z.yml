@@ -1,0 +1,19 @@
+- generic [ref=e6]:
+  - generic [ref=e7]:
+    - generic [ref=e9]: K
+    - heading "Welcome to Keel" [level=2] [ref=e40]
+    - paragraph [ref=e11]: Sign in to manage your shop
+  - generic [ref=e12]:
+    - generic [ref=e13]:
+      - generic [ref=e14]: Email
+      - textbox "you@example.com" [ref=e15]: test@keel-test.com
+    - generic [ref=e16]:
+      - generic [ref=e17]: Password
+      - textbox "········" [ref=e18]: test123456
+    - button "Sign In" [ref=e41]
+    - button "Forgot password?" [ref=e42]
+  - generic [ref=e25]: or
+  - button "Continue with Google" [ref=e43]:
+    - img [ref=e44]
+    - text: Continue with Google
+  - button "Don't have an account? Create one" [active] [ref=e49]

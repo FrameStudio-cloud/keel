@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { AuthContext } from "../context/AuthContext";
 import { FiMail } from "react-icons/fi";
+import { FcGoogle } from "react-icons/fc";
 
 export default function Login() {
-  const { login } = useContext(AuthContext);
+  const { login, signInWithGoogle } = useContext(AuthContext);
   const navigate = useNavigate();
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
@@ -192,6 +193,28 @@ export default function Login() {
                 </button>
               )}
             </form>
+
+            {mode !== "check_email" && (
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200 dark:border-white/10" />
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-white dark:bg-[#16213e] px-2 text-slate-400">or</span>
+                </div>
+              </div>
+            )}
+
+            {mode === "login" && (
+              <button
+                type="button"
+                onClick={signInWithGoogle}
+                className="w-full py-2.5 bg-white dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-white font-medium rounded-xl text-sm transition-all flex items-center justify-center gap-2"
+              >
+                <FcGoogle className="text-lg" />
+                Continue with Google
+              </button>
+            )}
 
             <div className="text-center mt-4">
               <button

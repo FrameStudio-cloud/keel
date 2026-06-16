@@ -14,7 +14,7 @@ const CATEGORIES = [
 const STEPS = ["category", "store", "details", "currency", "payment", "done"];
 
 export default function SetupWizard() {
-  const { logout } = useContext(AuthContext);
+  const { logout, completeSetup } = useContext(AuthContext);
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
@@ -60,6 +60,7 @@ export default function SetupWizard() {
     }
 
     setSaving(false);
+    completeSetup();
     setStep(STEPS.length - 1);
   }
 

@@ -29,7 +29,7 @@ Formerly **mitho-dash**. Renamed to **Keel**.
 ## Auth
 
 - Email/password auth via Supabase Auth
-- `AuthContext` wraps the app — provides `user`, `session`, `loading`, `login()`, `logout()`
+- `AuthContext` wraps the app — provides `user`, `session`, `login()`, `logout()` (no `loading` — reads session from localStorage synchronously)
 - New users sign up via Login page → creates auth user + shop + settings + user record in one flow
 - If email confirmation is enabled, user must confirm before first login
 - `getShopId()` now looks up the auth'd user's shop from `users` table (no longer grabs first shop)
@@ -37,7 +37,7 @@ Formerly **mitho-dash**. Renamed to **Keel**.
 ## Supabase Tables
 
 - `shops` — id, name, slug, business_category, created_at
-- `products` — id, name, category, price, stock, variants (jsonb), shop_id, created_at
+- `products` — id, name, category, price, stock, variants (jsonb), barcode, cost_price, image, shop_id, created_at
 - `catalogue` — id, name, type, category, price, image, available, featured, variants (jsonb), specs, includes, shop_id, created_at
 - `banners` — id, type (hero/sale/info/alert), title, subtitle, message, image_url, link_url, active, sort_order, shop_id
 - `sales` — id, product_id, product_name, amount, quantity, method, shop_id, created_at
@@ -76,7 +76,7 @@ Formerly **mitho-dash**. Renamed to **Keel**.
 | `/website` | Website.jsx | Listings, Banners, Business Info, Gallery tabs |
 | `/settings` | Settings.jsx | Store details, currency, theme, data export |
 | `/profile` | Profile.jsx | Store info display |
-| `/login` | Login.jsx | Placeholder auth page |
+| `/login` | Login.jsx | Auth page with email/password + Google OAuth |
 | `/setup` | SetupWizard.jsx | First-run onboarding |
 | `/stock-history` | StockHistory.jsx | Stock movement log |
 

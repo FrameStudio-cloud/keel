@@ -26,13 +26,16 @@ export default function SettingsProvider({ children }) {
     (async () => {
       try {
         const shopId = await getShopId();
-        if (!shopId) return;
+        if (!shopId) {
+          setSettings((prev) => ({ ...prev, loading: false }));
+          return;
+        }
 
         const { data: shop } = await supabase
           .from("shops")
           .select("business_category")
           .eq("id", shopId)
-          .single();
+          .maybeSingle();
 
         const { data: store } = await supabase
           .from("store_settings")

@@ -1,0 +1,18 @@
+- generic [ref=e6]:
+  - generic [ref=e7]:
+    - generic [ref=e9]: K
+    - heading "Create Your Shop" [level=2] [ref=e34]
+    - paragraph [ref=e11]: Set up your shop in seconds
+  - generic [ref=e12]:
+    - generic [ref=e35]:
+      - generic [ref=e36]: Shop Name
+      - textbox "e.g. Lewis Electronics" [ref=e37]
+    - generic [ref=e13]:
+      - generic [ref=e14]: Email
+      - textbox "you@example.com" [ref=e15]: test@keel-test.com
+    - generic [ref=e16]:
+      - generic [ref=e17]: Password
+      - textbox "········" [ref=e18]: test123456
+    - button "Create Account" [ref=e38]
+  - generic [ref=e25]: or
+  - button "Already have an account? Sign in" [active] [ref=e39]
