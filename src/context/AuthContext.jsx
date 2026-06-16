@@ -22,11 +22,25 @@ export default function AuthProvider({ children }) {
   async function ensureUserRecords(user) {
     const { data: existingUser } = await supabase
       .from("users")
-      .select("id")
+      .select("id, shop_id")
       .eq("auth_user_id", user.id)
       .maybeSingle();
 
     if (existingUser) return true;
+
+    const { data: existingByEmail } = await supabase
+      .from("users")
+      .select("id, shop_id")
+      .eq("email", user.email)
+      .maybeSingle();
+
+    if (existingByEmail) {
+      await supabase
+        .from("users")
+        .update({ auth_user_id: user.id })
+        .eq("id", existingByEmail.id);
+      return true;
+    }
 
     const displayName = user.user_metadata?.full_name || user.email?.split("@")[0] || "My Shop";
     const baseSlug = displayName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
