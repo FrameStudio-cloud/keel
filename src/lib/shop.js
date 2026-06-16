@@ -1,19 +1,6 @@
-import { supabase } from "./supabase";
+import { supabase, getPersistedSession } from "./supabase";
 
 let currentShopId = null;
-
-function getPersistedUserId() {
-  try {
-    const key = Object.keys(localStorage).find((k) => k.startsWith("sb-") && k.endsWith("-auth-token"));
-    if (!key) return null;
-    const raw = localStorage.getItem(key);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    return parsed?.user?.id ?? null;
-  } catch {
-    return null;
-  }
-}
 
 export function clearShopId() {
   currentShopId = null;
@@ -22,7 +9,8 @@ export function clearShopId() {
 export async function getShopId() {
   if (currentShopId) return currentShopId;
 
-  const userId = getPersistedUserId();
+  const session = getPersistedSession();
+  const userId = session?.user?.id ?? null;
   if (!userId) return null;
 
   const { data } = await supabase

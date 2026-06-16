@@ -3,11 +3,11 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+const STORAGE_KEY = `sb-${new URL(supabaseUrl).hostname.split(".")[0]}-auth-token`;
+
 function getAccessToken() {
   try {
-    const key = Object.keys(localStorage).find((k) => k.startsWith("sb-") && k.endsWith("-auth-token"));
-    if (!key) return null;
-    const raw = localStorage.getItem(key);
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     return JSON.parse(raw)?.access_token ?? null;
   } catch {
@@ -21,9 +21,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 
 export function getPersistedSession() {
   try {
-    const key = Object.keys(localStorage).find((k) => k.startsWith("sb-") && k.endsWith("-auth-token"));
-    if (!key) return null;
-    const raw = localStorage.getItem(key);
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     return JSON.parse(raw);
   } catch {
@@ -33,20 +31,17 @@ export function getPersistedSession() {
 
 export function saveSession(session) {
   try {
-    const key = Object.keys(localStorage).find((k) => k.startsWith("sb-") && k.endsWith("-auth-token"));
-    if (!key) return;
-    localStorage.setItem(key, JSON.stringify(session));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
   } catch { /* noop */ }
 }
 
 export function clearPersistedSession() {
   try {
-    const key = Object.keys(localStorage).find((k) => k.startsWith("sb-") && k.endsWith("-auth-token"));
-    if (key) localStorage.removeItem(key);
-    const mfaKey = Object.keys(localStorage).find((k) => k.startsWith("sb-") && k.endsWith("-mfa-token"));
-    if (mfaKey) localStorage.removeItem(mfaKey);
-    const expiresKey = Object.keys(localStorage).find((k) => k.startsWith("sb-") && k.endsWith("-expires-at"));
-    if (expiresKey) localStorage.removeItem(expiresKey);
+    localStorage.removeItem(STORAGE_KEY);
+    const mfaKey = STORAGE_KEY.replace("-auth-token", "-mfa-token");
+    localStorage.removeItem(mfaKey);
+    const expiresKey = STORAGE_KEY.replace("-auth-token", "-expires-at");
+    localStorage.removeItem(expiresKey);
   } catch { /* noop */ }
 }
 
