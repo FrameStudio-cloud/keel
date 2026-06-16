@@ -26,6 +26,7 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
   const [settingsId, setSettingsId] = useState(null);
+  const [shopSlug, setShopSlug] = useState("");
   const [form, setForm] = useState({
     store_name: "",
     store_phone: "",
@@ -48,9 +49,11 @@ export default function Settings() {
       if (!shopId) { setLoading(false); return; }
 
       const [{ data: shop }, { data: store }] = await Promise.all([
-        supabase.from("shops").select("business_category").eq("id", shopId).single(),
+        supabase.from("shops").select("business_category, slug").eq("id", shopId).single(),
         supabase.from("store_settings").select("*").eq("shop_id", shopId).maybeSingle(),
       ]);
+
+      if (shop) setShopSlug(shop.slug || "");
 
       if (store) {
         setSettingsId(store.id);
@@ -400,6 +403,15 @@ export default function Settings() {
           <div className="flex items-center gap-2 mb-4">
             <FiFileText size={14} className="text-gray-400" />
             <h3 className="text-sm font-medium text-gray-800 dark:text-white">Terms of Service</h3>
+            {shopSlug && (
+              <a
+                href={`/terms?slug=${shopSlug}`}
+                target="_blank"
+                className="ml-auto text-xs text-blue-500 hover:text-blue-400 underline"
+              >
+                View published
+              </a>
+            )}
           </div>
           <p className="text-xs text-gray-400 dark:text-slate-500 mb-3">
             Use <code className="text-blue-500 bg-blue-500/10 px-1 rounded">{`{store_name}`}</code> to insert your store name. Sections with <code className="text-blue-500 bg-blue-500/10 px-1 rounded">{`## `}</code> become headings.

@@ -18,11 +18,18 @@ export default function Terms() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
-        .from("store_settings")
-        .select("store_name, terms_of_service")
-        .limit(1)
-        .maybeSingle();
+      const params = new URLSearchParams(window.location.search);
+      const slug = params.get("slug");
+
+      let query = supabase.from("store_settings").select("store_name, terms_of_service");
+      if (slug) {
+        const { data: shop } = await supabase.from("shops").select("id").eq("slug", slug).maybeSingle();
+        if (shop) query = query.eq("shop_id", shop.id);
+        else query = query.limit(1);
+      } else {
+        query = query.limit(1);
+      }
+      const { data } = await query.maybeSingle();
       if (data) {
         setStoreName(data.store_name || "");
         setTermsText(data.terms_of_service || "");
