@@ -1,20 +1,9 @@
 import { createContext, useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase, getPersistedSession, authLogin, authLogout } from "../lib/supabase";
 import { clearShopId } from "../lib/shop";
 
-function getPersistedSession() {
-  try {
-    const key = Object.keys(localStorage).find((k) => k.startsWith("sb-") && k.endsWith("-auth-token"));
-    if (!key) return null;
-    const raw = localStorage.getItem(key);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
-}
+const initialSession = getPersistedSession();
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext({
   user: null,
   session: null,
@@ -24,8 +13,6 @@ export const AuthContext = createContext({
   logout: async () => {},
   completeSetup: () => {},
 });
-
-const initialSession = getPersistedSession();
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(initialSession?.user ?? null);
@@ -76,45 +63,25 @@ export default function AuthProvider({ children }) {
         if (!needsSetup) setNeedsSetup(true);
       }).catch(() => {});
     }
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setSession(session);
-        if (session.user) setUser(session.user);
-      }
-    }).catch(() => {});
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-
-        if (event === "SIGNED_IN" && session?.user) {
-          if (!(await ensureUserRecords(session.user))) {
-            setNeedsSetup(true);
-          }
-        }
-
-        setUser(session?.user ?? null);
-      }
-    );
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  }, [user]);
 
   async function login(email, password) {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    const data = await authLogin(email, password);
+    setSession(data);
+    setUser(data.user);
   }
 
   async function signInWithGoogle() {
-    const { error } = await supabase.auth.signInWithOAuth({ provider: "google" });
-    if (error) throw error;
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const redirectTo = `${window.location.origin}/login`;
+    window.location.href = `${supabaseUrl}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`;
   }
 
   async function logout() {
-    await supabase.auth.signOut();
+    const token = getPersistedSession()?.access_token;
+    await authLogout(token);
+    setSession(null);
+    setUser(null);
     clearShopId();
   }
 

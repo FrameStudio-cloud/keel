@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../lib/supabase";
+import { supabase, authSignUp, authResetPassword, saveSession } from "../lib/supabase";
 import { AuthContext } from "../context/AuthContext";
 import { FiMail } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
@@ -25,12 +25,8 @@ export default function Login() {
         await login(email, password);
         navigate("/", { replace: true });
       } else {
-        const { data: authData, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-        if (signUpError) throw signUpError;
-        if (!authData.user) throw new Error("This email is already registered. Try signing in instead.");
+        const authData = await authSignUp(email, password);
+        if (!authData?.user?.id) throw new Error("This email is already registered. Try signing in instead.");
 
         const baseSlug = shopName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
         const suffix = Math.random().toString(36).slice(2, 6);
@@ -58,6 +54,7 @@ export default function Login() {
         if (userError) throw userError;
 
         if (authData.session) {
+          saveSession(authData.session);
           await login(email, password);
           navigate("/setup", { replace: true });
         } else {
@@ -78,13 +75,13 @@ export default function Login() {
     }
     setError("");
     setLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
-    setLoading(false);
-    if (error) {
-      setError(error.message);
-    } else {
+    try {
+      await authResetPassword(email);
       setMode("check_email");
+    } catch (err) {
+      setError(err.message);
     }
+    setLoading(false);
   }
 
   return (
