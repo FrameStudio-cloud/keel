@@ -23,9 +23,12 @@ export default function SettingsProvider({ children }) {
   });
 
   useEffect(() => {
+    console.log("[TRACE] SettingsProvider effect running");
     (async () => {
       try {
+        console.log("[TRACE] SettingsProvider getting shopId");
         const shopId = await getShopId();
+        console.log("[TRACE] SettingsProvider got shopId:", shopId);
         if (!shopId) {
           setSettings((prev) => ({ ...prev, loading: false }));
           return;

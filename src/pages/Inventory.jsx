@@ -32,6 +32,7 @@ export default function Inventory() {
   const [publishingId, setPublishingId] = useState(null);
 
   useEffect(() => {
+    console.log("[TRACE] Inventory mounted, calling fetchProducts");
     fetchProducts();
   }, []);
 
@@ -40,7 +41,9 @@ export default function Inventory() {
   }, []);
 
   async function fetchProducts() {
+    console.log("[TRACE] fetchProducts start");
     const shopId = await getShopId();
+    console.log("[TRACE] fetchProducts shopId:", shopId);
     const { data, error } = await supabase
       .from("products")
       .select("*")
