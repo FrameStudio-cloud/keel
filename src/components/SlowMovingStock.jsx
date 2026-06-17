@@ -1,47 +1,10 @@
-import { useState, useEffect } from "react";
-import { getShopId } from "../lib/shop";
-import { supabase } from "../lib/supabase";
 import { formatPrice } from "../lib/format";
+import { useSlowMovingStock } from "../hooks/useQueries";
 
 export default function SlowMovingStock() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: products = [], isLoading } = useSlowMovingStock();
 
-  useEffect(() => {
-    (async () => {
-      const shopId = await getShopId();
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-      const { data: sales } = await supabase
-        .from("sales")
-        .select("product_id, quantity")
-        .eq("shop_id", shopId)
-        .gte("created_at", thirtyDaysAgo.toISOString());
-
-      const soldIds = new Set();
-      const soldCount = {};
-      (sales || []).forEach((s) => {
-        soldIds.add(s.product_id);
-        soldCount[s.product_id] = (soldCount[s.product_id] || 0) + s.quantity;
-      });
-
-      const { data: allProducts } = await supabase
-        .from("products")
-        .select("*")
-        .eq("shop_id", shopId)
-        .order("stock", { ascending: false });
-
-      const slow = (allProducts || [])
-        .filter((p) => !soldIds.has(p.id) || (soldCount[p.id] || 0) < 3)
-        .slice(0, 5);
-
-      setProducts(slow);
-      setLoading(false);
-    })();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-5">
         <h3 className="text-slate-900 dark:text-white font-semibold text-sm mb-4">

@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FiCheck } from "react-icons/fi";
 import { supabase } from "../../lib/supabase";
 import { getShopId } from "../../lib/shop";
+import { useSettings } from "../../hooks/useSettings";
 
 const DAYS = [
   { key: "mon", label: "Mon" },
@@ -13,41 +14,19 @@ const DAYS = [
   { key: "sun", label: "Sun" },
 ];
 
-const defaultHours = () =>
-  DAYS.map((d) => ({ key: d.key, label: d.label, active: true, open: "08:00", close: "17:00" }));
+function hoursFromSettings(businessHours) {
+  if (!businessHours) return DAYS.map((d) => ({ key: d.key, label: d.label, active: true, open: "08:00", close: "17:00" }));
+  return DAYS.map((d) => {
+    const h = businessHours[d.key];
+    return { key: d.key, label: d.label, active: h?.active !== false, open: h?.open || "08:00", close: h?.close || "17:00" };
+  });
+}
 
 export default function BusinessTab() {
-  const [hours, setHours] = useState(defaultHours());
-  const [loading, setLoading] = useState(true);
+  const { businessHours } = useSettings();
+  const [hours, setHours] = useState(() => hoursFromSettings(businessHours));
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
-
-  useEffect(() => {
-    (async () => {
-      const shopId = await getShopId();
-      const { data } = await supabase
-        .from("store_settings")
-        .select("business_hours")
-        .eq("shop_id", shopId)
-        .maybeSingle();
-
-      if (data?.business_hours) {
-        setHours(
-          DAYS.map((d) => {
-            const h = data.business_hours[d.key];
-            return {
-              key: d.key,
-              label: d.label,
-              active: h?.active !== false,
-              open: h?.open || "08:00",
-              close: h?.close || "17:00",
-            };
-          })
-        );
-      }
-      setLoading(false);
-    })();
-  }, []);
 
   function showToast(msg, type = "success") {
     setToast({ msg, type });
@@ -77,16 +56,6 @@ export default function BusinessTab() {
     setSaving(false);
     if (error) return showToast("Something went wrong", "error");
     showToast("Business hours saved!");
-  }
-
-  if (loading) {
-    return (
-      <div className="space-y-3">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-12 bg-white/5 rounded-xl animate-pulse" />
-        ))}
-      </div>
-    );
   }
 
   return (

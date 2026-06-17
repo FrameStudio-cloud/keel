@@ -4,8 +4,11 @@ import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
 import Skeleton from "../components/Skeleton";
 import PlanPostModal from "../components/PlanPostModal";
+import Pagination from "../components/Pagination";
 import { getShopId } from "../lib/shop";
-import { supabase } from "../lib/supabase";
+import { paginateQuery } from "../lib/paginate";
+
+const PAGE_SIZE = 20;
 
 
 
@@ -78,26 +81,33 @@ export default function Social() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  async function fetchPosts() {
-    const shopId = await getShopId();
-    const { data, error } = await supabase
-      .from("posts")
-      .select("*")
-      .eq("shop_id", shopId)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error(error);
-    } else {
-      setPosts(data);
-    }
-    setLoading(false);
-  }
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const shopId = await getShopId();
+      const { data, error, total: count } = await paginateQuery({
+        table: "posts",
+        shopId,
+        page,
+        pageSize: PAGE_SIZE,
+        orderBy: "created_at",
+        ascending: false,
+      });
+      if (cancelled) return;
+      if (error) {
+        console.error(error);
+      } else {
+        setPosts(data ?? []);
+        setTotal(count);
+      }
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [page]);
 
   return (
     <PageLayout title="Social Media">
@@ -136,7 +146,7 @@ export default function Social() {
       {/* Posts */}
       <div className="flex justify-between items-center mb-3">
         <p className="text-sm font-medium text-gray-800 dark:text-white">
-          {posts.length} {posts.length === 1 ? "post" : "posts"}
+          {total} {total === 1 ? "post" : "posts"}
         </p>
         <button
           onClick={() => setShowModal(true)}
@@ -189,11 +199,12 @@ export default function Social() {
           ))}
         </div>
       )}
+      <Pagination page={page} total={total} pageSize={PAGE_SIZE} onPageChange={setPage} />
 
       {showModal && (
         <PlanPostModal
           onClose={() => setShowModal(false)}
-          onAdded={fetchPosts}
+          onAdded={() => setPage(0)}
         />
       )}
     </PageLayout>

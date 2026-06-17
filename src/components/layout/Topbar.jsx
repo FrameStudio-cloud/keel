@@ -1,63 +1,22 @@
 import { useState, useEffect, useRef, useCallback, useContext } from "react";
 import { CiBellOn, CiSearch, CiMenuBurger } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../../lib/supabase";
-import { getShopId } from "../../lib/shop";
 import { CRITICAL_STOCK_THRESHOLD } from "../../lib/constants";
 import { AuthContext } from "../../context/AuthContext";
+import { useSettings } from "../../hooks/useSettings";
+import { useLowStockProducts } from "../../hooks/useQueries";
 
 export default function Topbar({ title, searchQuery, setSearchQuery, onToggleSidebar }) {
+  const { storeName } = useSettings();
+  const { data: lowStock = [] } = useLowStockProducts();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [lowStock, setLowStock] = useState([]);
-  const [storeName, setStoreName] = useState("");
   const notifRef = useRef(null);
 
   const { logout } = useContext(AuthContext);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    (async () => {
-      const shopId = await getShopId();
-      if (!shopId) return;
-      const { data } = await supabase
-        .from("store_settings")
-        .select("store_name")
-        .eq("shop_id", shopId)
-        .maybeSingle();
-      if (data?.store_name) setStoreName(data.store_name);
-    })();
-  }, []);
-
-  async function fetchLowStock() {
-    const shopId = await getShopId();
-    if (!shopId) return;
-
-    const { data: settings } = await supabase
-      .from("store_settings")
-      .select("low_stock_threshold")
-      .eq("shop_id", shopId)
-      .maybeSingle();
-
-    const threshold = settings?.low_stock_threshold ?? 6;
-
-    const { data } = await supabase
-      .from("products")
-      .select("id, name, stock")
-      .eq("shop_id", shopId)
-      .lte("stock", threshold)
-      .order("stock", { ascending: true });
-
-    setLowStock(data || []);
-  }
-
-  useEffect(() => {
-    const timer = setTimeout(fetchLowStock, 0);
-    const interval = setInterval(fetchLowStock, 30000);
-    return () => { clearTimeout(timer); clearInterval(interval); };
-  }, []);
 
   useEffect(() => {
     function handleKeyDown(e) {
@@ -107,7 +66,7 @@ export default function Topbar({ title, searchQuery, setSearchQuery, onToggleSid
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search..."
             autoFocus
-            className="text-sm border border-gray-200 dark:border-white/10 rounded-lg px-3 py-1.5 w-48 focus:outline-none focus:border-blue-400 dark:focus:border-blue-300 bg-slate-100 dark:bg-[#1a1a2e] text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
+            className="text-sm border border-gray-200 dark:border-white/10 rounded-lg px-3 py-1.5 w-28 focus:outline-none focus:border-blue-400 dark:focus:border-blue-300 bg-slate-100 dark:bg-[#1a1a2e] text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
           />
         )}
 

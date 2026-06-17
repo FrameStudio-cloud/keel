@@ -23,7 +23,8 @@ npm run build   # Vite production build
 npm run lint    # ESLint (flat config)
 ```
 
-Current lint: 0 errors, 0 warnings (pre-existing `react-refresh/only-export-components` on AuthContext excluded).
+Current lint: 1 error (pre-existing `react-refresh/only-export-components` on AuthContext — excluded).
+Dependencies: `@tanstack/react-query` added for caching/deduplication.
 
 ## Renamed
 
@@ -55,6 +56,7 @@ We went with `accessToken` because it was the only approach that eliminated the 
 | Signup | `POST /auth/v1/signup` |
 | Logout | `POST /auth/v1/logout` |
 | Password reset | `POST /auth/v1/recover` |
+| Update password | `PUT /auth/v1/user` (with Bearer token from recovery hash) |
 | Google OAuth redirect | `GET /auth/v1/authorize?provider=google&redirect_to=...` |
 
 ### Session storage key
@@ -131,33 +133,44 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 ## Key Files
 
 - `src/lib/supabase.js` — Supabase client creation (`accessToken` getter), auth helpers (`authLogin`, `authSignUp`, `authLogout`, `authResetPassword`), session storage helpers (`saveSession`, `getPersistedSession`, `clearPersistedSession`), `STORAGE_KEY` constant
-- `src/context/AuthContext.jsx` — wraps app with auth state, `ensureUserRecords()` with email fallback, login/logout via direct auth helpers
-- `src/context/SettingsProvider.jsx` — fetches settings + shop category, applies side-effects (theme, currency, payment config)
-- `src/lib/shop.js` — `getShopId()` (reads `STORAGE_KEY` via `getPersistedSession()`, queries `users` by `auth_user_id`), `withShop()` singleton
-- `src/pages/Settings.jsx` — flat scroll design (no cards), visual sections, Terms of Service card link to `/terms`
-- `src/pages/Terms.jsx` — public Terms of Service page, fetches from `src/data/terms.json` (static), no DB dependency
-- `src/pages/SetupWizard.jsx` — onboarding flow: category → store name → phone/address → currency → payment → threshold
+- `src/context/AuthContext.jsx` — wraps app with auth state, `ensureUserRecords()` with email fallback, login/logout via direct auth helpers. New signups save `"light"` theme.
+- `src/context/SettingsProvider.jsx` — fetches settings + shop category, applies side-effects (theme, currency, payment config). Theme default `"light"`, synchronous class toggle.
+- `src/context/settingsContext.js` — default theme `"light"`.
+- `src/lib/shop.js` — `getShopId()` singleton with promise deduplication (reads `STORAGE_KEY` via `getPersistedSession()`, queries `users` by `auth_user_id`), `withShop()` singleton
+- `src/pages/Overview.jsx` — single `supabase.rpc("get_dashboard_summary")` call for all KPIs, chart, top products; real website analytics section querying `page_views` table (gated by `hasWebsite`)
+- `src/pages/Settings.jsx` — flat scroll design, reads initial form values from useSettings; upsert uses `onConflict: "shop_id"`; export uses `Promise.allSettled()`
+- `src/pages/Terms.jsx` — public Terms of Service page, imports from `src/data/terms.json` (static), no DB dependency
+- `src/pages/SetupWizard.jsx` — onboarding flow, saves `"light"` theme
+- `src/pages/Login.jsx` — signup defaults to `"light"` theme
 - `src/pages/Website.jsx` — tabbed website management: Listings, Banners, Business Info, Gallery
-- `src/components/website/` — ListingsTab, BannersTab, BusinessTab, GalleryTab (all use Supabase)
-- `src/pages/Inventory.jsx` — product CRUD, stock adjust, debounced search, variant badges, one-tap publish to catalogue
+- `src/components/website/` — ListingsTab (no mockItems), BannersTab (fixed state mutation in moveUp), BusinessTab (reads businessHours from useSettings), GalleryTab
+- `src/components/website/ChatWidgetTab.jsx` — 5 multi-tenant leak fixes (all queries shop-filtered); reads whatsapp from useSettings
+- `src/pages/Inventory.jsx` — product CRUD, stock adjust, debounced search, variant badges, one-tap publish to catalogue (includes shop_id filter)
+- `src/pages/Social.jsx` — replaced fake Instagram stats with "Connect" placeholder
 - `src/components/AddProductModal.jsx` — variant fields (color/size/storage) based on `settings.businessCategory`
 - `src/components/EditProductModal.jsx` — same variant fields, pre-filled from product.variants
 - `src/components/Bots.jsx` — WhatsApp + Telegram bot cards per shop
 - `src/lib/format.js` — formatPrice, setCurrency, getCurrency
 - `src/payment/paymentConfig.js` — getPaymentMethods, setPaymentConfig, getDefaultPayment
 - `src/payment/IntaSendCheckout.jsx` — IntaSend payment button + phone input
+- `src/components/layout/Sidebar.jsx` — reads storeName + lowStockThreshold from useSettings; uses `useLowStockCount` hook
+- `src/components/layout/Topbar.jsx` — reads storeName from useSettings; uses `useLowStockProducts` hook
+- `src/components/SlowMovingStock.jsx` — uses `useSlowMovingStock` React Query hook
+- `src/hooks/useQueries.js` — shared React Query hooks: `useLowStockCount`, `useLowStockProducts`, `useSlowMovingStock`
+- `src/App.jsx` — wrapped in `QueryClientProvider`
+- `src/data/terms.json` — static Terms of Service content
 
 ## Pages & Routes
 
 | Path | File | Description |
-|---|---|---|
-| `/` | Overview.jsx | KPIs, weekly chart, top products, website analytics (mock) |
+|---|---|---|---|
+| `/` | Overview.jsx | KPIs, weekly chart, top products, website analytics (real, gated by hasWebsite) |
 | `/inventory` | Inventory.jsx | Products CRUD, stock adjust, search, Publish button |
 | `/sales` | Sales.jsx | Sales list, log sale, receipt modal, debounced search |
-| `/social` | Social.jsx | Post scheduler, hardcoded Instagram stats |
+| `/social` | Social.jsx | Post scheduler, Instagram "Connect" placeholder |
 | `/bots` | Bots.jsx | WhatsApp + Telegram bot management |
 | `/website` | Website.jsx | Listings, Banners, Business Info, Gallery tabs |
-| `/settings` | Settings.jsx | Store details, currency, theme, data export, Terms editor |
+| `/settings` | Settings.jsx | Store details, currency, theme, data export, Terms link |
 | `/profile` | Profile.jsx | Store info display |
 | `/login` | Login.jsx | Auth page with email/password + Google OAuth |
 | `/setup` | SetupWizard.jsx | First-run onboarding |
@@ -174,31 +187,33 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 
 ## Known Issues (Pre-Production Audit)
 
-### Multi-tenant security leaks — missing `shop_id` filter
-- `src/pages/Inventory.jsx:89` — `catalogue.delete()` by ID only (no shop_id)
-- `src/components/website/ChatWidgetTab.jsx:121` — `chat_faqs.delete()` by ID only
-- `src/components/website/ChatWidgetTab.jsx:137-140` — `chat_faqs.upsert()` no shop filter
-- `src/components/website/ChatWidgetTab.jsx:143-147` — `chat_messages.update()` by ID only
-- `src/components/website/ChatWidgetTab.jsx:291-294` — `chat_faqs.update()` by ID only
+### Fixed
+- Multi-tenant leaks — all 5 queries (`Inventory.jsx` catalogue delete, `ChatWidgetTab.jsx` FAQ delete/upsert/update, messages update) now filter by `shop_id`
+- `.single()` → `.maybeSingle()` — fixed in `Settings.jsx`, `SetupWizard.jsx`, `ChatWidgetTab.jsx`, `BusinessTab.jsx`
+- Settings export — uses `Promise.allSettled()` instead of serial loop
+- `expenses` table — created via migration (no longer missing)
+- Sidebar + Topbar — read settings from `useSettings()` context instead of re-fetching (eliminated 4 Supabase calls)
+- BannersTab `moveUp` — fixed state mutation, uses spread copies for sort_order swap
+- Removed all hardcoded mock data: ListingsTab mockItems, GalleryTab mockItems, Social.jsx fake Instagram, Overview.jsx fake stat cards, deleted PageViewsChart/MostViewedPages/TrafficSources placeholder components
+- Removed stray `className` string rendering as raw text in ListingsTab
+- Fixed badge contrast (text-*-300 → text-*-700 for light mode)
+- Added sidebar scrollability (`overflow-y-auto` on nav)
+- Settings page reads initial form values from useSettings (2 fewer Supabase calls)
+- BusinessTab reads businessHours from useSettings (1 fewer Supabase call)
+- ChatWidgetTab reads whatsapp from useSettings (1 fewer Supabase call)
+- Added unique constraint `store_settings_shop_id_key` for `onConflict: "shop_id"` upsert
+- Added `@tanstack/react-query` with `QueryClientProvider` wrapping app
+- Created `src/hooks/useQueries.js` — shared React Query hooks for low stock + slow moving stock
+- Overview uses single `supabase.rpc("get_dashboard_summary")` call instead of 6 individual queries
+- Created `get_dashboard_summary` RPC (Postgres function returning all dashboard data in one JSON)
+- Migrated SlowMovingStock to `useSlowMovingStock` React Query hook
+- `getShopId()` promise deduplication — concurrent callers share same in-flight promise
+- Seeded demo data for shop "campus glow": 10 products, 128 sales, 12 expenses, 20 stock movements, 5 catalogue items, 3 banners, 3 posts, 450 page views
 
-### `.single()` throws on missing rows (should be `.maybeSingle()`)
-- `src/pages/Settings.jsx:50` — `shops.select().single()`
-- `src/pages/SetupWizard.jsx:38` — `store_settings.select("id").single()`
-- `src/components/website/ChatWidgetTab.jsx:58` — `store_settings.select("whatsapp").single()`
-- `src/components/website/BusinessTab.jsx:32` — `store_settings.select("business_hours").single()`
-
-### No pagination on any list query
-Every `select("*")` fetches ALL rows — no `.limit()`/`.range()` anywhere. Will degrade with data growth.
-
-### Google OAuth broken
-Session exchange never completes after OAuth redirect because custom auth (raw `fetch`) bypasses gotrue-js callback handler.
-
-### Performance
-- Settings export loops 6 tables serially (`Settings.jsx:167-173`) — use `Promise.allSettled()`
-- seedData.js references `expenses` table that doesn't exist in schema
-- Sidebar + Topbar fetch same settings independently (4 duplicate queries per page)
-- `useDebounce` hook exists at `src/hooks/useDebounce.js` but is never imported
-- BannersTab `moveUp` mutates state objects directly (`BannersTab.jsx:72-75`)
+### Still broken
+- **Google OAuth** — session exchange never completes after OAuth redirect (custom auth bypasses gotrue-js callback handler)
+- **No pagination** — every `select("*")` fetches ALL rows, no `.limit()`/`.range()`
+- **`useDebounce` never imported** — exists at `src/hooks/useDebounce.js` but unused
 
 ## Conventions
 

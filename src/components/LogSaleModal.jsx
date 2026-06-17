@@ -23,7 +23,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
 
   async function fetchProducts() {
     const shopId = await getShopId();
-    const { data } = await supabase.from("products").select("*").eq("shop_id", shopId).order("name");
+    const { data } = await supabase.from("products").select("*").eq("shop_id", shopId).order("name").limit(200);
     setProducts(data || []);
   }
 

@@ -90,3 +90,19 @@ export async function authLogout(accessToken) {
   });
   clearPersistedSession();
 }
+
+export async function authUpdatePassword(accessToken, newPassword) {
+  const res = await window.fetch(`${supabaseUrl}/auth/v1/user`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: supabaseKey,
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ password: newPassword }),
+  });
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.msg || data.error_description || "Password update failed");
+  }
+}

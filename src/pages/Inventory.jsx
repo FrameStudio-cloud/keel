@@ -6,11 +6,16 @@ import Skeleton from "../components/Skeleton";
 import AddProductModal from "../components/AddProductModal";
 import EditProductModal from "../components/EditProductModal";
 import StockAdjustModal from "../components/StockAdjustModal";
+import Pagination from "../components/Pagination";
 import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
+import { paginateQuery } from "../lib/paginate";
+import { useDebounce } from "../hooks/useDebounce";
 import { useSettings } from "../hooks/useSettings";
 import { formatPrice } from "../lib/format";
 import { CRITICAL_STOCK_THRESHOLD } from "../lib/constants";
+
+const PAGE_SIZE = 50;
 
 export default function Inventory() {
   const { lowStockThreshold, businessCategory } = useSettings();
@@ -30,30 +35,39 @@ export default function Inventory() {
   const [adjustProduct, setAdjustProduct] = useState(null);
   const [publishedMap, setPublishedMap] = useState({});
   const [publishingId, setPublishingId] = useState(null);
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(0);
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    let cancelled = false;
+    (async () => {
+      const shopId = await getShopId();
+      const { data, error, total: count } = await paginateQuery({
+        table: "products",
+        shopId,
+        page,
+        pageSize: PAGE_SIZE,
+        searchTerm: debouncedSearch,
+        searchColumns: ["name", "category", "barcode"],
+        orderBy: "created_at",
+        ascending: false,
+      });
+      if (cancelled) return;
+      if (error) {
+        console.error(error);
+      } else {
+        setProducts(data ?? []);
+        setTotal(count);
+      }
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [page, debouncedSearch]);
 
   useEffect(() => {
     fetchCatalogue();
   }, []);
-
-  async function fetchProducts() {
-    const shopId = await getShopId();
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .eq("shop_id", shopId)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error(error);
-    } else {
-      setProducts(data);
-    }
-    setLoading(false);
-  }
 
   async function fetchCatalogue() {
     const shopId = await getShopId();
@@ -92,13 +106,6 @@ export default function Inventory() {
     fetchCatalogue();
   }
 
-  const filteredProducts = products.filter(
-    (p) =>
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (showBarcode && p.barcode && p.barcode.toLowerCase().includes(searchQuery.toLowerCase())),
-  );
-
   return (
     <PageLayout
       title="Inventory"
@@ -107,7 +114,7 @@ export default function Inventory() {
     >
       <div className="flex justify-between items-center mb-4">
         <p className="text-sm text-gray-400 dark:text-slate-500">
-          {filteredProducts.length} products
+          {total} products
         </p>
         <button
           onClick={() => setShowModal(true)}
@@ -145,7 +152,7 @@ export default function Inventory() {
         ) : (
           <>
             <div className="sm:hidden space-y-2 p-3">
-              {filteredProducts.map((p) => {
+              {products.map((p) => {
                 const status = getStatus(p.stock);
                 return (
                   <div
@@ -248,7 +255,7 @@ export default function Inventory() {
                 </tr>
               </thead>
               <tbody>
-                {filteredProducts.map((p) => {
+                {products.map((p) => {
                   const status = getStatus(p.stock);
                   return (
                     <tr
@@ -322,6 +329,7 @@ export default function Inventory() {
                 })}
               </tbody>
             </table>
+            <Pagination page={page} total={total} pageSize={PAGE_SIZE} onPageChange={setPage} />
           </>
         )}
       </div>
@@ -329,7 +337,7 @@ export default function Inventory() {
       {showModal && (
         <AddProductModal
           onClose={() => setShowModal(false)}
-          onAdded={fetchProducts}
+          onAdded={() => setPage(0)}
         />
       )}
 
@@ -337,7 +345,7 @@ export default function Inventory() {
         <EditProductModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
-          onUpdated={fetchProducts}
+          onUpdated={() => setPage(0)}
         />
       )}
 
@@ -345,7 +353,7 @@ export default function Inventory() {
         <StockAdjustModal
           product={adjustProduct}
           onClose={() => setAdjustProduct(null)}
-          onAdjusted={fetchProducts}
+          onAdjusted={() => setPage(0)}
         />
       )}
     </PageLayout>

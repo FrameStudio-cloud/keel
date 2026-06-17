@@ -39,7 +39,8 @@ export default function Marketing() {
         .from("products")
         .select("*")
         .eq("shop_id", shopId)
-        .order("name");
+        .order("name")
+        .limit(200);
       if (data) setCatalogue(data);
       setLoading(false);
     })();

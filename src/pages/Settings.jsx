@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
 import { setCurrency } from "../lib/format";
 import { setPaymentConfig } from "../lib/paymentConfig";
+import { useSettings } from "../hooks/useSettings";
 import { FiSave, FiDownload, FiShoppingBag, FiDollarSign, FiMonitor, FiFileText, FiSun, FiMoon, FiCheck, FiClock } from "react-icons/fi";
 
 const CATEGORIES = ["general", "clothing", "electronics", "electricals"];
@@ -21,71 +22,52 @@ const DAYS = [
 const defaultHours = () =>
   DAYS.map((d) => ({ key: d.key, label: d.label, active: true, open: "08:00", close: "17:00" }));
 
+function hoursFromSettings(businessHours) {
+  if (!businessHours) return defaultHours();
+  return DAYS.map((d) => {
+    const h = businessHours[d.key];
+    return { key: d.key, label: d.label, active: h?.active !== false, open: h?.open || "08:00", close: h?.close || "17:00" };
+  });
+}
+
 export default function Settings() {
-  const [loading, setLoading] = useState(true);
+  const settings = useSettings();
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
-  const [settingsId, setSettingsId] = useState(null);
   const [form, setForm] = useState({
-    store_name: "",
-    store_phone: "",
-    store_address: "",
-    currency_symbol: "KSh",
-    low_stock_threshold: 6,
-    default_payment: "Cash",
-    receipt_footer: "",
-    theme: "dark",
-    website_url: "",
-    whatsapp: "",
-    business_category: "general",
+    store_name: settings.storeName,
+    store_phone: settings.storePhone,
+    store_address: settings.storeAddress,
+    currency_symbol: settings.currencySymbol,
+    low_stock_threshold: settings.lowStockThreshold,
+    default_payment: settings.defaultPayment,
+    receipt_footer: settings.receiptFooter,
+    theme: settings.theme || "light",
+    website_url: settings.websiteUrl,
+    whatsapp: settings.whatsapp,
+    business_category: settings.businessCategory,
   });
-  const [hours, setHours] = useState(defaultHours());
+  const [hours, setHours] = useState(() => hoursFromSettings(settings.businessHours));
 
   useEffect(() => {
-    (async () => {
-      const shopId = await getShopId();
-      if (!shopId) { setLoading(false); return; }
-
-      const [{ data: shop }, { data: store }] = await Promise.all([
-        supabase.from("shops").select("business_category, slug").eq("id", shopId).maybeSingle(),
-        supabase.from("store_settings").select("*").eq("shop_id", shopId).maybeSingle(),
-      ]);
-
-      if (store) {
-        setSettingsId(store.id);
-        setForm({
-          store_name: store.store_name || "",
-          store_phone: store.store_phone || "",
-          store_address: store.store_address || "",
-          currency_symbol: store.currency_symbol || "KSh",
-          low_stock_threshold: store.low_stock_threshold ?? 6,
-          default_payment: store.default_payment || "Cash",
-          receipt_footer: store.receipt_footer || "",
-          theme: store.theme || "dark",
-          website_url: store.website_url || "",
-          whatsapp: store.whatsapp || "",
-          business_category: shop?.business_category || "general",
-        });
-        if (store.business_hours) {
-          setHours(
-            DAYS.map((d) => {
-              const h = store.business_hours[d.key];
-              return {
-                key: d.key,
-                label: d.label,
-                active: h?.active !== false,
-                open: h?.open || "08:00",
-                close: h?.close || "17:00",
-              };
-            })
-          );
-        }
-      } else if (shop) {
-        setForm((prev) => ({ ...prev, business_category: shop.business_category || "general" }));
-      }
-      setLoading(false);
-    })();
-  }, []);
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (settings.loading) return;
+    setForm({
+      store_name: settings.storeName,
+      store_phone: settings.storePhone,
+      store_address: settings.storeAddress,
+      currency_symbol: settings.currencySymbol,
+      low_stock_threshold: settings.lowStockThreshold,
+      default_payment: settings.defaultPayment,
+      receipt_footer: settings.receiptFooter,
+      theme: settings.theme || "light",
+      website_url: settings.websiteUrl,
+      whatsapp: settings.whatsapp,
+      business_category: settings.businessCategory,
+    });
+    setHours(hoursFromSettings(settings.businessHours));
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [settings]);
 
   function showToast(msg, type = "success") {
     setToast({ msg, type });
@@ -130,26 +112,22 @@ export default function Settings() {
       business_hours: businessHours,
       shop_id: shopId,
     };
-    if (settingsId) payload.id = settingsId;
 
     const [storeResult, shopResult] = await Promise.all([
-      supabase.from("store_settings").upsert(payload).select().single(),
+      supabase.from("store_settings").upsert(payload, { onConflict: "shop_id" }).select().single(),
       supabase.from("shops").update({ business_category: form.business_category }).eq("id", shopId),
     ]);
 
     setSaving(false);
 
-    const { data, error } = storeResult;
-    if (error) {
-      console.error("Settings save error:", error);
-      showToast(error.message || "Something went wrong", "error");
+    if (storeResult.error) {
+      console.error("Settings save error:", storeResult.error);
+      showToast(storeResult.error.message || "Something went wrong", "error");
       return;
     }
     if (shopResult.error) {
       console.error("Category update error:", shopResult.error);
     }
-
-    if (data && !settingsId) setSettingsId(data.id);
 
     setCurrency(form.currency_symbol);
     setPaymentConfig(null, form.default_payment);
@@ -185,7 +163,7 @@ export default function Settings() {
     showToast("Export downloaded!");
   }
 
-  if (loading) {
+  if (settings.loading) {
     return (
       <PageLayout title="Settings">
         <div className="max-w-2xl mx-auto py-6 space-y-6">

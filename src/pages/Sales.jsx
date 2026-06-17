@@ -4,8 +4,12 @@ import Badge from "../components/Badge";
 import Skeleton from "../components/Skeleton";
 import LogSaleModal from "../components/LogSaleModal";
 import ReceiptModal from "../components/ReceiptModal";
+import Pagination from "../components/Pagination";
 import { getShopId } from "../lib/shop";
-import { supabase } from "../lib/supabase";
+import { paginateQuery } from "../lib/paginate";
+import { useDebounce } from "../hooks/useDebounce";
+
+const PAGE_SIZE = 50;
 
 export default function Sales() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -13,26 +17,36 @@ export default function Sales() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [receiptSale, setReceiptSale] = useState(null);
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(0);
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
   useEffect(() => {
-    fetchSales();
-  }, []);
-
-  async function fetchSales() {
-    const shopId = await getShopId();
-    const { data, error } = await supabase
-      .from("sales")
-      .select("*")
-      .eq("shop_id", shopId)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error(error);
-    } else {
-      setSales(data);
-    }
-    setLoading(false);
-  }
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const shopId = await getShopId();
+      const { data, error, total: count } = await paginateQuery({
+        table: "sales",
+        shopId,
+        page,
+        pageSize: PAGE_SIZE,
+        searchTerm: debouncedSearch,
+        searchColumns: ["product_name", "method"],
+        orderBy: "created_at",
+        ascending: false,
+      });
+      if (cancelled) return;
+      if (error) {
+        console.error(error);
+      } else {
+        setSales(data ?? []);
+        setTotal(count);
+      }
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [page, debouncedSearch]);
 
   function formatDate(timestamp) {
     const date = new Date(timestamp);
@@ -45,15 +59,10 @@ export default function Sales() {
 
       
   }
-const filteredSales = sales.filter(
-  (s) =>
-    s.product_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.method.toLowerCase().includes(searchQuery.toLowerCase()),
-);
   return (
     <PageLayout title="Sales" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-gray-400 dark:text-slate-500">{filteredSales.length} transactions</p>
+        <p className="text-sm text-gray-400 dark:text-slate-500">{total} transactions</p>
         <button
           onClick={() => setShowModal(true)}
           className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all"
@@ -90,7 +99,7 @@ const filteredSales = sales.filter(
         ) : (
           <>
             <div className="sm:hidden space-y-2 p-3">
-              {filteredSales.map((s) => (
+              {sales.map((s) => (
                 <div
                   key={s.id}
                   onClick={() => setReceiptSale(s)}
@@ -146,7 +155,7 @@ const filteredSales = sales.filter(
                 </tr>
               </thead>
               <tbody>
-                {filteredSales.map((s) => (
+                {sales.map((s) => (
                   <tr
                     key={s.id}
                     onClick={() => setReceiptSale(s)}
@@ -178,6 +187,7 @@ const filteredSales = sales.filter(
                 ))}
               </tbody>
             </table>
+            <Pagination page={page} total={total} pageSize={PAGE_SIZE} onPageChange={setPage} />
           </>
         )}
       </div>
@@ -185,7 +195,7 @@ const filteredSales = sales.filter(
       {showModal && (
         <LogSaleModal
           onClose={() => setShowModal(false)}
-          onAdded={fetchSales}
+          onAdded={() => setPage(0)}
         />
       )}
 

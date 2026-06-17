@@ -1,24 +1,36 @@
 import { useState, useEffect } from "react";
 import PageLayout from "../components/layout/PageLayout";
+import Pagination from "../components/Pagination";
 import { getShopId } from "../lib/shop";
-import { supabase } from "../lib/supabase";
+import { paginateQuery } from "../lib/paginate";
+
+const PAGE_SIZE = 50;
 
 export default function StockHistory() {
   const [movements, setMovements] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     (async () => {
+      setLoading(true);
       const shopId = await getShopId();
-      const { data, error } = await supabase
-        .from("stock_movements")
-        .select("*")
-        .eq("shop_id", shopId)
-        .order("created_at", { ascending: false });
-      if (!error) setMovements(data || []);
+      const { data, error, total: count } = await paginateQuery({
+        table: "stock_movements",
+        shopId,
+        page,
+        pageSize: PAGE_SIZE,
+        orderBy: "created_at",
+        ascending: false,
+      });
+      if (!error) {
+        setMovements(data || []);
+        setTotal(count);
+      }
       setLoading(false);
     })();
-  }, []);
+  }, [page]);
 
   return (
     <PageLayout title="Stock History">
@@ -102,6 +114,7 @@ export default function StockHistory() {
               </tbody>
             </table>
           </div>
+            <Pagination page={page} total={total} pageSize={PAGE_SIZE} onPageChange={setPage} />
         </>
       )}
     </PageLayout>

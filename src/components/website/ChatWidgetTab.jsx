@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { getShopId } from "../../lib/shop";
+import { useSettings } from "../../hooks/useSettings";
+import Pagination from "../Pagination";
+
+const MSG_PAGE_SIZE = 50;
 import { FiCheck, FiPlus, FiTrash2, FiChevronUp, FiChevronDown, FiCopy, FiMessageCircle } from "react-icons/fi";
 
 const POSITIONS = [
@@ -9,6 +13,7 @@ const POSITIONS = [
 ];
 
 export default function ChatWidgetTab() {
+  const { whatsapp } = useSettings();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
@@ -22,6 +27,8 @@ export default function ChatWidgetTab() {
   });
   const [faqs, setFaqs] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [msgPage, setMsgPage] = useState(0);
+  const [msgTotal, setMsgTotal] = useState(0);
   const [newFaq, setNewFaq] = useState({ question: "", answer: "" });
   const [editingFaq, setEditingFaq] = useState(null);
 
@@ -50,37 +57,42 @@ export default function ChatWidgetTab() {
           position: cfg.position || "right",
           whatsapp_number: cfg.whatsapp_number || "",
         });
-      } else {
-        const { data: settings } = await supabase
-          .from("store_settings")
-          .select("whatsapp")
-          .eq("shop_id", id)
-          .maybeSingle();
-        if (settings?.whatsapp) {
-          setConfig((prev) => ({ ...prev, whatsapp_number: settings.whatsapp }));
-        }
+      } else if (whatsapp) {
+        setConfig((prev) => ({ ...prev, whatsapp_number: whatsapp }));
       }
 
       const { data: faqData } = await supabase
         .from("chat_faqs")
         .select("*")
         .eq("shop_id", id)
-        .order("sort_order", { ascending: true });
+        .order("sort_order", { ascending: true })
+        .limit(200);
 
       if (faqData) setFaqs(faqData);
 
-      const { data: msgData } = await supabase
-        .from("chat_messages")
-        .select("*")
-        .eq("shop_id", id)
-        .eq("status", "unanswered")
-        .order("created_at", { ascending: false });
-
-      if (msgData) setMessages(msgData);
-
       setLoading(false);
     })();
-  }, []);
+  }, [whatsapp]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!shopId) return;
+      const { data: msgData, count } = await supabase
+        .from("chat_messages")
+        .select("*", { count: "exact" })
+        .eq("shop_id", shopId)
+        .eq("status", "unanswered")
+        .range(msgPage * MSG_PAGE_SIZE, (msgPage + 1) * MSG_PAGE_SIZE - 1)
+        .order("created_at", { ascending: false });
+      if (cancelled) return;
+      if (msgData) {
+        setMessages(msgData);
+        setMsgTotal(count ?? 0);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [shopId, msgPage]);
 
   async function saveConfig() {
     if (!shopId) return;
@@ -368,7 +380,7 @@ export default function ChatWidgetTab() {
           <div className="flex items-center gap-2 mb-4">
             <FiMessageCircle size={14} className="text-slate-400" />
             <h3 className="text-sm font-medium text-slate-800 dark:text-white">
-              Unanswered Questions ({messages.length})
+              Unanswered Questions ({msgTotal})
             </h3>
           </div>
           {messages.map((msg) => (
@@ -388,6 +400,7 @@ export default function ChatWidgetTab() {
               </button>
             </div>
           ))}
+          <Pagination page={msgPage} total={msgTotal} pageSize={MSG_PAGE_SIZE} onPageChange={setMsgPage} />
         </div>
       )}
 

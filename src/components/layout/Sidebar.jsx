@@ -5,9 +5,8 @@ import { FcSalesPerformance } from "react-icons/fc";
 import { MdOutlinePhoneIphone } from "react-icons/md";
 import { IoGlobeOutline, IoRocketOutline, IoSettingsOutline, IoPersonOutline, IoTimeOutline, IoWalletOutline, IoStatsChartOutline, IoMegaphoneOutline } from "react-icons/io5";
 import { BsBuildingsFill } from "react-icons/bs";
-import { useEffect, useState } from "react";
-import { supabase } from "../../lib/supabase";
-import { getShopId } from "../../lib/shop";
+import { useSettings } from "../../hooks/useSettings";
+import { useLowStockCount } from "../../hooks/useQueries";
 
 const groups = [
   {
@@ -38,44 +37,8 @@ const groups = [
 ];
 
 export default function Sidebar({ open, onClose }) {
-  const [lowStockCount, setLowStockCount] = useState(0);
-  const [storeName, setStoreName] = useState("");
-
-  useEffect(() => {
-    (async () => {
-      const shopId = await getShopId();
-      if (!shopId) return;
-      const { data } = await supabase
-        .from("store_settings")
-        .select("store_name")
-        .eq("shop_id", shopId)
-        .maybeSingle();
-      if (data?.store_name) setStoreName(data.store_name);
-    })();
-  }, []);
-
-  useEffect(() => {
-    async function fetchLowStock() {
-      const shopId = await getShopId();
-
-      const { data: settings } = await supabase
-        .from("store_settings")
-        .select("low_stock_threshold")
-        .eq("shop_id", shopId)
-        .maybeSingle();
-
-      const threshold = settings?.low_stock_threshold ?? 6;
-
-      const { count } = await supabase
-        .from("products")
-        .select("*", { count: "exact", head: true })
-        .eq("shop_id", shopId)
-        .lte("stock", threshold);
-
-      setLowStockCount(count);
-    }
-    fetchLowStock();
-  }, []);
+  const { storeName } = useSettings();
+  const { data: lowStockCount = 0 } = useLowStockCount();
 
   return (
     <>
@@ -90,7 +53,7 @@ export default function Sidebar({ open, onClose }) {
       <aside
         className={`
           w-56 h-screen bg-white dark:bg-[#16213e] border-r border-gray-100 dark:border-white/10
-          flex flex-col flex-shrink-0
+          flex flex-col flex-shrink-0 overflow-hidden
           fixed lg:static z-40 inset-y-0 left-0
           transition-transform duration-200
           ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
@@ -108,7 +71,7 @@ export default function Sidebar({ open, onClose }) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 p-3 flex flex-col gap-1">
+      <nav className="flex-1 p-3 flex flex-col gap-1 overflow-y-auto">
         {groups.map((group, gi) => (
           <div key={group.label}>
             <p

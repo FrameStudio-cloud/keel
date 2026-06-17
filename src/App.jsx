@@ -1,5 +1,10 @@
 import { lazy, Suspense, useContext } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: 1, staleTime: 10_000 } },
+});
 import Overview from "./pages/Overview";
 import TourGuide from "./components/TourGuide";
 import SettingsProvider from "./context/SettingsProvider";
@@ -76,12 +81,14 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <SettingsProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </SettingsProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <SettingsProvider>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </SettingsProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }

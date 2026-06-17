@@ -4,6 +4,8 @@ import { supabase } from "../../lib/supabase";
 import { getShopId, withShop } from "../../lib/shop";
 import { formatPrice } from "../../lib/format";
 import { uploadImage, deleteImage } from "../../lib/storage";
+import { paginateQuery } from "../../lib/paginate";
+import Pagination from "../Pagination";
 import ImageUploader from "../ImageUploader";
 
 const EMPTY_FORM = {
@@ -22,6 +24,8 @@ const EMPTY_FORM = {
 
 
 
+const PAGE_SIZE = 50;
+
 export default function ListingsTab() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,23 +36,31 @@ export default function ListingsTab() {
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [toast, setToast] = useState(null);
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    fetchItems();
-  }, []);
-
-  async function fetchItems() {
-    const shopId = await getShopId();
-    const { data, error } = await supabase
-      .from("catalogue")
-      .select("*")
-      .eq("shop_id", shopId)
-      .order("created_at", { ascending: false });
-    if (!error && data?.length > 0) {
-      setItems(data);
-    }
-    setLoading(false);
-  }
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const shopId = await getShopId();
+      const { data, error, total: count } = await paginateQuery({
+        table: "catalogue",
+        shopId,
+        page,
+        pageSize: PAGE_SIZE,
+        orderBy: "created_at",
+        ascending: false,
+      });
+      if (cancelled) return;
+      if (!error && data) {
+        setItems(data);
+        setTotal(count);
+      }
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [page]);
 
   function showToast(msg, type = "success") {
     setToast({ msg, type });
@@ -127,7 +139,7 @@ export default function ListingsTab() {
     }
     showToast(editItem ? "Item updated!" : "Item added!");
     setShowForm(false);
-    fetchItems();
+    setPage(0);
   }
 
   async function handleDelete(item) {
@@ -146,7 +158,7 @@ export default function ListingsTab() {
       return;
     }
     showToast("Item deleted");
-    fetchItems();
+    setPage(0);
   }
 
   async function toggleAvailable(item) {
@@ -155,7 +167,7 @@ export default function ListingsTab() {
       .update({ available: !item.available })
       .eq("id", item.id)
       .eq("shop_id", await getShopId());
-    fetchItems();
+    setPage(0);
   }
 
   return (
@@ -173,7 +185,7 @@ export default function ListingsTab() {
       )}
 
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-slate-600 dark:text-slate-400">{items.length} items</p>
+        <p className="text-sm text-slate-600 dark:text-slate-400">{total} items</p>
         <button
           onClick={openAdd}
           className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-4 py-2 rounded-xl transition-all"
@@ -269,14 +281,14 @@ export default function ListingsTab() {
                     </td>
                     <td className="px-4 py-3"><span className="text-xs text-slate-900 dark:text-white">{item.category}</span></td>
                     <td className="px-4 py-3">
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${item.type === "service" ? "bg-blue-500/20 text-blue-300" : "bg-green-500/20 text-green-300"}`}>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${item.type === "service" ? "bg-blue-500/20 text-blue-700 dark:text-blue-300" : "bg-green-500/20 text-green-700 dark:text-green-300"}`}>
                         {item.type}
                       </span>
                     </td>
                     <td className="px-4 py-3"><span className="text-sm font-bold text-blue-400">{item.price_label || formatPrice(item.price)}</span></td>
                     <td className="px-4 py-3">
                       <button onClick={() => toggleAvailable(item)} className={`text-xs font-semibold px-3 py-1 rounded-full transition-all ${
-                        item.available ? "bg-green-500/20 text-green-300 hover:bg-red-500/20 hover:text-red-300" : "bg-red-500/20 text-red-300 hover:bg-green-500/20 hover:text-green-300"
+                        item.available ? "bg-green-500/20 text-green-700 dark:text-green-300 hover:bg-red-500/20 hover:text-red-700 dark:hover:text-red-300" : "bg-red-500/20 text-red-700 dark:text-red-300 hover:bg-green-500/20 hover:text-green-700 dark:hover:text-green-300"
                       }`}>{item.available ? "Available" : "Hidden"}</button>
                     </td>
                     <td className="px-4 py-3">
@@ -291,6 +303,7 @@ export default function ListingsTab() {
                 ))}
               </tbody>
             </table>
+            <Pagination page={page} total={total} pageSize={PAGE_SIZE} onPageChange={setPage} />
           </div>
         </>
       )}

@@ -41,13 +41,15 @@ export default function Finance() {
           .select("amount, method")
           .eq("shop_id", shopId)
           .gte("created_at", today.toISOString())
-          .lte("created_at", todayEnd.toISOString()),
+          .lte("created_at", todayEnd.toISOString())
+          .limit(500),
         supabase
           .from("expenses")
           .select("*")
           .eq("shop_id", shopId)
           .eq("expense_date", today.toISOString().slice(0, 10))
-          .order("created_at", { ascending: false }),
+          .order("created_at", { ascending: false })
+          .limit(500),
       ]);
 
       const sales = salesRes.data || [];
