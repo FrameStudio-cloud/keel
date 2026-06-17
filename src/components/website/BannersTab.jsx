@@ -71,8 +71,8 @@ export default function BannersTab() {
     const shopId = await getShopId();
     const arr = [...banners];
     const temp = arr[index].sort_order;
-    arr[index].sort_order = arr[index - 1].sort_order;
-    arr[index - 1].sort_order = temp;
+    arr[index] = { ...arr[index], sort_order: arr[index - 1].sort_order };
+    arr[index - 1] = { ...arr[index - 1], sort_order: temp };
     await Promise.all([
       supabase
         .from("banners")

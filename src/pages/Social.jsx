@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FiClock, FiHeart, FiEye } from "react-icons/fi";
+import { FiClock } from "react-icons/fi";
 import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
 import Skeleton from "../components/Skeleton";
@@ -7,12 +7,7 @@ import PlanPostModal from "../components/PlanPostModal";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 
-const account = {
-  username: "@lewisshop",
-  followers: 1240,
-  following: 380,
-  posts: 47,
-};
+
 
 function PostCard({ post }) {
   const isScheduled = post.status === "scheduled";
@@ -104,57 +99,22 @@ export default function Social() {
     setLoading(false);
   }
 
-  const topPost = [...posts]
-    .filter((p) => p.reach)
-    .sort((a, b) => b.reach - a.reach)[0];
-
   return (
     <PageLayout title="Social Media">
-      {/* Account card */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="col-span-2 bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-pink-500 flex items-center justify-center text-white font-medium">
-            IG
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-800 dark:text-white">
-              {account.username}
-            </p>
-            <div className="flex gap-4 mt-1">
-              <span className="text-xs text-gray-400 dark:text-slate-500">
-                {account.followers.toLocaleString()} followers
-              </span>
-              <span className="text-xs text-gray-400 dark:text-slate-500">
-                {account.following} following
-              </span>
-              <span className="text-xs text-gray-400 dark:text-slate-500">
-                {account.posts} posts
-              </span>
-            </div>
-          </div>
-          <Badge label="Connected" color="green" />
+      {/* Instagram connect */}
+      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 flex items-center gap-4 mb-6">
+        <div className="w-10 h-10 rounded-lg bg-pink-500 flex items-center justify-center text-white text-sm font-bold">
+          IG
         </div>
-
-        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 flex flex-col justify-between">
-          {topPost ? (
-            <>
-              <p className="text-xs text-gray-400 dark:text-slate-500">Best performing post</p>
-              <p className="text-sm text-gray-700 dark:text-gray-100 line-clamp-2 leading-relaxed">
-                {topPost.caption}
-              </p>
-              <div className="flex gap-3">
-                <span className="text-xs text-gray-500 dark:text-slate-400">
-                  <FiHeart className="inline" /> {topPost.likes}
-                </span>
-                <span className="text-xs text-gray-500 dark:text-slate-400">
-                  <FiEye className="inline" /> {topPost.reach?.toLocaleString()}
-                </span>
-              </div>
-            </>
-          ) : (
-            <p className="text-xs text-gray-400 dark:text-slate-500">No published posts yet</p>
-          )}
+        <div className="flex-1">
+          <p className="text-sm font-medium text-gray-800 dark:text-white">Instagram</p>
+          <p className="text-xs text-gray-400 dark:text-slate-500">
+            Connect your Instagram to track post performance
+          </p>
         </div>
+        <button className="text-xs text-blue-600 dark:text-blue-400 border border-blue-200 px-4 py-1.5 rounded-full hover:bg-blue-50 transition-all">
+          Connect
+        </button>
       </div>
 
       {/* TikTok connect */}

@@ -35,7 +35,7 @@ export default function SetupWizard() {
 
     await supabase.from("shops").update({ business_category: form.category }).eq("id", shopId);
 
-    const { data: existing } = await supabase.from("store_settings").select("id").eq("shop_id", shopId).single();
+    const { data: existing } = await supabase.from("store_settings").select("id").eq("shop_id", shopId).maybeSingle();
     if (existing) {
       await supabase.from("store_settings").update({
         store_name: form.storeName,
@@ -44,7 +44,7 @@ export default function SetupWizard() {
         currency_symbol: form.currencySymbol,
         default_payment: form.defaultPayment,
         low_stock_threshold: form.lowStockThreshold,
-        theme: "dark",
+        theme: "light",
       }).eq("shop_id", shopId);
     } else {
       await supabase.from("store_settings").insert({
@@ -55,7 +55,7 @@ export default function SetupWizard() {
         currency_symbol: form.currencySymbol,
         default_payment: form.defaultPayment,
         low_stock_threshold: form.lowStockThreshold,
-        theme: "dark",
+        theme: "light",
       });
     }
 

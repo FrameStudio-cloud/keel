@@ -14,7 +14,7 @@ export default function SettingsProvider({ children }) {
     lowStockThreshold: 6,
     defaultPayment: "Cash",
     receiptFooter: "",
-    theme: "dark",
+    theme: "light",
     websiteUrl: "",
     whatsapp: "",
     businessHours: null,
@@ -50,7 +50,7 @@ export default function SettingsProvider({ children }) {
             store.default_payment
           );
 
-          const theme = store.theme || "dark";
+          const theme = store.theme || "light";
           document.documentElement.classList.toggle("dark", theme === "dark");
 
           setSettings({
@@ -81,6 +81,8 @@ export default function SettingsProvider({ children }) {
       }
     })();
   }, []);
+
+  document.documentElement.classList.toggle("dark", settings.theme === "dark");
 
   return (
     <SettingsContext.Provider value={settings}>

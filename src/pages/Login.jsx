@@ -42,7 +42,7 @@ export default function Login() {
         await supabase.from("store_settings").insert({
           shop_id: shopData.id,
           store_name: shopName,
-          theme: "dark",
+          theme: "light",
         });
 
         const { error: userError } = await supabase.from("users").insert({

@@ -26,7 +26,6 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
   const [settingsId, setSettingsId] = useState(null);
-  const [shopSlug, setShopSlug] = useState("");
   const [form, setForm] = useState({
     store_name: "",
     store_phone: "",
@@ -39,7 +38,6 @@ export default function Settings() {
     website_url: "",
     whatsapp: "",
     business_category: "general",
-    terms_of_service: "",
   });
   const [hours, setHours] = useState(defaultHours());
 
@@ -49,11 +47,9 @@ export default function Settings() {
       if (!shopId) { setLoading(false); return; }
 
       const [{ data: shop }, { data: store }] = await Promise.all([
-        supabase.from("shops").select("business_category, slug").eq("id", shopId).single(),
+        supabase.from("shops").select("business_category, slug").eq("id", shopId).maybeSingle(),
         supabase.from("store_settings").select("*").eq("shop_id", shopId).maybeSingle(),
       ]);
-
-      if (shop) setShopSlug(shop.slug || "");
 
       if (store) {
         setSettingsId(store.id);
@@ -69,7 +65,6 @@ export default function Settings() {
           website_url: store.website_url || "",
           whatsapp: store.whatsapp || "",
           business_category: shop?.business_category || "general",
-          terms_of_service: store.terms_of_service || "",
         });
         if (store.business_hours) {
           setHours(
@@ -133,7 +128,6 @@ export default function Settings() {
       website_url: form.website_url,
       whatsapp: form.whatsapp,
       business_hours: businessHours,
-      terms_of_service: form.terms_of_service,
       shop_id: shopId,
     };
     if (settingsId) payload.id = settingsId;
@@ -170,13 +164,14 @@ export default function Settings() {
     const tables = ["products", "sales", "stock_movements", "catalogue", "expenses", "page_views"];
     const allData = {};
 
-    for (const table of tables) {
-      const { data } = await supabase
-        .from(table)
-        .select("*")
-        .eq("shop_id", shopId);
-      allData[table] = data || [];
-    }
+    const results = await Promise.allSettled(
+      tables.map((table) =>
+        supabase.from(table).select("*").eq("shop_id", shopId)
+      )
+    );
+    tables.forEach((table, i) => {
+      allData[table] = results[i].status === "fulfilled" ? results[i].value.data || [] : [];
+    });
 
     const blob = new Blob([JSON.stringify(allData, null, 2)], {
       type: "application/json",
@@ -314,6 +309,17 @@ export default function Settings() {
             <h3 className="text-sm font-medium text-gray-800 dark:text-white">Appearance</h3>
           </div>
           <div className="flex gap-3">
+              <button
+              onClick={() => handleThemeChange("light")}
+              className={`flex-1 py-3 rounded-lg text-sm font-semibold border transition-all flex items-center justify-center gap-2 ${
+                form.theme === "light"
+                  ? "bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/25"
+                  : "bg-white dark:bg-[#1a1a2e] text-gray-500 dark:text-slate-400 border-gray-200 dark:border-white/10 hover:text-gray-800 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/20"
+              }`}
+            >
+              <FiSun size={14} />
+              Light
+            </button>
             <button
               onClick={() => handleThemeChange("dark")}
               className={`flex-1 py-3 rounded-lg text-sm font-semibold border transition-all flex items-center justify-center gap-2 ${
@@ -325,17 +331,7 @@ export default function Settings() {
               <FiMoon size={14} />
               Dark
             </button>
-            <button
-              onClick={() => handleThemeChange("light")}
-              className={`flex-1 py-3 rounded-lg text-sm font-semibold border transition-all flex items-center justify-center gap-2 ${
-                form.theme === "light"
-                  ? "bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/25"
-                  : "bg-white dark:bg-[#1a1a2e] text-gray-500 dark:text-slate-400 border-gray-200 dark:border-white/10 hover:text-gray-800 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/20"
-              }`}
-            >
-              <FiSun size={14} />
-              Light
-            </button>
+          
           </div>
         </div>
 
@@ -399,31 +395,13 @@ export default function Settings() {
           <textarea rows={2} value={form.receipt_footer} onChange={(e) => setForm({ ...form, receipt_footer: e.target.value })} placeholder="Thank you for your business!" className={`${inputClass} resize-none`} />
         </div>
 
-        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5">
-          <div className="flex items-center gap-2 mb-4">
+        <a href="/terms" target="_blank" className="block bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5 hover:border-gray-300 dark:hover:border-white/20 transition-all group">
+          <div className="flex items-center gap-2">
             <FiFileText size={14} className="text-gray-400" />
             <h3 className="text-sm font-medium text-gray-800 dark:text-white">Terms of Service</h3>
-            {shopSlug && (
-              <a
-                href={`/terms?slug=${shopSlug}`}
-                target="_blank"
-                className="ml-auto text-xs text-blue-500 hover:text-blue-400 underline"
-              >
-                View published
-              </a>
-            )}
+            <span className="ml-auto text-gray-400 group-hover:text-gray-600 dark:group-hover:text-slate-300 transition-all">&gt;</span>
           </div>
-          <p className="text-xs text-gray-400 dark:text-slate-500 mb-3">
-            Use <code className="text-blue-500 bg-blue-500/10 px-1 rounded">{`{store_name}`}</code> to insert your store name. Sections with <code className="text-blue-500 bg-blue-500/10 px-1 rounded">{`## `}</code> become headings.
-          </p>
-          <textarea
-            rows={8}
-            value={form.terms_of_service}
-            onChange={(e) => setForm({ ...form, terms_of_service: e.target.value })}
-            placeholder={`## 1. Use of Service\n\nBy using {store_name}, you agree to these terms...`}
-            className={`${inputClass} resize-none font-mono text-xs`}
-          />
-        </div>
+        </a>
 
         <button onClick={handleSave} disabled={saving} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25">
           <FiSave size={14} />

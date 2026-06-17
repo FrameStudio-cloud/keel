@@ -2,14 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { getShopId } from "../../lib/shop";
 
-const mockItems = [
-  { id: "mock-1", name: "Phone Case", category: "Accessories", image: "https://picsum.photos/seed/case/400/400", description: "Premium silicone case" },
-  { id: "mock-2", name: "Wireless Earbuds", category: "Audio", image: "https://picsum.photos/seed/earbuds/400/400", description: "Noise cancelling" },
-  { id: "mock-3", name: "Smart Watch", category: "Wearables", image: "https://picsum.photos/seed/watch/400/400", description: "Fitness tracker" },
-  { id: "mock-4", name: "Laptop Stand", category: "Accessories", image: "https://picsum.photos/seed/stand/400/400", description: "Adjustable aluminum" },
-  { id: "mock-5", name: "LED Desk Lamp", category: "Lighting", image: "https://picsum.photos/seed/lamp/400/400", description: "USB charged" },
-  { id: "mock-6", name: "Backpack", category: "Bags", image: "https://picsum.photos/seed/bag/400/400", description: "Waterproof 25L" },
-];
+
 
 export default function GalleryTab() {
   const [items, setItems] = useState([]);
@@ -27,8 +20,6 @@ export default function GalleryTab() {
 
       if (!error && data?.length > 0) {
         setItems(data);
-      } else {
-        setItems(mockItems);
       }
       setLoading(false);
     })();

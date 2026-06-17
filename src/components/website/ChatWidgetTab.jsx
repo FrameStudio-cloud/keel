@@ -55,7 +55,7 @@ export default function ChatWidgetTab() {
           .from("store_settings")
           .select("whatsapp")
           .eq("shop_id", id)
-          .single();
+          .maybeSingle();
         if (settings?.whatsapp) {
           setConfig((prev) => ({ ...prev, whatsapp_number: settings.whatsapp }));
         }
@@ -118,7 +118,7 @@ export default function ChatWidgetTab() {
   }
 
   async function deleteFaq(id) {
-    const { error } = await supabase.from("chat_faqs").delete().eq("id", id);
+    const { error } = await supabase.from("chat_faqs").delete().eq("id", id).eq("shop_id", shopId);
     if (error) return showToast(error.message, "error");
     setFaqs(faqs.filter((f) => f.id !== id));
     showToast("FAQ deleted");
@@ -135,8 +135,8 @@ export default function ChatWidgetTab() {
     updated[swapIdx] = { ...updated[swapIdx], sort_order: temp };
     setFaqs(updated);
     await supabase.from("chat_faqs").upsert([
-      { id: updated[idx].id, sort_order: updated[idx].sort_order },
-      { id: updated[swapIdx].id, sort_order: updated[swapIdx].sort_order },
+      { id: updated[idx].id, shop_id: shopId, sort_order: updated[idx].sort_order },
+      { id: updated[swapIdx].id, shop_id: shopId, sort_order: updated[swapIdx].sort_order },
     ]);
   }
 
@@ -144,7 +144,8 @@ export default function ChatWidgetTab() {
     const { error } = await supabase
       .from("chat_messages")
       .update({ status: "answered" })
-      .eq("id", id);
+      .eq("id", id)
+      .eq("shop_id", shopId);
     if (error) return showToast(error.message, "error");
     setMessages(messages.filter((m) => m.id !== id));
   }
@@ -291,7 +292,8 @@ export default function ChatWidgetTab() {
                       const { error } = await supabase
                         .from("chat_faqs")
                         .update({ question: faq.question, answer: faq.answer })
-                        .eq("id", faq.id);
+                        .eq("id", faq.id)
+                        .eq("shop_id", shopId);
                       if (error) return showToast(error.message, "error");
                       setEditingFaq(null);
                       showToast("FAQ updated!");

@@ -58,7 +58,7 @@ export default function AuthProvider({ children }) {
     await supabase.from("store_settings").insert({
       shop_id: shopData.id,
       store_name: displayName,
-      theme: "dark",
+      theme: "light",
     });
 
     await supabase.from("users").insert({

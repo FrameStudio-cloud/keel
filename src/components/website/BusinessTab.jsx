@@ -29,7 +29,7 @@ export default function BusinessTab() {
         .from("store_settings")
         .select("business_hours")
         .eq("shop_id", shopId)
-        .single();
+        .maybeSingle();
 
       if (data?.business_hours) {
         setHours(

@@ -8,7 +8,7 @@ export const SettingsContext = createContext({
   lowStockThreshold: 6,
   defaultPayment: "Cash",
   receiptFooter: "",
-  theme: "dark",
+  theme: "light",
   websiteUrl: "",
   whatsapp: "",
   businessHours: null,

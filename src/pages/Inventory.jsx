@@ -83,10 +83,11 @@ export default function Inventory() {
   }
 
   async function handleUnpublish(product) {
+    const shopId = await getShopId();
     const item = publishedMap[product.name.toLowerCase()];
     if (!item) return;
     setPublishingId(product.id);
-    await supabase.from("catalogue").delete().eq("id", item.id);
+    await supabase.from("catalogue").delete().eq("id", item.id).eq("shop_id", shopId);
     setPublishingId(null);
     fetchCatalogue();
   }

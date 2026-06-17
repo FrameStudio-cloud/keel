@@ -7,9 +7,6 @@ import SlowMovingStock from "../components/SlowMovingStock";
 import Skeleton from "../components/Skeleton";
 import { formatPrice } from "../lib/format";
 
-import PageViewsChart from "../components/PageViewsChart";
-import MostViewedPages from "../components/MostViewedPages";
-import TrafficSources from "../components/TrafficSources";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { useSettings } from "../hooks/useSettings";
@@ -225,29 +222,9 @@ export default function Overview() {
             <TopProducts products={topProducts} />
           </div>
           {hasWebsite && (
-            <>
-              <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div className="lg:col-span-2">
-                  <SlowMovingStock />
-                </div>
-                <div className="lg:col-span-1">
-                  <div className="grid grid-cols-2 gap-3">
-                    <StatCard label="Total Views" value="1,234" change="All time" up />
-                    <StatCard label="Today" value="56" change="+12% vs yesterday" up />
-                    <StatCard label="Most viewed" value="Home" change="42% of all visits" up />
-                    <StatCard label="Top product" value="Phone Case" change="89 views" up />
-                  </div>
-                </div>
-              </div>
-              <div className="mt-6">
-                <p className="text-sm font-semibold text-gray-800 dark:text-white mb-3">Analytics</p>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  <PageViewsChart />
-                  <MostViewedPages />
-                  <TrafficSources />
-                </div>
-              </div>
-            </>
+            <div className="mt-6">
+              <SlowMovingStock />
+            </div>
           )}
         </>
       )}

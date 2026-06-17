@@ -1,0 +1,37 @@
+{
+  "sections": [
+    [
+      "## 1. Use of Service",
+      "By using {store_name}, you agree to these terms and conditions. If you do not agree, please do not use our services.",
+      "{store_name} reserves the right to update these terms at any time without prior notice."
+    ],
+    [
+      "## 2. Products & Pricing",
+      "All product descriptions, images, and prices are subject to change without notice.",
+      "We reserve the right to discontinue any product at any time."
+    ],
+    [
+      "## 3. Orders & Payment",
+      "By placing an order, you agree to provide accurate and complete information.",
+      "Payment must be received in full before orders are processed. We accept the payment methods displayed at checkout."
+    ],
+    [
+      "## 4. Shipping & Delivery",
+      "Delivery times are estimates and not guaranteed. {store_name} is not liable for delays caused by third-party services.",
+      "Risk of loss passes to you upon delivery."
+    ],
+    [
+      "## 5. Returns & Refunds",
+      "Returns are accepted within the period specified in our return policy. Items must be in original condition.",
+      "Refunds will be processed using the original payment method within a reasonable timeframe."
+    ],
+    [
+      "## 6. Limitation of Liability",
+      "{store_name} shall not be liable for any indirect, incidental, or consequential damages arising from the use of our products or services."
+    ],
+    [
+      "## 7. Contact",
+      "For questions about these terms, please contact us through the contact information provided on our website."
+    ]
+  ]
+}

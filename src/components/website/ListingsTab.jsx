@@ -20,13 +20,7 @@ const EMPTY_FORM = {
   includes: "",
 };
 
-const mockItems = [
-  { id: "mock-1", name: "iPhone 15 Pro Case", category: "Accessories", type: "product", price: 3500, price_label: "KSh 3,500", image: "https://picsum.photos/seed/case2/400/400", available: true, badge: "Best Seller", specs: ["Silicone", "MagSafe compatible"], includes: null, description: "", created_at: new Date().toISOString() },
-  { id: "mock-2", name: "Wireless Charger Pad", category: "Accessories", type: "product", price: 2500, price_label: "KSh 2,500", image: "https://picsum.photos/seed/charger/400/400", available: true, badge: null, specs: ["Fast charge", "LED indicator"], includes: null, description: "", created_at: new Date().toISOString() },
-  { id: "mock-3", name: "CCTV Installation", category: "Security", type: "service", price: 15000, price_label: "From KSh 15,000", image: "https://picsum.photos/seed/cctv/400/400", available: true, badge: "Popular", specs: null, includes: ["4 cameras", "DVR + 1TB", "Installation"], description: "", created_at: new Date().toISOString() },
-  { id: "mock-4", name: "Bluetooth Speaker", category: "Audio", type: "product", price: 4500, price_label: "KSh 4,500", image: "https://picsum.photos/seed/speaker/400/400", available: false, badge: null, specs: ["Waterproof", "12hr battery"], includes: null, description: "", created_at: new Date().toISOString() },
-  { id: "mock-5", name: "Web Design", category: "Digital", type: "service", price: 25000, price_label: "KSh 25,000", image: "https://picsum.photos/seed/web/400/400", available: true, badge: null, specs: null, includes: ["5 pages", "Mobile responsive", "Hosting 1yr"], description: "", created_at: new Date().toISOString() },
-];
+
 
 export default function ListingsTab() {
   const [items, setItems] = useState([]);
@@ -52,8 +46,6 @@ export default function ListingsTab() {
       .order("created_at", { ascending: false });
     if (!error && data?.length > 0) {
       setItems(data);
-    } else {
-      setItems(mockItems);
     }
     setLoading(false);
   }

@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
-import { supabase } from "../lib/supabase";
 import { FiArrowLeft } from "react-icons/fi";
+import defaultTerms from "../data/terms.json";
 
-function renderTermLine(text, storeName) {
-  const replaced = text.replace(/\{store_name\}/g, storeName || "this store");
+function renderTermLine(text) {
+  const replaced = text.replace(/\{store_name\}/g, "this store");
   if (replaced.startsWith("## ")) {
     return <h2 className="text-sm font-semibold text-gray-800 dark:text-white mb-2">{replaced.slice(3)}</h2>;
   }
@@ -12,44 +11,7 @@ function renderTermLine(text, storeName) {
 }
 
 export default function Terms() {
-  const [storeName, setStoreName] = useState("");
-  const [termsText, setTermsText] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      const params = new URLSearchParams(window.location.search);
-      const slug = params.get("slug");
-
-      let query = supabase.from("store_settings").select("store_name, terms_of_service");
-      if (slug) {
-        const { data: shop } = await supabase.from("shops").select("id").eq("slug", slug).maybeSingle();
-        if (shop) query = query.eq("shop_id", shop.id);
-        else query = query.limit(1);
-      } else {
-        query = query.limit(1);
-      }
-      const { data } = await query.maybeSingle();
-      if (data) {
-        setStoreName(data.store_name || "");
-        setTermsText(data.terms_of_service || "");
-      }
-      setLoading(false);
-    })();
-  }, []);
-
-  const lines = termsText.split("\n");
-  const sections = [];
-  let current = [];
-  for (const line of lines) {
-    if (line.trim() === "" && current.length > 0) {
-      sections.push(current);
-      current = [];
-    } else {
-      current.push(line);
-    }
-  }
-  if (current.length > 0) sections.push(current);
+  const sections = defaultTerms.sections;
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e]">
@@ -60,7 +22,7 @@ export default function Terms() {
           href="/"
           className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-white mb-6 transition-all"
         >
-          <FiArrowLeft size={14} /> Back to {storeName || "store"}
+          <FiArrowLeft size={14} /> Back to store
         </a>
 
         <div className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-100 dark:border-white/10 p-6">
@@ -68,33 +30,19 @@ export default function Terms() {
             Terms of Service
           </h1>
 
-          {loading ? (
-            <div className="space-y-3">
-              <div className="h-4 bg-white/5 rounded animate-pulse w-3/5" />
-              <div className="h-3 bg-white/5 rounded animate-pulse w-full" />
-              <div className="h-3 bg-white/5 rounded animate-pulse w-4/5" />
-            </div>
-          ) : termsText ? (
-            <div className="space-y-5">
-              {sections.map((group, i) => (
-                <section key={i}>
-                  {group.map((line, j) => {
-                    const rendered = renderTermLine(line, storeName);
-                    return rendered ? <div key={j}>{rendered}</div> : null;
-                  })}
-                </section>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-400 dark:text-slate-500">
-              Terms of service have not been set up yet. Check back later.
-            </p>
-          )}
+          <div className="space-y-5">
+            {sections.map((group, i) => (
+              <section key={i}>
+                {group.map((line, j) => {
+                  const rendered = renderTermLine(line);
+                  return rendered ? <div key={j}>{rendered}</div> : null;
+                })}
+              </section>
+            ))}
+          </div>
         </div>
 
-        <p className="text-center text-xs text-gray-400 dark:text-slate-500 mt-6">
-          {storeName ? `${storeName} · ` : ""}Powered by Keel
-        </p>
+        <p className="text-center text-xs text-gray-400 dark:text-slate-500 mt-6">Powered by Keel</p>
       </div>
     </div>
   );
