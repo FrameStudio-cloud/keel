@@ -17,44 +17,8 @@ export default function Reports() {
   async function fetchProfitMargins() {
     const shopId = await getShopId();
     if (!shopId) return [];
-
-    const { data: sales } = await supabase
-      .from("sales")
-      .select("product_id, product_name, amount, quantity")
-      .eq("shop_id", shopId);
-
-    const { data: products } = await supabase
-      .from("products")
-      .select("id, name, cost_price")
-      .eq("shop_id", shopId);
-
-    if (!sales || !products) return [];
-
-    const costMap = {};
-    products.forEach((p) => {
-      costMap[p.id] = p.cost_price || 0;
-      costMap[p.name] = p.cost_price || 0;
-    });
-
-    const grouped = {};
-    sales.forEach((s) => {
-      const key = s.product_id || s.product_name;
-      if (!grouped[key]) {
-        grouped[key] = { name: s.product_name, qty: 0, revenue: 0, cost: 0 };
-      }
-      grouped[key].qty += s.quantity;
-      grouped[key].revenue += s.amount;
-    });
-
-    return Object.values(grouped)
-      .map((p) => {
-        const unitCost = costMap[p.name] || 0;
-        const totalCost = unitCost * p.qty;
-        const profit = p.revenue - totalCost;
-        const margin = p.revenue > 0 ? Math.round((profit / p.revenue) * 100) : 0;
-        return { ...p, totalCost, profit, margin };
-      })
-      .sort((a, b) => b.revenue - a.revenue);
+    const { data } = await supabase.rpc("get_profit_margins", { p_shop_id: shopId });
+    return data || [];
   }
 
   async function fetchPnl(range) {
@@ -78,12 +42,14 @@ export default function Reports() {
         .from("sales")
         .select("amount, created_at")
         .eq("shop_id", shopId)
-        .gte("created_at", start.toISOString()),
+        .gte("created_at", start.toISOString())
+        .limit(2000),
       supabase
         .from("expenses")
         .select("amount, expense_date")
         .eq("shop_id", shopId)
-        .gte("expense_date", start.toISOString().slice(0, 10)),
+        .gte("expense_date", start.toISOString().slice(0, 10))
+        .limit(2000),
     ]);
 
     const sales = salesRes.data || [];

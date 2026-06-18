@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { FiImage, FiGlobe } from "react-icons/fi";
 import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
@@ -18,6 +19,7 @@ import { CRITICAL_STOCK_THRESHOLD } from "../lib/constants";
 const PAGE_SIZE = 50;
 
 export default function Inventory() {
+  const queryClient = useQueryClient();
   const { lowStockThreshold, businessCategory } = useSettings();
   const threshold = lowStockThreshold ?? 6;
   const showBarcode = businessCategory === "electricals" || businessCategory === "electronics";
@@ -337,7 +339,7 @@ export default function Inventory() {
       {showModal && (
         <AddProductModal
           onClose={() => setShowModal(false)}
-          onAdded={() => setPage(0)}
+          onAdded={() => { setPage(0); queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }); }}
         />
       )}
 
@@ -345,7 +347,7 @@ export default function Inventory() {
         <EditProductModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
-          onUpdated={() => setPage(0)}
+          onUpdated={() => { setPage(0); queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }); }}
         />
       )}
 
@@ -353,7 +355,7 @@ export default function Inventory() {
         <StockAdjustModal
           product={adjustProduct}
           onClose={() => setAdjustProduct(null)}
-          onAdjusted={() => setPage(0)}
+          onAdjusted={() => { setPage(0); queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }); }}
         />
       )}
     </PageLayout>

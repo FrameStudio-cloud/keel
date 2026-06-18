@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
 import Skeleton from "../components/Skeleton";
@@ -12,6 +13,7 @@ import { useDebounce } from "../hooks/useDebounce";
 const PAGE_SIZE = 50;
 
 export default function Sales() {
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [sales, setSales] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -195,7 +197,7 @@ export default function Sales() {
       {showModal && (
         <LogSaleModal
           onClose={() => setShowModal(false)}
-          onAdded={() => setPage(0)}
+          onAdded={() => { setPage(0); queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }); }}
         />
       )}
 

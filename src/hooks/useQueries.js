@@ -44,7 +44,8 @@ export function useSlowMovingStock() {
         .from("products")
         .select("*")
         .eq("shop_id", shopId)
-        .order("stock", { ascending: false });
+        .order("stock", { ascending: false })
+        .limit(100);
       return (allProducts || [])
         .filter((p) => !soldIds.has(p.id) || (soldCount[p.id] || 0) < 3)
         .slice(0, 5);
