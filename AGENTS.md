@@ -25,6 +25,7 @@ npm run lint    # ESLint (flat config)
 
 Current lint: 1 error (pre-existing `react-refresh/only-export-components` on AuthContext — excluded).
 Dependencies: `@tanstack/react-query` added for caching/deduplication.
+**Vercel `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` must match local `.env`** — RPC functions (`get_dashboard_summary`, `get_profit_margins`) live in the Supabase project linked to local `.env`. If Vercel uses a different Supabase project, those RPCs will 404.
 
 ## Renamed
 
@@ -209,11 +210,16 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - Migrated SlowMovingStock to `useSlowMovingStock` React Query hook
 - `getShopId()` promise deduplication — concurrent callers share same in-flight promise
 - Seeded demo data for shop "campus glow": 10 products, 128 sales, 12 expenses, 20 stock movements, 5 catalogue items, 3 banners, 3 posts, 450 page views
+- Cleaned unused deps: removed `dotenv`, `autoprefixer`, `postcss`, `docx`, `@types/react`, `@types/react-dom`; moved `esbuild` to devDependencies
+- `useQueries.js` slow-moving stock: added `.limit(100)` to prevent unbounded fetch
+- `Reports.jsx` profit margins: replaced 2 unbounded queries + JS aggregation with `get_profit_margins` RPC (server-side GROUP BY join, zero over-fetch)
+- `Reports.jsx` PnL: added `.limit(2000)` safety net to sales + expenses queries
+- `Sales.jsx` + `Inventory.jsx`: invalidate `["dashboardSummary"]` query after mutations so Overview always shows fresh data
+- `get_profit_margins` RPC created (Postgres function for aggregated profit/margin calculation per product)
 
 ### Still broken
 - **Google OAuth** — session exchange never completes after OAuth redirect (custom auth bypasses gotrue-js callback handler)
-- **No pagination** — every `select("*")` fetches ALL rows, no `.limit()`/`.range()`
-- **`useDebounce` never imported** — exists at `src/hooks/useDebounce.js` but unused
+- **Pagination gaps** — `useQueries.js:45` (slow-moving stock) unbounded, `Reports.jsx:21-29` (profit margins) fetches all sales+products, `Reports.jsx:76-87` (PnL) date-filtered but no ceiling
 
 ## Conventions
 
