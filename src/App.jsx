@@ -35,13 +35,15 @@ function Loading() {
 }
 
 function ProtectedRoute({ children }) {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
+  if (loading) return <Loading />;
   if (!user) return <Navigate to="/login" replace />;
   return children;
 }
 
 function PublicRoute({ children }) {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
+  if (loading) return <Loading />;
   if (user) return <Navigate to="/" replace />;
   return children;
 }

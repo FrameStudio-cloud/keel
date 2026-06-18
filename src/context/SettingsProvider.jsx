@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
 import { setCurrency } from "../lib/format";
 import { setPaymentConfig } from "../lib/paymentConfig";
 import { SettingsContext } from "./settingsContext";
+import { AuthContext } from "./AuthContext";
 
 export default function SettingsProvider({ children }) {
+  const { user } = useContext(AuthContext);
   const [settings, setSettings] = useState({
     storeName: "",
     storePhone: "",
@@ -80,7 +82,7 @@ export default function SettingsProvider({ children }) {
         setSettings((prev) => ({ ...prev, loading: false }));
       }
     })();
-  }, []);
+  }, [user]);
 
   document.documentElement.classList.toggle("dark", settings.theme === "dark");
 

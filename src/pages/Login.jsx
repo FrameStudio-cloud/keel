@@ -1,21 +1,14 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase, authSignUp, authResetPassword, authUpdatePassword, saveSession } from "../lib/supabase";
+import { supabase, authSignUp, authResetPassword, authUpdatePassword, saveSession, parseHashParams } from "../lib/supabase";
 import { AuthContext } from "../context/AuthContext";
 import { FiMail, FiCheckCircle } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 
-function isRecoveryHash() {
-  const hash = window.location.hash.replace(/^#/, "");
-  if (!hash) return false;
-  const params = Object.fromEntries(new URLSearchParams(hash));
-  return params.type === "recovery" && !!params.access_token;
-}
-
 export default function Login() {
   const { login, signInWithGoogle } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [mode, setMode] = useState(isRecoveryHash() ? "reset_password" : "login");
+  const [mode, setMode] = useState(parseHashParams()?.type === "recovery" ? "reset_password" : "login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");

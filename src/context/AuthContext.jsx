@@ -1,12 +1,11 @@
 import { createContext, useEffect, useState } from "react";
-import { supabase, getPersistedSession, authLogin, authLogout } from "../lib/supabase";
+import { supabase, getPersistedSession, saveSession, authLogin, authLogout, parseHashParams, fetchUserData, STORAGE_KEY_EXPORTED } from "../lib/supabase";
 import { clearShopId } from "../lib/shop";
-
-const initialSession = getPersistedSession();
 
 export const AuthContext = createContext({
   user: null,
   session: null,
+  loading: true,
   needsSetup: false,
   login: async () => {},
   signInWithGoogle: async () => {},
@@ -15,11 +14,74 @@ export const AuthContext = createContext({
 });
 
 export default function AuthProvider({ children }) {
-  const [user, setUser] = useState(initialSession?.user ?? null);
-  const [session, setSession] = useState(initialSession ?? null);
+  const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [needsSetup, setNeedsSetup] = useState(false);
 
-  async function ensureUserRecords(user) {
+  useEffect(() => {
+    let cancelled = false;
+
+    async function initAuth() {
+      const hashData = parseHashParams();
+
+      if (hashData?.type === "recovery") {
+        setLoading(false);
+        return;
+      }
+
+      if (hashData?.access_token) {
+        try {
+          window.history.replaceState(null, "", window.location.pathname);
+
+          const userData = await fetchUserData(hashData.access_token);
+
+          const fullSession = {
+            access_token: hashData.access_token,
+            refresh_token: hashData.refresh_token,
+            expires_in: hashData.expires_in,
+            user: userData,
+          };
+
+          saveSession(fullSession);
+
+          if (!cancelled) {
+            setUser(userData);
+            setSession(fullSession);
+          }
+
+          await ensureUserRecordsInner(userData);
+        } catch (err) {
+          console.error("OAuth token exchange failed", err);
+        }
+      } else {
+        const persisted = getPersistedSession();
+        if (persisted && !cancelled) {
+          setUser(persisted.user);
+          setSession(persisted);
+        }
+      }
+
+      if (!cancelled) setLoading(false);
+    }
+
+    initAuth();
+
+    function handleStorageChange(e) {
+      if (e.key === STORAGE_KEY_EXPORTED && !e.newValue) {
+        setUser(null);
+        setSession(null);
+      }
+    }
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  async function ensureUserRecordsInner(user) {
     const { data: existingUser } = await supabase
       .from("users")
       .select("id, shop_id")
@@ -73,7 +135,7 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
     if (user) {
-      ensureUserRecords(user).then((needsSetup) => {
+      ensureUserRecordsInner(user).then((needsSetup) => {
         if (!needsSetup) setNeedsSetup(true);
       }).catch(() => {});
     }
@@ -104,7 +166,7 @@ export default function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, needsSetup, login, signInWithGoogle, logout, completeSetup }}>
+    <AuthContext.Provider value={{ user, session, loading, needsSetup, login, signInWithGoogle, logout, completeSetup }}>
       {children}
     </AuthContext.Provider>
   );

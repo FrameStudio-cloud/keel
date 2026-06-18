@@ -5,18 +5,35 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 const STORAGE_KEY = `sb-${new URL(supabaseUrl).hostname.split(".")[0]}-auth-token`;
 
-function getAccessToken() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw)?.access_token ?? null;
-  } catch {
-    return null;
-  }
-}
+export const STORAGE_KEY_EXPORTED = STORAGE_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
-  accessToken: async () => getAccessToken(),
+  accessToken: async () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const session = JSON.parse(raw);
+      if (!session?.access_token) return null;
+      if (session.expires_at && Date.now() >= session.expires_at - 60000) {
+        if (!session.refresh_token) {
+          clearPersistedSession();
+          return null;
+        }
+        const res = await window.fetch(`${supabaseUrl}/auth/v1/token?grant_type=refresh_token`, {
+          method: "POST",
+          headers: { apikey: supabaseKey, "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh_token: session.refresh_token }),
+        });
+        if (!res.ok) { clearPersistedSession(); return null; }
+        const data = await res.json();
+        saveSession(data);
+        return data.access_token;
+      }
+      return session.access_token;
+    } catch {
+      return null;
+    }
+  },
 });
 
 export function getPersistedSession() {
@@ -31,7 +48,10 @@ export function getPersistedSession() {
 
 export function saveSession(session) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      ...session,
+      expires_at: Date.now() + (parseInt(session.expires_in) * 1000),
+    }));
   } catch { /* noop */ }
 }
 
@@ -43,6 +63,47 @@ export function clearPersistedSession() {
     const expiresKey = STORAGE_KEY.replace("-auth-token", "-expires-at");
     localStorage.removeItem(expiresKey);
   } catch { /* noop */ }
+}
+
+export function parseHashParams() {
+  const hash = window.location.hash.replace(/^#/, "");
+  if (!hash) return null;
+  const params = new URLSearchParams(hash);
+  const access_token = params.get("access_token");
+  const refresh_token = params.get("refresh_token");
+  const expires_in = params.get("expires_in");
+  const type = params.get("type");
+  if (!access_token) return null;
+  return { access_token, refresh_token, expires_in: parseInt(expires_in), type };
+}
+
+export async function fetchUserData(accessToken) {
+  const res = await window.fetch(`${supabaseUrl}/auth/v1/user`, {
+    method: "GET",
+    headers: { apikey: supabaseKey, Authorization: `Bearer ${accessToken}` },
+  });
+  if (!res.ok) throw new Error("Failed to fetch user");
+  return res.json();
+}
+
+export async function refreshAccessToken() {
+  const session = getPersistedSession();
+  if (!session?.refresh_token) throw new Error("No refresh token available");
+
+  const res = await window.fetch(`${supabaseUrl}/auth/v1/token?grant_type=refresh_token`, {
+    method: "POST",
+    headers: { apikey: supabaseKey, "Content-Type": "application/json" },
+    body: JSON.stringify({ refresh_token: session.refresh_token }),
+  });
+
+  if (!res.ok) {
+    clearPersistedSession();
+    throw new Error("Session expired");
+  }
+
+  const data = await res.json();
+  saveSession(data);
+  return data.access_token;
 }
 
 export async function authSignUp(email, password) {
