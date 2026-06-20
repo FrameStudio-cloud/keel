@@ -2,6 +2,9 @@
 
 ## Session Context
 
+Root `/` route uses `HomeOrDashboard` wrapper — shows landing page (`Homepage.jsx`) if unauthenticated, redirects to Overview dashboard if logged in.
+Favicon + logo: `public/keel icon.png` (logo), `public/favicon-*.png` + `public/android-chrome-*.png` + `public/apple-touch-icon.png` (favicons). Referenced in `index.html` and used in place of inline "K" squares.
+Homepage (`src/pages/Homepage.jsx`) sections: Nav, Hero, Dashboard Preview (screenshot), Features (4 phone-screenshot cards with click-to-open modal), How It Works, Testimonials (6 cards with initials avatars), FAQ (accordion), Contact, CTA + Trust Badges, Footer. Mobile-first grid: features single-column on phone, `pb-12` section spacing, nav with backdrop overlay. Typography: `text-xs` → `text-sm` body, `text-sm` → `text-base` subtexts, hero `text-lg` on desktop. CTA label deduplicated to "Get Started Free". Testimonials trimmed to ≤30 words, include Owner role. Trust badges use single accent color (`text-blue-600`).
 Low-stock threshold comes from `settings.lowStockThreshold` (database), not hardcoded.
 Critical stock threshold is `CRITICAL_STOCK_THRESHOLD = 2` in `src/lib/constants.js`.
 Payment methods are dynamic — configured via `paymentConfig` singleton, updated by SettingsProvider.
@@ -142,7 +145,7 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - `src/pages/Settings.jsx` — flat scroll design, reads initial form values from useSettings; upsert uses `onConflict: "shop_id"`; export uses `Promise.allSettled()`
 - `src/pages/Terms.jsx` — public Terms of Service page, imports from `src/data/terms.json` (static), no DB dependency
 - `src/pages/SetupWizard.jsx` — onboarding flow, saves `"light"` theme
-- `src/pages/Login.jsx` — signup defaults to `"light"` theme
+- `src/pages/Login.jsx` — signup defaults to `"light"` theme, uses `/keel icon.png` logo
 - `src/pages/Website.jsx` — tabbed website management: Listings, Banners, Business Info, Gallery
 - `src/components/website/` — ListingsTab (no mockItems), BannersTab (fixed state mutation in moveUp), BusinessTab (reads businessHours from useSettings), GalleryTab
 - `src/components/website/ChatWidgetTab.jsx` — 5 multi-tenant leak fixes (all queries shop-filtered); reads whatsapp from useSettings
@@ -158,7 +161,8 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - `src/components/layout/Topbar.jsx` — reads storeName from useSettings; uses `useLowStockProducts` hook
 - `src/components/SlowMovingStock.jsx` — uses `useSlowMovingStock` React Query hook
 - `src/hooks/useQueries.js` — shared React Query hooks: `useLowStockCount`, `useLowStockProducts`, `useSlowMovingStock`
-- `src/App.jsx` — wrapped in `QueryClientProvider`
+- `src/App.jsx` — wrapped in `QueryClientProvider`; `HomeOrDashboard` wrapper routes `/` to Homepage or Overview based on auth
+- `src/pages/Homepage.jsx` — landing page with 10 sections (Hero, Preview, Features, How It Works, Testimonials, FAQ, Contact, CTA, Footer). Single CTA label, Owner role in testimonials, mobile-first responsive layout.
 - `src/data/terms.json` — static Terms of Service content
 
 ## Pages & Routes
@@ -166,6 +170,7 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 | Path | File | Description |
 |---|---|---|---|
 | `/` | Overview.jsx | KPIs, weekly chart, top products, website analytics (real, gated by hasWebsite) |
+| `/` (unauthenticated) | Homepage.jsx | Landing page: Nav, Hero, Dashboard Preview, Features, How It Works, Testimonials, FAQ, Contact, CTA, Footer |
 | `/inventory` | Inventory.jsx | Products CRUD, stock adjust, search, Publish button |
 | `/sales` | Sales.jsx | Sales list, log sale, receipt modal, debounced search |
 | `/social` | Social.jsx | Post scheduler, Instagram "Connect" placeholder |

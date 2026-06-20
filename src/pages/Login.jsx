@@ -114,9 +114,7 @@ export default function Login() {
     <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] flex items-center justify-center p-4">
       <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-8 w-full max-w-sm">
         <div className="text-center mb-6">
-          <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center mx-auto mb-3">
-            <span className="text-white font-bold text-lg">K</span>
-          </div>
+          <img src="/keel icon.png" alt="Keel" className="w-12 h-12 mx-auto mb-3" />
           <h2 className="text-slate-900 dark:text-white font-bold text-lg">
             {mode === "check_email" ? "Check your email" : mode === "reset_password" ? "Reset your password" : mode === "reset_done" ? "Password updated" : mode === "signup" ? "Create Your Shop" : "Welcome to Keel"}
           </h2>

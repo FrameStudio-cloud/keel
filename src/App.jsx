@@ -6,6 +6,7 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 10_000 } },
 });
 import Overview from "./pages/Overview";
+import Homepage from "./pages/Homepage";
 import TourGuide from "./components/TourGuide";
 import SettingsProvider from "./context/SettingsProvider";
 import AuthProvider, { AuthContext } from "./context/AuthContext";
@@ -48,6 +49,13 @@ function PublicRoute({ children }) {
   return children;
 }
 
+function HomeOrDashboard() {
+  const { user, loading } = useContext(AuthContext);
+  if (loading) return <Loading />;
+  if (user) return <Overview />;
+  return <Homepage />;
+}
+
 function AppRoutes() {
   const { needsSetup } = useContext(AuthContext);
   const location = useLocation();
@@ -64,7 +72,7 @@ function AppRoutes() {
         <Route path="/p/:id" element={<PublicProduct />} />
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/setup" element={<ProtectedRoute><SetupWizard /></ProtectedRoute>} />
-        <Route path="/" element={<ProtectedRoute><Overview /></ProtectedRoute>} />
+        <Route path="/" element={<HomeOrDashboard />} />
         <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
         <Route path="/sales" element={<ProtectedRoute><Sales /></ProtectedRoute>} />
         <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} />
