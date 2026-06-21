@@ -1,6 +1,6 @@
 # Keel
 
-A **multi-tenant shop management dashboard** with website management features. Built with React 19, Vite, Tailwind CSS v4, and Supabase. Provides inventory tracking, sales logging, bot management (WhatsApp + Telegram), social media post planning, website catalogue/banner management, business info, and dark mode.
+A **multi-tenant shop management dashboard** with website management features. Built with React 19, Vite, Tailwind CSS v4, and Supabase. Provides inventory tracking, sales logging, bot management (WhatsApp + Telegram), social media post planning, website catalogue/banner management, business info, dark mode, and public information pages (Features, Use Cases, About).
 
 ---
 
@@ -35,7 +35,7 @@ Browser → React SPA → supabase-js → Supabase (PostgreSQL)
 ```
 mitho-dash/
 ├── .env                        # VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
-├── AGENTS.md                   # AI development session context
+├── AGENTS.md                   # AI assistant session context
 ├── src/
 │   ├── main.jsx
 │   ├── index.css               # Tailwind + dark mode CSS variables
@@ -62,7 +62,11 @@ mitho-dash/
 │   │   ├── SetupWizard.jsx     # First-run onboarding
 │   │   ├── Profile.jsx
 │   │   ├── Bots.jsx            # WhatsApp + Telegram bots
-│   │   └── Login.jsx
+│   │   ├── Login.jsx
+│   │   ├── Features.jsx        # Public: 12 deep-dive features with shop-type badges
+│   │   ├── UseCases.jsx        # Public: 8 problem/solution narratives
+│   │   ├── AboutFramestudio.jsx # Public: team info, beliefs, contact
+│   │   └── Terms.jsx           # Public: Terms of Service (static JSON)
 │   ├── components/
 │   │   ├── layout/             # PageLayout, Sidebar, Topbar
 │   │   ├── website/            # ListingsTab, BannersTab, BusinessTab, GalleryTab
@@ -80,8 +84,11 @@ mitho-dash/
 ## Routes
 
 | Path | Page | Description |
-|---|---|---|
+|---|---|---|---|
 | `/` | Overview | KPIs, weekly sales chart, top products, website analytics |
+| `/features` | Features | 12 deep-dive features with shop-type badges |
+| `/use-cases` | UseCases | 8 real-world situations (Situation → Cost → How Keel Helps) |
+| `/about` | AboutFramestudio | Who Framestudio is, why Keel was built |
 | `/inventory` | Inventory | Product table, CRUD, stock adjust, search, publish |
 | `/sales` | Sales | Sales list, log sale, receipt |
 | `/social` | Social | Post scheduler, post feed |
@@ -91,6 +98,7 @@ mitho-dash/
 | `/profile` | Profile | Store info display |
 | `/login` | Login | Placeholder auth page |
 | `/setup` | SetupWizard | First-run onboarding |
+| `/terms` | Terms | Public Terms of Service |
 
 ---
 
@@ -153,6 +161,10 @@ Extended: `website_url`, `whatsapp`, `business_hours` (jsonb — `{Monday:{open,
 - **Dark mode** — persisted to DB, applied via CSS variables
 - **SetupWizard** — guided first-run onboarding
 - **Website tracking** — page_views table, usePageTracking hook
+- **Flashcard How It Works** — animated card stack on homepage with CSS keyframes
+- **Website Integration section** — 3 catalogue screenshots with infinite marquee loop on mobile
+- **Public pages** — Features, Use Cases, About pages with in-depth content
+- **ScrollToTop** — auto-scrolls to top on every route change
 
 ---
 

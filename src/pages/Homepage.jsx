@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
+import fashionCatalogue from "../assets/catalogue/zurifashion-catalogue-shot.png";
+import wixCatalogue from "../assets/catalogue/wix-collection-shot.png";
+import electricalsCatalogue from "../assets/catalogue/mini-electricals-shots.png";
 import {
   FiPackage, FiTrendingUp,
   FiChevronDown, FiMail, FiPhone, FiInstagram, FiTwitter, FiGithub,
@@ -20,6 +23,24 @@ const howItWorks = [
   { icon: FiTrendingUp, title: "Start Selling", desc: "Log sales, print receipts, and track revenue in real time. Built-in reports show you exactly where your business stands." },
 ];
 
+const websiteShots = [
+  {
+    image: fashionCatalogue,
+    label: "Fashion Boutique",
+    desc: "Showcase your clothing line with a clean, browsable product grid.",
+  },
+  {
+    image: wixCatalogue,
+    label: "General Store",
+    desc: "Display all your categories — groceries, household, and more.",
+  },
+  {
+    image: electricalsCatalogue,
+    label: "Electronics Store",
+    desc: "List phones, accessories, and gadgets with variant options.",
+  },
+];
+
 const testimonials = [
   { name: "Grace Mwangi", shop: "Owner, Electronics Shop, Thika", text: "Keel saved me hours of manual spreadsheet work. I can check stock levels from my phone and the low-stock alerts mean I never run out of popular items." },
   { name: "James Kiprop", shop: "Owner, General Store, Nairobi", text: "The sales tracking is exactly what I needed. Profit reports at a glance, and the receipt printing keeps my records clean." },
@@ -33,6 +54,11 @@ const faqs = [
   { q: "What is Keel?", a: "Keel is a shop management dashboard for small businesses. It helps you track inventory, log sales, view reports, manage a website, and handle social media — all from one place." },
   { q: "How much does it cost?", a: "Keel is free to use during our beta period. We'll announce pricing when we launch, but early users will get grandfathered into special rates." },
   { q: "Can I manage multiple shops?", a: "Yes. Each shop gets its own dashboard, inventory, and settings. Sign in once and switch between your shops easily." },
+  { q: "Do I get a real website with Keel?", a: "Yes. Keel generates a live website for your shop with a product catalogue, promotional banners, business info page, image gallery, and a WhatsApp chat widget. Add or update products in your dashboard and they appear on your site instantly — no coding needed." },
+  { q: "Can customers buy directly from my website?", a: "Your Keel website currently works as a product showcase and catalogue. Customers browse your listings, see prices and variants, and contact you via WhatsApp or the contact info you provide. Direct checkout is coming soon." },
+  { q: "Can I use my own domain name?", a: "Yes. You can link a custom domain to your Keel website. Ask us for the DNS details after you've set up your shop." },
+  { q: "How do I add products quickly?", a: "Use your phone camera to scan barcodes — Keel auto-fills the product fields. Works for electronics and electricals categories. You can also add products one at a time or enter them manually." },
+  { q: "Does Keel help me communicate with customers?", a: "Yes. Your website comes with a WhatsApp chat widget so customers can message you directly. Keel also offers WhatsApp and Telegram bot integrations for automated customer interactions." },
   { q: "Is my data secure?", a: "Absolutely. Your data is stored in Supabase (HIPAA-compliant infrastructure), encrypted in transit and at rest. We never share your data with third parties." },
   { q: "How do I get started?", a: "Click 'Get Started' above, create your account with your email and shop name, and you'll be guided through a quick 5-minute setup wizard." },
 ];
@@ -65,6 +91,29 @@ export default function Homepage() {
   const [openFaq, setOpenFaq] = useState(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState(null);
+  const marqueeRef = useRef(null);
+
+  useEffect(() => {
+    const track = marqueeRef.current;
+    if (!track) return;
+    let rafId;
+    let scrollX = 0;
+    const half = track.scrollWidth / 2;
+
+    const animate = () => {
+      if (track.dataset.paused === "true") {
+        rafId = requestAnimationFrame(animate);
+        return;
+      }
+      scrollX += 1;
+      if (scrollX >= half) scrollX = 0;
+      track.scrollLeft = scrollX;
+      rafId = requestAnimationFrame(animate);
+    };
+
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] text-slate-900 dark:text-white">
@@ -80,6 +129,7 @@ export default function Homepage() {
           <div className="hidden sm:flex items-center gap-6 text-xs text-slate-600 dark:text-slate-400">
             <a href="#features" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Features</a>
             <a href="#how-it-works" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">How It Works</a>
+            <a href="#website-integration" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Website</a>
             <a href="#testimonials" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Testimonials</a>
             <a href="#faq" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">FAQ</a>
             <a href="#contact" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Contact</a>
@@ -108,6 +158,7 @@ export default function Homepage() {
             <div className="sm:hidden border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] px-4 py-3 space-y-2 text-sm shadow-xl">
             <a href="#features" onClick={() => setMobileNavOpen(false)} className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">Features</a>
             <a href="#how-it-works" onClick={() => setMobileNavOpen(false)} className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">How It Works</a>
+            <a href="#website-integration" onClick={() => setMobileNavOpen(false)} className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">Website</a>
             <a href="#testimonials" onClick={() => setMobileNavOpen(false)} className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">Testimonials</a>
             <a href="#faq" onClick={() => setMobileNavOpen(false)} className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">FAQ</a>
             <a href="#contact" onClick={() => setMobileNavOpen(false)} className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">Contact</a>
@@ -165,23 +216,120 @@ export default function Homepage() {
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
+      {/* HOW IT WORKS — Flashcard stack */}
       <section id="how-it-works" className="max-w-6xl mx-auto px-4 sm:px-6 pb-12 sm:pb-24">
         <div className="text-center mb-12">
           <h2 className="text-2xl sm:text-3xl font-extrabold">How it works</h2>
           <p className="mt-2 text-base text-slate-600 dark:text-slate-400">Three steps to get your shop online and running.</p>
         </div>
-        <div className="grid sm:grid-cols-3 gap-6">
+
+        <style>{`
+          @keyframes cardCycle {
+            0%, 20% {
+              transform: translateY(var(--peek-y)) scale(var(--peek-scale));
+              opacity: 0.6;
+              z-index: 1;
+              filter: blur(0.5px);
+            }
+            20%, 25% {
+              transform: translateY(0) scale(1);
+              opacity: 1;
+              z-index: 9;
+              filter: blur(0);
+            }
+            25%, 55% {
+              transform: translateY(0) scale(1);
+              opacity: 1;
+              z-index: 10;
+              filter: blur(0);
+            }
+            55%, 60% {
+              transform: translateY(80px) scale(0.92);
+              opacity: 0;
+              z-index: 11;
+              filter: blur(1px);
+            }
+            60%, 100% {
+              transform: translateY(var(--peek-y)) scale(var(--peek-scale));
+              opacity: 0.6;
+              z-index: 1;
+              filter: blur(0.5px);
+            }
+          }
+        `}</style>
+
+        <div className="relative h-[270px] sm:h-[240px]">
           {howItWorks.map(({ icon: Icon, title, desc }, i) => (
-            <div key={title} className="text-center">
-              <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center mx-auto mb-4">
-                <Icon className="text-blue-600 dark:text-blue-400 text-lg" />
+            <div
+              key={title}
+              className="absolute inset-x-0"
+              style={{
+                animation: `cardCycle 15s ease-in-out ${["-5s", "0s", "-10s"][i]} infinite`,
+                "--peek-y": `${12 + i * 8}px`,
+                "--peek-scale": `${1 - i * 0.025}`,
+              }}
+            >
+              <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-6 text-center">
+                <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center mx-auto mb-4">
+                  <Icon className="text-blue-600 dark:text-blue-400 text-lg" />
+                </div>
+                <h3 className="font-bold text-sm mb-2">{title}</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed sm:max-w-xs mx-auto">{desc}</p>
               </div>
-              <div className="w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center mx-auto mb-3">
-                {String(i + 1).padStart(2, "0")}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* WEBSITE INTEGRATION */}
+      <section id="website-integration" className="max-w-6xl mx-auto px-4 sm:px-6 pb-12 sm:pb-24">
+        <div className="text-center mb-10">
+          <h2 className="text-2xl sm:text-3xl font-extrabold">Your shop, now online — managed from one place</h2>
+          <p className="mt-2 text-base text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
+            Keel powers your entire website. Publish products, run banners, set business hours, add a WhatsApp chat widget — all from your dashboard. No coding, no separate tools.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
+            <span className="text-xs text-slate-500 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-full">Live product catalogue</span>
+            <span className="text-xs text-slate-500 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-full">WhatsApp chat widget</span>
+            <span className="text-xs text-slate-500 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-full">Custom banners</span>
+            <span className="text-xs text-slate-500 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-full">Business info page</span>
+          </div>
+        </div>
+
+        {/* Mobile: infinite marquee loop (JS-powered) */}
+        <div className="sm:hidden overflow-hidden pb-2 select-none">
+          <div
+            ref={marqueeRef}
+            className="flex gap-4 overflow-hidden"
+            onMouseEnter={() => { if (marqueeRef.current) marqueeRef.current.dataset.paused = "true" }}
+            onMouseLeave={() => { if (marqueeRef.current) marqueeRef.current.dataset.paused = "false" }}
+          >
+            {[...websiteShots, ...websiteShots].map(({ image, label, desc }, i) => (
+              <div
+                key={`${label}-${i}`}
+                className="w-[80vw] flex-shrink-0 bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden"
+              >
+                <img src={image} alt={label} className="w-full" />
+                <div className="p-4">
+                  <h3 className="font-bold text-sm mb-0.5">{label}</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{desc}</p>
+                </div>
               </div>
-              <h3 className="font-bold text-sm mb-1">{title}</h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed sm:max-w-xs mx-auto">{desc}</p>
+            ))}
+          </div>
+        </div>
+
+        <div className="hidden sm:grid sm:grid-cols-3 gap-4">
+          {websiteShots.map(({ image, label, desc }) => (
+            <div
+              key={label}
+              className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden"
+            >
+              <img src={image} alt={label} className="w-full" />
+              <div className="p-4">
+                <h3 className="font-bold text-sm mb-0.5">{label}</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{desc}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -308,9 +456,20 @@ export default function Homepage() {
       {/* FOOTER */}
       <footer className="border-t border-slate-200 dark:border-white/10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-500">
-            <img src="/keel icon.png" alt="Keel" className="w-5 h-5" />
-            &copy; {new Date().getFullYear()} Keel. All rights reserved.
+          <div className="flex flex-col items-center sm:items-start gap-2">
+            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-500">
+              <img src="/keel icon.png" alt="Keel" className="w-5 h-5" />
+              &copy; {new Date().getFullYear()} Keel. All rights reserved.
+            </div>
+            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-500">
+              <Link to="/features" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Features</Link>
+              <span>&middot;</span>
+              <Link to="/use-cases" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Use Cases</Link>
+              <span>&middot;</span>
+              <Link to="/about" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">About</Link>
+              <span>&middot;</span>
+              <a href="https://framestudio.co.ke" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Made by Framestudio</a>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             {socialLinks.map(({ icon: Icon, href, label }) => (

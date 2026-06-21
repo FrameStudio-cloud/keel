@@ -1,0 +1,27 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - heading "Your products, online and ready to sell" [level=2] [ref=e4]
+    - paragraph [ref=e5]: Publish your inventory to a live website with one tap. Three real storefronts powered by Keel.
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - generic [ref=e9]:
+        - img [ref=e10]
+        - text: zurifashion-catalogue-shot.png
+      - generic [ref=e12]:
+        - heading "Fashion Boutique" [level=3] [ref=e13]
+        - paragraph [ref=e14]: Showcase your clothing line with a clean, browsable product grid.
+    - generic [ref=e15]:
+      - generic [ref=e17]:
+        - img [ref=e18]
+        - text: wix-collection-shot.png
+      - generic [ref=e20]:
+        - heading "General Store" [level=3] [ref=e21]
+        - paragraph [ref=e22]: Display all your categories — groceries, household, and more.
+    - generic [ref=e23]:
+      - generic [ref=e25]:
+        - img [ref=e26]
+        - text: mini-electricals-shots.png
+      - generic [ref=e28]:
+        - heading "Electronics Store" [level=3] [ref=e29]
+        - paragraph [ref=e30]: List phones, accessories, and gadgets with variant options.
+  - paragraph [ref=e31]: ↑ Your actual screenshots will appear here in place of the colored placeholders

@@ -4,7 +4,7 @@
 
 Root `/` route uses `HomeOrDashboard` wrapper — shows landing page (`Homepage.jsx`) if unauthenticated, redirects to Overview dashboard if logged in.
 Favicon + logo: `public/keel icon.png` (logo), `public/favicon-*.png` + `public/android-chrome-*.png` + `public/apple-touch-icon.png` (favicons). Referenced in `index.html` and used in place of inline "K" squares.
-Homepage (`src/pages/Homepage.jsx`) sections: Nav, Hero, Dashboard Preview (screenshot), Features (4 phone-screenshot cards with click-to-open modal), How It Works, Testimonials (6 cards with initials avatars), FAQ (accordion), Contact, CTA + Trust Badges, Footer. Mobile-first grid: features single-column on phone, `pb-12` section spacing, nav with backdrop overlay. Typography: `text-xs` → `text-sm` body, `text-sm` → `text-base` subtexts, hero `text-lg` on desktop. CTA label deduplicated to "Get Started Free". Testimonials trimmed to ≤30 words, include Owner role. Trust badges use single accent color (`text-blue-600`).
+Homepage (`src/pages/Homepage.jsx`) sections: Nav, Hero, Dashboard Preview (screenshot), Features (4 phone-screenshot cards with click-to-open modal), How It Works (flashcard stack animation — 3 cards fall/reveal on loop, CSS keyframe + custom properties), Website Integration (3 catalogue screenshots from `src/assets/catalogue/`, horizontal scroll on mobile, 3-column grid on desktop), Testimonials (6 cards with initials avatars), FAQ (10 questions, accordion), Contact, CTA + Trust Badges, Footer. Mobile-first grid: features single-column on phone, `pb-12` section spacing, nav with backdrop overlay. Typography: `text-xs` → `text-sm` body, `text-sm` → `text-base` subtexts, hero `text-lg` on desktop. CTA label deduplicated to "Get Started Free". Testimonials trimmed to ≤30 words, include Owner role. Trust badges use single accent color (`text-blue-600`).
 Low-stock threshold comes from `settings.lowStockThreshold` (database), not hardcoded.
 Critical stock threshold is `CRITICAL_STOCK_THRESHOLD = 2` in `src/lib/constants.js`.
 Payment methods are dynamic — configured via `paymentConfig` singleton, updated by SettingsProvider.
@@ -161,16 +161,23 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - `src/components/layout/Topbar.jsx` — reads storeName from useSettings; uses `useLowStockProducts` hook
 - `src/components/SlowMovingStock.jsx` — uses `useSlowMovingStock` React Query hook
 - `src/hooks/useQueries.js` — shared React Query hooks: `useLowStockCount`, `useLowStockProducts`, `useSlowMovingStock`
-- `src/App.jsx` — wrapped in `QueryClientProvider`; `HomeOrDashboard` wrapper routes `/` to Homepage or Overview based on auth
-- `src/pages/Homepage.jsx` — landing page with 10 sections (Hero, Preview, Features, How It Works, Testimonials, FAQ, Contact, CTA, Footer). Single CTA label, Owner role in testimonials, mobile-first responsive layout.
+- `src/App.jsx` — wrapped in `QueryClientProvider`; `HomeOrDashboard` wrapper routes `/` to Homepage or Overview based on auth; includes `ScrollToTop` component (scrolls to top on every route change)
+- `src/pages/Homepage.jsx` — landing page with 10 sections (Nav, Hero, Preview, Features, How It Works, Website Integration, Testimonials, FAQ, Contact, CTA, Footer). How It Works uses CSS keyframe flashcard stack. Website Integration uses 3 catalogue screenshots with infinite marquee loop on mobile. Footer links to Features, Use Cases, About, and Framestudio.
+- `src/pages/Features.jsx` — public page: 12 deep-dive features with intro/body/outcome/shop-type badges
+- `src/pages/UseCases.jsx` — public page: 8 real-world situations (Situation → Cost → How Keel Helps → Who it's for)
+- `src/pages/AboutFramestudio.jsx` — public page: who Framestudio is, why Keel was built, beliefs, contact
 - `src/data/terms.json` — static Terms of Service content
+- `src/assets/catalogue/` — 3 catalogue screenshots (zurifashion-catalogue-shot.png, wix-collection-shot.png, mini-electricals-shots.png) used in Website Integration section
 
 ## Pages & Routes
 
 | Path | File | Description |
 |---|---|---|---|
 | `/` | Overview.jsx | KPIs, weekly chart, top products, website analytics (real, gated by hasWebsite) |
-| `/` (unauthenticated) | Homepage.jsx | Landing page: Nav, Hero, Dashboard Preview, Features, How It Works, Testimonials, FAQ, Contact, CTA, Footer |
+| `/` (unauthenticated) | Homepage.jsx | Landing page: Nav, Hero, Dashboard Preview, Features, How It Works, Website Integration, Testimonials, FAQ, Contact, CTA, Footer |
+| `/features` | Features.jsx | 12 deep-dive features with shop-type badges |
+| `/use-cases` | UseCases.jsx | 8 real-world situations (Situation → Cost → How Keel Helps) |
+| `/about` | AboutFramestudio.jsx | Who Framestudio is, why Keel was built |
 | `/inventory` | Inventory.jsx | Products CRUD, stock adjust, search, Publish button |
 | `/sales` | Sales.jsx | Sales list, log sale, receipt modal, debounced search |
 | `/social` | Social.jsx | Post scheduler, Instagram "Connect" placeholder |

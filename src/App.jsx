@@ -1,5 +1,11 @@
-import { lazy, Suspense, useContext } from "react";
+import { lazy, Suspense, useContext, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient({
@@ -26,6 +32,9 @@ const Reports = lazy(() => import("./pages/Reports"));
 const Marketing = lazy(() => import("./pages/Marketing"));
 const PublicProduct = lazy(() => import("./pages/PublicProduct"));
 const Terms = lazy(() => import("./pages/Terms"));
+const UseCases = lazy(() => import("./pages/UseCases"));
+const AboutFramestudio = lazy(() => import("./pages/AboutFramestudio"));
+const Features = lazy(() => import("./pages/Features"));
 
 function Loading() {
   return (
@@ -69,6 +78,9 @@ function AppRoutes() {
       <TourGuide />
       <Routes>
         <Route path="/terms" element={<Terms />} />
+        <Route path="/use-cases" element={<UseCases />} />
+        <Route path="/about" element={<AboutFramestudio />} />
+        <Route path="/features" element={<Features />} />
         <Route path="/p/:id" element={<PublicProduct />} />
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/setup" element={<ProtectedRoute><SetupWizard /></ProtectedRoute>} />
@@ -95,6 +107,7 @@ export default function App() {
       <AuthProvider>
         <SettingsProvider>
           <BrowserRouter>
+            <ScrollToTop />
             <AppRoutes />
           </BrowserRouter>
         </SettingsProvider>
