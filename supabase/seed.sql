@@ -133,3 +133,20 @@ FROM (
   SELECT name FROM catalogue ORDER BY id
 ) c
 CROSS JOIN generate_series(1, 25);
+
+-- 10. Chat config
+INSERT INTO chat_config (shop_id, enabled, welcome_message, widget_color, position, whatsapp_number)
+VALUES ('00000000-0000-0000-0000-000000000001', true, 'Hi! How can we help you today?', '#3B82F6', 'right', '254700123456')
+ON CONFLICT (shop_id) DO NOTHING;
+
+-- 11. Chat FAQs
+INSERT INTO chat_faqs (shop_id, question, answer, sort_order) VALUES
+  ('00000000-0000-0000-0000-000000000001', 'What are your delivery charges?', 'Delivery within Thika is free for orders above KSh 3,000. Standard delivery is KSh 200.', 0),
+  ('00000000-0000-0000-0000-000000000001', 'How long does delivery take?', 'Delivery typically takes 1-2 business days within Thika, and 2-4 days for other locations.', 1),
+  ('00000000-0000-0000-0000-000000000001', 'What is your return policy?', 'You can return any product within 7 days of delivery if it is unused and in its original packaging.', 2),
+  ('00000000-0000-0000-0000-000000000001', 'Do you offer warranty?', 'Yes, all electronics come with a 1-year warranty. Cases and accessories have a 30-day warranty.', 3);
+
+-- 12. Chat messages (sample unanswered)
+INSERT INTO chat_messages (shop_id, question, customer_name, status) VALUES
+  ('00000000-0000-0000-0000-000000000001', 'Do you have the iPhone 15 Pro Max case in purple?', 'Jane Doe', 'unanswered'),
+  ('00000000-0000-0000-0000-000000000001', 'Can I pay via M-Pesa on delivery?', 'John Smith', 'unanswered');

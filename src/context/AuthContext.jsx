@@ -123,6 +123,15 @@ export default function AuthProvider({ children }) {
       theme: "light",
     });
 
+    await supabase.from("chat_config").upsert({
+      shop_id: shopData.id,
+      enabled: true,
+      welcome_message: "Hi! How can we help you today?",
+      widget_color: "#3B82F6",
+      position: "right",
+      whatsapp_number: "",
+    }, { onConflict: "shop_id" });
+
     await supabase.from("users").insert({
       auth_user_id: user.id,
       shop_id: shopData.id,

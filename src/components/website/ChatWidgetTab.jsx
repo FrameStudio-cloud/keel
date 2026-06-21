@@ -5,7 +5,7 @@ import { useSettings } from "../../hooks/useSettings";
 import Pagination from "../Pagination";
 
 const MSG_PAGE_SIZE = 50;
-import { FiCheck, FiPlus, FiTrash2, FiChevronUp, FiChevronDown, FiCopy, FiMessageCircle } from "react-icons/fi";
+import { FiCheck, FiPlus, FiTrash2, FiChevronUp, FiChevronDown, FiCopy, FiMessageCircle, FiSend, FiCheckCircle } from "react-icons/fi";
 
 const POSITIONS = [
   { value: "right", label: "Bottom Right" },
@@ -29,8 +29,14 @@ export default function ChatWidgetTab() {
   const [messages, setMessages] = useState([]);
   const [msgPage, setMsgPage] = useState(0);
   const [msgTotal, setMsgTotal] = useState(0);
+  const [msgTab, setMsgTab] = useState("unanswered");
+  const [replies, setReplies] = useState({});
+  const [answeredMessages, setAnsweredMessages] = useState([]);
+  const [answeredPage, setAnsweredPage] = useState(0);
+  const [answeredTotal, setAnsweredTotal] = useState(0);
   const [newFaq, setNewFaq] = useState({ question: "", answer: "" });
   const [editingFaq, setEditingFaq] = useState(null);
+  const [sendingReply, setSendingReply] = useState(null);
 
   function showToast(msg, type = "success") {
     setToast({ msg, type });
@@ -43,11 +49,13 @@ export default function ChatWidgetTab() {
       if (!id) { setLoading(false); return; }
       setShopId(id);
 
-      const { data: cfg } = await supabase
+      const { data: cfg, error: cfgErr } = await supabase
         .from("chat_config")
         .select("*")
         .eq("shop_id", id)
         .maybeSingle();
+
+      if (cfgErr) { showToast(cfgErr.message, "error"); setLoading(false); return; }
 
       if (cfg) {
         setConfig({
@@ -61,12 +69,14 @@ export default function ChatWidgetTab() {
         setConfig((prev) => ({ ...prev, whatsapp_number: whatsapp }));
       }
 
-      const { data: faqData } = await supabase
+      const { data: faqData, error: faqErr } = await supabase
         .from("chat_faqs")
         .select("*")
         .eq("shop_id", id)
         .order("sort_order", { ascending: true })
         .limit(200);
+
+      if (faqErr) { showToast(faqErr.message, "error"); setLoading(false); return; }
 
       if (faqData) setFaqs(faqData);
 
@@ -78,21 +88,28 @@ export default function ChatWidgetTab() {
     let cancelled = false;
     (async () => {
       if (!shopId) return;
-      const { data: msgData, count } = await supabase
+      const page = msgTab === "unanswered" ? msgPage : answeredPage;
+      const { data: msgData, count, error: msgErr } = await supabase
         .from("chat_messages")
         .select("*", { count: "exact" })
         .eq("shop_id", shopId)
-        .eq("status", "unanswered")
-        .range(msgPage * MSG_PAGE_SIZE, (msgPage + 1) * MSG_PAGE_SIZE - 1)
+        .eq("status", msgTab)
+        .range(page * MSG_PAGE_SIZE, (page + 1) * MSG_PAGE_SIZE - 1)
         .order("created_at", { ascending: false });
       if (cancelled) return;
+      if (msgErr) { showToast(msgErr.message, "error"); return; }
       if (msgData) {
-        setMessages(msgData);
-        setMsgTotal(count ?? 0);
+        if (msgTab === "unanswered") {
+          setMessages(msgData);
+          setMsgTotal(count ?? 0);
+        } else {
+          setAnsweredMessages(msgData);
+          setAnsweredTotal(count ?? 0);
+        }
       }
     })();
     return () => { cancelled = true; };
-  }, [shopId, msgPage]);
+  }, [shopId, msgPage, answeredPage, msgTab]);
 
   async function saveConfig() {
     if (!shopId) return;
@@ -141,15 +158,17 @@ export default function ChatWidgetTab() {
     if (idx === -1) return;
     const swapIdx = idx + direction;
     if (swapIdx < 0 || swapIdx >= faqs.length) return;
+    const prev = faqs;
     const updated = [...faqs];
     const temp = updated[idx].sort_order;
     updated[idx] = { ...updated[idx], sort_order: updated[swapIdx].sort_order };
     updated[swapIdx] = { ...updated[swapIdx], sort_order: temp };
     setFaqs(updated);
-    await supabase.from("chat_faqs").upsert([
+    const { error } = await supabase.from("chat_faqs").upsert([
       { id: updated[idx].id, shop_id: shopId, sort_order: updated[idx].sort_order },
       { id: updated[swapIdx].id, shop_id: shopId, sort_order: updated[swapIdx].sort_order },
     ]);
+    if (error) { setFaqs(prev); showToast(error.message, "error"); }
   }
 
   async function markAnswered(id) {
@@ -160,6 +179,25 @@ export default function ChatWidgetTab() {
       .eq("shop_id", shopId);
     if (error) return showToast(error.message, "error");
     setMessages(messages.filter((m) => m.id !== id));
+    setMsgTotal((prev) => Math.max(0, prev - 1));
+    showToast("Marked as answered!");
+  }
+
+  async function sendReply(id) {
+    const answer = (replies[id] || "").trim();
+    if (!answer) return;
+    setSendingReply(id);
+    const { error } = await supabase
+      .from("chat_messages")
+      .update({ status: "answered", answer })
+      .eq("id", id)
+      .eq("shop_id", shopId);
+    setSendingReply(null);
+    if (error) return showToast(error.message, "error");
+    setReplies((prev) => { const r = { ...prev }; delete r[id]; return r; });
+    setMessages(messages.filter((m) => m.id !== id));
+    setMsgTotal((prev) => Math.max(0, prev - 1));
+    showToast("Reply sent!");
   }
 
   async function copyEmbed() {
@@ -375,34 +413,118 @@ export default function ChatWidgetTab() {
         </div>
       </div>
 
-      {messages.length > 0 && (
-        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <FiMessageCircle size={14} className="text-slate-400" />
-            <h3 className="text-sm font-medium text-slate-800 dark:text-white">
-              Unanswered Questions ({msgTotal})
-            </h3>
-          </div>
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className="bg-slate-50 dark:bg-[#1a1a2e] rounded-lg border border-slate-200 dark:border-white/10 p-3 mb-2"
+      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5">
+        <div className="flex items-center gap-3 mb-4">
+          <FiMessageCircle size={14} className="text-slate-400" />
+          <div className="flex gap-1 bg-slate-100 dark:bg-[#1a1a2e] rounded-lg p-0.5">
+            <button
+              onClick={() => setMsgTab("unanswered")}
+              className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+                msgTab === "unanswered"
+                  ? "bg-white dark:bg-[#16213e] text-slate-900 dark:text-white shadow-sm"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+              }`}
             >
-              <p className="text-sm text-slate-900 dark:text-white">{msg.question}</p>
-              {msg.customer_name && (
-                <p className="text-xs text-slate-400 mt-1">— {msg.customer_name}</p>
-              )}
-              <button
-                onClick={() => markAnswered(msg.id)}
-                className="mt-2 px-3 py-1 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-green-500"
-              >
-                Mark Answered
-              </button>
-            </div>
-          ))}
-          <Pagination page={msgPage} total={msgTotal} pageSize={MSG_PAGE_SIZE} onPageChange={setMsgPage} />
+              Unanswered ({msgTotal})
+            </button>
+            <button
+              onClick={() => setMsgTab("answered")}
+              className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+                msgTab === "answered"
+                  ? "bg-white dark:bg-[#16213e] text-slate-900 dark:text-white shadow-sm"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+              }`}
+            >
+              Answered ({answeredTotal})
+            </button>
+          </div>
         </div>
-      )}
+
+        {msgTab === "unanswered" ? (
+          messages.length > 0 ? (
+            <>
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className="bg-slate-50 dark:bg-[#1a1a2e] rounded-lg border border-slate-200 dark:border-white/10 p-3 mb-2"
+                >
+                  <p className="text-sm text-slate-900 dark:text-white">{msg.question}</p>
+                  {msg.customer_name && (
+                    <p className="text-xs text-slate-400 mt-1">— {msg.customer_name}</p>
+                  )}
+                  <div className="mt-2">
+                    <textarea
+                      rows={2}
+                      value={replies[msg.id] || ""}
+                      onChange={(e) => setReplies({ ...replies, [msg.id]: e.target.value })}
+                      placeholder="Type your reply..."
+                      className="w-full bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-xs text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 transition-colors resize-none"
+                    />
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        onClick={() => sendReply(msg.id)}
+                        disabled={!replies[msg.id]?.trim() || sendingReply === msg.id}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-500 transition-all disabled:opacity-50"
+                      >
+                        <FiSend size={12} />
+                        {sendingReply === msg.id ? "Sending..." : "Send Reply"}
+                      </button>
+                      <button
+                        onClick={() => markAnswered(msg.id)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-green-500 transition-all"
+                      >
+                        <FiCheckCircle size={12} />
+                        Mark Answered
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <Pagination page={msgPage} total={msgTotal} pageSize={MSG_PAGE_SIZE} onPageChange={setMsgPage} />
+            </>
+          ) : (
+            <p className="text-xs text-slate-400 dark:text-slate-500 text-center py-6">
+              No unanswered questions.
+            </p>
+          )
+        ) : (
+          answeredMessages.length > 0 ? (
+            <>
+              {answeredMessages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className="bg-slate-50 dark:bg-[#1a1a2e] rounded-lg border border-slate-200 dark:border-white/10 p-3 mb-2"
+                >
+                  <p className="text-sm font-medium text-slate-900 dark:text-white">Q: {msg.question}</p>
+                  {msg.answer && (
+                    <div className="mt-1.5 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-lg px-3 py-2">
+                      <p className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 mb-0.5">Your reply:</p>
+                      <p className="text-xs text-slate-700 dark:text-slate-300">{msg.answer}</p>
+                    </div>
+                  )}
+                  {msg.customer_name && (
+                    <p className="text-xs text-slate-400 mt-1">— {msg.customer_name}</p>
+                  )}
+                  {msg.feedback && (
+                    <span className={`inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                      msg.feedback === "helpful"
+                        ? "bg-green-100 dark:bg-green-500/10 text-green-600 dark:text-green-400"
+                        : "bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400"
+                    }`}>
+                      {msg.feedback === "helpful" ? "👍 Helpful" : "👎 Not helpful"}
+                    </span>
+                  )}
+                </div>
+              ))}
+              <Pagination page={answeredPage} total={answeredTotal} pageSize={MSG_PAGE_SIZE} onPageChange={setAnsweredPage} />
+            </>
+          ) : (
+            <p className="text-xs text-slate-400 dark:text-slate-500 text-center py-6">
+              No answered messages yet.
+            </p>
+          )
+        )}
+      </div>
 
       <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5">
         <h3 className="text-sm font-medium text-slate-800 dark:text-white mb-2">Integration</h3>
