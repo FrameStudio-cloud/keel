@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase, authSignUp, authResetPassword, authUpdatePassword, saveSession, parseHashParams } from "../lib/supabase";
 import { AuthContext } from "../context/AuthContext";
@@ -6,7 +6,7 @@ import { FiMail, FiCheckCircle } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 
 export default function Login() {
-  const { login, signInWithGoogle } = useContext(AuthContext);
+  const { user, loading: authLoading, login, signInWithGoogle } = useContext(AuthContext);
   const navigate = useNavigate();
   const [mode, setMode] = useState(parseHashParams()?.type === "recovery" ? "reset_password" : "login");
   const [email, setEmail] = useState("");
@@ -16,6 +16,10 @@ export default function Login() {
   const [shopName, setShopName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user && !authLoading) navigate("/", { replace: true });
+  }, [user, authLoading, navigate]);
 
   async function handleSubmit(e) {
     e.preventDefault();
