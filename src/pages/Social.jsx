@@ -122,9 +122,9 @@ export default function Social() {
             Connect your Instagram to track post performance
           </p>
         </div>
-        <button className="text-xs text-blue-600 dark:text-blue-400 border border-blue-200 px-4 py-1.5 rounded-full hover:bg-blue-50 transition-all">
-          Connect
-        </button>
+          <span className="text-xs text-blue-600 dark:text-blue-400 border border-blue-200 px-4 py-1.5 rounded-full">
+            Connect
+          </span>
       </div>
 
       {/* TikTok connect */}
@@ -138,9 +138,9 @@ export default function Social() {
             Connect your TikTok to track video performance
           </p>
         </div>
-        <button className="text-xs text-blue-600 dark:text-blue-400 border border-blue-200 px-4 py-1.5 rounded-full hover:bg-blue-50 transition-all">
-          Connect
-        </button>
+          <span className="text-xs text-blue-600 dark:text-blue-400 border border-blue-200 px-4 py-1.5 rounded-full">
+            Connect
+          </span>
       </div>
 
       {/* Posts */}

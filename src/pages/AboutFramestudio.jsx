@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FiArrowLeft, FiHeart, FiSmartphone, FiMapPin, FiMail, FiTwitter, FiGithub } from "react-icons/fi";
+import { FiArrowLeft, FiHeart, FiSmartphone, FiMapPin, FiMail, FiTwitter } from "react-icons/fi";
 
 export default function AboutFramestudio() {
   return (

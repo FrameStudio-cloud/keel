@@ -22,6 +22,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
     method: getDefaultPayment(),
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [showScanner, setShowScanner] = useState(false);
 
   async function fetchProducts() {
@@ -44,7 +45,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
   async function handleSubmit() {
     if (!form.product_id || !form.quantity) return;
     if (selectedProduct.stock < form.quantity) {
-      alert("Not enough stock");
+      setError("Not enough stock");
       return;
     }
 
@@ -135,7 +136,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
                   if (match) {
                     setForm((prev) => ({ ...prev, product_id: match.id }));
                   } else {
-                    alert("No product found with this barcode");
+                    setError("No product found with this barcode");
                   }
                   setShowScanner(false);
                 }}
@@ -207,6 +208,12 @@ export default function LogSaleModal({ onClose, onAdded }) {
             </div>
           )}
         </div>
+
+        {error && (
+          <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-lg px-3 py-2 text-xs text-red-600 dark:text-red-400">
+            {error}
+          </div>
+        )}
 
         <div className="flex gap-2 mt-5">
           <button

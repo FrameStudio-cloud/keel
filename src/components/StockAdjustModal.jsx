@@ -3,6 +3,7 @@ import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { useSettings } from "../hooks/useSettings";
 import { useFocusTrap } from "../hooks/useFocusTrap";
+import { FiX } from "react-icons/fi";
 
 export default function StockAdjustModal({ product, onClose, onAdjusted }) {
   const trapRef = useFocusTrap(true);
@@ -64,9 +65,9 @@ export default function StockAdjustModal({ product, onClose, onAdjusted }) {
           </h2>
           <button
             onClick={onClose}
-            className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white text-lg"
+            className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white"
           >
-            âœ•
+            <FiX size={16} />
           </button>
         </div>
 

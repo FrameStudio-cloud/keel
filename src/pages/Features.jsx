@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FiArrowLeft, FiPackage, FiCamera, FiAlertTriangle, FiShoppingCart, FiBarChart2, FiDollarSign, FiGlobe, FiMessageSquare, FiCalendar, FiMessageCircle, FiLayers, FiSmartphone, FiMoon } from "react-icons/fi";
+import { FiArrowLeft, FiPackage, FiCamera, FiAlertTriangle, FiShoppingCart, FiBarChart2, FiDollarSign, FiGlobe, FiMessageSquare, FiCalendar, FiMessageCircle, FiLayers, FiSmartphone } from "react-icons/fi";
 
 const features = [
   {

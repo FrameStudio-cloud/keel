@@ -120,7 +120,10 @@ export default function Reports() {
 
   function exportCSV(data, filename, columns) {
     const header = columns.map((c) => c.label).join(",");
-    const rows = data.map((row) => columns.map((c) => c.value(row)).join(","));
+    const rows = data.map((row) => columns.map((c) => {
+      const val = String(c.value(row));
+      return `"${val.replace(/"/g, '""')}"`;
+    }).join(","));
     const csv = [header, ...rows].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);

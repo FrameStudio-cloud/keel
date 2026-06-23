@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 import fashionCatalogue from "../assets/catalogue/zurifashion-catalogue-shot.png";
 import wixCatalogue from "../assets/catalogue/wix-collection-shot.png";
 import electricalsCatalogue from "../assets/catalogue/mini-electricals-shots.png";
@@ -88,6 +89,7 @@ function FeatureCard({ image, title, desc, onSelect }) {
 }
 
 export default function Homepage() {
+  const navTrapRef = useFocusTrap(mobileNavOpen);
   const [openFaq, setOpenFaq] = useState(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState(null);
@@ -155,7 +157,7 @@ export default function Homepage() {
               className="fixed inset-0 z-40 bg-black/40 sm:hidden"
               onClick={() => setMobileNavOpen(false)}
             />
-            <div className="sm:hidden border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] px-4 py-3 space-y-2 text-sm shadow-xl">
+            <div ref={navTrapRef} className="sm:hidden border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] px-4 py-3 space-y-2 text-sm shadow-xl">
             <a href="#features" onClick={() => setMobileNavOpen(false)} className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">Features</a>
             <a href="#how-it-works" onClick={() => setMobileNavOpen(false)} className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">How It Works</a>
             <a href="#website-integration" onClick={() => setMobileNavOpen(false)} className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">Website</a>
@@ -380,6 +382,8 @@ export default function Homepage() {
             >
               <button
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                aria-expanded={openFaq === i}
+                aria-controls={`faq-panel-${i}`}
                 className="w-full flex items-center justify-between px-5 py-4 text-left text-sm font-semibold hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors"
               >
                 {q}
@@ -388,7 +392,7 @@ export default function Homepage() {
                 />
               </button>
               {openFaq === i && (
-                <div className="px-5 pb-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-200 dark:border-white/10 pt-3">
+                <div id={`faq-panel-${i}`} role="region" className="px-5 pb-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-200 dark:border-white/10 pt-3">
                   {a}
                 </div>
               )}

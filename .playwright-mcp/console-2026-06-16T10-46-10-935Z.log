@@ -1,0 +1,4 @@
+[     241ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5174/node_modules/.vite/deps/react-dom_client.js?v=f642ba2b:14337
+[     861ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:5174/login:0
+[   32614ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://hmcowpwfefeeossztuem.supabase.co/auth/v1/authorize?provider=google:0
+[   32701ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://hmcowpwfefeeossztuem.supabase.co/favicon.ico:0

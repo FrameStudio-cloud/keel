@@ -1,0 +1,70 @@
+[     368ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=8fa07b62:14336
+[    2371ms] [ERROR] WebSocket connection to 'ws://localhost:5173/?token=tssHafuLYQqV' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/@vite/client:864
+[    2376ms] [INFO] [vite] Direct websocket connection fallback. Check out https://vite.dev/config/server-options.html#server-hmr to remove the previous connection error. @ http://localhost:5173/@vite/client:879
+[  947444ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/src/index.css?t=1780957226214:0
+[  947445ms] [ERROR] [vite] Failed to reload /src/index.css. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:928
+[  947445ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/src/components/UserMenu.jsx?t=1780957226214:0
+[  947445ms] [ERROR] [vite] Failed to reload /src/components/UserMenu.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:928
+[  958259ms] [ERROR] %o
+
+%s
+
+%s
+ TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/Settings.jsx?t=1780957226214 The above error occurred in the <Route> component. React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary. @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=8fa07b62:5272
+[  959139ms] [ERROR] %o
+
+%s
+
+%s
+ TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/Settings.jsx?t=1780957226214 The above error occurred in one of your React components. React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary. @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=8fa07b62:5272
+[  980836ms] [ERROR] %o
+
+%s
+
+%s
+ TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/Settings.jsx?t=1780957226214 The above error occurred in one of your React components. React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary. @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=8fa07b62:5272
+[  981853ms] [ERROR] %o
+
+%s
+
+%s
+ TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/Settings.jsx?t=1780957226214 The above error occurred in one of your React components. React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary. @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=8fa07b62:5272
+[  993151ms] [ERROR] %o
+
+%s
+
+%s
+ TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/Settings.jsx?t=1780957226214 The above error occurred in one of your React components. React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary. @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=8fa07b62:5272
+[ 1007717ms] [ERROR] %o
+
+%s
+
+%s
+ TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/Settings.jsx?t=1780957226214 The above error occurred in one of your React components. React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary. @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=8fa07b62:5272
+[ 1008414ms] [ERROR] %o
+
+%s
+
+%s
+ TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/Settings.jsx?t=1780957226214 The above error occurred in one of your React components. React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary. @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=8fa07b62:5272
+[ 2878842ms] [ERROR] %o
+
+%s
+
+%s
+ TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/Settings.jsx?t=1780957226214 The above error occurred in one of your React components. React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary. @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=8fa07b62:5272
+[ 2879368ms] [ERROR] %o
+
+%s
+
+%s
+ TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/Settings.jsx?t=1780957226214 The above error occurred in one of your React components. React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary. @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=8fa07b62:5272
+[ 2879569ms] [ERROR] [vite] Failed to reload /src/components/layout/Sidebar.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:928
+[ 2880299ms] [ERROR] [vite] Failed to reload /src/components/layout/Sidebar.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:928
+[ 2891294ms] [ERROR] [vite] Failed to reload /src/components/layout/Sidebar.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:928
+[ 2916032ms] [ERROR] [vite] Failed to reload /src/components/layout/Sidebar.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:928
+[ 2916625ms] [ERROR] [vite] Failed to reload /src/components/layout/Sidebar.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:928
+[ 3269140ms] [ERROR] [vite] Failed to reload /src/components/layout/Sidebar.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:928
+[ 3274521ms] [ERROR] [vite] Failed to reload /src/components/layout/Sidebar.jsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:928
+[ 3366565ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=8fa07b62:14336
+[34470981ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:992

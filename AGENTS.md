@@ -222,7 +222,7 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - Migrated SlowMovingStock to `useSlowMovingStock` React Query hook
 - `getShopId()` promise deduplication — concurrent callers share same in-flight promise
 - Seeded demo data for shop "campus glow": 10 products, 128 sales, 12 expenses, 20 stock movements, 5 catalogue items, 3 banners, 3 posts, 450 page views
-- Cleaned unused deps: removed `dotenv`, `autoprefixer`, `postcss`, `docx`, `@types/react`, `@types/react-dom`; moved `esbuild` to devDependencies
+- Cleaned unused deps: removed `dotenv`, `autoprefixer`, `postcss`, `docx`, `@types/react`, `@types/react-dom`, `esbuild`
 - `useQueries.js` slow-moving stock: added `.limit(100)` to prevent unbounded fetch
 - `Reports.jsx` profit margins: replaced 2 unbounded queries + JS aggregation with `get_profit_margins` RPC (server-side GROUP BY join, zero over-fetch)
 - `Reports.jsx` PnL: added `.limit(2000)` safety net to sales + expenses queries
@@ -255,9 +255,14 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - `Login.jsx:11` — `parseHashParams` call removed (reads hash directly via `URLSearchParams`)
 - Google OAuth `state` param removed — `AuthContext.jsx:168` reverts to bare authorize URL (state param interfered with Supabase OAuth)
 - `HomeOrDashboard` root route (`App.jsx:63-65`) — shows `Loading` while hash contains `access_token=`
+- `LogSaleModal.jsx` — `alert()` replaced with `setError` state display; `alert("No product found")` → `setError`
+- `AboutFramestudio.jsx` — removed unused `FiGithub` import
+- `Features.jsx` — removed unused `FiMoon` import
+- `esbuild` removed from `devDependencies` — Vite 8 uses Rolldown native minifier (was `minify: "esbuild"` in vite.config.js, now uses default)
 
 ### Still broken
 - **Pagination gaps** — `Reports.jsx:21-29` (profit margins) fetches all sales+products, `Reports.jsx:76-87` (PnL) date-filtered but no ceiling
+- `eslint-plugin-react` and `eslint-plugin-jsx-a11y` skipped — ESLint 10 peer dep conflict; existing react-hooks + react-refresh plugins sufficient
 
 ## Conventions
 

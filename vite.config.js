@@ -11,7 +11,6 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), tailwindcss()],
     build: {
-      minify: "esbuild",
       rollupOptions: {
         output: {
           manualChunks(id) {
