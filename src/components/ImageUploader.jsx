@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FiImage, FiTrash2, FiCamera, FiUploadCloud } from "react-icons/fi";
 
 export default function ImageUploader({ currentImage, onImageChange }) {
@@ -6,10 +6,20 @@ export default function ImageUploader({ currentImage, onImageChange }) {
   const [dragging, setDragging] = useState(false);
   const browseRef = useRef(null);
   const cameraRef = useRef(null);
+  const blobUrlRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
+    };
+  }, []);
 
   function handleFile(file) {
     if (!file) return;
-    setPreview(URL.createObjectURL(file));
+    if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
+    const url = URL.createObjectURL(file);
+    blobUrlRef.current = url;
+    setPreview(url);
     onImageChange(file);
   }
 

@@ -33,7 +33,8 @@ export function useSlowMovingStock() {
         .from("sales")
         .select("product_id, quantity")
         .eq("shop_id", shopId)
-        .gte("created_at", thirtyDaysAgo.toISOString());
+        .gte("created_at", thirtyDaysAgo.toISOString())
+        .limit(5000);
       const soldIds = new Set();
       const soldCount = {};
       (sales || []).forEach((s) => {
@@ -66,10 +67,13 @@ export function useLowStockProducts() {
         .select("id, name, stock")
         .eq("shop_id", shopId)
         .lte("stock", lowStockThreshold ?? 6)
-        .order("stock", { ascending: true });
+        .order("stock", { ascending: true })
+        .limit(200);
       return data || [];
     },
     staleTime: 30_000,
     refetchInterval: 30_000,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   });
 }

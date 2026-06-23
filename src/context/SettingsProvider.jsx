@@ -47,10 +47,8 @@ export default function SettingsProvider({ children }) {
 
         if (store) {
           setCurrency(store.currency_symbol || "KSh");
-          setPaymentConfig(
-            store.default_payment ? ["Cash", "M-Pesa", "Bank"] : null,
-            store.default_payment
-          );
+          const paymentMethods = store.payment_methods || ["Cash", "M-Pesa", "Bank"];
+          setPaymentConfig(paymentMethods, store.default_payment);
 
           const theme = store.theme || "light";
           document.documentElement.classList.toggle("dark", theme === "dark");
@@ -84,7 +82,9 @@ export default function SettingsProvider({ children }) {
     })();
   }, [user]);
 
-  document.documentElement.classList.toggle("dark", settings.theme === "dark");
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", settings.theme === "dark");
+  }, [settings.theme]);
 
   return (
     <SettingsContext.Provider value={settings}>

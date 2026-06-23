@@ -1,7 +1,9 @@
 import { useSettings } from "../hooks/useSettings";
 import { formatPrice } from "../lib/format";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 
 export default function ReceiptModal({ sale, onClose }) {
+  const trapRef = useFocusTrap(true);
   const { storeName, storePhone, storeAddress, receiptFooter } = useSettings();
 
   if (!sale) return null;
@@ -9,6 +11,7 @@ export default function ReceiptModal({ sale, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div
+        ref={trapRef}
         className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-6 w-full max-w-sm mx-4"
         role="dialog"
         aria-modal="true"

@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase, authSignUp, authResetPassword, authUpdatePassword, saveSession, parseHashParams } from "../lib/supabase";
+import { supabase, authSignUp, authResetPassword, authUpdatePassword, saveSession } from "../lib/supabase";
 import { AuthContext } from "../context/AuthContext";
 import { FiMail, FiCheckCircle } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
@@ -8,7 +8,11 @@ import { FcGoogle } from "react-icons/fc";
 export default function Login() {
   const { user, loading: authLoading, login, signInWithGoogle } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [mode, setMode] = useState(parseHashParams()?.type === "recovery" ? "reset_password" : "login");
+  const [mode, setMode] = useState(() => {
+    const hash = window.location.hash.replace(/^#/, "");
+    const params = new URLSearchParams(hash);
+    return params.get("type") === "recovery" ? "reset_password" : "login";
+  });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -35,8 +39,14 @@ export default function Login() {
         if (!authData?.user?.id) throw new Error("This email is already registered. Try signing in instead.");
 
         const baseSlug = shopName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-        const suffix = Math.random().toString(36).slice(2, 6);
-        const slug = `${baseSlug}-${suffix}`;
+        let slug;
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const suffix = Math.random().toString(36).slice(2, 8);
+          slug = `${baseSlug}-${suffix}`;
+          const { data: existing } = await supabase.from("shops").select("id").eq("slug", slug).maybeSingle();
+          if (!existing) break;
+          if (attempt === 4) throw new Error("Unable to create unique shop slug. Please try a different shop name.");
+        }
 
         const { data: shopData, error: shopError } = await supabase
           .from("shops")

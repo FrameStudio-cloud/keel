@@ -45,7 +45,7 @@ Keel is a **mobile-friendly dashboard** that brings everything into one place. F
 **Sales**
 - Log sales against any product
 - Auto-deduct stock on sale
-- Payment methods: Cash, M-Pesa, Bank, IntaSend
+- Payment methods: Cash, M-Pesa, Bank
 - Instant receipt modal (shows store name, items, total)
 - Search by product or payment method
 
@@ -91,7 +91,7 @@ Keel is built for **small-to-medium retail businesses in East Africa**, especial
 - General retail stores
 - Multi-shop owners who want unified management
 
-The system is pre-configured with Kenyan Shilling (KSh), M-Pesa payments, and IntaSend checkout — but works with any currency and payment method.
+The system is pre-configured with Kenyan Shilling (KSh) and M-Pesa payments — but works with any currency and payment method.
 
 ## Technical Overview (Simple Version)
 
@@ -107,7 +107,7 @@ Keel is **pre-1.0 (v0.0.0)** — fully functional with all core features working
 - 0 lint errors, 0 warnings
 - All 11 pages rendering and functional
 - Live Supabase database backing all features
-- IntaSend payment integration configured
+- M-Pesa payment integration configured
 
 ## Why Your Support Matters
 

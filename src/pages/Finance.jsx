@@ -122,6 +122,7 @@ export default function Finance() {
   }
 
   async function handleSeed() {
+    if (!window.confirm("This will delete ALL existing sales and expenses for today and replace them with demo data. Continue?")) return;
     setSeeding(true);
     setSeedMsg("");
     const result = await seedDemoData();

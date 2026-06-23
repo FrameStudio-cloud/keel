@@ -48,10 +48,8 @@ export default function BusinessTab() {
     const shopId = await getShopId();
     const { error } = await supabase
       .from("store_settings")
-      .upsert({
-        business_hours: businessHours,
-        shop_id: shopId,
-      });
+      .update({ business_hours: businessHours })
+      .eq("shop_id", shopId);
 
     setSaving(false);
     if (error) return showToast("Something went wrong", "error");

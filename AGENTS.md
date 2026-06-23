@@ -12,7 +12,7 @@ Currency symbol is a module-level singleton in `src/lib/format.js`, updated by S
 Dark mode uses `@variant dark` in Tailwind v4, toggled via `.dark` class on `<html>`. No CSS variables — all colors use `dark:` Tailwind variants with `bg-slate-100 dark:bg-[#1a1a2e]` pattern.
 **Default theme is `"light"`** — changed from `"dark"` to prevent flash on reload (previously, default was `"dark"` but `<html>` had no dark class, causing a light→dark flash after settings loaded).
 Settings are fetched once by `SettingsProvider` context and consumed via `useSettings()` hook.
-Theme class is applied synchronously during `SettingsProvider` render (not just in useEffect) to prevent flash-of-wrong-theme.
+Theme class is applied via useEffect in SettingsProvider (no flash since default is "light").
 All Supabase tables have RLS disabled — no auth.
 Tailwind v4 — no `tailwind.config.js`, dark mode via `@variant dark (&:where(.dark, .dark *));`.
 Multi-tenant via `shop_id` FK on every table — use `getShopId()` / `withShop()` helpers.
@@ -156,11 +156,11 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - `src/components/Bots.jsx` — WhatsApp + Telegram bot cards per shop
 - `src/lib/format.js` — formatPrice, setCurrency, getCurrency
 - `src/payment/paymentConfig.js` — getPaymentMethods, setPaymentConfig, getDefaultPayment
-- `src/payment/IntaSendCheckout.jsx` — IntaSend payment button + phone input
 - `src/components/layout/Sidebar.jsx` — reads storeName + lowStockThreshold from useSettings; uses `useLowStockCount` hook
 - `src/components/layout/Topbar.jsx` — reads storeName from useSettings; uses `useLowStockProducts` hook
 - `src/components/SlowMovingStock.jsx` — uses `useSlowMovingStock` React Query hook
 - `src/hooks/useQueries.js` — shared React Query hooks: `useLowStockCount`, `useLowStockProducts`, `useSlowMovingStock`
+- `src/hooks/useFocusTrap.js` — focus trap hook for modal keyboard accessibility
 - `src/App.jsx` — wrapped in `QueryClientProvider`; `HomeOrDashboard` wrapper routes `/` to Homepage or Overview based on auth; includes `ScrollToTop` component (scrolls to top on every route change)
 - `src/pages/Homepage.jsx` — landing page with 10 sections (Nav, Hero, Preview, Features, How It Works, Website Integration, Testimonials, FAQ, Contact, CTA, Footer). How It Works uses CSS keyframe flashcard stack. Website Integration uses 3 catalogue screenshots with infinite marquee loop on mobile. Footer links to Features, Use Cases, About, and Framestudio.
 - `src/pages/Features.jsx` — public page: 12 deep-dive features with intro/body/outcome/shop-type badges
@@ -228,10 +228,36 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - `Reports.jsx` PnL: added `.limit(2000)` safety net to sales + expenses queries
 - `Sales.jsx` + `Inventory.jsx`: invalidate `["dashboardSummary"]` query after mutations so Overview always shows fresh data
 - `get_profit_margins` RPC created (Postgres function for aggregated profit/margin calculation per product)
+- Token refresh race in `supabase.js:10-46` — dedup `refreshPromise` mutex prevents concurrent refresh calls
+- Dark-mode flash eliminated — `SettingsProvider.jsx:87-89` moves `classList.toggle` into `useEffect` (no flash since default is "light")
+- All unbounded queries capped with `.limit()` — `useSlowMovingStock` (5000), low-stock count (200), `Marketing.jsx` product list (100)
+- Payment methods dynamic — `SettingsProvider.jsx:37` reads `store.payment_methods` column from DB
+- Overview lazily loaded + `manualChunks` split `recharts` (384 KB) and `vendor` (276 KB) out of main bundle
+- IntaSend removed from AGENTS.md, docs/architecture.md, PITCH.md, README.md, seed files
+- `withShop()` no longer throws on null shop — returns payload unchanged instead (`shop.js:69`)
+- `AuthContext.jsx:147-155` — `ensuringRef` dedup guard prevents double `ensureUserRecordsInner`
+- `vercel.json` rewrite simplified to `"/(.*)"` covering all routes
+- `vite.config.js:7-9` — env validation throws at build time if `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` missing
+- Hardcoded `"KSh"` replaced with `formatPrice()` in Sales.jsx (2), AddProductModal.jsx (2), LogSaleModal.jsx (2)
+- OAuth exchange timeout — `AuthContext.jsx:57-60` `Promise.race` with 15s timeout on `fetchUserData`
+- Recovery flow auto-login — `AuthContext.jsx:30-51` processes recovery hash same as OAuth (no manual re-login)
+- `ensureUserRecordsInner` rollback — `AuthContext.jsx:135-148` `Promise.allSettled` with shop deletion on failure
+- Slug collision retry — `Login.jsx:38-44`, `AuthContext.jsx:115-121` 5 attempts with 6-char suffix
+- `Reports.jsx:109-118` — useEffect cleanup flag prevents setState on unmounted component
+- `ImageUploader.jsx:10-14` — blob URL tracked in ref, revoked on unmount (`useEffect` cleanup)
+- `Inventory.jsx:82,103` — `publishedMap` keyed by `product.id` instead of `product.name.toLowerCase()`
+- `AddProductModal.jsx:44` — duplicate check uses case-sensitive `.eq()` not `.ilike()`
+- `Profile.jsx:102` — fallback theme changed from `"dark"` to `"light"`
+- `useLowStockProducts` — `retry: 2` with exponential backoff (`useQueries.js:74-75`)
+- `Marketing.jsx` — toasts use React state instead of DOM (`showToast` → `setToast`)
+- OG meta tags in `index.html:11-14` — `og:title`, `og:description`, `og:image`, `twitter:card`
+- Focus trap on all 8 modals via `src/hooks/useFocusTrap.js` — `Tab` key cycles within dialog
+- `Login.jsx:11` — `parseHashParams` call removed (reads hash directly via `URLSearchParams`)
+- Google OAuth `state` param removed — `AuthContext.jsx:168` reverts to bare authorize URL (state param interfered with Supabase OAuth)
+- `HomeOrDashboard` root route (`App.jsx:63-65`) — shows `Loading` while hash contains `access_token=`
 
 ### Still broken
-- **Google OAuth** — session exchange never completes after OAuth redirect (custom auth bypasses gotrue-js callback handler)
-- **Pagination gaps** — `useQueries.js:45` (slow-moving stock) unbounded, `Reports.jsx:21-29` (profit margins) fetches all sales+products, `Reports.jsx:76-87` (PnL) date-filtered but no ceiling
+- **Pagination gaps** — `Reports.jsx:21-29` (profit margins) fetches all sales+products, `Reports.jsx:76-87` (PnL) date-filtered but no ceiling
 
 ## Conventions
 

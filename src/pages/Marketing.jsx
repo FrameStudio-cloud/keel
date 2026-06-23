@@ -9,16 +9,6 @@ import {
   FiLink, FiCopy, FiShare2, FiSmartphone, FiFileText, FiGrid, FiStar, FiDownload, FiCheck, FiExternalLink,
 } from "react-icons/fi";
 
-function showToast(msg, type) {
-  const el = document.createElement("div");
-  el.className = `fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold shadow-xl transition-all duration-300 ${
-    type === "error" ? "bg-red-500 text-white" : "bg-blue-600 text-white"
-  }`;
-  el.textContent = msg;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 2500);
-}
-
 export default function Marketing() {
   const { whatsapp, websiteUrl } = useSettings();
   const [catalogue, setCatalogue] = useState([]);
@@ -27,7 +17,19 @@ export default function Marketing() {
   const [copied, setCopied] = useState(false);
   const [qrType, setQrType] = useState("website");
   const [qrUrl, setQrUrl] = useState("");
+  const [toast, setToast] = useState(null);
   const qrCanvasRef = useRef(null);
+  const toastTimer = useRef(null);
+
+  useEffect(() => {
+    return () => { if (toastTimer.current) clearTimeout(toastTimer.current); };
+  }, []);
+
+  function showToast(msg, type) {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast({ msg, type });
+    toastTimer.current = setTimeout(() => setToast(null), 2500);
+  }
   const [loading, setLoading] = useState(true);
 
   const selectedProduct = catalogue.find((c) => c.id === selectedId);
@@ -40,7 +42,7 @@ export default function Marketing() {
         .select("*")
         .eq("shop_id", shopId)
         .order("name")
-        .limit(200);
+        .limit(100);
       if (data) setCatalogue(data);
       setLoading(false);
     })();
@@ -133,13 +135,21 @@ export default function Marketing() {
 
   if (loading) {
     return (
+      <>
       <PageLayout title="Marketing">
         <div className="space-y-3">{[...Array(5)].map((_, i) => <div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse" />)}</div>
       </PageLayout>
+        {toast && (
+          <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold shadow-xl transition-all ${toast.type === "error" ? "bg-red-500 text-white" : "bg-blue-600 text-white"}`}>
+            {toast.msg}
+          </div>
+        )}
+      </>
     );
   }
 
   return (
+    <>
     <PageLayout title="Marketing">
       <div className="max-w-2xl mx-auto space-y-6">
 
@@ -309,5 +319,11 @@ export default function Marketing() {
 
       </div>
     </PageLayout>
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold shadow-xl transition-all ${toast.type === "error" ? "bg-red-500 text-white" : "bg-blue-600 text-white"}`}>
+          {toast.msg}
+        </div>
+      )}
+    </>
   );
 }

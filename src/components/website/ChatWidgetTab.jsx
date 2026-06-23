@@ -158,7 +158,7 @@ export default function ChatWidgetTab() {
     if (idx === -1) return;
     const swapIdx = idx + direction;
     if (swapIdx < 0 || swapIdx >= faqs.length) return;
-    const prev = faqs;
+    const prev = [...faqs];
     const updated = [...faqs];
     const temp = updated[idx].sort_order;
     updated[idx] = { ...updated[idx], sort_order: updated[swapIdx].sort_order };

@@ -99,7 +99,7 @@ export default function Profile() {
           <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 flex items-center gap-3">
             <FiMonitor size={14} className="text-slate-400 flex-shrink-0" />
             <span className="text-slate-600 dark:text-slate-400 text-sm flex-1">Theme</span>
-            <span className="text-slate-900 dark:text-white text-sm capitalize">{theme || "dark"}</span>
+            <span className="text-slate-900 dark:text-white text-sm capitalize">{theme || "light"}</span>
           </div>
         </div>
 

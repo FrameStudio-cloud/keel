@@ -39,6 +39,6 @@ export async function getShopId() {
 }
 
 export function withShop(payload) {
-  if (!currentShopId) throw new Error("Shop not loaded yet");
+  if (!currentShopId) return payload;
   return { ...payload, shop_id: currentShopId };
 }

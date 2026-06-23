@@ -79,7 +79,7 @@ export default function Inventory() {
       .eq("shop_id", shopId);
     if (data) {
       const map = {};
-      data.forEach((item) => { map[item.name.toLowerCase()] = item; });
+      data.forEach((item) => { map[item.id] = item; });
       setPublishedMap(map);
     }
   }
@@ -100,7 +100,7 @@ export default function Inventory() {
 
   async function handleUnpublish(product) {
     const shopId = await getShopId();
-    const item = publishedMap[product.name.toLowerCase()];
+    const item = publishedMap[product.id];
     if (!item) return;
     setPublishingId(product.id);
     await supabase.from("catalogue").delete().eq("id", item.id).eq("shop_id", shopId);

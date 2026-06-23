@@ -9,6 +9,7 @@ import Pagination from "../components/Pagination";
 import { getShopId } from "../lib/shop";
 import { paginateQuery } from "../lib/paginate";
 import { useDebounce } from "../hooks/useDebounce";
+import { formatPrice } from "../lib/format";
 
 const PAGE_SIZE = 50;
 
@@ -113,7 +114,7 @@ export default function Sales() {
                       <p className="text-slate-500 dark:text-slate-400 text-xs">{formatDate(s.created_at)}</p>
                     </div>
                     <p className="text-blue-600 dark:text-blue-400 text-sm font-semibold flex-shrink-0 ml-3">
-                      KSh {s.amount.toLocaleString()}
+                      {formatPrice(s.amount)}
                     </p>
                   </div>
                   <div className="flex items-center gap-3 mt-2">
@@ -172,7 +173,7 @@ export default function Sales() {
                     <td className="px-4 py-3 text-gray-400 dark:text-slate-500">{s.quantity}</td>
                     <td className="px-4 py-3 text-gray-400 dark:text-slate-500">{s.method}</td>
                     <td className="px-4 py-3 font-medium text-blue-700 dark:text-blue-400">
-                      KSh {s.amount.toLocaleString()}
+                      {formatPrice(s.amount)}
                     </td>
                     <td className="px-4 py-3">
                       <Badge label="Paid" color="green" />

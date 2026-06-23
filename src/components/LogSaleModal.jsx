@@ -4,10 +4,13 @@ import { FiX, FiCamera, FiSearch } from "react-icons/fi";
 import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { getPaymentMethods, getDefaultPayment } from "../lib/paymentConfig";
+import { formatPrice } from "../lib/format";
 import { useSettings } from "../hooks/useSettings";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 import BarcodeScanner from "./BarcodeScanner";
 
 export default function LogSaleModal({ onClose, onAdded }) {
+  const trapRef = useFocusTrap(true);
   const { businessCategory } = useSettings();
   const showBarcode = businessCategory === "electricals" || businessCategory === "electronics";
 
@@ -48,13 +51,13 @@ export default function LogSaleModal({ onClose, onAdded }) {
     setLoading(true);
 
     // 1 — insert the sale
-    const { error: saleError } = await supabase.from("sales").insert(withShop({
+    const { data: saleData, error: saleError } = await supabase.from("sales").insert(withShop({
       product_id: selectedProduct.id,
       product_name: selectedProduct.name,
       amount: total,
       quantity: parseInt(form.quantity),
       method: form.method,
-    }));
+    })).select("id").single();
 
     if (saleError) {
       console.error(saleError);
@@ -72,6 +75,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
 
     if (stockError) {
       console.error(stockError);
+      await supabase.from("sales").delete().eq("id", saleData.id);
     } else {
       onAdded();
       onClose();
@@ -83,6 +87,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div
+        ref={trapRef}
         className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-100 dark:border-white/10 p-6 w-full max-w-md mx-4"
         role="dialog"
         aria-modal="true"
@@ -155,7 +160,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
                 })
                 .map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.name} — KSh {p.price.toLocaleString()} (stock: {p.stock})
+                    {p.name} — {formatPrice(p.price)} (stock: {p.stock})
                     {showBarcode && p.barcode ? ` [${p.barcode}]` : ""}
                   </option>
                 ))}
@@ -197,7 +202,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
             <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg px-4 py-3 flex justify-between items-center">
               <span className="text-xs text-blue-500">Total</span>
               <span className="text-sm font-medium text-blue-700 dark:text-blue-400">
-                KSh {total.toLocaleString()}
+                {formatPrice(total)}
               </span>
             </div>
           )}

@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useRef, useState } from "react";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 import { FiX, FiCamera, FiCameraOff, FiRefreshCw } from "react-icons/fi";
 
 export default function BarcodeScanner({ onScan, onClose }) {
@@ -8,6 +9,7 @@ export default function BarcodeScanner({ onScan, onClose }) {
   const [selectedCam, setSelectedCam] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [found, setFound] = useState(null);
+  const trapRef = useFocusTrap(true);
   const scannerRef = useRef(null);
   const mountedRef = useRef(true);
 
@@ -103,6 +105,7 @@ export default function BarcodeScanner({ onScan, onClose }) {
 
   return (
     <div
+      ref={trapRef}
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
       role="dialog"
       aria-modal="true"

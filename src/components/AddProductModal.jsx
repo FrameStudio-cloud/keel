@@ -4,10 +4,13 @@ import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { uploadImage } from "../lib/storage";
 import { useSettings } from "../hooks/useSettings";
+import { formatPrice } from "../lib/format";
 import ImageUploader from "./ImageUploader";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 import BarcodeScanner from "./BarcodeScanner";
 
 export default function AddProductModal({ onClose, onAdded }) {
+  const trapRef = useFocusTrap(true);
   const { businessCategory } = useSettings();
   const showBarcode = businessCategory === "electricals" || businessCategory === "electronics";
 
@@ -40,7 +43,7 @@ export default function AddProductModal({ onClose, onAdded }) {
       .from("products")
       .select("*")
       .eq("shop_id", shopId)
-      .ilike("name", form.name);
+      .eq("name", form.name);
 
     if (matches && matches.length > 0) {
       setExistingProduct(matches[0]);
@@ -116,6 +119,7 @@ export default function AddProductModal({ onClose, onAdded }) {
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div
+        ref={trapRef}
         className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-100 dark:border-white/10 p-6 w-full max-w-md mx-4"
         role="dialog"
         aria-modal="true"
@@ -158,7 +162,7 @@ export default function AddProductModal({ onClose, onAdded }) {
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
-                Price (KSh)
+                Price
               </label>
               <input
                 name="price"
@@ -243,8 +247,8 @@ export default function AddProductModal({ onClose, onAdded }) {
                 "{existingProduct.name}" already exists
               </p>
               <p>
-                Current stock: {existingProduct.stock} &nbsp;·&nbsp; Price: KSh{" "}
-                {existingProduct.price.toLocaleString()}
+                Current stock: {existingProduct.stock} &nbsp;·&nbsp; Price:{" "}
+                {formatPrice(existingProduct.price)}
               </p>
               <p className="mt-1 text-amber-500 dark:text-amber-400">
                 Your new stock and price values will replace these.

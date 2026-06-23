@@ -107,12 +107,15 @@ export default function Reports() {
   }
 
   useEffect(() => {
+    let cancelled = false;
     (async () => {
       const margins = await fetchProfitMargins();
+      if (cancelled) return;
       setProfitData(margins);
       await fetchPnl(timeRange);
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     })();
+    return () => { cancelled = true; };
   }, [timeRange]);
 
   function exportCSV(data, filename, columns) {

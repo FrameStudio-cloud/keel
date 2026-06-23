@@ -544,7 +544,7 @@ keel/
 │   │   └── storage.js                     # Image upload/delete
 │   ├── payment/
 │   │   ├── index.js                       # Re-exports
-│   │   ├── IntaSendCheckout.jsx           # M-Pesa checkout
+│   │   ├── paymentConfig.js               # Dynamic payment methods
 │   │   └── usePayment.js                  # Sale + payment + stock tracking
 │   ├── pages/
 │   │   ├── Overview.jsx                   # Dashboard KPIs

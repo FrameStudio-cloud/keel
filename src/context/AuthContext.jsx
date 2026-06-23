@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import { supabase, getPersistedSession, saveSession, authLogin, authLogout, parseHashParams, fetchUserData, STORAGE_KEY_EXPORTED } from "../lib/supabase";
 import { clearShopId } from "../lib/shop";
 
@@ -14,6 +14,7 @@ export const AuthContext = createContext({
 });
 
 export default function AuthProvider({ children }) {
+  const ensuringRef = useRef(false);
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,7 +27,26 @@ export default function AuthProvider({ children }) {
       const hashData = parseHashParams();
 
       if (hashData?.type === "recovery") {
-        setLoading(false);
+        if (hashData?.access_token) {
+          try {
+            window.history.replaceState(null, "", window.location.pathname);
+            const userData = await fetchUserData(hashData.access_token);
+            const fullSession = {
+              access_token: hashData.access_token,
+              refresh_token: hashData.refresh_token,
+              expires_in: hashData.expires_in,
+              user: userData,
+            };
+            saveSession(fullSession);
+            if (!cancelled) {
+              setUser(userData);
+              setSession(fullSession);
+            }
+          } catch (err) {
+            console.error("Recovery token exchange failed", err);
+          }
+        }
+        if (!cancelled) setLoading(false);
         return;
       }
 
@@ -34,7 +54,10 @@ export default function AuthProvider({ children }) {
         try {
           window.history.replaceState(null, "", window.location.pathname);
 
-          const userData = await fetchUserData(hashData.access_token);
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("OAuth exchange timed out")), 15000)
+          );
+          const userData = await Promise.race([fetchUserData(hashData.access_token), timeoutPromise]);
 
           const fullSession = {
             access_token: hashData.access_token,
@@ -106,8 +129,13 @@ export default function AuthProvider({ children }) {
 
     const displayName = user.user_metadata?.full_name || user.email?.split("@")[0] || "My Shop";
     const baseSlug = displayName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-    const suffix = Math.random().toString(36).slice(2, 6);
-    const slug = `${baseSlug}-${suffix}`;
+    let slug;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const suffix = Math.random().toString(36).slice(2, 8);
+      slug = `${baseSlug}-${suffix}`;
+      const { data: existing } = await supabase.from("shops").select("id").eq("slug", slug).maybeSingle();
+      if (!existing) break;
+    }
 
     const { data: shopData, error: shopError } = await supabase
       .from("shops")
@@ -117,37 +145,47 @@ export default function AuthProvider({ children }) {
 
     if (shopError || !shopData) return true;
 
-    await supabase.from("store_settings").insert({
-      shop_id: shopData.id,
-      store_name: displayName,
-      theme: "light",
-    });
+    const results = await Promise.allSettled([
+      supabase.from("store_settings").insert({
+        shop_id: shopData.id,
+        store_name: displayName,
+        theme: "light",
+      }),
+      supabase.from("chat_config").upsert({
+        shop_id: shopData.id,
+        enabled: true,
+        welcome_message: "Hi! How can we help you today?",
+        widget_color: "#3B82F6",
+        position: "right",
+        whatsapp_number: "",
+      }, { onConflict: "shop_id" }),
+      supabase.from("users").insert({
+        auth_user_id: user.id,
+        shop_id: shopData.id,
+        name: displayName,
+        email: user.email,
+      }),
+    ]);
 
-    await supabase.from("chat_config").upsert({
-      shop_id: shopData.id,
-      enabled: true,
-      welcome_message: "Hi! How can we help you today?",
-      widget_color: "#3B82F6",
-      position: "right",
-      whatsapp_number: "",
-    }, { onConflict: "shop_id" });
-
-    await supabase.from("users").insert({
-      auth_user_id: user.id,
-      shop_id: shopData.id,
-      name: displayName,
-      email: user.email,
-    });
+    const failed = results.find(r => r.status === "rejected");
+    if (failed) {
+      await supabase.from("shops").delete().eq("id", shopData.id);
+      return true;
+    }
 
     return false;
   }
 
   useEffect(() => {
-    if (user) {
-      ensureUserRecordsInner(user).then((needsSetup) => {
-        if (!needsSetup) setNeedsSetup(true);
-      }).catch(() => {});
-    }
+      if (user) {
+        if (!ensuringRef.current) {
+          ensuringRef.current = true;
+          ensureUserRecordsInner(user).then((needsSetup) => {
+            if (!needsSetup) setNeedsSetup(true);
+            ensuringRef.current = false;
+          }).catch(() => { ensuringRef.current = false; });
+        }
+      }
   }, [user]);
 
   async function login(email, password) {
@@ -163,8 +201,12 @@ export default function AuthProvider({ children }) {
   }
 
   async function logout() {
-    const token = getPersistedSession()?.access_token;
-    await authLogout(token);
+    try {
+      const token = getPersistedSession()?.access_token;
+      await authLogout(token);
+    } catch {
+      /* session cleared locally even if server request fails */
+    }
     setSession(null);
     setUser(null);
     clearShopId();

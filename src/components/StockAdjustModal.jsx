@@ -2,8 +2,10 @@ import { useState } from "react";
 import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { useSettings } from "../hooks/useSettings";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 
 export default function StockAdjustModal({ product, onClose, onAdjusted }) {
+  const trapRef = useFocusTrap(true);
   const [change, setChange] = useState(0);
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
@@ -47,6 +49,7 @@ export default function StockAdjustModal({ product, onClose, onAdjusted }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div
+        ref={trapRef}
         className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-6 w-full max-w-md mx-4"
         role="dialog"
         aria-modal="true"

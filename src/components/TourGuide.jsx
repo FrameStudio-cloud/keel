@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useContext } from "react";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
@@ -196,6 +197,7 @@ export default function TourGuide() {
     defaultPayment: "Cash",
     lowStockThreshold: 6,
   });
+  const trapRef = useFocusTrap(true);
   const tooltipRef = useRef(null);
 
   useEffect(() => {
@@ -310,9 +312,9 @@ export default function TourGuide() {
       currency_symbol: form.currencySymbol,
       default_payment: form.defaultPayment,
       low_stock_threshold: form.lowStockThreshold,
-      theme: "dark",
+      theme: "light",
       shop_id: shopId,
-    });
+    }, { onConflict: "shop_id" });
   }
 
   if (!visible) return null;
@@ -330,6 +332,7 @@ export default function TourGuide() {
 
   return (
     <div
+      ref={trapRef}
       className="fixed inset-0 z-50"
       role="dialog"
       aria-modal="true"

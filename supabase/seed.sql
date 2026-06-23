@@ -76,18 +76,18 @@ FROM (
   VALUES
     (1, 2, 'Cash'),    (2, 1, 'M-Pesa'),   (3, 1, 'Cash'),    (4, 2, 'M-Pesa'),
     (5, 1, 'Bank'),    (6, 1, 'Cash'),     (7, 3, 'M-Pesa'),  (8, 1, 'Cash'),
-    (9, 2, 'IntaSend'),(10, 1, 'M-Pesa'),  (11, 1, 'Cash'),   (12, 2, 'Bank'),
+    (9, 2, 'M-Pesa'), (10, 1, 'M-Pesa'),  (11, 1, 'Cash'),   (12, 2, 'Bank'),
     (1, 1, 'M-Pesa'),  (3, 2, 'Cash'),     (5, 1, 'M-Pesa'),  (7, 1, 'Cash'),
-    (9, 1, 'Bank'),    (2, 2, 'IntaSend'), (4, 1, 'M-Pesa'),  (6, 2, 'Cash'),
+    (9, 1, 'Bank'),    (2, 2, 'M-Pesa'),   (4, 1, 'M-Pesa'),  (6, 2, 'Cash'),
     (8, 1, 'M-Pesa'),  (10, 1, 'Cash'),    (12, 1, 'M-Pesa'), (1, 3, 'Bank'),
-    (3, 1, 'Cash'),    (5, 2, 'M-Pesa'),   (7, 1, 'IntaSend'),(9, 2, 'Cash'),
+    (3, 1, 'Cash'),    (5, 2, 'M-Pesa'),   (7, 1, 'M-Pesa'),  (9, 2, 'Cash'),
     (11, 1, 'M-Pesa'), (2, 1, 'Bank'),     (4, 1, 'Cash'),    (6, 1, 'M-Pesa'),
-    (8, 2, 'Cash'),    (10, 1, 'Bank'),    (1, 2, 'M-Pesa'),  (3, 1, 'IntaSend'),
+    (8, 2, 'Cash'),    (10, 1, 'Bank'),    (1, 2, 'M-Pesa'),  (3, 1, 'M-Pesa'),
     (5, 1, 'Cash'),    (7, 2, 'M-Pesa'),   (9, 1, 'Cash'),    (11, 2, 'Bank'),
-    (2, 2, 'M-Pesa'),  (4, 1, 'IntaSend'), (6, 1, 'Cash'),    (8, 1, 'M-Pesa'),
+    (2, 2, 'M-Pesa'),  (4, 1, 'M-Pesa'),   (6, 1, 'Cash'),    (8, 1, 'M-Pesa'),
     (10, 2, 'Bank'),   (12, 1, 'Cash'),    (1, 1, 'M-Pesa'),  (3, 3, 'Cash'),
     (5, 1, 'Bank'),    (7, 1, 'M-Pesa'),   (9, 2, 'Cash'),    (11, 1, 'M-Pesa'),
-    (2, 1, 'Cash'),    (4, 2, 'Bank'),     (6, 1, 'M-Pesa'),  (8, 1, 'IntaSend'),
+    (2, 1, 'Cash'),    (4, 2, 'Bank'),     (6, 1, 'M-Pesa'),  (8, 1, 'M-Pesa'),
     (10, 1, 'Cash'),   (12, 2, 'M-Pesa'),  (1, 2, 'Bank'),    (3, 1, 'M-Pesa')
 ) AS s(product_num, qty, method)
 JOIN (

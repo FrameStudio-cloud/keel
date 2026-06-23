@@ -11,12 +11,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 10_000 } },
 });
-import Overview from "./pages/Overview";
 import Homepage from "./pages/Homepage";
 import TourGuide from "./components/TourGuide";
 import SettingsProvider from "./context/SettingsProvider";
 import AuthProvider, { AuthContext } from "./context/AuthContext";
 
+const Overview = lazy(() => import("./pages/Overview"));
 const Inventory = lazy(() => import("./pages/Inventory"));
 const Sales = lazy(() => import("./pages/Sales"));
 const Social = lazy(() => import("./pages/Social"));
@@ -62,6 +62,9 @@ function HomeOrDashboard() {
   const { user, loading } = useContext(AuthContext);
   if (loading) return <Loading />;
   if (user) return <Overview />;
+  if (window.location.hash && window.location.hash.includes("access_token=")) {
+    return <Loading />;
+  }
   return <Homepage />;
 }
 

@@ -75,7 +75,7 @@ async function seed() {
   // ─── 4. Sales ───────────────────────────────────
   const now = Date.now();
   const sales = [];
-  const methods = ["Cash", "M-Pesa", "Bank", "IntaSend"];
+  const methods = ["Cash", "M-Pesa", "Bank"];
   for (let i = 0; i < 60; i++) {
     const productIdx = Math.floor(Math.random() * products.length);
     const product = products[productIdx];

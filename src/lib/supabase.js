@@ -7,6 +7,8 @@ const STORAGE_KEY = `sb-${new URL(supabaseUrl).hostname.split(".")[0]}-auth-toke
 
 export const STORAGE_KEY_EXPORTED = STORAGE_KEY;
 
+let refreshPromise = null;
+
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   accessToken: async () => {
     try {
@@ -19,15 +21,22 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
           clearPersistedSession();
           return null;
         }
-        const res = await window.fetch(`${supabaseUrl}/auth/v1/token?grant_type=refresh_token`, {
-          method: "POST",
-          headers: { apikey: supabaseKey, "Content-Type": "application/json" },
-          body: JSON.stringify({ refresh_token: session.refresh_token }),
-        });
-        if (!res.ok) { clearPersistedSession(); return null; }
-        const data = await res.json();
-        saveSession(data);
-        return data.access_token;
+        if (refreshPromise) return refreshPromise;
+        refreshPromise = (async () => {
+          const res = await window.fetch(`${supabaseUrl}/auth/v1/token?grant_type=refresh_token`, {
+            method: "POST",
+            headers: { apikey: supabaseKey, "Content-Type": "application/json" },
+            body: JSON.stringify({ refresh_token: session.refresh_token }),
+          });
+          if (!res.ok) { clearPersistedSession(); return null; }
+          const data = await res.json();
+          saveSession(data);
+          refreshPromise = null;
+          return data.access_token;
+        })();
+        const token = await refreshPromise;
+        refreshPromise = null;
+        return token;
       }
       return session.access_token;
     } catch {
@@ -50,7 +59,7 @@ export function saveSession(session) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       ...session,
-      expires_at: Date.now() + (parseInt(session.expires_in) * 1000),
+      expires_at: Date.now() + ((parseInt(session.expires_in) || 3600) * 1000),
     }));
   } catch { /* noop */ }
 }
@@ -145,10 +154,14 @@ export async function authLogin(email, password) {
 }
 
 export async function authLogout(accessToken) {
-  await window.fetch(`${supabaseUrl}/auth/v1/logout`, {
-    method: "POST",
-    headers: { apikey: supabaseKey, Authorization: `Bearer ${accessToken}` },
-  });
+  try {
+    await window.fetch(`${supabaseUrl}/auth/v1/logout`, {
+      method: "POST",
+      headers: { apikey: supabaseKey, Authorization: `Bearer ${accessToken}` },
+    });
+  } catch {
+    /* server request may fail, session still cleared below */
+  }
   clearPersistedSession();
 }
 

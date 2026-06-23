@@ -75,7 +75,7 @@ mitho-dash/
 │   │   ├── LogSaleModal.jsx
 │   │   ├── ReceiptModal.jsx
 │   │   └── ...
-│   └── payment/                # IntaSend integration
+│   └── payment/                # Payment methods
 └── dist/
 ```
 
