@@ -1,4 +1,5 @@
-import { useState } from "react";
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useState, useEffect } from "react";
 import { FiX, FiCamera } from "react-icons/fi";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
@@ -25,9 +26,46 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
   const [loading, setLoading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
+  const [attributes, setAttributes] = useState([]);
+  const [attributeValues, setAttributeValues] = useState({});
+
+  async function fetchAttributesAndValues() {
+    const { data: cat } = await supabase
+      .from("categories")
+      .select("id")
+      .eq("slug", businessCategory)
+      .single();
+    if (!cat) return;
+
+    const { data: attrs } = await supabase
+      .from("category_attributes")
+      .select("id, name, type, options, required, sort_order")
+      .eq("category_id", cat.id)
+      .order("sort_order");
+    if (attrs) setAttributes(attrs);
+
+    const { data: vals } = await supabase
+      .from("product_attribute_values")
+      .select("attribute_id, value")
+      .eq("product_id", product.id);
+    if (vals) {
+      const map = {};
+      vals.forEach((v) => { map[v.attribute_id] = v.value; });
+      setAttributeValues(map);
+    }
+  }
+
+  useEffect(() => {
+    fetchAttributesAndValues();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [businessCategory, product.id]);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
+  }
+
+  function handleAttrChange(attrId, value) {
+    setAttributeValues((prev) => ({ ...prev, [attrId]: value }));
   }
 
   async function handleUpdate() {
@@ -67,10 +105,27 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
 
     if (error) {
       console.error(error);
-    } else {
-      onUpdated();
-      onClose();
+      setLoading(false);
+      return;
     }
+
+    const attrEntries = Object.entries(attributeValues).filter(
+      (entry) => entry[1].trim()
+    ).map(([attrId, val]) => ({
+        product_id: product.id,
+        attribute_id: attrId,
+        value: val,
+        shop_id: shopId,
+      }));
+
+    if (attrEntries.length > 0) {
+      await supabase.from("product_attribute_values").upsert(attrEntries, {
+        onConflict: "product_id, attribute_id",
+      });
+    }
+
+    onUpdated();
+    onClose();
     setLoading(false);
   }
 
@@ -141,7 +196,7 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
-                Price (KSh)
+                Price
               </label>
               <input
                 name="price"
@@ -177,6 +232,44 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
               />
             </div>
           </div>
+
+          {attributes.length > 0 && (
+            <div className="border-t border-gray-100 dark:border-white/10 pt-3">
+              <p className="text-xs text-gray-400 dark:text-slate-500 mb-3 font-medium">
+                Variant attributes
+              </p>
+              <div className="flex flex-col gap-3">
+                {attributes.map((attr) => (
+                  <div key={attr.id}>
+                    <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+                      {attr.name}
+                      {attr.required && <span className="text-red-400 ml-0.5">*</span>}
+                    </label>
+                    {attr.type === "select" && attr.options ? (
+                      <select
+                        value={attributeValues[attr.id] || ""}
+                        onChange={(e) => handleAttrChange(attr.id, e.target.value)}
+                        className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                      >
+                        <option value="">{attr.required ? `Select ${attr.name.toLowerCase()}` : "Optional"}</option>
+                        {attr.options.map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        value={attributeValues[attr.id] || ""}
+                        onChange={(e) => handleAttrChange(attr.id, e.target.value)}
+                        type={attr.type === "number" ? "number" : "text"}
+                        placeholder={`Enter ${attr.name.toLowerCase()}`}
+                        className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {showBarcode && (
             <div>

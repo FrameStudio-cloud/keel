@@ -174,26 +174,26 @@ export default function Homepage() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-10 sm:pt-24 sm:pb-16 text-center">
         <img src="/keel icon.png" alt="Keel" className="w-16 h-16 mx-auto mb-6" />
         <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
-          Shop Management,{" "}
+              Shop Management,{" "}
           <span className="text-blue-600 dark:text-blue-400">Simplified</span>
-        </h1>
+            </h1>
         <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-xl mx-auto leading-relaxed">
-          Track inventory, manage sales, view reports, and grow your business — all from one clean dashboard. No complexity, no clutter.
-        </p>
+              Track inventory, manage sales, view reports, and grow your business — all from one clean dashboard. No complexity, no clutter.
+            </p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link
-            to="/login"
+              <Link
+                to="/login"
             className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
-          >
-            Get Started Free <FiArrowRight />
-          </Link>
-          <Link
-            to="/login"
+              >
+                Get Started Free <FiArrowRight />
+              </Link>
+              <Link
+                to="/login"
             className="w-full sm:w-auto px-6 py-2.5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 font-medium rounded-xl text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
-          >
-            Sign In
-          </Link>
-        </div>
+              >
+                Sign In
+              </Link>
+            </div>
       </section>
 
       {/* DASHBOARD PREVIEW */}

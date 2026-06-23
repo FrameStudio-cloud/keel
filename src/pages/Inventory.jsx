@@ -36,6 +36,7 @@ export default function Inventory() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [adjustProduct, setAdjustProduct] = useState(null);
   const [publishedMap, setPublishedMap] = useState({});
+  const [attributeMap, setAttributeMap] = useState({});
   const [publishingId, setPublishingId] = useState(null);
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
@@ -70,6 +71,25 @@ export default function Inventory() {
   useEffect(() => {
     fetchCatalogue();
   }, []);
+
+  useEffect(() => {
+    if (products.length === 0) return;
+    const ids = products.map((p) => p.id);
+    (async () => {
+      const { data } = await supabase
+        .from("product_attribute_values")
+        .select("product_id, value, attribute:attribute_id(name)")
+        .in("product_id", ids);
+      if (data) {
+        const map = {};
+        data.forEach((v) => {
+          if (!map[v.product_id]) map[v.product_id] = [];
+          map[v.product_id].push(v);
+        });
+        setAttributeMap(map);
+      }
+    })();
+  }, [products]);
 
   async function fetchCatalogue() {
     const shopId = await getShopId();
@@ -180,6 +200,15 @@ export default function Inventory() {
                             <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">{p.barcode}</span>
                           )}
                         </div>
+                        {attributeMap[p.id]?.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1.5">
+                            {attributeMap[p.id].map((av, i) => (
+                              <span key={i} className="text-[10px] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded whitespace-nowrap">
+                                {av.attribute?.name}: {av.value}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center justify-between border-t border-gray-200 dark:border-white/10 pt-3">
@@ -267,6 +296,15 @@ export default function Inventory() {
                       <td className="px-4 py-3 font-medium text-gray-800 dark:text-white">
                         {p.name}
                         {p.new_arrival && <span className="ml-2 text-[10px] font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-500/20 px-1.5 py-0.5 rounded align-middle">New</span>}
+                        {attributeMap[p.id]?.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {attributeMap[p.id].map((av, i) => (
+                              <span key={i} className="text-[10px] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded whitespace-nowrap">
+                                {av.value}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-gray-400 dark:text-slate-500">{p.category}</td>
                       {showBarcode && (

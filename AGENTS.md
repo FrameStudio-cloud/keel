@@ -133,6 +133,10 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - `stock_movements` — id, product_id, product_name, change, reason, shop_id, created_at
 - `page_views` — id, page, product_name, referrer, user_agent, shop_id, created_at
 - `users` — id, auth_user_id (UUID), shop_id, name, email, created_at
+- `categories` — id, name, slug (unique), created_at
+- `category_attributes` — id, category_id (FK), name, type (select/text/number), options (jsonb), required, sort_order
+- `product_attribute_values` — id, product_id (FK), attribute_id (FK), value, shop_id; UNIQUE(product_id, attribute_id)
+- `catalogue_attribute_values` — id, catalogue_id (FK), attribute_id (FK), value, shop_id; UNIQUE(catalogue_id, attribute_id)
 
 ## Key Files
 
@@ -149,10 +153,22 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - `src/pages/Website.jsx` — tabbed website management: Listings, Banners, Business Info, Gallery
 - `src/components/website/` — ListingsTab (no mockItems), BannersTab (fixed state mutation in moveUp), BusinessTab (reads businessHours from useSettings), GalleryTab
 - `src/components/website/ChatWidgetTab.jsx` — 5 multi-tenant leak fixes (all queries shop-filtered); reads whatsapp from useSettings
-- `src/pages/Inventory.jsx` — product CRUD, stock adjust, debounced search, variant badges, one-tap publish to catalogue (includes shop_id filter)
+
+### Category & Attribute System
+
+Business category controls variant fields via data-driven tables (not hardcoded `if/else`):
+
+- `categories` table — defines shop types (Clothing, Electronics, Electricals, General, Wigs)
+- `category_attributes` table — per-category variant dimensions (e.g. Wigs → Hair Type, Texture, Length, Color, Weight)
+- `product_attribute_values` / `catalogue_attribute_values` — structured values per product/catalogue item
+- **23 attribute definitions** across 5 categories, all database-driven
+- AddProductModal / EditProductModal render dynamic fields by querying `category_attributes` for the shop's category
+- Inventory displays attribute badges from `product_attribute_values`
+- Adding a new category = DB insert only, zero code changes
+- `src/pages/Inventory.jsx` — product CRUD, stock adjust, debounced search, variant badges from `product_attribute_values`, one-tap publish to catalogue (includes shop_id filter)
 - `src/pages/Social.jsx` — replaced fake Instagram stats with "Connect" placeholder
-- `src/components/AddProductModal.jsx` — variant fields (color/size/storage) based on `settings.businessCategory`
-- `src/components/EditProductModal.jsx` — same variant fields, pre-filled from product.variants
+- `src/components/AddProductModal.jsx` — dynamic attribute fields from `category_attributes` query (not hardcoded), saves to `product_attribute_values`
+- `src/components/EditProductModal.jsx` — same dynamic fields, pre-filled from `product_attribute_values`, upserts on save
 - `src/components/Bots.jsx` — WhatsApp + Telegram bot cards per shop
 - `src/lib/format.js` — formatPrice, setCurrency, getCurrency
 - `src/payment/paymentConfig.js` — getPaymentMethods, setPaymentConfig, getDefaultPayment
@@ -263,6 +279,19 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 ### Still broken
 - **Pagination gaps** — `Reports.jsx:21-29` (profit margins) fetches all sales+products, `Reports.jsx:76-87` (PnL) date-filtered but no ceiling
 - `eslint-plugin-react` and `eslint-plugin-jsx-a11y` skipped — ESLint 10 peer dep conflict; existing react-hooks + react-refresh plugins sufficient
+
+## Documentation
+
+| Path | Format | Purpose |
+|---|---|---|
+| `C:\Users\Administrator\Documents\Dev notes\Keel Ecosystem\` | Obsidian `.md` (19 files) | Technical reference: apps, architecture, features, setup, Supabase, incident log |
+| `C:\Users\Administrator\Documents\Dev notes\Keel Narrative\` | Obsidian `.md` (5 files) | Origin story, architecture decisions, future roadmap, business context (collaborative, has prompts to fill in) |
+| `C:\Users\Administrator\Documents\Keel User Guide.docx` | Word doc | Step-by-step for shop owners (signup → features) |
+| `C:\Users\Administrator\Documents\Keel Technical Architecture.docx` | Word doc | For developers: schema, auth, multi-tenancy, category system, deployment |
+| `C:\Users\Administrator\Documents\Keel Client Proposal.docx` | Word doc | For potential clients: problem/solution, features, pricing |
+| `C:\Users\Administrator\Documents\Keel Deployment Checklist.docx` | Word doc | Deployment steps: prerequisites → Supabase → Vercel → testing → go-live |
+
+Mini-catalogue deployments: `mini-catalogue-phase2` (Zuri Fashion), `mini-catalogue-electricals`, `wix` (Lumière Hair). Each is a separate Vercel project with identical code — only `config/shop.js` and `config/catalogue.js` differ.
 
 ## Conventions
 
