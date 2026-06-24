@@ -89,10 +89,10 @@ function FeatureCard({ image, title, desc, onSelect }) {
 }
 
 export default function Homepage() {
-  const navTrapRef = useFocusTrap(mobileNavOpen);
   const [openFaq, setOpenFaq] = useState(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState(null);
+  const navTrapRef = useFocusTrap(mobileNavOpen);
   const marqueeRef = useRef(null);
 
   useEffect(() => {
