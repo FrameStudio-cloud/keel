@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import { GoGraph } from "react-icons/go";
 import { FaBoxOpen } from "react-icons/fa";
@@ -39,6 +40,22 @@ const groups = [
 export default function Sidebar({ open, onClose }) {
   const { storeName } = useSettings();
   const { data: lowStockCount = 0 } = useLowStockCount();
+  const navRef = useRef(null);
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem("sidebarScroll");
+    if (saved && navRef.current) {
+      navRef.current.scrollTop = parseInt(saved, 10);
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (navRef.current) {
+        sessionStorage.setItem("sidebarScroll", navRef.current.scrollTop);
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -71,7 +88,7 @@ export default function Sidebar({ open, onClose }) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 p-3 flex flex-col gap-1 overflow-y-auto">
+      <nav ref={navRef} className="flex-1 p-3 flex flex-col gap-1 overflow-y-auto">
         {groups.map((group, gi) => (
           <div key={group.label}>
             <p
