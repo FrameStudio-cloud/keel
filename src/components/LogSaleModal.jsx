@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from "react";
-import { FiX, FiCamera, FiSearch } from "react-icons/fi";
+import { FiX, FiCamera, FiSearch, FiCheck } from "react-icons/fi";
 import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { getPaymentMethods, getDefaultPayment } from "../lib/paymentConfig";
@@ -108,13 +108,13 @@ export default function LogSaleModal({ onClose, onAdded }) {
         <div className="flex flex-col gap-3">
           <div>
             <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Product</label>
-            <div className="relative mb-2">
+            <div className="relative">
               <FiSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => { setSearch(e.target.value); setForm((prev) => ({ ...prev, product_id: "" })); }}
                 placeholder={showBarcode ? "Search by name or scan barcode..." : "Search by name..."}
-                className="w-full border border-gray-200 dark:border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                className="w-full border border-gray-200 dark:border-white/10 rounded-lg pl-9 pr-9 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
               />
               {showBarcode && (
                 <button
@@ -135,6 +135,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
                   );
                   if (match) {
                     setForm((prev) => ({ ...prev, product_id: match.id }));
+                    setSearch(`${match.name} — ${formatPrice(match.price)} (stock: ${match.stock})`);
                   } else {
                     setError("No product found with this barcode");
                   }
@@ -143,29 +144,44 @@ export default function LogSaleModal({ onClose, onAdded }) {
                 onClose={() => setShowScanner(false)}
               />
             )}
-            <select
-              name="product_id"
-              value={form.product_id}
-              onChange={handleChange}
-              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
-            >
-              <option value="">Select a product</option>
-              {products
-                .filter((p) => {
-                  const q = search.toLowerCase();
-                  return (
-                    !q ||
-                    p.name.toLowerCase().includes(q) ||
-                    (showBarcode && p.barcode && p.barcode.toLowerCase().includes(q))
-                  );
-                })
-                .map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} — {formatPrice(p.price)} (stock: {p.stock})
-                    {showBarcode && p.barcode ? ` [${p.barcode}]` : ""}
-                  </option>
-                ))}
-            </select>
+            <div className="relative mt-2">
+              {search && !form.product_id && (
+                <div className="absolute z-10 w-full bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-white/10 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                  {(() => {
+                    const q = search.toLowerCase();
+                    const filtered = products.filter((p) =>
+                      !q ||
+                      p.name.toLowerCase().includes(q) ||
+                      (showBarcode && p.barcode && p.barcode.toLowerCase().includes(q))
+                    );
+                    return filtered.length === 0 ? (
+                      <div className="px-3 py-2 text-xs text-gray-400">No products found</div>
+                    ) : (
+                      filtered.map((p) => (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => {
+                            setForm((prev) => ({ ...prev, product_id: p.id }));
+                            setSearch(`${p.name} — ${formatPrice(p.price)} (stock: ${p.stock})`);
+                          }}
+                          className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-colors flex items-center justify-between"
+                        >
+                          <span>{p.name}</span>
+                          <span className="text-xs text-gray-400">{formatPrice(p.price)} · stock: {p.stock}</span>
+                        </button>
+                      ))
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
+            {form.product_id && selectedProduct && (
+              <div className="mt-2 flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
+                <FiCheck size={14} />
+                {selectedProduct.name} — {formatPrice(selectedProduct.price)}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">

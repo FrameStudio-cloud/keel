@@ -156,7 +156,7 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div
         ref={trapRef}
-        className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-100 dark:border-white/10 p-6 w-full max-w-md mx-4"
+        className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-100 dark:border-white/10 p-6 w-full max-w-md mx-4 max-h-[85vh] overflow-y-auto"
         role="dialog"
         aria-modal="true"
         aria-label="Edit product"
