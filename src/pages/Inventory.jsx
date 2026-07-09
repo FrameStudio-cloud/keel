@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
-import { FiImage, FiGlobe } from "react-icons/fi";
+import { FiImage, FiGlobe, FiPackage } from "react-icons/fi";
 import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
 import Skeleton from "../components/Skeleton";
+import EmptyState from "../components/EmptyState";
 import AddProductModal from "../components/AddProductModal";
 import EditProductModal from "../components/EditProductModal";
 import StockAdjustModal from "../components/StockAdjustModal";
@@ -174,6 +175,14 @@ export default function Inventory() {
               </div>
             ))}
           </div>
+        ) : products.length === 0 ? (
+          <EmptyState
+            icon={FiPackage}
+            title="Your inventory is empty"
+            description="Add your first product to start tracking stock, prices, and variants."
+            actionLabel="Add Product"
+            onClick={() => setShowModal(true)}
+          />
         ) : (
           <>
             <div className="sm:hidden space-y-2 p-3">

@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 import PageLayout from "../components/layout/PageLayout";
+import EmptyState from "../components/EmptyState";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { formatPrice } from "../lib/format";
 import { useSettings } from "../hooks/useSettings";
 import QRCode from "qrcode";
 import {
-  FiLink, FiCopy, FiShare2, FiSmartphone, FiFileText, FiGrid, FiStar, FiDownload, FiCheck, FiExternalLink,
+  FiLink, FiCopy, FiShare2, FiSmartphone, FiFileText, FiGrid, FiStar, FiDownload, FiCheck, FiExternalLink, FiPackage,
 } from "react-icons/fi";
 import Switch from "react-switch";
 
@@ -154,9 +156,24 @@ export default function Marketing() {
 
   return (
     <>
-      <Helmet><title>Marketing — Keel</title></Helmet>
+      <Helmet>
+        <title>Marketing — Keel</title>
+        <meta name="description" content="Generate product links, QR codes, print catalogues, and manage new arrival announcements for your shop." />
+        <meta property="og:title" content="Marketing — Keel" />
+        <meta property="og:description" content="Share products, generate QR codes, and manage new arrival announcements." />
+        <meta property="og:url" content="https://keel-nu.vercel.app/marketing" />
+      </Helmet>
     <PageLayout title="Marketing">
       <p className="text-xs text-gray-400 dark:text-slate-500 mb-6">Share product links, manage your WhatsApp order button, generate QR codes, and mark new arrivals.</p>
+      {products.length === 0 ? (
+        <EmptyState
+          icon={FiPackage}
+          title="No products yet"
+          description="Add products in Inventory to generate shareable links, QR codes, and print catalogues."
+          actionLabel="Go to Inventory"
+          to="/inventory"
+        />
+      ) : (
       <div className="max-w-2xl mx-auto space-y-6">
 
         {/* 1. Shareable Product Links */}
@@ -210,14 +227,18 @@ export default function Marketing() {
           </p>
           <div className="bg-gray-50 dark:bg-[#1a1a2e] rounded-lg p-4 border border-gray-200 dark:border-white/10 mb-3">
             <p className="text-xs text-gray-400 dark:text-slate-500 mb-2">Preview</p>
-            <a
-              href={`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, "")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-green-500 text-white text-sm px-5 py-2.5 rounded-xl hover:bg-green-600 transition-all font-medium"
-            >
-              <FiSmartphone size={16} /> Order Now via WhatsApp
-            </a>
+            {whatsappNumber ? (
+              <a
+                href={`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-green-500 text-white text-sm px-5 py-2.5 rounded-xl hover:bg-green-600 transition-all font-medium"
+              >
+                <FiSmartphone size={16} /> Order Now via WhatsApp
+              </a>
+            ) : (
+              <p className="text-xs text-gray-400 dark:text-slate-500 italic">Set your WhatsApp number in Settings to enable the button.</p>
+            )}
           </div>
           <button onClick={testWhatsApp} className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 hover:underline">
             <FiExternalLink size={14} /> Test link
@@ -328,6 +349,7 @@ export default function Marketing() {
         </div>
 
       </div>
+      )}
     </PageLayout>
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold shadow-xl transition-all ${toast.type === "error" ? "bg-red-500 text-white" : "bg-blue-600 text-white"}`}>

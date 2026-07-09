@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { FiClock } from "react-icons/fi";
+import { FiCalendar } from "react-icons/fi";
 import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
 import Skeleton from "../components/Skeleton";
+import EmptyState from "../components/EmptyState";
 import PlanPostModal from "../components/PlanPostModal";
 import Pagination from "../components/Pagination";
 import { getShopId } from "../lib/shop";
@@ -158,9 +159,13 @@ export default function Social() {
           ))}
         </div>
       ) : posts.length === 0 ? (
-        <p className="text-sm text-gray-400 dark:text-slate-500">
-          No posts yet. Plan your first one.
-        </p>
+        <EmptyState
+          icon={FiCalendar}
+          title="No posts yet"
+          description="Plan and schedule your first social media post."
+          actionLabel="Plan Post"
+          onClick={() => setShowModal(true)}
+        />
       ) : (
         <div className="flex flex-col gap-3">
           {posts.map((post) => (

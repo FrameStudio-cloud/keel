@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
+import { FiShoppingCart } from "react-icons/fi";
 import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
 import Skeleton from "../components/Skeleton";
+import EmptyState from "../components/EmptyState";
 import LogSaleModal from "../components/LogSaleModal";
 import ReceiptModal from "../components/ReceiptModal";
 import Pagination from "../components/Pagination";
@@ -98,9 +100,13 @@ export default function Sales() {
             ))}
           </div>
         ) : sales.length === 0 ? (
-          <p className="text-sm text-gray-400 dark:text-slate-500 p-6">
-            No sales yet. Log your first one.
-          </p>
+          <EmptyState
+            icon={FiShoppingCart}
+            title="No sales yet"
+            description="Log your first sale to start tracking revenue and transactions."
+            actionLabel="Log Sale"
+            onClick={() => setShowModal(true)}
+          />
         ) : (
           <>
             <div className="sm:hidden space-y-2 p-3">

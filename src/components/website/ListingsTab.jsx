@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { FiX } from "react-icons/fi";
+import { FiX, FiGlobe } from "react-icons/fi";
+import { Link } from "react-router-dom";
+import EmptyState from "../EmptyState";
 import { supabase } from "../../lib/supabase";
 import { getShopId, withShop } from "../../lib/shop";
 import { formatPrice } from "../../lib/format";
@@ -201,9 +203,13 @@ export default function ListingsTab() {
           ))}
         </div>
       ) : items.length === 0 ? (
-        <div className="text-center py-12 text-slate-600 dark:text-slate-400">
-          <p className="text-sm">No items found</p>
-        </div>
+        <EmptyState
+          icon={FiGlobe}
+          title="No catalogue items"
+          description="Publish products from your Inventory to make them visible on your website."
+          actionLabel="Go to Inventory"
+          to="/inventory"
+        />
       ) : (
         <>
           <div className="sm:hidden space-y-2">
