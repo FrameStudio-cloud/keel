@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
 import { FiImage, FiGlobe } from "react-icons/fi";
 import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
@@ -134,6 +135,7 @@ export default function Inventory() {
       searchQuery={searchQuery}
       setSearchQuery={setSearchQuery}
     >
+      <Helmet><title>Inventory — Keel</title></Helmet>
       <div className="flex justify-between items-center mb-4">
         <p className="text-sm text-gray-400 dark:text-slate-500">
           {total} products

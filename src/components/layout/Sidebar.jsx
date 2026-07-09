@@ -23,7 +23,7 @@ const groups = [
     label: "Marketing",
     items: [
       { label: "Social Media", icon: <MdOutlinePhoneIphone />, path: "/social" },
-      { label: "Bots", icon: <IoRocketOutline />, path: "/bots" },
+
       { label: "Website", icon: <IoGlobeOutline />, path: "/website" },
       { label: "Marketing", icon: <IoMegaphoneOutline />, path: "/marketing" },
     ],

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
 import ListingsTab from "../components/website/ListingsTab";
 import BannersTab from "../components/website/BannersTab";
@@ -19,6 +20,7 @@ export default function Website() {
 
   return (
     <PageLayout title="Website">
+      <Helmet><title>Website — Keel</title></Helmet>
       <div className="flex gap-1 mb-6 border-b border-slate-200 dark:border-white/10 overflow-x-auto overflow-hidden">
         {TABS.map((tab) => (
           <button

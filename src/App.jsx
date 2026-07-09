@@ -1,9 +1,16 @@
 import { lazy, Suspense, useContext, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import posthog from "./lib/posthog";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
+
+function PostHogPageView() {
+  const { pathname } = useLocation();
+  useEffect(() => { posthog.capture('$pageview'); }, [pathname]);
   return null;
 }
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -13,14 +20,16 @@ const queryClient = new QueryClient({
 });
 import Homepage from "./pages/Homepage";
 import TourGuide from "./components/TourGuide";
+import UpdateChecker from "./components/UpdateChecker";
 import SettingsProvider from "./context/SettingsProvider";
 import AuthProvider, { AuthContext } from "./context/AuthContext";
+import { useSettings } from "./hooks/useSettings";
+import LockoutScreen from "./pages/LockoutScreen";
 
 const Overview = lazy(() => import("./pages/Overview"));
 const Inventory = lazy(() => import("./pages/Inventory"));
 const Sales = lazy(() => import("./pages/Sales"));
 const Social = lazy(() => import("./pages/Social"));
-const Bots = lazy(() => import("./pages/Bots"));
 const Website = lazy(() => import("./pages/Website"));
 const Settings = lazy(() => import("./pages/Settings"));
 const SetupWizard = lazy(() => import("./pages/SetupWizard"));
@@ -46,8 +55,15 @@ function Loading() {
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useContext(AuthContext);
-  if (loading) return <Loading />;
+  const { subscriptionExpiresAt, loading: settingsLoading } = useSettings();
+
+  if (loading || settingsLoading) return <Loading />;
   if (!user) return <Navigate to="/login" replace />;
+
+  if (subscriptionExpiresAt && new Date(subscriptionExpiresAt) < new Date()) {
+    return <LockoutScreen />;
+  }
+
   return children;
 }
 
@@ -91,7 +107,6 @@ function AppRoutes() {
         <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
         <Route path="/sales" element={<ProtectedRoute><Sales /></ProtectedRoute>} />
         <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} />
-        <Route path="/bots" element={<ProtectedRoute><Bots /></ProtectedRoute>} />
         <Route path="/website" element={<ProtectedRoute><Website /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
@@ -111,6 +126,8 @@ export default function App() {
         <SettingsProvider>
           <BrowserRouter>
             <ScrollToTop />
+            <PostHogPageView />
+            <UpdateChecker />
             <AppRoutes />
           </BrowserRouter>
         </SettingsProvider>

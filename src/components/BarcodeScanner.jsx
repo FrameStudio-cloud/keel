@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useRef, useState } from "react";
 import { useFocusTrap } from "../hooks/useFocusTrap";
-import { FiX, FiCamera, FiCameraOff, FiRefreshCw } from "react-icons/fi";
+import { FiX, FiCamera, FiCameraOff, FiRefreshCw, FiRotateCw } from "react-icons/fi";
 
 export default function BarcodeScanner({ onScan, onClose }) {
   const [error, setError] = useState(null);
@@ -13,13 +13,39 @@ export default function BarcodeScanner({ onScan, onClose }) {
   const scannerRef = useRef(null);
   const mountedRef = useRef(true);
 
+  function cameraPriority(label) {
+    const lower = label.toLowerCase();
+    if (lower.includes("macro") || lower.includes("depth") || lower.includes("tof") || lower.includes("0.3") || lower.includes("sensor") || lower.includes("ir")) return 5;
+    if (lower.includes("front") || lower.includes("facetime") || lower.includes("internal")) return 4;
+    if (lower.includes("ultra") || lower.includes("tele") || lower.includes("zoom")) return 2;
+    if (lower.includes("back") || lower.includes("rear") || lower.includes("wide")) return 1;
+    return 3;
+  }
+
+  async function getVideoInputs() {
+    let devices = await navigator.mediaDevices.enumerateDevices();
+    let videoInputs = devices.filter(d => d.kind === "videoinput");
+
+    if (videoInputs.every(d => !d.label)) {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      stream.getTracks().forEach(t => t.stop());
+      devices = await navigator.mediaDevices.enumerateDevices();
+      videoInputs = devices.filter(d => d.kind === "videoinput");
+    }
+
+    videoInputs.sort((a, b) => cameraPriority(a.label) - cameraPriority(b.label));
+    return videoInputs;
+  }
+
   async function initScanner() {
     try {
+      if (!navigator.mediaDevices?.enumerateDevices) throw new Error("API not supported");
+
       const { Html5Qrcode } = await import("html5-qrcode");
       const scanner = new Html5Qrcode("barcode-reader");
       scannerRef.current = scanner;
 
-      const cams = await Html5Qrcode.getCameras();
+      const cams = await getVideoInputs();
       if (!mountedRef.current) return;
 
       if (cams.length === 0) {
@@ -27,10 +53,10 @@ export default function BarcodeScanner({ onScan, onClose }) {
         return;
       }
 
-      setCameras(cams);
-      const camId = cams[0].id;
-      setSelectedCam(camId);
-      startScanning(scanner, camId);
+      const formatted = cams.map(c => ({ id: c.deviceId, label: c.label }));
+      setCameras(formatted);
+      setSelectedCam(formatted[0].id);
+      startScanning(scanner, formatted[0].id);
     } catch {
       if (mountedRef.current) {
         setError("Camera access denied or not supported");
@@ -78,6 +104,13 @@ export default function BarcodeScanner({ onScan, onClose }) {
     if (scannerRef.current) {
       startScanning(scannerRef.current, camId);
     }
+  }
+
+  function flipCamera() {
+    if (cameras.length < 2) return;
+    const idx = cameras.findIndex(c => c.id === selectedCam);
+    const next = (idx + 1) % cameras.length;
+    switchCamera(cameras[next].id);
   }
 
   function confirmCode() {
@@ -172,22 +205,34 @@ export default function BarcodeScanner({ onScan, onClose }) {
             </div>
           )}
 
-          {cameras.length > 1 && (
+          {cameras.length > 0 && (
             <div className="mt-3">
               <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
                 Camera
               </label>
-              <select
-                value={selectedCam || ""}
-                onChange={(e) => switchCamera(e.target.value)}
-                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
-              >
-                {cameras.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.label || `Camera ${cameras.indexOf(c) + 1}`}
-                  </option>
-                ))}
-              </select>
+              <div className="flex gap-2">
+                <select
+                  value={selectedCam || ""}
+                  onChange={(e) => switchCamera(e.target.value)}
+                  className="flex-1 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                >
+                  {cameras.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.label || `Camera ${cameras.indexOf(c) + 1}`}
+                    </option>
+                  ))}
+                </select>
+                {cameras.length > 1 && (
+                  <button
+                    onClick={flipCamera}
+                    className="px-3 border border-gray-200 dark:border-white/10 rounded-lg text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+                    title="Switch to next camera"
+                    aria-label="Flip camera"
+                  >
+                    <FiRotateCw size={16} />
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>

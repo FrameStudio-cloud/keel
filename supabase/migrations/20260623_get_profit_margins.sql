@@ -21,6 +21,7 @@ BEGIN
     WHERE s.shop_id = p_shop_id
     GROUP BY COALESCE(p.name, s.product_name)
     ORDER BY revenue DESC
+    LIMIT 2000
   ) t;
   RETURN COALESCE(result, '{}'::JSON[]);
 END;

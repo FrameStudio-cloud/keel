@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
 import Skeleton from "../components/Skeleton";
@@ -64,6 +65,7 @@ export default function Sales() {
   }
   return (
     <PageLayout title="Sales" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
+      <Helmet><title>Sales — Keel</title></Helmet>
       <div className="flex justify-between items-center mb-4">
         <p className="text-sm text-gray-400 dark:text-slate-500">{total} transactions</p>
         <button

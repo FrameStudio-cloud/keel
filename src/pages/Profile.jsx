@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
 import Skeleton from "../components/Skeleton";
 import { useSettings } from "../hooks/useSettings";
@@ -55,6 +56,7 @@ export default function Profile() {
 
   return (
     <PageLayout title="Store Profile">
+      <Helmet><title>Store Profile — Keel</title></Helmet>
       <div className="max-w-2xl mx-auto">
         <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-6 mb-6">
           <div className="w-16 h-16 rounded-2xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mb-4">

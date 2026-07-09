@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /inventory
+Disallow: /sales
+Disallow: /settings
+Disallow: /profile
+Disallow: /social
+Disallow: /bots
+Disallow: /website
+Disallow: /reports
+Disallow: /marketing
+Disallow: /stock-history
+Disallow: /setup
+Disallow: /finance
+Disallow: /api/
+
+Sitemap: https://keel-nu.vercel.app/sitemap.xml

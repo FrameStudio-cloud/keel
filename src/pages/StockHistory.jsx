@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
 import Pagination from "../components/Pagination";
 import { getShopId } from "../lib/shop";
@@ -34,6 +35,7 @@ export default function StockHistory() {
 
   return (
     <PageLayout title="Stock History">
+      <Helmet><title>Stock History — Keel</title></Helmet>
       {loading ? (
         <div className="space-y-3">
           {[...Array(5)].map((_, i) => (

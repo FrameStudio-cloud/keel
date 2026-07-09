@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
 import StatCard from "../components/StatCard";
 import { getShopId } from "../lib/shop";
@@ -157,6 +158,7 @@ export default function Finance() {
 
   return (
     <PageLayout title="Finance">
+      <Helmet><title>Finance — Keel</title></Helmet>
       {summary.revenue === 0 && summary.expenses === 0 && !loading && (
         <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl flex items-center justify-between">
           <p className="text-xs text-blue-700 dark:text-blue-300">

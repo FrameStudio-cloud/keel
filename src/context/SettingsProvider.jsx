@@ -21,6 +21,7 @@ export default function SettingsProvider({ children }) {
     whatsapp: "",
     businessHours: null,
     businessCategory: "general",
+    subscriptionExpiresAt: null,
     loading: true,
   });
 
@@ -35,7 +36,7 @@ export default function SettingsProvider({ children }) {
 
         const { data: shop } = await supabase
           .from("shops")
-          .select("business_category")
+          .select("business_category, subscription_expires_at")
           .eq("id", shopId)
           .maybeSingle();
 
@@ -66,12 +67,14 @@ export default function SettingsProvider({ children }) {
             whatsapp: store.whatsapp || "",
             businessHours: store.business_hours || null,
             businessCategory: shop?.business_category || "general",
+            subscriptionExpiresAt: shop?.subscription_expires_at || null,
             loading: false,
           });
         } else {
           setSettings((prev) => ({
             ...prev,
             businessCategory: shop?.business_category || "general",
+            subscriptionExpiresAt: shop?.subscription_expires_at || null,
             loading: false,
           }));
         }

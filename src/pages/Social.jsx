@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { FiClock } from "react-icons/fi";
 import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
@@ -111,39 +112,7 @@ export default function Social() {
 
   return (
     <PageLayout title="Social Media">
-      {/* Instagram connect */}
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 flex items-center gap-4 mb-6">
-        <div className="w-10 h-10 rounded-lg bg-pink-500 flex items-center justify-center text-white text-sm font-bold">
-          IG
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-medium text-gray-800 dark:text-white">Instagram</p>
-          <p className="text-xs text-gray-400 dark:text-slate-500">
-            Connect your Instagram to track post performance
-          </p>
-        </div>
-          <span className="text-xs text-blue-600 dark:text-blue-400 border border-blue-200 px-4 py-1.5 rounded-full">
-            Connect
-          </span>
-      </div>
-
-      {/* TikTok connect */}
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 flex items-center gap-4 mb-6">
-        <div className="w-10 h-10 rounded-lg bg-gray-900 flex items-center justify-center text-white text-sm font-bold">
-          TT
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-medium text-gray-800 dark:text-white">TikTok</p>
-          <p className="text-xs text-gray-400 dark:text-slate-500">
-            Connect your TikTok to track video performance
-          </p>
-        </div>
-          <span className="text-xs text-blue-600 dark:text-blue-400 border border-blue-200 px-4 py-1.5 rounded-full">
-            Connect
-          </span>
-      </div>
-
-      {/* Posts */}
+      <Helmet><title>Social Media — Keel</title></Helmet>
       <div className="flex justify-between items-center mb-3">
         <p className="text-sm font-medium text-gray-800 dark:text-white">
           {total} {total === 1 ? "post" : "posts"}

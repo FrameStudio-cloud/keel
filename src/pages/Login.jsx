@@ -1,5 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { supabase, authSignUp, authResetPassword, authUpdatePassword, saveSession } from "../lib/supabase";
 import { AuthContext } from "../context/AuthContext";
 import { FiMail, FiCheckCircle } from "react-icons/fi";
@@ -125,6 +126,14 @@ export default function Login() {
   }
 
   return (
+    <>
+      <Helmet>
+        <title>Sign In — Keel</title>
+        <meta name="description" content="Sign in to Keel or create a free account. Manage your inventory, sales, and reports from one dashboard." />
+        <meta property="og:title" content="Sign In — Keel" />
+        <meta property="og:description" content="Sign in to Keel or create a free account. Manage your inventory, sales, and reports from one dashboard." />
+        <meta property="og:url" content="https://keel-nu.vercel.app/login" />
+      </Helmet>
     <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] flex items-center justify-center p-4">
       <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-8 w-full max-w-sm">
         <div className="text-center mb-6">
@@ -339,5 +348,6 @@ export default function Login() {
         )}
       </div>
     </div>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import { createContext, useEffect, useRef, useState } from "react";
 import { supabase, getPersistedSession, saveSession, authLogin, authLogout, parseHashParams, fetchUserData, STORAGE_KEY_EXPORTED } from "../lib/supabase";
 import { clearShopId } from "../lib/shop";
+import posthog from "../lib/posthog";
 
 export const AuthContext = createContext({
   user: null,
@@ -178,6 +179,10 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
       if (user) {
+        posthog.identify(user.id, {
+          email: user.email,
+          name: user.user_metadata?.full_name || user.email?.split('@')[0],
+        });
         if (!ensuringRef.current) {
           ensuringRef.current = true;
           ensureUserRecordsInner(user).then((needsSetup) => {
@@ -207,6 +212,7 @@ export default function AuthProvider({ children }) {
     } catch {
       /* session cleared locally even if server request fails */
     }
+    posthog.reset();
     setSession(null);
     setUser(null);
     clearShopId();

@@ -16,6 +16,7 @@ Theme class is applied via useEffect in SettingsProvider (no flash since default
 All Supabase tables have RLS disabled — no auth.
 Tailwind v4 — no `tailwind.config.js`, dark mode via `@variant dark (&:where(.dark, .dark *));`.
 Multi-tenant via `shop_id` FK on every table — use `getShopId()` / `withShop()` helpers.
+Subscription lockout: `shops.subscription_expires_at` (timestamptz) controls access. `ProtectedRoute` in `App.jsx` checks `useSettings().subscriptionExpiresAt` — if in the past, renders `LockoutScreen.jsx` (lock icon, expiry date, Sign Out button). SettingsProvider fetches this column alongside `business_category`. If `null` (never set), no lockout applies. Migration: `20260624_add_subscription_expires_at.sql`. Managed via framestudio-dashboard's Keel Pulse page at `/keel`.
 Business category (`clothing`/`electronics`/`electricals`/`general`) controls variant fields (color/size/storage) in Inventory modals.
 Terms of Service are stored in `src/data/terms.json` (static JSON), not in the database. The Settings page shows a simple card link to `/terms` instead of an editor.
 
@@ -165,6 +166,7 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - AddProductModal / EditProductModal render dynamic fields by querying `category_attributes` for the shop's category
 - Inventory displays attribute badges from `product_attribute_values`
 - Adding a new category = DB insert only, zero code changes
+- **`catalogue_attribute_values` — deferred.** Table exists in schema + seed data, but no frontend reads/writes it yet. The mini-catalogue reads from the legacy `variants` JSONB column instead. To complete: (1) copy `product_attribute_values` → `catalogue_attribute_values` on Inventory publish, (2) add dynamic attribute fields + badges to ListingsTab, (3) update mini-catalogue to read from `catalogue_attribute_values` instead of JSONB. Not critical — products sell fine without variant toggles on the public site.
 - `src/pages/Inventory.jsx` — product CRUD, stock adjust, debounced search, variant badges from `product_attribute_values`, one-tap publish to catalogue (includes shop_id filter)
 - `src/pages/Social.jsx` — replaced fake Instagram stats with "Connect" placeholder
 - `src/components/AddProductModal.jsx` — dynamic attribute fields from `category_attributes` query (not hardcoded), saves to `product_attribute_values`
@@ -277,7 +279,6 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - `esbuild` removed from `devDependencies` — Vite 8 uses Rolldown native minifier (was `minify: "esbuild"` in vite.config.js, now uses default)
 
 ### Still broken
-- **Pagination gaps** — `Reports.jsx:21-29` (profit margins) fetches all sales+products, `Reports.jsx:76-87` (PnL) date-filtered but no ceiling
 - `eslint-plugin-react` and `eslint-plugin-jsx-a11y` skipped — ESLint 10 peer dep conflict; existing react-hooks + react-refresh plugins sufficient
 
 ## Documentation

@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import PageLayout from "../components/layout/PageLayout";
 import StatCard from "../components/StatCard";
@@ -114,6 +115,7 @@ export default function Overview() {
 
   return (
     <PageLayout title="Overview">
+      <Helmet><title>Overview — Keel</title></Helmet>
       {isLoading ? (
         <div className="space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -129,34 +131,36 @@ export default function Overview() {
         </div>
       ) : (
         <>
+          <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-3">Sales Overview</p>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
             <StatCard label="Sales today" value={formatPrice(stats.salesToday)} change={stats.salesToday > 0 ? "From today's transactions" : "No sales yet today"} up={stats.salesToday > 0} />
             <StatCard label="Items sold" value={stats.itemsSold} change={stats.itemsSold > 0 ? "Units today" : "None yet"} up={stats.itemsSold > 0} />
             <StatCard label="Low stock alerts" value={stats.lowStock} change={stats.lowStock > 0 ? "Products need restocking" : "All stock healthy"} up={stats.lowStock === 0} />
             <StatCard label="Total products" value={stats.totalProducts} change="In your inventory" up />
           </div>
+          <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-3">Performance</p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <WeeklySalesChart data={chartData} timeRange={timeRange} onTimeRangeChange={setTimeRange} />
             <TopProducts products={topProducts} />
           </div>
           {hasWebsite && (
-            <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="lg:col-span-2"><SlowMovingStock /></div>
-              <div className="lg:col-span-1">
-                <div className="grid grid-cols-2 gap-3">
-                  <StatCard label="Total Views" value={(pageViews?.total || 0).toLocaleString()} change="All time" up />
-                  <StatCard label="Today" value={(pageViews?.today || 0).toLocaleString()} change="Visits today" up={pageViews?.today > 0} />
-                  <StatCard label="Most viewed" value={pageViews?.topPages?.[0]?.name || "—"} change={`${pageViews?.topPages?.[0]?.count || 0} visits`} up />
-                  <StatCard label="Pages" value={pageViews?.topPages?.length || 0} change="Tracked pages" up />
+            <>
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mt-8 mb-3">Website Analytics</p>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="lg:col-span-2"><SlowMovingStock /></div>
+                <div className="lg:col-span-1">
+                  <div className="grid grid-cols-2 gap-3">
+                    <StatCard label="Total Views" value={(pageViews?.total || 0).toLocaleString()} change="All time" up />
+                    <StatCard label="Today" value={(pageViews?.today || 0).toLocaleString()} change="Visits today" up={pageViews?.today > 0} />
+                    <StatCard label="Most viewed" value={pageViews?.topPages?.[0]?.name || "—"} change={`${pageViews?.topPages?.[0]?.count || 0} visits`} up />
+                    <StatCard label="Pages" value={pageViews?.topPages?.length || 0} change="Tracked pages" up />
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-          {hasWebsite && (
-            <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
-              {pageViews?.topPages?.length > 0 && (
-                <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
-                  <p className="text-xs font-medium text-gray-800 dark:text-white mb-3">Most Viewed Pages</p>
+              <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {pageViews?.topPages?.length > 0 && (
+                  <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
+                    <p className="text-xs font-medium text-gray-800 dark:text-white mb-3">Most Viewed Pages</p>
                   <div className="flex flex-col gap-2.5">
                     {pageViews.topPages.map((p) => (
                       <div key={p.name} className="flex items-center gap-2">
@@ -204,9 +208,10 @@ export default function Overview() {
                 </div>
               )}
             </div>
-          )}
-        </>
-      )}
+          </>
+        )}
+      </>
+    )}
     </PageLayout>
   );
 }

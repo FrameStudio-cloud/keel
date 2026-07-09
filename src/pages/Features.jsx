@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { FiArrowLeft, FiPackage, FiCamera, FiAlertTriangle, FiShoppingCart, FiBarChart2, FiDollarSign, FiGlobe, FiMessageSquare, FiCalendar, FiMessageCircle, FiLayers, FiSmartphone } from "react-icons/fi";
 
 const features = [
@@ -129,6 +130,14 @@ function FeaturePageSection({ icon: Icon, title, intro, body, outcome, shops }) 
 
 export default function Features() {
   return (
+    <>
+      <Helmet>
+        <title>Features — Keel</title>
+        <meta name="description" content="Explore all 12 features of Keel — inventory management, barcode scanning, sales logging, profit reports, expense tracking, website builder, WhatsApp bots, and more." />
+        <meta property="og:title" content="Features — Keel" />
+        <meta property="og:description" content="Explore all 12 features of Keel — inventory, sales, reports, website, and customer communication in one dashboard." />
+        <meta property="og:url" content="https://keel-nu.vercel.app/features" />
+      </Helmet>
     <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] text-slate-900 dark:text-white">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <Link to="/" className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 mb-6 transition-all">
@@ -157,5 +166,6 @@ export default function Features() {
         <p className="text-center text-xs text-slate-500 dark:text-slate-500 mt-6">Powered by Keel</p>
       </div>
     </div>
+    </>
   );
 }

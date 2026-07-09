@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
 import Skeleton from "../components/Skeleton";
 import { getShopId } from "../lib/shop";
@@ -154,6 +155,7 @@ export default function Reports() {
 
   return (
     <PageLayout title="Reports">
+      <Helmet><title>Reports — Keel</title></Helmet>
       {!hasData && !loading && (
         <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl text-xs text-blue-700 dark:text-blue-300">
           No data yet. Go to <strong>Finance</strong> and click <strong>"Load demo data"</strong> to populate sample sales and expenses.

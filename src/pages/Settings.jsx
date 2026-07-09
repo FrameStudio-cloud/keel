@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
 import Skeleton from "../components/Skeleton";
 import { supabase } from "../lib/supabase";
@@ -191,6 +192,7 @@ export default function Settings() {
 
   return (
     <PageLayout title="Settings">
+      <Helmet><title>Settings — Keel</title></Helmet>
       {toast && (
         <div
           className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold shadow-xl ${

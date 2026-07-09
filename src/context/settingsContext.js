@@ -13,5 +13,6 @@ export const SettingsContext = createContext({
   whatsapp: "",
   businessHours: null,
   businessCategory: "general",
+  subscriptionExpiresAt: null,
   loading: true,
 });

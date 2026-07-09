@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { useFocusTrap } from "../hooks/useFocusTrap";
 import fashionCatalogue from "../assets/catalogue/zurifashion-catalogue-shot.png";
 import wixCatalogue from "../assets/catalogue/wix-collection-shot.png";
@@ -120,6 +121,14 @@ export default function Homepage() {
   }, []);
 
   return (
+    <>
+      <Helmet>
+        <title>Keel — Business Dashboard for African SMEs</title>
+        <meta name="description" content="Track inventory, manage sales, view reports, and grow your business — all from one clean dashboard. Built for Kenyan shop owners." />
+        <meta property="og:title" content="Keel — Business Dashboard for African SMEs" />
+        <meta property="og:description" content="Track inventory, manage sales, view reports, and grow your business — all from one clean dashboard." />
+        <meta property="og:url" content="https://keel-nu.vercel.app/" />
+      </Helmet>
     <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] text-slate-900 dark:text-white">
       {/* NAV */}
       <nav className="sticky top-0 z-50 bg-white/80 dark:bg-[#16213e]/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10">
@@ -830,5 +839,6 @@ export default function Homepage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }

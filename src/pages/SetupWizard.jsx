@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
 import { AuthContext } from "../context/AuthContext";
@@ -87,6 +88,8 @@ export default function SetupWizard() {
   }
 
   return (
+    <>
+      <Helmet><title>Setup — Keel</title></Helmet>
     <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] flex items-center justify-center p-4">
       <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-8 w-full max-w-md">
         <div className="flex items-center justify-between mb-6">
@@ -233,5 +236,6 @@ export default function SetupWizard() {
         </div>
       </div>
     </div>
+    </>
   );
 }

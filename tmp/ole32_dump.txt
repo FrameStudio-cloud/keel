@@ -1,0 +1,586 @@
+Microsoft (R) COFF/PE Dumper Version 14.44.35228.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file C:\Windows\System32\ole32.dll
+
+File Type: DLL
+
+  Section contains the following exports for ole32.dll
+
+    00000000 characteristics
+    81F3B052 time date stamp
+        0.00 version
+         800 ordinal base
+         557 number of functions
+         549 number of names
+
+    ordinal hint RVA      name
+
+        836    0 00044190 BindMoniker
+        837    1          CLIPFORMAT_UserFree (forwarded to COMBASE.CLIPFORMAT_UserFree)
+        838    2          CLIPFORMAT_UserFree64 (forwarded to COMBASE.CLIPFORMAT_UserFree64)
+        805    3 000D5950 CLIPFORMAT_UserFreeExt
+        839    4          CLIPFORMAT_UserMarshal (forwarded to COMBASE.CLIPFORMAT_UserMarshal)
+        840    5          CLIPFORMAT_UserMarshal64 (forwarded to COMBASE.CLIPFORMAT_UserMarshal64)
+        806    6 000D5970 CLIPFORMAT_UserMarshalExt
+        841    7          CLIPFORMAT_UserSize (forwarded to COMBASE.CLIPFORMAT_UserSize)
+        842    8          CLIPFORMAT_UserSize64 (forwarded to COMBASE.CLIPFORMAT_UserSize64)
+        807    9 000D5990 CLIPFORMAT_UserSizeExt
+        843    A          CLIPFORMAT_UserUnmarshal (forwarded to COMBASE.CLIPFORMAT_UserUnmarshal)
+        844    B          CLIPFORMAT_UserUnmarshal64 (forwarded to COMBASE.CLIPFORMAT_UserUnmarshal64)
+        808    C 000D59B0 CLIPFORMAT_UserUnmarshalExt
+        845    D          CLSIDFromOle1Class (forwarded to api-ms-win-core-com-private-l1-1-1.CLSIDFromOle1Class)
+        846    E          CLSIDFromProgID (forwarded to api-ms-win-core-com-l1-1-0.CLSIDFromProgID)
+        847    F          CLSIDFromProgIDEx (forwarded to api-ms-win-core-com-l1-1-2.CLSIDFromProgIDEx)
+        848   10          CLSIDFromString (forwarded to api-ms-win-core-com-l1-1-0.CLSIDFromString)
+        849   11          CStdAsyncStubBuffer2_Connect (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.CStdAsyncStubBuffer2_Connect)
+        850   12          CStdAsyncStubBuffer2_Disconnect (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.CStdAsyncStubBuffer2_Disconnect)
+        851   13          CStdAsyncStubBuffer2_Release (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.CStdAsyncStubBuffer2_Release)
+        852   14          CStdAsyncStubBuffer_AddRef (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.CStdAsyncStubBuffer_AddRef)
+        853   15          CStdAsyncStubBuffer_Connect (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.CStdAsyncStubBuffer_Connect)
+        854   16          CStdAsyncStubBuffer_Disconnect (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.CStdAsyncStubBuffer_Disconnect)
+        855   17          CStdAsyncStubBuffer_Invoke (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.CStdAsyncStubBuffer_Invoke)
+        856   18          CStdAsyncStubBuffer_QueryInterface (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.CStdAsyncStubBuffer_QueryInterface)
+        857   19          CStdAsyncStubBuffer_Release (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.CStdAsyncStubBuffer_Release)
+        858   1A          CStdStubBuffer2_Connect (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.CStdStubBuffer2_Connect)
+        859   1B          CStdStubBuffer2_CountRefs (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.CStdStubBuffer2_CountRefs)
+        860   1C          CStdStubBuffer2_Disconnect (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.CStdStubBuffer2_Disconnect)
+        861   1D          CStdStubBuffer2_QueryInterface (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.CStdStubBuffer2_QueryInterface)
+        862   1E 00009EE0 CheckInitDde
+        863   1F 0000A0F0 CleanROTForApartment
+        809   20 00009920 ClipboardProcessUninitialize
+        864   21          CoAddRefServerProcess (forwarded to api-ms-win-core-com-l1-1-0.CoAddRefServerProcess)
+        865   22 00041E90 CoAicGetTokenForCOM
+        866   23 00006DF0 CoAllowSetForegroundWindow
+        867   24          CoAllowUnmarshalerCLSID (forwarded to api-ms-win-core-com-l1-1-0.CoAllowUnmarshalerCLSID)
+        868   25 00055210 CoBuildVersion
+        869   26          CoCancelCall (forwarded to api-ms-win-core-com-l1-1-0.CoCancelCall)
+        870   27 00041F10 CoCheckElevationEnabled
+        871   28          CoCopyProxy (forwarded to api-ms-win-core-com-l1-1-0.CoCopyProxy)
+        872   29          CoCreateFreeThreadedMarshaler (forwarded to api-ms-win-core-com-l1-1-0.CoCreateFreeThreadedMarshaler)
+        873   2A          CoCreateGuid (forwarded to api-ms-win-core-com-l1-1-0.CoCreateGuid)
+        874   2B          CoCreateInstance (forwarded to api-ms-win-core-com-l1-1-0.CoCreateInstance)
+        875   2C          CoCreateInstanceEx (forwarded to api-ms-win-core-com-l1-1-0.CoCreateInstanceEx)
+        876   2D          CoCreateInstanceFromApp (forwarded to api-ms-win-core-com-l1-1-0.CoCreateInstanceFromApp)
+        877   2E          CoCreateObjectInContext (forwarded to api-ms-win-core-com-private-l1-1-1.CoCreateObjectInContext)
+        878   2F          CoDeactivateObject (forwarded to api-ms-win-core-com-private-l1-1-1.CoDeactivateObject)
+        879   30          CoDecodeProxy (forwarded to COMBASE.CoDecodeProxy)
+        880   31          CoDecrementMTAUsage (forwarded to api-ms-win-core-com-l1-1-0.CoDecrementMTAUsage)
+        881   32          CoDisableCallCancellation (forwarded to api-ms-win-core-com-l1-1-0.CoDisableCallCancellation)
+        882   33          CoDisconnectContext (forwarded to api-ms-win-core-com-l1-1-0.CoDisconnectContext)
+        883   34          CoDisconnectObject (forwarded to api-ms-win-core-com-l1-1-0.CoDisconnectObject)
+        884   35 00055220 CoDosDateTimeToFileTime
+        885   36          CoEnableCallCancellation (forwarded to api-ms-win-core-com-l1-1-0.CoEnableCallCancellation)
+        886   37          CoFileTimeNow (forwarded to api-ms-win-core-com-l1-1-2.CoFileTimeNow)
+        887   38 00055250 CoFileTimeToDosDateTime
+        888   39 00055280 CoFreeAllLibraries
+        889   3A 00055290 CoFreeLibrary
+        890   3B          CoFreeUnusedLibraries (forwarded to api-ms-win-core-com-l1-1-0.CoFreeUnusedLibraries)
+        891   3C          CoFreeUnusedLibrariesEx (forwarded to api-ms-win-core-com-l1-1-0.CoFreeUnusedLibrariesEx)
+        892   3D          CoGetActivationState (forwarded to api-ms-win-core-com-private-l1-1-1.CoGetActivationState)
+        893   3E          CoGetApartmentID (forwarded to api-ms-win-core-com-private-l1-1-1.CoGetApartmentID)
+        894   3F          CoGetApartmentType (forwarded to api-ms-win-core-com-l1-1-0.CoGetApartmentType)
+        895   40          CoGetCallContext (forwarded to api-ms-win-core-com-l1-1-0.CoGetCallContext)
+        896   41          CoGetCallState (forwarded to api-ms-win-core-com-private-l1-1-1.CoGetCallState)
+        897   42          CoGetCallerTID (forwarded to api-ms-win-core-com-l1-1-0.CoGetCallerTID)
+        898   43          CoGetCancelObject (forwarded to api-ms-win-core-com-l1-1-0.CoGetCancelObject)
+        899   44          CoGetClassObject (forwarded to api-ms-win-core-com-l1-1-0.CoGetClassObject)
+        900   45          CoGetClassVersion (forwarded to api-ms-win-core-com-private-l1-1-1.CoGetClassVersion)
+        901   46          CoGetComCatalog (forwarded to api-ms-win-core-com-private-l1-1-1.GetCatalogHelper)
+        902   47          CoGetContextToken (forwarded to api-ms-win-core-com-l1-1-0.CoGetContextToken)
+        903   48          CoGetCurrentLogicalThreadId (forwarded to api-ms-win-core-com-l1-1-0.CoGetCurrentLogicalThreadId)
+        904   49          CoGetCurrentProcess (forwarded to api-ms-win-core-com-l1-1-0.CoGetCurrentProcess)
+        905   4A          CoGetDefaultContext (forwarded to api-ms-win-core-com-l1-1-0.CoGetDefaultContext)
+        906   4B          CoGetInstanceFromFile (forwarded to api-ms-win-core-com-private-l1-1-1.CoGetInstanceFromFile)
+        907   4C          CoGetInstanceFromIStorage (forwarded to api-ms-win-core-com-private-l1-1-1.CoGetInstanceFromIStorage)
+        908   4D 000335F0 CoGetInterceptor
+        909   4E 0000C640 CoGetInterceptorForOle32
+        910   4F 00013CC0 CoGetInterceptorFromTypeInfo
+        911   50          CoGetInterfaceAndReleaseStream (forwarded to api-ms-win-core-com-l1-1-0.CoGetInterfaceAndReleaseStream)
+        912   51          CoGetMalloc (forwarded to api-ms-win-core-com-l1-1-0.CoGetMalloc)
+        913   52          CoGetMarshalSizeMax (forwarded to api-ms-win-core-com-l1-1-0.CoGetMarshalSizeMax)
+        914   53          CoGetModuleType (forwarded to api-ms-win-core-com-private-l1-1-1.CoGetModuleType)
+        915   54 0000C940 CoGetObject
+        916   55          CoGetObjectContext (forwarded to api-ms-win-core-com-l1-1-0.CoGetObjectContext)
+        917   56          CoGetPSClsid (forwarded to api-ms-win-core-com-l1-1-0.CoGetPSClsid)
+        918   57          CoGetProcessIdentifier (forwarded to api-ms-win-core-com-private-l1-1-1.CoGetProcessIdentifier)
+        919   58          CoGetStandardMarshal (forwarded to api-ms-win-core-com-l1-1-0.CoGetStandardMarshal)
+        920   59          CoGetStdMarshalEx (forwarded to api-ms-win-core-com-l1-1-0.CoGetStdMarshalEx)
+        921   5A          CoGetSystemSecurityPermissions (forwarded to api-ms-win-core-com-private-l1-1-1.CoGetSystemSecurityPermissions)
+        922   5B 00041F30 CoGetSystemWow64DirectoryW
+        923   5C          CoGetTreatAsClass (forwarded to api-ms-win-core-com-l1-1-0.CoGetTreatAsClass)
+        924   5D          CoHandlePriorityEventsFromMessagePump (forwarded to COMBASE.#111)
+        925   5E          CoImpersonateClient (forwarded to api-ms-win-core-com-l1-1-0.CoImpersonateClient)
+        926   5F          CoIncrementMTAUsage (forwarded to api-ms-win-core-com-l1-1-0.CoIncrementMTAUsage)
+        927   60 000184A0 CoInitialize
+        928   61          CoInitializeEx (forwarded to api-ms-win-core-com-l1-1-0.CoInitializeEx)
+        929   62          CoInitializeSecurity (forwarded to api-ms-win-core-com-l1-1-0.CoInitializeSecurity)
+        930   63 0001F9D0 CoInitializeWOW
+        931   64 000552A0 CoInstall
+        932   65          CoInvalidateRemoteMachineBindings (forwarded to api-ms-win-core-com-private-l1-1-1.CoInvalidateRemoteMachineBindings)
+        933   66          CoIsHandlerConnected (forwarded to api-ms-win-core-com-l1-1-0.CoIsHandlerConnected)
+        934   67          CoIsOle1Class (forwarded to api-ms-win-core-com-private-l1-3-1.CoIsOle1Class)
+        935   68 00055370 CoLoadLibrary
+        936   69          CoLockObjectExternal (forwarded to api-ms-win-core-com-l1-1-0.CoLockObjectExternal)
+        937   6A          CoMarshalHresult (forwarded to api-ms-win-core-com-l1-1-0.CoMarshalHresult)
+        938   6B          CoMarshalInterThreadInterfaceInStream (forwarded to api-ms-win-core-com-l1-1-0.CoMarshalInterThreadInterfaceInStream)
+        939   6C          CoMarshalInterface (forwarded to api-ms-win-core-com-l1-1-0.CoMarshalInterface)
+        940   6D          CoPopServiceDomain (forwarded to api-ms-win-core-com-private-l1-1-1.CoPopServiceDomain)
+        941   6E          CoPushServiceDomain (forwarded to api-ms-win-core-com-private-l1-1-1.CoPushServiceDomain)
+        942   6F          CoQueryAuthenticationServices (forwarded to api-ms-win-core-com-l1-1-0.CoQueryAuthenticationServices)
+        943   70          CoQueryClientBlanket (forwarded to api-ms-win-core-com-l1-1-0.CoQueryClientBlanket)
+        944   71          CoQueryProxyBlanket (forwarded to api-ms-win-core-com-l1-1-0.CoQueryProxyBlanket)
+        945   72 000553A0 CoQueryReleaseObject
+        946   73          CoReactivateObject (forwarded to api-ms-win-core-com-private-l1-1-1.CoReactivateObject)
+        947   74          CoRegisterActivationFilter (forwarded to api-ms-win-core-com-l1-1-0.CoRegisterActivationFilter)
+        948   75          CoRegisterChannelHook (forwarded to COMBASE.#112)
+        949   76          CoRegisterClassObject (forwarded to api-ms-win-core-com-l1-1-0.CoRegisterClassObject)
+        950   77          CoRegisterInitializeSpy (forwarded to api-ms-win-core-com-private-l1-1-1.CoRegisterInitializeSpy)
+        951   78          CoRegisterMallocSpy (forwarded to api-ms-win-core-com-private-l1-1-1.CoRegisterMallocSpy)
+        952   79 0001FA70 CoRegisterMessageFilter
+        953   7A          CoRegisterPSClsid (forwarded to api-ms-win-core-com-l1-1-0.CoRegisterPSClsid)
+        954   7B          CoRegisterSurrogate (forwarded to api-ms-win-core-com-l1-1-0.CoRegisterSurrogate)
+        955   7C 0001FA90 CoRegisterSurrogateEx
+        956   7D          CoReleaseMarshalData (forwarded to api-ms-win-core-com-l1-1-0.CoReleaseMarshalData)
+        957   7E          CoReleaseServerProcess (forwarded to api-ms-win-core-com-l1-1-0.CoReleaseServerProcess)
+        958   7F          CoResumeClassObjects (forwarded to api-ms-win-core-com-l1-1-0.CoResumeClassObjects)
+        959   80          CoRetireServer (forwarded to api-ms-win-core-com-private-l1-1-1.CoRetireServer)
+        960   81          CoRevertToSelf (forwarded to api-ms-win-core-com-l1-1-0.CoRevertToSelf)
+        961   82          CoRevokeClassObject (forwarded to api-ms-win-core-com-l1-1-0.CoRevokeClassObject)
+        962   83          CoRevokeInitializeSpy (forwarded to api-ms-win-core-com-private-l1-1-1.CoRevokeInitializeSpy)
+        963   84          CoRevokeMallocSpy (forwarded to api-ms-win-core-com-private-l1-1-1.CoRevokeMallocSpy)
+        964   85          CoSetCancelObject (forwarded to api-ms-win-core-com-l1-1-0.CoSetCancelObject)
+        965   86          CoSetMessageDispatcher (forwarded to COMBASE.#110)
+        966   87          CoSetProxyBlanket (forwarded to api-ms-win-core-com-l1-1-0.CoSetProxyBlanket)
+        967   88 000553B0 CoSetState
+        968   89          CoSuspendClassObjects (forwarded to api-ms-win-core-com-l1-1-0.CoSuspendClassObjects)
+        969   8A          CoSwitchCallContext (forwarded to api-ms-win-core-com-l1-1-0.CoSwitchCallContext)
+        970   8B          CoTaskMemAlloc (forwarded to api-ms-win-core-com-l1-1-0.CoTaskMemAlloc)
+        971   8C          CoTaskMemFree (forwarded to api-ms-win-core-com-l1-1-0.CoTaskMemFree)
+        972   8D          CoTaskMemRealloc (forwarded to api-ms-win-core-com-l1-1-0.CoTaskMemRealloc)
+        973   8E          CoTestCancel (forwarded to api-ms-win-core-com-l1-1-0.CoTestCancel)
+        974   8F          CoTreatAsClass (forwarded to api-ms-win-core-com-private-l1-3-1.CoTreatAsClass)
+        975   90 00058840 CoTryGetInterceptorForAppModelVirtualization
+        976   91          CoUninitialize (forwarded to api-ms-win-core-com-l1-1-0.CoUninitialize)
+        977   92 0001FAB0 CoUnloadingWOW
+        978   93          CoUnmarshalHresult (forwarded to api-ms-win-core-com-l1-1-0.CoUnmarshalHresult)
+        979   94          CoUnmarshalInterface (forwarded to api-ms-win-core-com-l1-1-0.CoUnmarshalInterface)
+        980   95          CoVrfCheckThreadState (forwarded to api-ms-win-core-com-private-l1-1-1.CoVrfCheckThreadState)
+        981   96          CoVrfGetThreadState (forwarded to api-ms-win-core-com-private-l1-1-1.CoVrfGetThreadState)
+        982   97          CoVrfReleaseThreadState (forwarded to api-ms-win-core-com-private-l1-1-1.CoVrfReleaseThreadState)
+        983   98          CoWaitForMultipleHandles (forwarded to api-ms-win-core-com-l1-1-0.CoWaitForMultipleHandles)
+        984   99          CoWaitForMultipleObjects (forwarded to api-ms-win-core-com-l1-1-0.CoWaitForMultipleObjects)
+        985   9A 00058B00 ComPs_NdrDllCanUnloadNow
+        986   9B 00058B10 ComPs_NdrDllGetClassObject
+        987   9C 000591C0 ComPs_NdrDllRegisterProxy
+        988   9D 00059200 ComPs_NdrDllUnregisterProxy
+        989   9E 00044260 CreateAntiMoniker
+        990   9F 0000E9C0 CreateBindCtx
+        991   A0 00045AE0 CreateClassMoniker
+        992   A1 0001C5A0 CreateDataAdviseHolder
+        993   A2 00082F20 CreateDataCache
+        994   A3          CreateErrorInfo (forwarded to api-ms-win-core-com-private-l1-1-1.CoCreateErrorInfo)
+        995   A4 000328F0 CreateFileMoniker
+        996   A5 0000ECB0 CreateGenericComposite
+        997   A6 000324F0 CreateILockBytesOnHGlobal
+        998   A7 0000A540 CreateItemMoniker
+        999   A8 000442B0 CreateObjrefMoniker
+       1000   A9 00007510 CreateOleAdviseHolder
+       1001   AA 00044370 CreatePointerMoniker
+       1002   AB 0001AD40 CreateStdProgressIndicator
+       1003   AC          CreateStreamOnHGlobal (forwarded to api-ms-win-core-com-l1-1-0.CreateStreamOnHGlobal)
+       1004   AD          DcomChannelSetHResult (forwarded to COMBASE.DcomChannelSetHResult)
+       1005   AE 00069080 DdeBindToObject
+       1006   AF 00041F50 DeletePatternAndExtensionTables
+       1007   B0 00002BF0 DestroyRunningObjectTable
+       1008   B1          DllDebugObjectRPCHook (forwarded to api-ms-win-core-com-private-l1-1-1.DllDebugObjectRPCHook)
+       1009   B2 00041FB0 DllGetClassObject
+       1010   B3 00041FB0 DllGetClassObjectWOW
+       1011   B4 00042010 DllRegisterServer
+       1012   B5 000381E0 DoDragDrop
+       1013   B6 0009C2C0 DragDropSetFDT
+       1014   B7          EnableHookObject (forwarded to api-ms-win-core-com-private-l1-1-1.EnableHookObject)
+       1015   B8 0004FA50 FindExt
+       1016   B9 00042060 FmtIdToPropStgName
+       1017   BA          FreePropVariantArray (forwarded to api-ms-win-core-com-l1-1-0.FreePropVariantArray)
+       1018   BB 000D5D20 GetActiveObjectExt
+       1019   BC 0004FAF0 GetClassFile
+       1020   BD 00042080 GetConvertStg
+       1021   BE 000420A0 GetDocumentBitStg
+       1022   BF          GetErrorInfo (forwarded to api-ms-win-core-com-private-l1-1-1.CoGetErrorInfo)
+       1023   C0 000420C0 GetHGlobalFromILockBytes
+       1024   C1          GetHGlobalFromStream (forwarded to api-ms-win-core-com-l1-1-0.GetHGlobalFromStream)
+       1025   C2          GetHookInterface (forwarded to api-ms-win-core-com-private-l1-1-1.GetHookInterface)
+       1026   C3 00068770 GetObjectFromRotByPath
+       1027   C4 00009690 GetRunningObjectTable
+       1028   C5          HACCEL_UserFree (forwarded to COMBASE.HACCEL_UserFree)
+       1029   C6          HACCEL_UserFree64 (forwarded to COMBASE.HACCEL_UserFree64)
+       1030   C7          HACCEL_UserMarshal (forwarded to COMBASE.HACCEL_UserMarshal)
+       1031   C8          HACCEL_UserMarshal64 (forwarded to COMBASE.HACCEL_UserMarshal64)
+       1032   C9          HACCEL_UserSize (forwarded to COMBASE.HACCEL_UserSize)
+       1033   CA          HACCEL_UserSize64 (forwarded to COMBASE.HACCEL_UserSize64)
+       1034   CB          HACCEL_UserUnmarshal (forwarded to COMBASE.HACCEL_UserUnmarshal)
+       1035   CC          HACCEL_UserUnmarshal64 (forwarded to COMBASE.HACCEL_UserUnmarshal64)
+       1036   CD          HBITMAP_UserFree (forwarded to COMBASE.HBITMAP_UserFree)
+       1037   CE          HBITMAP_UserFree64 (forwarded to COMBASE.HBITMAP_UserFree64)
+       1038   CF          HBITMAP_UserMarshal (forwarded to COMBASE.HBITMAP_UserMarshal)
+       1039   D0          HBITMAP_UserMarshal64 (forwarded to COMBASE.HBITMAP_UserMarshal64)
+       1040   D1          HBITMAP_UserSize (forwarded to COMBASE.HBITMAP_UserSize)
+       1041   D2          HBITMAP_UserSize64 (forwarded to COMBASE.HBITMAP_UserSize64)
+       1042   D3          HBITMAP_UserUnmarshal (forwarded to COMBASE.HBITMAP_UserUnmarshal)
+       1043   D4          HBITMAP_UserUnmarshal64 (forwarded to COMBASE.HBITMAP_UserUnmarshal64)
+       1044   D5          HBRUSH_UserFree (forwarded to COMBASE.HBRUSH_UserFree)
+       1045   D6          HBRUSH_UserFree64 (forwarded to COMBASE.HBRUSH_UserFree64)
+       1046   D7          HBRUSH_UserMarshal (forwarded to COMBASE.HBRUSH_UserMarshal)
+       1047   D8          HBRUSH_UserMarshal64 (forwarded to COMBASE.HBRUSH_UserMarshal64)
+       1048   D9          HBRUSH_UserSize (forwarded to COMBASE.HBRUSH_UserSize)
+       1049   DA          HBRUSH_UserSize64 (forwarded to COMBASE.HBRUSH_UserSize64)
+       1050   DB          HBRUSH_UserUnmarshal (forwarded to COMBASE.HBRUSH_UserUnmarshal)
+       1051   DC          HBRUSH_UserUnmarshal64 (forwarded to COMBASE.HBRUSH_UserUnmarshal64)
+       1052   DD          HDC_UserFree (forwarded to COMBASE.HDC_UserFree)
+       1053   DE          HDC_UserFree64 (forwarded to COMBASE.HDC_UserFree64)
+       1054   DF          HDC_UserMarshal (forwarded to COMBASE.HDC_UserMarshal)
+       1055   E0          HDC_UserMarshal64 (forwarded to COMBASE.HDC_UserMarshal64)
+       1056   E1          HDC_UserSize (forwarded to COMBASE.HDC_UserSize)
+       1057   E2          HDC_UserSize64 (forwarded to COMBASE.HDC_UserSize64)
+       1058   E3          HDC_UserUnmarshal (forwarded to COMBASE.HDC_UserUnmarshal)
+       1059   E4          HDC_UserUnmarshal64 (forwarded to COMBASE.HDC_UserUnmarshal64)
+       1060   E5 00020690 HENHMETAFILE_UserFree
+       1061   E6 000206A0 HENHMETAFILE_UserFree64
+       1062   E7 000206B0 HENHMETAFILE_UserMarshal
+       1063   E8 000206C0 HENHMETAFILE_UserMarshal64
+       1064   E9 000206D0 HENHMETAFILE_UserSize
+       1065   EA 000206E0 HENHMETAFILE_UserSize64
+       1066   EB 000206F0 HENHMETAFILE_UserUnmarshal
+       1067   EC 00020700 HENHMETAFILE_UserUnmarshal64
+       1068   ED          HGLOBAL_UserFree (forwarded to COMBASE.HGLOBAL_UserFree)
+       1069   EE          HGLOBAL_UserFree64 (forwarded to COMBASE.HGLOBAL_UserFree64)
+       1070   EF          HGLOBAL_UserMarshal (forwarded to COMBASE.HGLOBAL_UserMarshal)
+       1071   F0          HGLOBAL_UserMarshal64 (forwarded to COMBASE.HGLOBAL_UserMarshal64)
+       1072   F1          HGLOBAL_UserSize (forwarded to COMBASE.HGLOBAL_UserSize)
+       1073   F2          HGLOBAL_UserSize64 (forwarded to COMBASE.HGLOBAL_UserSize64)
+       1074   F3          HGLOBAL_UserUnmarshal (forwarded to COMBASE.HGLOBAL_UserUnmarshal)
+       1075   F4          HGLOBAL_UserUnmarshal64 (forwarded to COMBASE.HGLOBAL_UserUnmarshal64)
+       1076   F5          HICON_UserFree (forwarded to COMBASE.HICON_UserFree)
+       1077   F6          HICON_UserFree64 (forwarded to COMBASE.HICON_UserFree64)
+       1078   F7          HICON_UserMarshal (forwarded to COMBASE.HICON_UserMarshal)
+       1079   F8          HICON_UserMarshal64 (forwarded to COMBASE.HICON_UserMarshal64)
+       1080   F9          HICON_UserSize (forwarded to COMBASE.HICON_UserSize)
+       1081   FA          HICON_UserSize64 (forwarded to COMBASE.HICON_UserSize64)
+       1082   FB          HICON_UserUnmarshal (forwarded to COMBASE.HICON_UserUnmarshal)
+       1083   FC          HICON_UserUnmarshal64 (forwarded to COMBASE.HICON_UserUnmarshal64)
+       1084   FD          HMENU_UserFree (forwarded to COMBASE.HMENU_UserFree)
+       1085   FE          HMENU_UserFree64 (forwarded to COMBASE.HMENU_UserFree64)
+       1086   FF          HMENU_UserMarshal (forwarded to COMBASE.HMENU_UserMarshal)
+       1087  100          HMENU_UserMarshal64 (forwarded to COMBASE.HMENU_UserMarshal64)
+       1088  101          HMENU_UserSize (forwarded to COMBASE.HMENU_UserSize)
+       1089  102          HMENU_UserSize64 (forwarded to COMBASE.HMENU_UserSize64)
+       1090  103          HMENU_UserUnmarshal (forwarded to COMBASE.HMENU_UserUnmarshal)
+       1091  104          HMENU_UserUnmarshal64 (forwarded to COMBASE.HMENU_UserUnmarshal64)
+       1092  105 00020710 HMETAFILEPICT_UserFree
+       1093  106 00020720 HMETAFILEPICT_UserFree64
+       1094  107 00020730 HMETAFILEPICT_UserMarshal
+       1095  108 00020740 HMETAFILEPICT_UserMarshal64
+       1096  109 00020750 HMETAFILEPICT_UserSize
+       1097  10A 00020760 HMETAFILEPICT_UserSize64
+       1098  10B 00020770 HMETAFILEPICT_UserUnmarshal
+       1099  10C 00020780 HMETAFILEPICT_UserUnmarshal64
+       1100  10D 00020790 HMETAFILE_UserFree
+       1101  10E 000207A0 HMETAFILE_UserFree64
+       1102  10F 000207B0 HMETAFILE_UserMarshal
+       1103  110 000207C0 HMETAFILE_UserMarshal64
+       1104  111 000207D0 HMETAFILE_UserSize
+       1105  112 000207E0 HMETAFILE_UserSize64
+       1106  113 000207F0 HMETAFILE_UserUnmarshal
+       1107  114 00020800 HMETAFILE_UserUnmarshal64
+       1108  115          HMONITOR_UserFree (forwarded to COMBASE.HMONITOR_UserFree)
+       1109  116          HMONITOR_UserFree64 (forwarded to COMBASE.HMONITOR_UserFree64)
+       1110  117          HMONITOR_UserMarshal (forwarded to COMBASE.HMONITOR_UserMarshal)
+       1111  118          HMONITOR_UserMarshal64 (forwarded to COMBASE.HMONITOR_UserMarshal64)
+       1112  119          HMONITOR_UserSize (forwarded to COMBASE.HMONITOR_UserSize)
+       1113  11A          HMONITOR_UserSize64 (forwarded to COMBASE.HMONITOR_UserSize64)
+       1114  11B          HMONITOR_UserUnmarshal (forwarded to COMBASE.HMONITOR_UserUnmarshal)
+       1115  11C          HMONITOR_UserUnmarshal64 (forwarded to COMBASE.HMONITOR_UserUnmarshal64)
+       1116  11D          HPALETTE_UserFree (forwarded to COMBASE.HPALETTE_UserFree)
+       1117  11E          HPALETTE_UserFree64 (forwarded to COMBASE.HPALETTE_UserFree64)
+        810  11F 000D59D0 HPALETTE_UserFreeExt
+       1118  120          HPALETTE_UserMarshal (forwarded to COMBASE.HPALETTE_UserMarshal)
+       1119  121          HPALETTE_UserMarshal64 (forwarded to COMBASE.HPALETTE_UserMarshal64)
+        811  122 000D59F0 HPALETTE_UserMarshalExt
+       1120  123          HPALETTE_UserSize (forwarded to COMBASE.HPALETTE_UserSize)
+       1121  124          HPALETTE_UserSize64 (forwarded to COMBASE.HPALETTE_UserSize64)
+        812  125 000D5A10 HPALETTE_UserSizeExt
+       1122  126          HPALETTE_UserUnmarshal (forwarded to COMBASE.HPALETTE_UserUnmarshal)
+       1123  127          HPALETTE_UserUnmarshal64 (forwarded to COMBASE.HPALETTE_UserUnmarshal64)
+        813  128 000D5A30 HPALETTE_UserUnmarshalExt
+       1124  129          HRGN_UserFree (forwarded to COMBASE.HRGN_UserFree)
+       1125  12A          HRGN_UserMarshal (forwarded to COMBASE.HRGN_UserMarshal)
+       1126  12B          HRGN_UserSize (forwarded to COMBASE.HRGN_UserSize)
+       1127  12C          HRGN_UserUnmarshal (forwarded to COMBASE.HRGN_UserUnmarshal)
+       1128  12D          HWND_UserFree (forwarded to COMBASE.HWND_UserFree)
+       1129  12E          HWND_UserFree64 (forwarded to COMBASE.HWND_UserFree64)
+        814  12F 000D5A50 HWND_UserFree64Ext
+        815  130 000D5A70 HWND_UserFreeExt
+       1130  131          HWND_UserMarshal (forwarded to COMBASE.HWND_UserMarshal)
+       1131  132          HWND_UserMarshal64 (forwarded to COMBASE.HWND_UserMarshal64)
+        816  133 000D5A90 HWND_UserMarshal64Ext
+        817  134 000D5AB0 HWND_UserMarshalExt
+       1132  135          HWND_UserSize (forwarded to COMBASE.HWND_UserSize)
+       1133  136          HWND_UserSize64 (forwarded to COMBASE.HWND_UserSize64)
+        818  137 000D5AD0 HWND_UserSize64Ext
+        819  138 000D5AF0 HWND_UserSizeExt
+       1134  139          HWND_UserUnmarshal (forwarded to COMBASE.HWND_UserUnmarshal)
+       1135  13A          HWND_UserUnmarshal64 (forwarded to COMBASE.HWND_UserUnmarshal64)
+        824  13B 000D5B10 HWND_UserUnmarshal64Ext
+        825  13C 000D5B30 HWND_UserUnmarshalExt
+       1136  13D          HkOleRegisterObject (forwarded to api-ms-win-core-com-private-l1-1-1.HkOleRegisterObject)
+       1137  13E          IIDFromString (forwarded to api-ms-win-core-com-l1-1-0.IIDFromString)
+       1138  13F 0009E3D0 IsAccelerator
+       1139  140 0000F700 IsEqualGUID
+       1140  141 000553C0 IsRoInitializeASTAAllowedInDesktop
+       1141  142 00042310 IsValidIid
+       1142  143 0000DB30 IsValidInterface
+       1143  144 00042300 IsValidPtrIn
+       1144  145 00042300 IsValidPtrOut
+       1145  146 0000D350 MkParseDisplayName
+       1146  147 000483F0 MonikerCommonPrefixWith
+        826  148 000D5B50 MonikerLoadTypeLib
+       1147  149 000484B0 MonikerRelativePathTo
+       1148  14A          NdrOleInitializeExtension (forwarded to api-ms-win-core-com-private-l1-1-1.NdrOleInitializeExtension)
+       1149  14B          NdrProxyForwardingFunction10 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction10)
+       1150  14C          NdrProxyForwardingFunction11 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction11)
+       1151  14D          NdrProxyForwardingFunction12 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction12)
+       1152  14E          NdrProxyForwardingFunction13 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction13)
+       1153  14F          NdrProxyForwardingFunction14 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction14)
+       1154  150          NdrProxyForwardingFunction15 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction15)
+       1155  151          NdrProxyForwardingFunction16 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction16)
+       1156  152          NdrProxyForwardingFunction17 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction17)
+       1157  153          NdrProxyForwardingFunction18 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction18)
+       1158  154          NdrProxyForwardingFunction19 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction19)
+       1159  155          NdrProxyForwardingFunction20 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction20)
+       1160  156          NdrProxyForwardingFunction21 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction21)
+       1161  157          NdrProxyForwardingFunction22 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction22)
+       1162  158          NdrProxyForwardingFunction23 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction23)
+       1163  159          NdrProxyForwardingFunction24 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction24)
+       1164  15A          NdrProxyForwardingFunction25 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction25)
+       1165  15B          NdrProxyForwardingFunction26 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction26)
+       1166  15C          NdrProxyForwardingFunction27 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction27)
+       1167  15D          NdrProxyForwardingFunction28 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction28)
+       1168  15E          NdrProxyForwardingFunction29 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction29)
+       1169  15F          NdrProxyForwardingFunction3 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction3)
+       1170  160          NdrProxyForwardingFunction30 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction30)
+       1171  161          NdrProxyForwardingFunction31 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction31)
+       1172  162          NdrProxyForwardingFunction32 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction32)
+       1173  163          NdrProxyForwardingFunction4 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction4)
+       1174  164          NdrProxyForwardingFunction5 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction5)
+       1175  165          NdrProxyForwardingFunction6 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction6)
+       1176  166          NdrProxyForwardingFunction7 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction7)
+       1177  167          NdrProxyForwardingFunction8 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction8)
+       1178  168          NdrProxyForwardingFunction9 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.NdrProxyForwardingFunction9)
+       1179  169          ObjectStublessClient10 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient10)
+       1180  16A          ObjectStublessClient11 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient11)
+       1181  16B          ObjectStublessClient12 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient12)
+       1182  16C          ObjectStublessClient13 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient13)
+       1183  16D          ObjectStublessClient14 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient14)
+       1184  16E          ObjectStublessClient15 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient15)
+       1185  16F          ObjectStublessClient16 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient16)
+       1186  170          ObjectStublessClient17 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient17)
+       1187  171          ObjectStublessClient18 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient18)
+       1188  172          ObjectStublessClient19 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient19)
+       1189  173          ObjectStublessClient20 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient20)
+       1190  174          ObjectStublessClient21 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient21)
+       1191  175          ObjectStublessClient22 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient22)
+       1192  176          ObjectStublessClient23 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient23)
+       1193  177          ObjectStublessClient24 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient24)
+       1194  178          ObjectStublessClient25 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient25)
+       1195  179          ObjectStublessClient26 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient26)
+       1196  17A          ObjectStublessClient27 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient27)
+       1197  17B          ObjectStublessClient28 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient28)
+       1198  17C          ObjectStublessClient29 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient29)
+       1199  17D          ObjectStublessClient3 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient3)
+       1200  17E          ObjectStublessClient30 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient30)
+       1201  17F          ObjectStublessClient31 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient31)
+       1202  180          ObjectStublessClient32 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient32)
+       1203  181          ObjectStublessClient4 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient4)
+       1204  182          ObjectStublessClient5 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient5)
+       1205  183          ObjectStublessClient6 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient6)
+       1206  184          ObjectStublessClient7 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient7)
+       1207  185          ObjectStublessClient8 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient8)
+       1208  186          ObjectStublessClient9 (forwarded to api-ms-win-core-com-midlproxystub-l1-1-0.ObjectStublessClient9)
+       1209  187 00014DB0 Ole32DllGetClassObject
+       1210  188 00055210 OleBuildVersion
+       1211  189 000B5E30 OleConvertIStorageToOLESTREAM
+       1212  18A 000B5EC0 OleConvertIStorageToOLESTREAMEx
+       1213  18B 000B60D0 OleConvertOLESTREAMToIStorage
+       1214  18C 000247D0 OleConvertOLESTREAMToIStorage2
+       1215  18D 000B6100 OleConvertOLESTREAMToIStorageEx
+       1216  18E 000248B0 OleConvertOLESTREAMToIStorageEx2
+       1217  18F 0007B4C0 OleCreate
+       1218  190 000A3A10 OleCreateDefaultHandler
+       1219  191 000A3A40 OleCreateEmbeddingHelper
+       1220  192 0007B550 OleCreateEx
+       1221  193 00006660 OleCreateFontIndirectExt
+       1222  194 0007B7B0 OleCreateFromData
+       1223  195 0007B840 OleCreateFromDataEx
+       1224  196 0007BAA0 OleCreateFromFile
+       1225  197 0007BB40 OleCreateFromFileEx
+       1226  198 0007BDD0 OleCreateLink
+       1227  199 0007BE60 OleCreateLinkEx
+       1228  19A 0007C010 OleCreateLinkFromData
+       1229  19B 0007C0A0 OleCreateLinkFromDataEx
+       1230  19C 0007C390 OleCreateLinkToFile
+       1231  19D 0007C420 OleCreateLinkToFileEx
+       1232  19E 0009E5F0 OleCreateMenuDescriptor
+       1233  19F 000067F0 OleCreatePictureIndirectExt
+       1234  1A0 000CFE30 OleCreatePropertyFrameIndirectExt
+       1235  1A1 0007C6D0 OleCreateStaticFromData
+       1236  1A2 0009E780 OleDestroyMenuDescriptor
+       1237  1A3 0007CA80 OleDoAutoConvert
+       1238  1A4 00034FA0 OleDraw
+       1239  1A5 00035090 OleDuplicateData
+       1240  1A6 000033D0 OleFlushClipboard
+       1241  1A7 000A46C0 OleGetAutoConvert
+       1242  1A8 00008AA0 OleGetClipboard
+       1243  1A9 0008AE90 OleGetClipboardWithEnterpriseInfo
+       1244  1AA 000A64A0 OleGetIconOfClass
+       1245  1AB 000A6610 OleGetIconOfFile
+        802  1AC 0008E480 OleGetPackageClipboardOwner
+       1246  1AD 000CD860 OleIconToCursorExt
+       1247  1AE 000097E0 OleInitialize
+       1248  1AF 0007E0B0 OleInitializeWOW
+       1249  1B0 000356B0 OleIsCurrentClipboard
+       1250  1B1 0007D2B0 OleIsRunning
+       1251  1B2 0007CBE0 OleLoad
+       1252  1B3 00044870 OleLoadFromStream
+       1253  1B4 000CDD40 OleLoadPictureExt
+       1254  1B5 000D0520 OleLoadPictureFileExt
+       1255  1B6 000CDE90 OleLoadPicturePathExt
+       1256  1B7 00007810 OleLockRunning
+       1257  1B8 000A6960 OleMetafilePictFromIconAndLabel
+       1258  1B9 0007D350 OleNoteObjectVisible
+       1259  1BA 0007CCF0 OleQueryCreateFromData
+       1260  1BB 0007CD50 OleQueryLinkFromData
+       1261  1BC 000A8470 OleRegEnumFormatEtc
+       1262  1BD 000A9420 OleRegEnumVerbs
+       1263  1BE 00004160 OleRegGetMiscStatus
+       1264  1BF 000A46D0 OleRegGetUserType
+       1265  1C0 00018D30 OleReleaseEnumVerbCache
+       1266  1C1 0000C8D0 OleRun
+       1267  1C2 0007D370 OleSave
+       1268  1C3 000D0670 OleSavePictureFileExt
+       1269  1C4 00018EC0 OleSaveToStream
+       1270  1C5 000A4C70 OleSetAutoConvert
+       1271  1C6 0008B340 OleSetClipboard
+       1272  1C7 00035210 OleSetContainedObject
+       1273  1C8 0009E7E0 OleSetMenuDescriptor
+       1274  1C9 0009E9A0 OleTranslateAccelerator
+       1275  1CA 0001C770 OleTranslateColorExt
+       1276  1CB 00008DE0 OleUninitialize
+       1277  1CC 000B70F0 OpenOrCreateStream
+       1278  1CD          ProgIDFromCLSID (forwarded to api-ms-win-core-com-l1-1-0.ProgIDFromCLSID)
+       1279  1CE 000420E0 PropStgNameToFmtId
+       1280  1CF 00042100 PropSysAllocString
+       1281  1D0 00042120 PropSysFreeString
+       1282  1D1 00042140 PropVariantChangeType
+       1283  1D2          PropVariantClear (forwarded to api-ms-win-core-com-l1-1-0.PropVariantClear)
+       1284  1D3          PropVariantCopy (forwarded to api-ms-win-core-com-l1-1-0.PropVariantCopy)
+       1285  1D4 00032510 ReadClassStg
+       1286  1D5 00042160 ReadClassStm
+       1287  1D6 0007EA50 ReadFmtUserTypeStg
+       1288  1D7 0007D6E0 ReadOleStg
+        827  1D8 00032510 ReadStorageProperties
+       1289  1D9 000B7180 ReadStringStream
+       1290  1DA 000D5DE0 RegisterActiveObjectExt
+       1291  1DB 0000BD60 RegisterDragDrop
+       1292  1DC 0000D0C0 ReleaseStgMedium
+       1293  1DD 000D5EC0 RevokeActiveObjectExt
+       1294  1DE 0000B880 RevokeDragDrop
+       1295  1DF          RoGetAgileReference (forwarded to api-ms-win-core-com-l1-1-1.RoGetAgileReference)
+       1296  1E0 00020810 SNB_UserFree
+       1297  1E1 00020820 SNB_UserFree64
+       1298  1E2 00020830 SNB_UserMarshal
+       1299  1E3 00020840 SNB_UserMarshal64
+       1300  1E4 00020850 SNB_UserSize
+       1301  1E5 00020860 SNB_UserSize64
+       1302  1E6 00020870 SNB_UserUnmarshal
+       1303  1E7 00020880 SNB_UserUnmarshal64
+       1304  1E8 00020890 STGMEDIUM_UserFree
+       1305  1E9 000208A0 STGMEDIUM_UserFree64
+        828  1EA 000D5C50 STGMEDIUM_UserFreeExt
+       1306  1EB 000208B0 STGMEDIUM_UserMarshal
+       1307  1EC 000208C0 STGMEDIUM_UserMarshal64
+        829  1ED 000D5C70 STGMEDIUM_UserMarshalExt
+       1308  1EE 000208D0 STGMEDIUM_UserSize
+       1309  1EF 000208E0 STGMEDIUM_UserSize64
+        830  1F0 000D5C90 STGMEDIUM_UserSizeExt
+       1310  1F1 000208F0 STGMEDIUM_UserUnmarshal
+       1311  1F2 00020900 STGMEDIUM_UserUnmarshal64
+        831  1F3 000D5CB0 STGMEDIUM_UserUnmarshalExt
+       1312  1F4 0007D850 SetConvertStg
+       1313  1F5 0007D880 SetDocumentBitStg
+       1314  1F6          SetErrorInfo (forwarded to api-ms-win-core-com-private-l1-1-1.CoSetErrorInfo)
+        832  1F7 00018F90 SetOleautModule
+       1315  1F8 00042050 SetWOWThunkGlobalPtr
+        833  1F9 000C4E90 StdTypesGetClassObject
+        834  1FA 000C4F10 StdTypesRegisterServer
+       1316  1FB 00042180 StgConvertPropertyToVariant
+       1317  1FC 000421A0 StgConvertVariantToProperty
+       1318  1FD 00032530 StgCreateDocfile
+       1319  1FE 000077A0 StgCreateDocfileOnILockBytes
+       1320  1FF 000421C0 StgCreatePropSetStg
+       1321  200 00032550 StgCreatePropStg
+       1322  201 000077C0 StgCreateStorageEx
+       1323  202 000421E0 StgGetIFillLockBytesOnFile
+       1324  203 00042200 StgGetIFillLockBytesOnILockBytes
+       1325  204 00032570 StgIsStorageFile
+       1326  205 00042220 StgIsStorageILockBytes
+       1327  206 00042240 StgOpenAsyncDocfileOnIFillLockBytes
+       1328  207 00042260 StgOpenPropStg
+       1329  208 00006450 StgOpenStorage
+       1330  209 00007210 StgOpenStorageEx
+       1331  20A 00042280 StgOpenStorageOnHandle
+       1332  20B 000075D0 StgOpenStorageOnILockBytes
+       1333  20C 000422A0 StgPropertyLengthAsVariant
+       1334  20D 000422C0 StgSetTimes
+       1335  20E          StringFromCLSID (forwarded to api-ms-win-core-com-l1-1-0.StringFromCLSID)
+       1336  20F          StringFromGUID2 (forwarded to api-ms-win-core-com-l1-1-0.StringFromGUID2)
+       1337  210          StringFromIID (forwarded to api-ms-win-core-com-l1-1-0.StringFromIID)
+       1338  211          UpdateDCOMSettings (forwarded to api-ms-win-core-com-private-l1-1-1.UpdateDCOMSettings)
+       1339  212          UpdateProcessTracing (forwarded to api-ms-win-core-com-private-l1-1-1.UpdateProcessTracing)
+       1340  213 000B8480 UtConvertDvtd16toDvtd32
+       1341  214 000B86F0 UtConvertDvtd32toDvtd16
+       1342  215 000B8A00 UtGetDvtd16Info
+       1343  216 000B8B70 UtGetDvtd32Info
+       1344  217          WdtpInterfacePointer_UserFree (forwarded to COMBASE.WdtpInterfacePointer_UserFree)
+       1345  218          WdtpInterfacePointer_UserFree64 (forwarded to COMBASE.WdtpInterfacePointer_UserFree64)
+       1346  219          WdtpInterfacePointer_UserMarshal (forwarded to COMBASE.WdtpInterfacePointer_UserMarshal)
+       1347  21A          WdtpInterfacePointer_UserMarshal64 (forwarded to COMBASE.WdtpInterfacePointer_UserMarshal64)
+       1348  21B          WdtpInterfacePointer_UserSize (forwarded to COMBASE.WdtpInterfacePointer_UserSize)
+       1349  21C          WdtpInterfacePointer_UserSize64 (forwarded to COMBASE.WdtpInterfacePointer_UserSize64)
+       1350  21D          WdtpInterfacePointer_UserUnmarshal (forwarded to COMBASE.WdtpInterfacePointer_UserUnmarshal)
+       1351  21E          WdtpInterfacePointer_UserUnmarshal64 (forwarded to COMBASE.WdtpInterfacePointer_UserUnmarshal64)
+       1352  21F 000422E0 WriteClassStg
+       1353  220 00032590 WriteClassStm
+       1354  221 0007EB30 WriteFmtUserTypeStg
+       1355  222 0007DD30 WriteOleStg
+        835  223 000D5CD0 WriteStorageProperties
+       1356  224 000B7310 WriteStringStream
+        800      0001BAE0 [NONAME]
+        801      0001B4C0 [NONAME]
+        803      0001C840 [NONAME]
+        804      0008DA20 [NONAME]
+        820      0009C380 [NONAME]
+        821      0009C4C0 [NONAME]
+        822      0009C350 [NONAME]
+        823      0009C5E0 [NONAME]
+
+  Summary
+
+        3000 .data
+        1000 .didat
+        F000 .pdata
+       33000 .rdata
+        3000 .reloc
+       78000 .rsrc
+       DF000 .text

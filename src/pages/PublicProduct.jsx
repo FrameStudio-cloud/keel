@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "../lib/supabase";
 import { formatPrice } from "../lib/format";
 import Skeleton from "../components/Skeleton";
@@ -103,6 +104,8 @@ export default function PublicProduct() {
   const includes = Array.isArray(product.includes) ? product.includes : [];
 
   return (
+    <>
+      <Helmet><title>{product ? `${product.name} — ${settings.store_name || "Keel"}` : "Product — Keel"}</title></Helmet>
     <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e]">
       <div className="max-w-lg mx-auto px-4 py-8">
         <a
@@ -206,5 +209,6 @@ export default function PublicProduct() {
         )}
       </div>
     </div>
+    </>
   );
 }

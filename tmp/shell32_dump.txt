@@ -1,0 +1,871 @@
+Microsoft (R) COFF/PE Dumper Version 14.44.35228.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file C:\Windows\System32\shell32.dll
+
+File Type: DLL
+
+  Section contains the following exports for SHELL32.dll
+
+    00000000 characteristics
+    99A9CCCA time date stamp
+        0.00 version
+           2 ordinal base
+        2001 number of functions
+         478 number of names
+
+    ordinal hint RVA      name
+
+        255    0 002AC120 AppCompat_RunDLLW
+        263    1 0002C6B0 AssocCreateForClasses
+        267    2 002B56C0 AssocElemCreateForKey
+        268    3 001A2B30 AssocGetDetailsOfPropKey
+        701    4 002BE5E0 CDefFolderMenu_Create2
+         83    5 002C00F0 CIDLData_CreateFromIDArray
+        937    6 00257D40 CStorageItem_GetValidatedStorageItemObject
+        269    7 002C0CA0 CallFileCopyHook
+        272    8 002D20E0 CheckEscapesW
+        273    9 000D5440 CommandLineToArgvW
+        274    A 002D5AF0 Control_RunDLL
+        275    B 002D5AF0 Control_RunDLLA
+        276    C 002D5B70 Control_RunDLLAsUserW
+        277    D 002D5BB0 Control_RunDLLW
+        935    E 00257D80 CreateStorageItemFromPath_FullTrustCaller
+        936    F 00257DA0 CreateStorageItemFromPath_FullTrustCaller_ForPackage
+        920   10 00257DC0 CreateStorageItemFromPath_PartialTrustCaller
+        921   11 00257DE0 CreateStorageItemFromShellItem_FullTrustCaller
+        925   12 0019D1D0 CreateStorageItemFromShellItem_FullTrustCaller_ForPackage
+        929   13 00257E00 CreateStorageItemFromShellItem_FullTrustCaller_ForPackage_WithProcessHandle
+        931   14 00257E20 CreateStorageItemFromShellItem_FullTrustCaller_UseImplicitFlagsAndPackage
+        129   15 0010B220 DAD_AutoScroll
+        131   16 002A0610 DAD_DragEnterEx
+         22   17 002EDA30 DAD_DragEnterEx2
+        132   18 002EDB30 DAD_DragLeave
+        134   19 001A7240 DAD_DragMove
+        136   1A 0010B230 DAD_SetDragImage
+        137   1B 0010B240 DAD_ShowDragImage
+        278   1C 000DBB60 DllCanUnloadNow
+        279   1D 00250B60 DllGetActivationFactory
+        280   1E 0009FDA0 DllGetClassObject
+        281   1F 002F8950 DllGetVersion
+        282   20 002F8A20 DllInstall
+        283   21 002F8D10 DllRegisterServer
+        284   22 002F8D10 DllUnregisterServer
+        285   23 002457A0 DoEnvironmentSubstA
+        286   24 00245850 DoEnvironmentSubstW
+        287   25 0006CC90 DragAcceptFiles
+        288   26 00249BC0 DragFinish
+        289   27 0019B900 DragQueryFile
+        290   28 0019B900 DragQueryFileA
+        291   29 0019B930 DragQueryFileAorW
+        292   2A 0019BC00 DragQueryFileW
+        293   2B 00249D80 DragQueryPoint
+         64   2C 002F9B90 DriveType
+        294   2D 000D3470 DuplicateIcon
+        295   2E 00245960 ExtractAssociatedIconA
+        296   2F 00245A50 ExtractAssociatedIconExA
+        297   30 00245B40 ExtractAssociatedIconExW
+        298   31 0019B210 ExtractAssociatedIconW
+        299   32 00245DB0 ExtractIconA
+        300   33 0019B2E0 ExtractIconEx
+        301   34 0019B2E0 ExtractIconExA
+        302   35 000AD520 ExtractIconExW
+        303   36 00062010 ExtractIconW
+        304   37 00317920 FindExecutableA
+        305   38 00317A00 FindExecutableW
+        306   39 00245E40 FreeIconList
+        307   3A 001A8D10 GetCurrentProcessExplicitAppUserModelID
+         63   3B 0031CC80 GetFileNameFromBrowse
+        919   3C 00257E40 GetSystemPersistedStorageItemList
+        154   3D 00324F50 ILAppendID
+         18   3E 000A4150 ILClone
+         19   3F 000CC5A0 ILCloneFirst
+         25   40 000C74C0 ILCombine
+        157   41 001A9650 ILCreateFromPath
+        189   42 00325040 ILCreateFromPathA
+        190   43 001A9650 ILCreateFromPathW
+         24   44 000574B0 ILFindChild
+         16   45 000A4120 ILFindLastID
+        155   46 000CE390 ILFree
+        153   47 000679A0 ILGetNext
+        152   48 000A6850 ILGetSize
+         21   49 00011C80 ILIsEqual
+         23   4A 00057480 ILIsParent
+        846   4B 001A96A0 ILLoadFromStreamEx
+         17   4C 000A4F70 ILRemoveLastID
+         27   4D 001A9790 ILSaveToStream
+        308   4E 00325D60 InitNetworkAddressControl
+        309   4F 00246300 InternalExtractIconListA
+        310   50 00246310 InternalExtractIconListW
+        942   51 00093FC0 IsDesktopExplorerProcess
+        119   52 0010E060 IsLFNDrive
+         41   53 002D2260 IsLFNDriveA
+         42   54 0010E060 IsLFNDriveW
+         66   55 002F9BD0 IsNetDrive
+        941   56 000D4CE0 IsProcessAnExplorer
+        680   57 000D8C40 IsUserAnAdmin
+        311   58 00250DC0 LaunchMSHelp_RunDLLW
+         81   59 00259EB0 OpenAs_RunDLL
+        125   5A 00259EB0 OpenAs_RunDLLA
+        133   5B 00259EC0 OpenAs_RunDLLW
+         85   5C 000E2A70 OpenRegStream
+        312   5D 005D6F30 Options_RunDLL
+        313   5E 005D6F30 Options_RunDLLA
+        314   5F 005D6F90 Options_RunDLLW
+        171   60 0005D410 PathCleanupSpec
+         92   61 002D2630 PathGetShortPath
+         43   62 001A3F50 PathIsExe
+        240   63 002D2A40 PathIsSlowA
+        239   64 002D2AB0 PathIsSlowW
+         47   65 002D2C60 PathMakeUniqueName
+         49   66 002D3060 PathQualify
+         51   67 0004FD50 PathResolve
+         75   68 002D34B0 PathYetAnotherMakeUniqueName
+         62   69 002489C0 PickIconDlg
+         13   6A 000FC780 PifMgr_CloseProperties
+         10   6B 000FC790 PifMgr_GetProperties
+          9   6C 000FC7A0 PifMgr_OpenProperties
+         11   6D 000FC7B0 PifMgr_SetProperties
+        135   6E 0025E3C0 PrepareDiscForBurnRunDllW
+        138   6F 0026D6E0 PrintersGetCommand_RunDLL
+        139   70 0026D6E0 PrintersGetCommand_RunDLLA
+        150   71 0026D7D0 PrintersGetCommand_RunDLLW
+        654   72 00064490 ReadCabinetState
+        524   73 00327850 RealDriveType
+        199   74 00273640 RealShellExecuteA
+        207   75 00273650 RealShellExecuteExA
+        208   76 00273660 RealShellExecuteExW
+        226   77 00273670 RealShellExecuteW
+        315   78 0019BCB0 RegenerateUserEnvironment
+         59   79 002EE900 RestartDialog
+        730   7A 002EE910 RestartDialogEx
+        316   7B 00252170 RunAsNewUser_RunDLLW
+        317   7C 00334B40 SHAddDefaultPropertiesByExt
+        167   7D 00334FD0 SHAddFromPropSheetExtArray
+        318   7E 0019D1F0 SHAddToRecentDocs
+        196   7F 0004E660 SHAlloc
+        319   80 0002B070 SHAppBarMessage
+        320   81 003413B0 SHAssocEnumHandlers
+        321   82 00341440 SHAssocEnumHandlersForProtocolByApplication
+        322   83 00012490 SHBindToFolderIDListParent
+        323   84 00011EE0 SHBindToFolderIDListParentEx
+        324   85 000A4260 SHBindToObject
+        325   86 000A4060 SHBindToParent
+        326   87 00346040 SHBrowseForFolder
+        327   88 00346040 SHBrowseForFolderA
+        328   89 00346300 SHBrowseForFolderW
+        147   8A 00055840 SHCLSIDFromString
+        644   8B 0006B620 SHChangeNotification_Lock
+        645   8C 0006B600 SHChangeNotification_Unlock
+        329   8D 000D9D60 SHChangeNotify
+          4   8E 000E2020 SHChangeNotifyDeregister
+          2   8F 000DC870 SHChangeNotifyRegister
+        330   90 000E31B0 SHChangeNotifyRegisterThread
+        331   91 001ABE40 SHChangeNotifySuspendResume
+         89   92 000DC970 SHCloneSpecialIDList
+        102   93 000D9B40 SHCoCreateInstance
+        332   94 00346FB0 SHCoCreateInstanceWorker
+        333   95 000DFD80 SHCreateAssociationRegistration
+        334   96 003505D0 SHCreateCategoryEnum
+        335   97 002C0120 SHCreateDataObject
+        336   98 0006A9A0 SHCreateDefaultContextMenu
+        337   99 00351080 SHCreateDefaultExtractIcon
+        338   9A 00334BF0 SHCreateDefaultPropertiesOp
+        165   9B 0006DD00 SHCreateDirectory
+        339   9C 002A3930 SHCreateDirectoryExA
+        340   9D 000DF280 SHCreateDirectoryExW
+        341   9E 001AE1B0 SHCreateDrvExtIcon
+        743   9F 002B7C80 SHCreateFileExtractIconW
+        342   A0 000A4FB0 SHCreateItemFromIDList
+        343   A1 000240F0 SHCreateItemFromParsingName
+        344   A2 002B7DB0 SHCreateItemFromRelativeName
+        345   A3 000A3430 SHCreateItemInKnownFolder
+        346   A4 000122A0 SHCreateItemWithParent
+        347   A5 005CC8C0 SHCreateLocalServerRunDll
+        348   A6 00275E90 SHCreateProcessAsUserW
+        168   A7 00335060 SHCreatePropSheetExtArray
+        349   A8 00361F50 SHCreateQueryCancelAutoPlayMoniker
+        256   A9 000BB300 SHCreateShellFolderView
+        174   AA 00385990 SHCreateShellFolderViewEx
+        350   AB 001A2FE0 SHCreateShellItem
+        351   AC 0019D210 SHCreateShellItemArray
+        352   AD 0006C420 SHCreateShellItemArrayFromDataObject
+        353   AE 000E3030 SHCreateShellItemArrayFromIDLists
+        354   AF 0006CEE0 SHCreateShellItemArrayFromShellItem
+         74   B0 002450C0 SHCreateStdEnumFmtEtc
+          3   B1 00316F80 SHDefExtractIconA
+          6   B2 0000F160 SHDefExtractIconW
+        169   B3 00335240 SHDestroyPropSheetExtArray
+         88   B4 002EDC10 SHDoDragDrop
+        355   B5 0000FA40 SHELL32_AddToBackIconTable
+        356   B6 00062AD0 SHELL32_AddToFrontIconTable
+        357   B7 0007C540 SHELL32_AreAllItemsAvailable
+        358   B8 00389080 SHELL32_CCommonPlacesFolder_CreateInstance
+        359   B9 00389090 SHELL32_CDBurn_CloseSession
+        360   BA 003890A0 SHELL32_CDBurn_DriveSupportedForDataBurn
+        361   BB 003890B0 SHELL32_CDBurn_Erase
+        362   BC 001B2A20 SHELL32_CDBurn_GetCDInfo
+        363   BD 001B2A30 SHELL32_CDBurn_GetLiveFSDiscInfo
+        364   BE 000563A0 SHELL32_CDBurn_GetStagingPathOrNormalPath
+        365   BF 00389110 SHELL32_CDBurn_GetTaskInfo
+        366   C0 00389120 SHELL32_CDBurn_IsBlankDisc
+        367   C1 00389130 SHELL32_CDBurn_IsBlankDisc2
+        368   C2 00389190 SHELL32_CDBurn_IsLiveFS
+        369   C3 001B2A40 SHELL32_CDBurn_OnDeviceChange
+        370   C4 003891A0 SHELL32_CDBurn_OnEject
+        371   C5 00389220 SHELL32_CDBurn_OnMediaChange
+        372   C6 00389230 SHELL32_CDefFolderMenu_Create2
+        373   C7 00389290 SHELL32_CDefFolderMenu_Create2Ex
+        374   C8 001B2A50 SHELL32_CDefFolderMenu_MergeMenu
+        375   C9 003892F0 SHELL32_CDrivesContextMenu_Create
+        376   CA 001B2A60 SHELL32_CDrivesDropTarget_Create
+        377   CB 001B2A70 SHELL32_CDrives_CreateSFVCB
+        378   CC 000DCB20 SHELL32_CFSDropTarget_CreateInstance
+        379   CD 00389300 SHELL32_CFSFolderCallback_Create
+        380   CE 00389310 SHELL32_CFillPropertiesTask_CreateInstance
+        381   CF 00389330 SHELL32_CLibraryDropTarget_CreateInstance
+        382   D0 00389340 SHELL32_CLocationContextMenu_Create
+        383   D1 00389350 SHELL32_CLocationFolderUI_CreateInstance
+        384   D2 001B2AD0 SHELL32_CMountPoint_DoAutorun
+        385   D3 00389360 SHELL32_CMountPoint_DoAutorunPrompt
+        386   D4 001B2AE0 SHELL32_CMountPoint_IsAutoRunDriveAndEnabledByPolicy
+        387   D5 00389390 SHELL32_CMountPoint_ProcessAutoRunFile
+        388   D6 003893A0 SHELL32_CMountPoint_WantAutorunUI
+        389   D7 003893B0 SHELL32_CMountPoint_WantAutorunUIGetReady
+        390   D8 001B2AF0 SHELL32_CNetFolderUI_CreateInstance
+        391   D9 003893C0 SHELL32_CPL_CategoryIdArrayFromVariant
+        392   DA 003893D0 SHELL32_CPL_IsLegacyCanonicalNameListedUnderKey
+        393   DB 003893F0 SHELL32_CPL_ModifyWowDisplayName
+        394   DC 00389400 SHELL32_CRecentDocsContextMenu_CreateInstance
+        395   DD 00389410 SHELL32_CTransferConfirmation_CreateInstance
+        396   DE 00389420 SHELL32_CallFileCopyHooks
+        397   DF 001B2B00 SHELL32_CanDisplayWin8CopyDialog
+        398   E0 00389480 SHELL32_CloseAutoplayPrompt
+        399   E1 00389490 SHELL32_CommandLineFromMsiDescriptor
+        400   E2 003894B0 SHELL32_CopySecondaryTiles
+        401   E3 003894C0 SHELL32_CreateConfirmationInterrupt
+        402   E4 003894D0 SHELL32_CreateConflictInterrupt
+        403   E5 003894E0 SHELL32_CreateDefaultOperationDataProvider
+        404   E6 001B2B30 SHELL32_CreateFileFolderContextMenu
+        405   E7 000E26B0 SHELL32_CreateLinkInfoW
+        406   E8 00389560 SHELL32_CreateQosRecorder
+        407   E9 00389580 SHELL32_CreateSharePointView
+        408   EA 002EA7D0 SHELL32_Create_IEnumUICommand
+        409   EB 000E2690 SHELL32_DestroyLinkInfo
+        410   EC 00389590 SHELL32_EncryptDirectory
+        411   ED 003895A0 SHELL32_EncryptedFileKeyInfo
+        412   EE 003895C0 SHELL32_EnumCommonTasks
+        413   EF 003895D0 SHELL32_FreeEncryptedFileKeyInfo
+        414   F0 0006DE80 SHELL32_GenerateAppID
+        415   F1 003895F0 SHELL32_GetAppIDRoot
+        416   F2 00389600 SHELL32_GetCommandProviderForFolderType
+        417   F3 00053A20 SHELL32_GetDPIAdjustedLogicalSize
+        418   F4 00389620 SHELL32_GetDiskCleanupPath
+        419   F5 00389630 SHELL32_GetFileNameFromBrowse
+        420   F6 00069F40 SHELL32_GetIconOverlayManager
+        421   F7 00389640 SHELL32_GetLinkInfoData
+        422   F8 00389660 SHELL32_GetRatingBucket
+        423   F9 00389690 SHELL32_GetSqmableFileName
+        424   FA 003896A0 SHELL32_GetThumbnailAdornerFromFactory
+        425   FB 003896C0 SHELL32_GetThumbnailAdornerFromFactory2
+        426   FC 003896E0 SHELL32_HandleUnrecognizedFileSystem
+        427   FD 000D79B0 SHELL32_IconCacheCreate
+        428   FE 000E1310 SHELL32_IconCacheDestroy
+        429   FF 0000E730 SHELL32_IconCacheHandleAssociationChanged
+        430  100 00094FA0 SHELL32_IconCacheRestore
+        431  101 0005AE20 SHELL32_IconCache_AboutToExtractIcons
+        432  102 000633C0 SHELL32_IconCache_DoneExtractingIcons
+        433  103 000608A0 SHELL32_IconCache_ExpandEnvAndSearchPath
+        434  104 000B1CF0 SHELL32_IconCache_RememberRecentlyExtractedIconsW
+        435  105 0006CC00 SHELL32_IconOverlayManagerInit
+        436  106 00061140 SHELL32_IsGetKeyboardLayoutPresent
+        437  107 001B2B40 SHELL32_IsSystemUpgradeInProgress
+        438  108 000DFD60 SHELL32_IsValidLinkInfo
+        439  109 003896F0 SHELL32_LegacyEnumSpecialTasksByType
+        440  10A 00389700 SHELL32_LegacyEnumTasks
+        441  10B 00095B70 SHELL32_LookupBackIconIndex
+        442  10C 00070670 SHELL32_LookupFrontIconIndex
+        443  10D 00389710 SHELL32_NormalizeRating
+        444  10E 001B2B50 SHELL32_NotifyLinkTrackingServiceOfMove
+        445  10F 000FC780 SHELL32_PifMgr_CloseProperties
+        446  110 000FC790 SHELL32_PifMgr_GetProperties
+        447  111 000FC7A0 SHELL32_PifMgr_OpenProperties
+        448  112 000FC7B0 SHELL32_PifMgr_SetProperties
+        449  113 00389720 SHELL32_Printers_CreateBindInfo
+        450  114 00389730 SHELL32_Printjob_GetPidl
+        451  115 00389740 SHELL32_PurgeSystemIcon
+        452  116 00071F90 SHELL32_RefreshOverlayImages
+        453  117 0006B000 SHELL32_ResolveLinkInfoW
+        454  118 001B2B60 SHELL32_SHAddSparseIcon
+        455  119 00389750 SHELL32_SHCreateByValueOperationInterrupt
+        456  11A 00096610 SHELL32_SHCreateDefaultContextMenu
+        457  11B 00389760 SHELL32_SHCreateLocalServer
+        458  11C 000BB6E0 SHELL32_SHCreateShellFolderView
+        459  11D 00389770 SHELL32_SHDuplicateEncryptionInfoFile
+        460  11E 00389790 SHELL32_SHEncryptFile
+        461  11F 003897A0 SHELL32_SHFormatDriveAsync
+        462  120 001B2B70 SHELL32_SHGetThreadUndoManager
+        463  121 001B2B80 SHELL32_SHGetUserNameW
+        464  122 001B2BA0 SHELL32_SHIsVirtualDevice
+        465  123 003897B0 SHELL32_SHLaunchPropSheet
+        466  124 003897C0 SHELL32_SHLogILFromFSIL
+        467  125 003897D0 SHELL32_SHOpenWithDialog
+        468  126 003897E0 SHELL32_SHStartNetConnectionDialogW
+        469  127 00315280 SHELL32_SHUICommandFromGUID
+        470  128 005D7F60 SHELL32_SendToMenu_InvokeTargetedCommand
+        471  129 001D65C0 SHELL32_SendToMenu_VerifyTargetedCommand
+        472  12A 00389800 SHELL32_ShowHideIconOnlyOnDesktop
+        473  12B 00389810 SHELL32_SimpleRatingToFilterCondition
+        474  12C 001B2BB0 SHELL32_StampIconForFile
+        475  12D 00060F70 SHELL32_SuspendUndo
+        476  12E 00389820 SHELL32_TryVirtualDiscImageDriveEject
+        477  12F 000D4F20 SHELL32_VerifySaferTrust
+        478  130 00389CB0 SHEmptyRecycleBinA
+        479  131 00389D40 SHEmptyRecycleBinW
+        480  132 000BBF10 SHEnableServiceObject
+        481  133 002A3BB0 SHEnumerateUnreadMailAccountsW
+        482  134 000C9430 SHEvaluateSystemCommandTemplate
+        483  135 0038C050 SHExecuteErrorMessageBox
+        484  136 0019B360 SHExtractIconsW
+        485  137 00257EC0 SHFileOperation
+        486  138 00257EC0 SHFileOperationA
+        487  139 00257EE0 SHFileOperationW
+         90  13A 002A3FB0 SHFindFiles
+        149  13B 0038CB70 SHFind_InitMenuPopup
+        526  13C 0038E340 SHFlushSFCache
+        488  13D 002AC5B0 SHFormatDrive
+        195  13E 0006D370 SHFree
+        489  13F 00257F00 SHFreeNameMappings
+        750  140 00023B50 SHGetAttributesFromDataObject
+        490  141 002B81C0 SHGetDataFromIDListA
+        491  142 000DC350 SHGetDataFromIDListW
+        492  143 00068AB0 SHGetDesktopFolder
+        493  144 002B82D0 SHGetDiskFreeSpaceA
+        494  145 002B82D0 SHGetDiskFreeSpaceExA
+        495  146 001A3030 SHGetDiskFreeSpaceExW
+        496  147 003971C0 SHGetDriveMedia
+        497  148 002B8350 SHGetFileInfo
+        498  149 002B8350 SHGetFileInfoA
+        499  14A 0000CE60 SHGetFileInfoW
+        500  14B 002F9BF0 SHGetFolderLocation
+        501  14C 001A76D0 SHGetFolderPathA
+        502  14D 002F9C10 SHGetFolderPathAndSubDirA
+        503  14E 000D95C0 SHGetFolderPathAndSubDirW
+        504  14F 00069830 SHGetFolderPathEx
+        505  150 000D26D0 SHGetFolderPathW
+        506  151 000759F0 SHGetIDListFromObject
+        507  152 003258F0 SHGetIconOverlayIndexA
+        508  153 001A9B40 SHGetIconOverlayIndexW
+        727  154 0008AE20 SHGetImageList
+        509  155 000614F0 SHGetInstanceExplorer
+        510  156 00029360 SHGetItemFromDataObject
+        511  157 000BB130 SHGetItemFromObject
+        512  158 000E2EF0 SHGetKnownFolderIDList
+        513  159 0006CEC0 SHGetKnownFolderItem
+        514  15A 000D5120 SHGetKnownFolderPath
+        515  15B 002B8460 SHGetLocalizedName
+        516  15C 001A3050 SHGetMalloc
+        517  15D 002B8640 SHGetNameFromIDList
+        518  15E 002B86E0 SHGetNewLinkInfo
+        179  15F 002B86E0 SHGetNewLinkInfoA
+        180  160 002B8800 SHGetNewLinkInfoW
+        519  161 002A40A0 SHGetPathFromIDList
+        527  162 002A40A0 SHGetPathFromIDListA
+        528  163 00057AF0 SHGetPathFromIDListEx
+        529  164 000A4CD0 SHGetPathFromIDListW
+        530  165 000C7C90 SHGetPropertyStoreForWindow
+        531  166 002B8830 SHGetPropertyStoreFromIDList
+        532  167 001A3070 SHGetPropertyStoreFromParsingName
+         98  168 002A41C0 SHGetRealIDL
+        709  169 0019B3B0 SHGetSetFolderCustomSettings
+         68  16A 000BA160 SHGetSetSettings
+        533  16B 001B3460 SHGetSettings
+        534  16C 00069000 SHGetSpecialFolderLocation
+        535  16D 001A76F0 SHGetSpecialFolderPathA
+        536  16E 000DA6C0 SHGetSpecialFolderPathW
+        537  16F 002B88D0 SHGetStockIconInfo
+        538  170 00012390 SHGetTemporaryPropertyForItem
+        539  171 002A41E0 SHGetUnreadMailCountW
+        193  172 001ABE60 SHHandleUpdateImage
+        228  173 00290400 SHHelpShortcuts_RunDLL
+        229  174 00290400 SHHelpShortcuts_RunDLLA
+        238  175 002904B0 SHHelpShortcuts_RunDLLW
+         28  176 003253E0 SHILCreateFromPath
+        540  177 0026E690 SHInvokePrinterCommandA
+        541  178 0026E780 SHInvokePrinterCommandW
+        542  179 002A47F0 SHIsFileAvailableOffline
+        747  17A 00398610 SHLimitInputEdit
+        543  17B 002F9C70 SHLoadInProc
+        544  17C 002A4AD0 SHLoadNonloadedIconOverlayIdentifiers
+         77  17D 002B89D0 SHMapPIDLToSystemImageListIndex
+        716  17E 003990A0 SHMultiFileProperties
+        178  17F 00290670 SHObjectProperties
+        545  180 002F9C80 SHOpenFolderAndSelectItems
+        546  181 00399870 SHOpenOrGetFolderView
+         80  182 003990C0 SHOpenPropSheetW
+        547  183 0025AC40 SHOpenWithDialog
+        548  184 00024590 SHParseDisplayName
+        549  185 00257F40 SHPathPrepareForWriteA
+        550  186 0019D230 SHPathPrepareForWriteW
+        685  187 001A7710 SHPropStgCreate
+        688  188 001A7730 SHPropStgReadMultiple
+        689  189 002F9CA0 SHPropStgWriteMultiple
+        551  18A 0039AA20 SHQueryRecycleBinA
+        552  18B 0039AAB0 SHQueryRecycleBinW
+        553  18C 001A7750 SHQueryUserNotificationState
+        554  18D 002B8A20 SHRemoveLocalizedName
+        170  18E 003352A0 SHReplaceFromPropSheetExtArray
+        555  18F 002F9CC0 SHResolveLibrary
+        100  190 000B9BE0 SHRestricted
+        556  191 00334D40 SHSetDefaultProperties
+        231  192 002F9CE0 SHSetFolderPathA
+        232  193 002F9D00 SHSetFolderPathW
+        176  194 00068370 SHSetInstanceExplorer
+        557  195 001A7800 SHSetKnownFolderPath
+        558  196 002B8AD0 SHSetLocalizedName
+        559  197 00011DE0 SHSetTemporaryPropertyForItem
+        560  198 002A4C50 SHSetUnreadMailCountW
+         73  199 00385A40 SHShellFolderView_Message
+        561  19A 0061D2A0 SHShowManageLibraryUI
+        162  19B 001A2030 SHSimpleIDListFromPath
+         14  19C 003897E0 SHStartNetConnectionDialogW
+        245  19D 000D8C60 SHTestTokenMembership
+        191  19E 00334940 SHUpdateImageA
+        192  19F 00334960 SHUpdateImageW
+        562  1A0 000E0D40 SHUpdateRecycleBinIcon
+        173  1A1 00317E00 SHValidateUNC
+        563  1A2 001A8D30 SetCurrentProcessExplicitAppUserModelID
+        564  1A3 00249220 SheChangeDirA
+        565  1A4 002492A0 SheChangeDirExW
+        566  1A5 002498A0 SheGetDirA
+        567  1A6 00249B00 SheSetCurDrive
+        568  1A7 003ACBE0 ShellAboutA
+        569  1A8 003ACD10 ShellAboutW
+        570  1A9 00275EC0 ShellExec_RunDLL
+        571  1AA 00275EC0 ShellExec_RunDLLA
+        572  1AB 00275F70 ShellExec_RunDLLW
+        573  1AC 002760D0 ShellExecuteA
+        574  1AD 00276170 ShellExecuteEx
+        575  1AE 00276170 ShellExecuteExA
+        576  1AF 00081400 ShellExecuteExW
+        577  1B0 0005D800 ShellExecuteW
+        578  1B1 003294F0 ShellHookProc
+        183  1B2          ShellMessageBoxA (forwarded to shlwapi.ShellMessageBoxA)
+        182  1B3          ShellMessageBoxW (forwarded to shlwapi.ShellMessageBoxW)
+         72  1B4 00317020 Shell_GetCachedImageIndex
+        579  1B5 00317030 Shell_GetCachedImageIndexA
+        580  1B6 00010610 Shell_GetCachedImageIndexW
+         71  1B7 000620D0 Shell_GetImageLists
+         67  1B8 0009D510 Shell_MergeMenus
+        581  1B9 001A7820 Shell_NotifyIcon
+        582  1BA 001A7820 Shell_NotifyIconA
+        583  1BB 001B39D0 Shell_NotifyIconGetRect
+        584  1BC 000BC010 Shell_NotifyIconW
+        103  1BD 000588A0 SignalFileOpen
+        585  1BE 0005D180 StateRepoNewMenuCache_EnsureCacheAsync
+        586  1BF 0005C490 StateRepoNewMenuCache_RebuildCacheAsync
+        682  1C0 003AD0B0 StgMakeUniqueName
+        587  1C1 000F1C50 StrChrA
+        588  1C2 000F1C60 StrChrIA
+        589  1C3 000F1C70 StrChrIW
+        590  1C4 000F1C80 StrChrW
+        591  1C5 000F1C90 StrCmpNA
+        592  1C6 000F1CA0 StrCmpNIA
+        593  1C7 000F1CB0 StrCmpNIW
+        594  1C8 000F1CC0 StrCmpNW
+        595  1C9 00247840 StrNCmpA
+        596  1CA 00247900 StrNCmpIA
+        597  1CB 002479C0 StrNCmpIW
+        598  1CC 00247AA0 StrNCmpW
+        599  1CD 000F1CD0 StrRChrA
+        600  1CE 000F1CE0 StrRChrIA
+        601  1CF 000F1CF0 StrRChrIW
+        602  1D0 000F1D00 StrRChrW
+        603  1D1 00247B90 StrRStrA
+        604  1D2 000F1D10 StrRStrIA
+        605  1D3 000F1D20 StrRStrIW
+        606  1D4 00247C70 StrRStrW
+        607  1D5 000F1D30 StrStrA
+        608  1D6 000F1D40 StrStrIA
+        609  1D7 000F1D50 StrStrIW
+        610  1D8 000F1D60 StrStrW
+        611  1D9 003AF180 UsersLibrariesFolderUI_CreateInstance
+        612  1DA 00276280 WOWShellExecute
+        613  1DB 002F8EA0 WaitForExplorerRestartW
+        164  1DC 002483D0 Win32DeleteFile
+        652  1DD 00245470 WriteCabinetState
+          5               [NONAME] (forwarded to SHUNIMPL.#35)
+          7               [NONAME] (forwarded to SHUNIMPL.#192)
+          8               [NONAME] (forwarded to SHUNIMPL.#193)
+         12      0039B700 [NONAME]
+         15      003250D0 [NONAME]
+         20      000A4150 [NONAME]
+         26               [NONAME] (forwarded to SHUNIMPL.#36)
+         29      002D27C0 [NONAME]
+         30               [NONAME] (forwarded to shlwapi.PathBuildRootW)
+         31               [NONAME] (forwarded to shlwapi.PathFindExtensionW)
+         32               [NONAME] (forwarded to shlwapi.PathAddBackslashW)
+         33               [NONAME] (forwarded to shlwapi.PathRemoveBlanksW)
+         34               [NONAME] (forwarded to shlwapi.PathFindFileNameW)
+         35      002D33B0 [NONAME]
+         36      002D2320 [NONAME]
+         37               [NONAME] (forwarded to shlwapi.PathCombineW)
+         38               [NONAME] (forwarded to shlwapi.PathStripPathW)
+         39               [NONAME] (forwarded to shlwapi.PathIsUNCW)
+         40               [NONAME] (forwarded to shlwapi.PathIsRelativeW)
+         44      002D5B90 [NONAME]
+         45      002D23E0 [NONAME]
+         46               [NONAME] (forwarded to shlwapi.PathMatchSpecW)
+         48               [NONAME] (forwarded to shlwapi.PathSetDlgItemPathW)
+         50               [NONAME] (forwarded to shlwapi.PathStripToRootW)
+         52               [NONAME] (forwarded to shlwapi.PathGetArgsW)
+         53               [NONAME] (forwarded to SHUNIMPL.#388)
+         54      002EE8E0 [NONAME]
+         55               [NONAME] (forwarded to shlwapi.PathQuoteSpacesW)
+         56               [NONAME] (forwarded to shlwapi.PathUnquoteSpacesW)
+         57               [NONAME] (forwarded to shlwapi.PathGetDriveNumberW)
+         58      002A2BE0 [NONAME]
+         60      002EE800 [NONAME]
+         61      0031CCE0 [NONAME]
+         65      002B7B20 [NONAME]
+         69      00326730 [NONAME]
+         70      002456E0 [NONAME]
+         76      00249BE0 [NONAME]
+         78               [NONAME] (forwarded to SHUNIMPL.#37)
+         79               [NONAME] (forwarded to SHUNIMPL.#38)
+         82               [NONAME] (forwarded to SHUNIMPL.#39)
+         84               [NONAME] (forwarded to SHUNIMPL.#40)
+         86               [NONAME] (forwarded to SHUNIMPL.#41)
+         87               [NONAME] (forwarded to SHUNIMPL.#42)
+         91      002A3EC0 [NONAME]
+         93               [NONAME] (forwarded to shcore.Win32CreateDirectory)
+         94      002483E0 [NONAME]
+         95      000C6910 [NONAME]
+         96               [NONAME] (forwarded to SHUNIMPL.#43)
+         97      0039B800 [NONAME]
+         99      000DE4F0 [NONAME]
+        101               [NONAME] (forwarded to SHUNIMPL.#1)
+        104               [NONAME] (forwarded to SHUNIMPL.#2)
+        105               [NONAME] (forwarded to SHUNIMPL.#3)
+        106               [NONAME] (forwarded to SHUNIMPL.#4)
+        107               [NONAME] (forwarded to SHUNIMPL.#5)
+        108               [NONAME] (forwarded to SHUNIMPL.#6)
+        109               [NONAME] (forwarded to SHUNIMPL.#7)
+        110               [NONAME] (forwarded to SHUNIMPL.#8)
+        111               [NONAME] (forwarded to SHUNIMPL.#9)
+        112               [NONAME] (forwarded to SHUNIMPL.#10)
+        113               [NONAME] (forwarded to SHUNIMPL.#11)
+        114               [NONAME] (forwarded to SHUNIMPL.#12)
+        115               [NONAME] (forwarded to SHUNIMPL.#13)
+        116               [NONAME] (forwarded to SHUNIMPL.#14)
+        117               [NONAME] (forwarded to SHUNIMPL.#15)
+        118               [NONAME] (forwarded to SHUNIMPL.#16)
+        120               [NONAME] (forwarded to SHUNIMPL.#17)
+        121               [NONAME] (forwarded to SHUNIMPL.#44)
+        122               [NONAME] (forwarded to SHUNIMPL.#45)
+        123               [NONAME] (forwarded to SHUNIMPL.#46)
+        124               [NONAME] (forwarded to SHUNIMPL.#18)
+        126               [NONAME] (forwarded to SHUNIMPL.#47)
+        127               [NONAME] (forwarded to SHUNIMPL.#371)
+        128      0009FDA0 [NONAME]
+        130               [NONAME] (forwarded to SHUNIMPL.#48)
+        140               [NONAME] (forwarded to SHUNIMPL.#19)
+        141               [NONAME] (forwarded to SHUNIMPL.#20)
+        142               [NONAME] (forwarded to SHUNIMPL.#21)
+        143               [NONAME] (forwarded to SHUNIMPL.#22)
+        144               [NONAME] (forwarded to SHUNIMPL.#23)
+        145               [NONAME] (forwarded to shlwapi.PathFindOnPathW)
+        146               [NONAME] (forwarded to SHUNIMPL.#49)
+        148               [NONAME] (forwarded to SHUNIMPL.#50)
+        151               [NONAME] (forwarded to SHUNIMPL.#51)
+        156      000CE390 [NONAME]
+        158               [NONAME] (forwarded to SHUNIMPL.#389)
+        159               [NONAME] (forwarded to shlwapi.PathIsDirectoryW)
+        160      003268D0 [NONAME]
+        161               [NONAME] (forwarded to SHUNIMPL.#214)
+        163               [NONAME] (forwarded to SHUNIMPL.#52)
+        166               [NONAME] (forwarded to SHUNIMPL.#53)
+        172      002B7F10 [NONAME]
+        175      000DA6C0 [NONAME]
+        177               [NONAME] (forwarded to SHUNIMPL.#54)
+        181      000E19F0 [NONAME]
+        184      0029FD50 [NONAME]
+        185               [NONAME] (forwarded to SHUNIMPL.#390)
+        186      003250F0 [NONAME]
+        187               [NONAME] (forwarded to SHUNIMPL.#235)
+        188      000DCEC0 [NONAME]
+        194      00335070 [NONAME]
+        197               [NONAME] (forwarded to SHUNIMPL.#55)
+        198               [NONAME] (forwarded to SHUNIMPL.#56)
+        200      0006E5C0 [NONAME]
+        201      00093D10 [NONAME]
+        202               [NONAME] (forwarded to SHUNIMPL.#57)
+        203      0029FD30 [NONAME]
+        204      002A5480 [NONAME]
+        205      0026E2A0 [NONAME]
+        206      00093D00 [NONAME]
+        209      002A2080 [NONAME]
+        210      002A2A60 [NONAME]
+        211      0026E490 [NONAME]
+        212      0026E140 [NONAME]
+        213      0026E4B0 [NONAME]
+        214      0026E5D0 [NONAME]
+        215      003897E0 [NONAME]
+        216               [NONAME] (forwarded to SHUNIMPL.#24)
+        217               [NONAME] (forwarded to SHUNIMPL.#25)
+        218               [NONAME] (forwarded to SHUNIMPL.#26)
+        219               [NONAME] (forwarded to SHUNIMPL.#27)
+        220               [NONAME] (forwarded to SHUNIMPL.#28)
+        221               [NONAME] (forwarded to SHUNIMPL.#29)
+        222               [NONAME] (forwarded to SHUNIMPL.#30)
+        223               [NONAME] (forwarded to SHUNIMPL.#31)
+        224               [NONAME] (forwarded to SHUNIMPL.#32)
+        225               [NONAME] (forwarded to SHUNIMPL.#33)
+        227               [NONAME] (forwarded to SHUNIMPL.#34)
+        230               [NONAME] (forwarded to SHUNIMPL.#372)
+        233               [NONAME] (forwarded to SHUNIMPL.#58)
+        234               [NONAME] (forwarded to SHUNIMPL.#59)
+        235               [NONAME] (forwarded to SHUNIMPL.#212)
+        236      00325FC0 [NONAME]
+        237      002A4E80 [NONAME]
+        241      002A4460 [NONAME]
+        242               [NONAME] (forwarded to SHUNIMPL.#373)
+        243               [NONAME] (forwarded to SHUNIMPL.#374)
+        244      000D9B60 [NONAME]
+        246               [NONAME] (forwarded to SHUNIMPL.#375)
+        247               [NONAME] (forwarded to SHUNIMPL.#376)
+        248               [NONAME] (forwarded to SHUNIMPL.#377)
+        249               [NONAME] (forwarded to shlwapi.PathParseIconLocationW)
+        250               [NONAME] (forwarded to shlwapi.PathRemoveExtensionW)
+        251               [NONAME] (forwarded to shlwapi.PathRemoveArgsW)
+        252               [NONAME] (forwarded to api-ms-win-core-url-l1.PathIsURLW)
+        253               [NONAME] (forwarded to SHUNIMPL.#378)
+        254      002EE7E0 [NONAME]
+        257      00385A30 [NONAME]
+        258      00326080 [NONAME]
+        259      00326140 [NONAME]
+        260      002DE180 [NONAME]
+        261      00391BE0 [NONAME]
+        262      00391F20 [NONAME]
+        264      002DE1B0 [NONAME]
+        265      00317FA0 [NONAME]
+        266      00318200 [NONAME]
+        270      00390CD0 [NONAME]
+        271      0039B7A0 [NONAME]
+        520               [NONAME] (forwarded to SHUNIMPL.#60)
+        521               [NONAME] (forwarded to SHUNIMPL.#61)
+        522               [NONAME] (forwarded to SHUNIMPL.#62)
+        523               [NONAME] (forwarded to SHUNIMPL.#63)
+        525               [NONAME] (forwarded to SHUNIMPL.#234)
+        640               [NONAME] (forwarded to SHUNIMPL.#64)
+        641               [NONAME] (forwarded to SHUNIMPL.#65)
+        643               [NONAME] (forwarded to SHUNIMPL.#66)
+        646               [NONAME] (forwarded to SHUNIMPL.#67)
+        648               [NONAME] (forwarded to SHUNIMPL.#379)
+        650               [NONAME] (forwarded to shlwapi.PathIsSameRootW)
+        651      00245450 [NONAME]
+        653               [NONAME] (forwarded to SHUNIMPL.#68)
+        660      00316E00 [NONAME]
+        681               [NONAME] (forwarded to SHUNIMPL.#428)
+        683      0039B7E0 [NONAME]
+        684      0039B7C0 [NONAME]
+        690      002F9C30 [NONAME]
+        691               [NONAME] (forwarded to SHUNIMPL.#216)
+        700               [NONAME] (forwarded to SHUNIMPL.#380)
+        702      001A3B50 [NONAME]
+        703               [NONAME] (forwarded to SHLWAPI.#269)
+        704               [NONAME] (forwarded to SHLWAPI.#270)
+        707               [NONAME] (forwarded to SHUNIMPL.#69)
+        708               [NONAME] (forwarded to SHUNIMPL.#70)
+        711      002A0020 [NONAME]
+        712               [NONAME] (forwarded to SHUNIMPL.#71)
+        713      002D2B50 [NONAME]
+        714      002D2BB0 [NONAME]
+        715               [NONAME] (forwarded to SHUNIMPL.#191)
+        719               [NONAME] (forwarded to SHUNIMPL.#478)
+        720               [NONAME] (forwarded to SHUNIMPL.#72)
+        721               [NONAME] (forwarded to SHUNIMPL.#73)
+        722               [NONAME] (forwarded to SHUNIMPL.#236)
+        723      000D7010 [NONAME]
+        724               [NONAME] (forwarded to SHUNIMPL.#381)
+        725               [NONAME] (forwarded to SHUNIMPL.#74)
+        726               [NONAME] (forwarded to SHUNIMPL.#75)
+        731               [NONAME] (forwarded to SHUNIMPL.#479)
+        732               [NONAME] (forwarded to SHUNIMPL.#480)
+        733      002D1C70 [NONAME]
+        740      00355800 [NONAME]
+        744      002EA7D0 [NONAME]
+        745               [NONAME] (forwarded to SHUNIMPL.#382)
+        748      003985B0 [NONAME]
+        749               [NONAME] (forwarded to SHUNIMPL.#76)
+        751      002A4E90 [NONAME]
+        752      003264F0 [NONAME]
+        753      000E26D0 [NONAME]
+        754      00398890 [NONAME]
+        755      002A2FB0 [NONAME]
+        756               [NONAME] (forwarded to SHUNIMPL.#77)
+        757      00023050 [NONAME]
+        758      000393E0 [NONAME]
+        759      000360D0 [NONAME]
+        760      00257EA0 [NONAME]
+        761      00334920 [NONAME]
+        762               [NONAME] (forwarded to SHUNIMPL.#383)
+        763      002EA800 [NONAME]
+        764      0002BA20 [NONAME]
+        765      003415C0 [NONAME]
+        766               [NONAME] (forwarded to SHUNIMPL.#385)
+        767      002B4020 [NONAME]
+        777      00020FB0 [NONAME]
+        778      002B5B20 [NONAME]
+        779      002A23C0 [NONAME]
+        781      00337060 [NONAME]
+        782      0031CF70 [NONAME]
+        786               [NONAME] (forwarded to SHUNIMPL.#237)
+        787      0005F800 [NONAME]
+        788      00362350 [NONAME]
+        789      00362400 [NONAME]
+        790      001A3120 [NONAME]
+        791      00362300 [NONAME]
+        792      000BE2F0 [NONAME]
+        810      00391C10 [NONAME]
+        811      00391A20 [NONAME]
+        812      0063DB40 [NONAME]
+        813      0063DBF0 [NONAME]
+        814      00254B60 [NONAME]
+        815      00254AC0 [NONAME]
+        816      00288070 [NONAME]
+        817      0028BF20 [NONAME]
+        818      00254B50 [NONAME]
+        819      00254CF0 [NONAME]
+        820               [NONAME] (forwarded to SHUNIMPL.#249)
+        821               [NONAME] (forwarded to SHUNIMPL.#250)
+        822               [NONAME] (forwarded to SHUNIMPL.#251)
+        823      000338F0 [NONAME]
+        824      00295CF0 [NONAME]
+        825      00283FE0 [NONAME]
+        826               [NONAME] (forwarded to SHUNIMPL.#252)
+        827               [NONAME] (forwarded to SHUNIMPL.#253)
+        828      002BE7F0 [NONAME]
+        829      002BEEB0 [NONAME]
+        830      002F8DD0 [NONAME]
+        831      002A3950 [NONAME]
+        832               [NONAME] (forwarded to SHUNIMPL.#387)
+        833      002F9C50 [NONAME]
+        834               [NONAME] (forwarded to SHUNIMPL.#254)
+        835               [NONAME] (forwarded to SHUNIMPL.#255)
+        836               [NONAME] (forwarded to SHUNIMPL.#256)
+        837               [NONAME] (forwarded to SHUNIMPL.#257)
+        838               [NONAME] (forwarded to SHUNIMPL.#258)
+        839               [NONAME] (forwarded to SHUNIMPL.#259)
+        840      003262A0 [NONAME]
+        841               [NONAME] (forwarded to SHUNIMPL.#424)
+        842               [NONAME] (forwarded to SHUNIMPL.#425)
+        843               [NONAME] (forwarded to SHUNIMPL.#386)
+        844      002F8D20 [NONAME]
+        845      00252FA0 [NONAME]
+        847      00254970 [NONAME]
+        848      00341610 [NONAME]
+        849      00254B10 [NONAME]
+        850      000CEFC0 [NONAME]
+        851      00295E30 [NONAME]
+        852               [NONAME] (forwarded to SHUNIMPL.#391)
+        853      000A4370 [NONAME]
+        854               [NONAME] (forwarded to SHUNIMPL.#260)
+        856               [NONAME] (forwarded to SHUNIMPL.#423)
+        857               [NONAME] (forwarded to SHUNIMPL.#426)
+        858               [NONAME] (forwarded to SHUNIMPL.#392)
+        859      003BAFA0 [NONAME]
+        860      00390800 [NONAME]
+        861               [NONAME] (forwarded to SHUNIMPL.#261)
+        862      00325340 [NONAME]
+        863               [NONAME] (forwarded to SHUNIMPL.#262)
+        864      0031E6B0 [NONAME]
+        865      002A2460 [NONAME]
+        866      001ADC00 [NONAME]
+        867               [NONAME] (forwarded to SHUNIMPL.#263)
+        868               [NONAME] (forwarded to SHUNIMPL.#264)
+        869               [NONAME] (forwarded to SHUNIMPL.#384)
+        870      0006D010 [NONAME]
+        871      0005FF40 [NONAME]
+        872               [NONAME] (forwarded to SHUNIMPL.#265)
+        873      0004D8C0 [NONAME]
+        874      00315100 [NONAME]
+        875      003150A0 [NONAME]
+        876      00314C50 [NONAME]
+        877      003151C0 [NONAME]
+        878      00314F00 [NONAME]
+        880      002A05D0 [NONAME]
+        881      001B2D80 [NONAME]
+        882      0038AC50 [NONAME]
+        883      0063B9D0 [NONAME]
+        884      002EDDD0 [NONAME]
+        885      0008E650 [NONAME]
+        886      002A49B0 [NONAME]
+        887      00347040 [NONAME]
+        888      00398910 [NONAME]
+        889               [NONAME] (forwarded to SHUNIMPL.#474)
+        890               [NONAME] (forwarded to SHUNIMPL.#475)
+        891      00329460 [NONAME]
+        892               [NONAME] (forwarded to SHUNIMPL.#476)
+        893      00029460 [NONAME]
+        894      00257E60 [NONAME]
+        895      000BB9B0 [NONAME]
+        896      00257D60 [NONAME]
+        897      0039EB50 [NONAME]
+        898      002B7F40 [NONAME]
+        899      000E2F80 [NONAME]
+        900      00028A50 [NONAME]
+        901      001D6070 [NONAME]
+        902               [NONAME] (forwarded to SHUNIMPL.#473)
+        903      00257D00 [NONAME]
+        904      002F9D20 [NONAME]
+        905      002F9BB0 [NONAME]
+        906      000E2FB0 [NONAME]
+        907      001A9310 [NONAME]
+        909               [NONAME] (forwarded to SHUNIMPL.#477)
+        910      002DD240 [NONAME]
+        911      002943B0 [NONAME]
+        912      002E8FD0 [NONAME]
+        913      002E9890 [NONAME]
+        914      00257CE0 [NONAME]
+        915      000BD7F0 [NONAME]
+        916      000DCA40 [NONAME]
+        922      0039B4A0 [NONAME]
+        923      0006DC20 [NONAME]
+        924      00257D20 [NONAME]
+        927      00353290 [NONAME]
+        928      00388FE0 [NONAME]
+        930      002D2430 [NONAME]
+        932      00257F60 [NONAME]
+        933      00257F20 [NONAME]
+        938      00334900 [NONAME]
+        939      0000D960 [NONAME]
+        940      00257E80 [NONAME]
+        943      000ABE60 [NONAME]
+        944      003999C0 [NONAME]
+        945      00334040 [NONAME]
+        946      002B8520 [NONAME]
+        947      002C1870 [NONAME]
+        948      002C1840 [NONAME]
+        949      001A3D40 [NONAME]
+        950      002C17F0 [NONAME]
+        951      002C1810 [NONAME]
+        952      002C17D0 [NONAME]
+        953      002C15F0 [NONAME]
+        970      002A31D0 [NONAME]
+        971      002B7510 [NONAME]
+        972      002DE600 [NONAME]
+       2000      003343A0 [NONAME]
+       2001      003ADBF0 [NONAME]
+       2002      003258B0 [NONAME]
+
+  Summary
+
+        B000 .data
+        4000 .didat
+       4F000 .pdata
+      164000 .rdata
+       14000 .reloc
+        9000 .rsrc
+      6BC000 .text

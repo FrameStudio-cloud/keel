@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bento Analytics — Overview</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #fafafa; }
+    .card { background: #ffffff; border: 1px solid rgba(0,0,0,0.04); border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .text-accent { color: #8b5cf6; }
+    .bg-accent { background: #8b5cf6; }
+    .bg-accent-light { background: #f5f3ff; }
+    .trend-up { color: #22c55e; }
+    .progress { background: #e4e4e7; border-radius: 999px; overflow: hidden; }
+    .progress-bar { height: 100%; border-radius: 999px; }
+  </style>
+</head>
+<body class="text-zinc-900 antialiased">
+  <div class="max-w-7xl mx-auto px-6 py-10">
+    <!-- Bento Grid Row 1 -->
+    <div class="grid grid-cols-7 gap-4 mb-4">
+      <!-- Revenue — spans 3 cols -->
+      <div class="col-span-3 card p-6 bg-gradient-to-br from-violet-50 to-white border-violet-100">
+        <p class="text-[10px] uppercase tracking-[0.12em] font-semibold text-violet-500 mb-2">Today's Revenue</p>
+        <p class="text-4xl font-bold text-zinc-900 tracking-tight mb-1">KSh 12,400</p>
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-medium trend-up">▲ 8%</span>
+          <span class="text-xs text-zinc-400">from yesterday</span>
+        </div>
+      </div>
+      <!-- Items sold -->
+      <div class="col-span-2 card p-5 flex flex-col justify-between">
+        <p class="text-[10px] uppercase tracking-[0.12em] font-semibold text-zinc-400">Sold Today</p>
+        <div>
+          <p class="text-3xl font-bold text-zinc-900">48</p>
+          <p class="text-xs text-zinc-400 mt-1">▲ 12 units</p>
+        </div>
+      </div>
+      <!-- Low stock -->
+      <div class="col-span-2 card p-5 flex flex-col justify-between">
+        <p class="text-[10px] uppercase tracking-[0.12em] font-semibold text-zinc-400">Low Stock</p>
+        <div>
+          <p class="text-3xl font-bold text-amber-500">3</p>
+          <p class="text-xs text-amber-600 mt-1">Needs attention</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bento Grid Row 2 -->
+    <div class="grid grid-cols-7 gap-4 mb-4">
+      <!-- Chart — spans 4 cols -->
+      <div class="col-span-4 card p-5">
+        <div class="flex items-center justify-between mb-4">
+          <p class="text-xs font-semibold text-zinc-700">Weekly Revenue</p>
+          <div class="flex gap-1 bg-zinc-100 rounded-lg p-0.5">
+            <span class="px-2.5 py-1 text-[10px] rounded-md font-medium bg-white text-zinc-800 shadow-sm">Week</span>
+            <span class="px-2.5 py-1 text-[10px] rounded-md font-medium text-zinc-400">Month</span>
+          </div>
+        </div>
+        <div class="h-40">
+          <svg class="w-full h-full" viewBox="0 0 400 150">
+            <defs>
+              <linearGradient id="area3" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.15"/>
+                <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,120 L25,100 L55,85 L85,95 L115,60 L145,72 L175,42 L205,52 L235,30 L265,38 L295,58 L325,48 L355,62 L385,50 L400,50 L400,150 L0,150 Z" fill="url(#area3)"/>
+            <polyline points="0,120 25,100 55,85 85,95 115,60 145,72 175,42 205,52 235,30 265,38 295,58 325,48 355,62 385,50" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="235" cy="30" r="3.5" fill="#8b5cf6" stroke="white" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="flex justify-between px-1 text-[10px] text-zinc-400">
+          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+        </div>
+      </div>
+      <!-- Top Products — spans 3 cols -->
+      <div class="col-span-3 card p-5">
+        <p class="text-xs font-semibold text-zinc-700 mb-4">Top Products</p>
+        <div class="space-y-3">
+          <div>
+            <div class="flex justify-between text-xs mb-1"><span class="text-zinc-700">Power Bank</span><span class="text-zinc-400 font-mono text-[10px]">100%</span></div>
+            <div class="progress h-1.5"><div class="progress-bar bg-gradient-to-r from-violet-400 to-violet-500" style="width:100%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1"><span class="text-zinc-700">HDMI Cable</span><span class="text-zinc-400 font-mono text-[10px]">72%</span></div>
+            <div class="progress h-1.5"><div class="progress-bar bg-gradient-to-r from-violet-300 to-violet-400" style="width:72%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1"><span class="text-zinc-700">Bluetooth Speaker</span><span class="text-zinc-400 font-mono text-[10px]">58%</span></div>
+            <div class="progress h-1.5"><div class="progress-bar bg-gradient-to-r from-violet-200 to-violet-300" style="width:58%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1"><span class="text-zinc-700">Webcam HD</span><span class="text-zinc-400 font-mono text-[10px]">35%</span></div>
+            <div class="progress h-1.5"><div class="progress-bar bg-violet-200" style="width:35%"></div></div>
+          </div>
+          <div class="flex gap-1 pt-1">
+            <span class="text-[10px] bg-violet-50 text-violet-600 px-2 py-0.5 rounded-full">+12%</span>
+            <span class="text-[10px] bg-violet-50 text-violet-600 px-2 py-0.5 rounded-full">+8%</span>
+            <span class="text-[10px] bg-violet-50 text-violet-600 px-2 py-0.5 rounded-full">+5%</span>
+            <span class="text-[10px] bg-zinc-100 text-zinc-400 px-2 py-0.5 rounded-full">+3%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bento Grid Row 3 -->
+    <div class="grid grid-cols-7 gap-4">
+      <!-- Slow Moving Stock — spans 3 cols -->
+      <div class="col-span-3 card p-5">
+        <p class="text-xs font-semibold text-zinc-700 mb-4">Slow Moving Stock</p>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between py-2 border-b border-zinc-100">
+            <div><p class="text-xs text-zinc-700">Wireless Earbuds</p><p class="text-[10px] text-zinc-400">SKU: WB-001</p></div>
+            <span class="text-[11px] bg-red-50 text-red-500 px-2 py-0.5 rounded-full font-medium">45 days</span>
+          </div>
+          <div class="flex items-center justify-between py-2 border-b border-zinc-100">
+            <div><p class="text-xs text-zinc-700">Charger Brick</p><p class="text-[10px] text-zinc-400">SKU: CB-003</p></div>
+            <span class="text-[11px] bg-amber-50 text-amber-500 px-2 py-0.5 rounded-full font-medium">30 days</span>
+          </div>
+          <div class="flex items-center justify-between py-2 border-b border-zinc-100">
+            <div><p class="text-xs text-zinc-700">USB Cable 2m</p><p class="text-[10px] text-zinc-400">SKU: UC-012</p></div>
+            <span class="text-[11px] bg-amber-50 text-amber-500 px-2 py-0.5 rounded-full font-medium">22 days</span>
+          </div>
+          <div class="flex items-center justify-between py-2">
+            <div><p class="text-xs text-zinc-700">Mouse Pad Large</p><p class="text-[10px] text-zinc-400">SKU: MP-007</p></div>
+            <span class="text-[11px] bg-green-50 text-green-500 px-2 py-0.5 rounded-full font-medium">8 days</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Website Analytics — spans 4 cols -->
+      <div class="col-span-4 card p-5">
+        <p class="text-xs font-semibold text-zinc-700 mb-1">Website Analytics</p>
+        <div class="flex items-baseline gap-1 mb-4">
+          <span class="text-2xl font-bold text-zinc-900">14.2K</span>
+          <span class="text-xs text-zinc-400">total views</span>
+          <span class="text-xs text-zinc-300 mx-1">·</span>
+          <span class="text-xs text-zinc-500">342 today</span>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="bg-zinc-50 rounded-xl p-3">
+            <p class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wide mb-2">Top Pages</p>
+            <div class="space-y-2">
+              <div><div class="flex justify-between text-[11px] mb-0.5"><span class="text-zinc-700">/pricing</span><span class="text-zinc-400">45%</span></div><div class="progress h-1"><div class="progress-bar bg-violet-500" style="width:45%"></div></div></div>
+              <div><div class="flex justify-between text-[11px] mb-0.5"><span class="text-zinc-700">/products</span><span class="text-zinc-400">32%</span></div><div class="progress h-1"><div class="progress-bar bg-violet-400" style="width:32%"></div></div></div>
+              <div><div class="flex justify-between text-[11px] mb-0.5"><span class="text-zinc-700">/contact</span><span class="text-zinc-400">20%</span></div><div class="progress h-1"><div class="progress-bar bg-violet-300" style="width:20%"></div></div></div>
+            </div>
+          </div>
+          <div class="bg-zinc-50 rounded-xl p-3">
+            <p class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wide mb-2">Traffic</p>
+            <div class="space-y-2">
+              <div><div class="flex justify-between text-[11px] mb-0.5"><span class="text-zinc-700">Instagram</span><span class="text-zinc-400">52%</span></div><div class="progress h-1"><div class="progress-bar bg-pink-400" style="width:52%"></div></div></div>
+              <div><div class="flex justify-between text-[11px] mb-0.5"><span class="text-zinc-700">Direct</span><span class="text-zinc-400">28%</span></div><div class="progress h-1"><div class="progress-bar bg-blue-400" style="width:28%"></div></div></div>
+              <div><div class="flex justify-between text-[11px] mb-0.5"><span class="text-zinc-700">Google</span><span class="text-zinc-400">15%</span></div><div class="progress h-1"><div class="progress-bar bg-green-400" style="width:15%"></div></div></div>
+            </div>
+          </div>
+          <div class="bg-zinc-50 rounded-xl p-3">
+            <p class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wide mb-2">Viewed Products</p>
+            <div class="space-y-2">
+              <div><div class="flex justify-between text-[11px] mb-0.5"><span class="text-zinc-700">Power Bank</span><span class="text-zinc-400">100%</span></div><div class="progress h-1"><div class="progress-bar bg-emerald-400" style="width:100%"></div></div></div>
+              <div><div class="flex justify-between text-[11px] mb-0.5"><span class="text-zinc-700">HDMI Cable</span><span class="text-zinc-400">72%</span></div><div class="progress h-1"><div class="progress-bar bg-emerald-400" style="width:72%"></div></div></div>
+              <div><div class="flex justify-between text-[11px] mb-0.5"><span class="text-zinc-700">Bluetooth</span><span class="text-zinc-400">45%</span></div><div class="progress h-1"><div class="progress-bar bg-emerald-300" style="width:45%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

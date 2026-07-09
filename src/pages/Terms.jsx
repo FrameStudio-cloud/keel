@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { FiArrowLeft } from "react-icons/fi";
 import defaultTerms from "../data/terms.json";
 
@@ -14,6 +15,14 @@ export default function Terms() {
   const sections = defaultTerms.sections;
 
   return (
+    <>
+      <Helmet>
+        <title>Terms of Service — Keel</title>
+        <meta name="description" content="Terms of Service for Keel — the shop management dashboard for Kenyan small businesses." />
+        <meta property="og:title" content="Terms of Service — Keel" />
+        <meta property="og:description" content="Terms of Service for Keel — the shop management dashboard for Kenyan small businesses." />
+        <meta property="og:url" content="https://keel-nu.vercel.app/terms" />
+      </Helmet>
     <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e]">
       <div
         className="max-w-3xl mx-auto px-4 py-8"
@@ -45,5 +54,6 @@ export default function Terms() {
         <p className="text-center text-xs text-gray-400 dark:text-slate-500 mt-6">Powered by Keel</p>
       </div>
     </div>
+    </>
   );
 }
