@@ -18,7 +18,7 @@
             UpgradeCode="aa1c6a67-747d-56fd-8686-9e4d4a5b4182"
             Language="!(loc.TauriLanguage)"
             Manufacturer="framestudio"
-            Version="1.0.0">
+            Version="1.1.0">
 
         <Package Id="*"
                  Keywords="Installer"

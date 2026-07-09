@@ -33,8 +33,8 @@ ${StrLoc}
 
 !define MANUFACTURER "framestudio"
 !define PRODUCTNAME "Keel"
-!define VERSION "1.0.0"
-!define VERSIONWITHBUILD "1.0.0.0"
+!define VERSION "1.1.0"
+!define VERSIONWITHBUILD "1.1.0.0"
 !define HOMEPAGE ""
 !define INSTALLMODE "currentUser"
 !define LICENSE ""
@@ -61,7 +61,7 @@ ${StrLoc}
 !define MANUKEY "Software\${MANUFACTURER}"
 !define MANUPRODUCTKEY "${MANUKEY}\${PRODUCTNAME}"
 !define UNINSTALLERSIGNCOMMAND ""
-!define ESTIMATEDSIZE "23560"
+!define ESTIMATEDSIZE "23572"
 !define STARTMENUFOLDER ""
 
 Var PassiveMode
