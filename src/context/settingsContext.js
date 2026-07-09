@@ -15,4 +15,5 @@ export const SettingsContext = createContext({
   businessCategory: "general",
   subscriptionExpiresAt: null,
   loading: true,
+  refreshSettings: async () => {},
 });

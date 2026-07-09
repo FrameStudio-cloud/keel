@@ -25,72 +25,79 @@ export default function SettingsProvider({ children }) {
     loading: true,
   });
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const shopId = await getShopId();
-        if (!shopId) {
-          setSettings((prev) => ({ ...prev, loading: false }));
-          return;
-        }
-
-        const { data: shop } = await supabase
-          .from("shops")
-          .select("business_category, subscription_expires_at")
-          .eq("id", shopId)
-          .maybeSingle();
-
-        const { data: store } = await supabase
-          .from("store_settings")
-          .select("*")
-          .eq("shop_id", shopId)
-          .maybeSingle();
-
-        if (store) {
-          setCurrency(store.currency_symbol || "KSh");
-          const paymentMethods = store.payment_methods || ["Cash", "M-Pesa", "Bank"];
-          setPaymentConfig(paymentMethods, store.default_payment);
-
-          const theme = store.theme || "light";
-          document.documentElement.classList.toggle("dark", theme === "dark");
-
-          setSettings({
-            storeName: store.store_name || "",
-            storePhone: store.store_phone || "",
-            storeAddress: store.store_address || "",
-            currencySymbol: store.currency_symbol || "KSh",
-            lowStockThreshold: store.low_stock_threshold ?? 6,
-            defaultPayment: store.default_payment || "Cash",
-            receiptFooter: store.receipt_footer || "",
-            theme,
-            websiteUrl: store.website_url || "",
-            whatsapp: store.whatsapp || "",
-            businessHours: store.business_hours || null,
-            businessCategory: shop?.business_category || "general",
-            subscriptionExpiresAt: shop?.subscription_expires_at || null,
-            loading: false,
-          });
-        } else {
-          setSettings((prev) => ({
-            ...prev,
-            businessCategory: shop?.business_category || "general",
-            subscriptionExpiresAt: shop?.subscription_expires_at || null,
-            loading: false,
-          }));
-        }
-      } catch (err) {
-        console.error("SettingsProvider error:", err);
+  const fetchSettings = async () => {
+    try {
+      const shopId = await getShopId();
+      if (!shopId) {
         setSettings((prev) => ({ ...prev, loading: false }));
+        return;
       }
-    })();
+
+      const { data: shop } = await supabase
+        .from("shops")
+        .select("business_category, subscription_expires_at")
+        .eq("id", shopId)
+        .maybeSingle();
+
+      const { data: store } = await supabase
+        .from("store_settings")
+        .select("*")
+        .eq("shop_id", shopId)
+        .maybeSingle();
+
+      if (store) {
+        setCurrency(store.currency_symbol || "KSh");
+        const paymentMethods = store.payment_methods || ["Cash", "M-Pesa", "Bank"];
+        setPaymentConfig(paymentMethods, store.default_payment);
+
+        const theme = store.theme || "light";
+        document.documentElement.classList.toggle("dark", theme === "dark");
+
+        setSettings({
+          storeName: store.store_name || "",
+          storePhone: store.store_phone || "",
+          storeAddress: store.store_address || "",
+          currencySymbol: store.currency_symbol || "KSh",
+          lowStockThreshold: store.low_stock_threshold ?? 6,
+          defaultPayment: store.default_payment || "Cash",
+          receiptFooter: store.receipt_footer || "",
+          theme,
+          websiteUrl: store.website_url || "",
+          whatsapp: store.whatsapp || "",
+          businessHours: store.business_hours || null,
+          businessCategory: shop?.business_category || "general",
+          subscriptionExpiresAt: shop?.subscription_expires_at || null,
+          loading: false,
+        });
+      } else {
+        setSettings((prev) => ({
+          ...prev,
+          businessCategory: shop?.business_category || "general",
+          subscriptionExpiresAt: shop?.subscription_expires_at || null,
+          loading: false,
+        }));
+      }
+    } catch (err) {
+      console.error("SettingsProvider error:", err);
+      setSettings((prev) => ({ ...prev, loading: false }));
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
   }, [user]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", settings.theme === "dark");
   }, [settings.theme]);
 
+  const refreshSettings = async () => {
+    setSettings((prev) => ({ ...prev, loading: true }));
+    await fetchSettings();
+  };
+
   return (
-    <SettingsContext.Provider value={settings}>
+    <SettingsContext.Provider value={{ ...settings, refreshSettings }}>
       {children}
     </SettingsContext.Provider>
   );
