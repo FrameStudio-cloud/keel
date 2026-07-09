@@ -17,6 +17,7 @@ A **multi-tenant shop management dashboard** with website management features. B
 | **Backend / DB** | Supabase (PostgreSQL + REST API) |
 | **Linting** | ESLint 10 |
 | **Toasts** | cite-ui |
+| **SEO** | react-helmet-async |
 
 ---
 
@@ -51,7 +52,9 @@ mitho-dash/
 │   │   └── settingsContext.js
 │   ├── hooks/
 │   │   ├── useSettings.js
-│   │   └── useDebounce.js
+│   │   ├── useDebounce.js
+│   │   ├── useQueries.js       # Shared React Query hooks (low stock, announcements, etc.)
+│   │   └── useFocusTrap.js     # Modal keyboard accessibility
 │   ├── pages/
 │   │   ├── Overview.jsx        # Dashboard KPIs, charts, website analytics
 │   │   ├── Inventory.jsx       # Product CRUD, stock adjust, publish to website
@@ -70,6 +73,9 @@ mitho-dash/
 │   ├── components/
 │   │   ├── layout/             # PageLayout, Sidebar, Topbar
 │   │   ├── website/            # ListingsTab, BannersTab, BusinessTab, GalleryTab
+│   │   ├── AnnouncementBanner.jsx # Carousel of global announcements (Overview)
+│   │   ├── BarcodeScanner.jsx     # Camera-based barcode scanning
+│   │   ├── SlowMovingStock.jsx    # Slow-moving stock table
 │   │   ├── AddProductModal.jsx # Variant fields based on business category
 │   │   ├── EditProductModal.jsx
 │   │   ├── LogSaleModal.jsx
@@ -96,7 +102,7 @@ mitho-dash/
 | `/website` | Website | Listings, Banners, Business Info, Gallery |
 | `/settings` | Settings | Store details, category, currency, theme, export |
 | `/profile` | Profile | Store info display |
-| `/login` | Login | Placeholder auth page |
+| `/login` | Login | Email/password sign-in + Google OAuth |
 | `/setup` | SetupWizard | First-run onboarding |
 | `/terms` | Terms | Public Terms of Service |
 
@@ -145,10 +151,25 @@ Website product listings — name, type (product/service), category, price, imag
 | `sort_order` | `integer` | Display order |
 
 ### `store_settings`
-Extended: `website_url`, `whatsapp`, `business_hours` (jsonb — `{Monday:{open,close,closed}, ...}`)
+Extended: `website_url`, `whatsapp`, `business_hours` (jsonb — `{Monday:{open,close,closed}, ...}`), `payment_methods` (jsonb)
+
+### `announcements`
+| Column | Type | Notes |
+|---|---|---|
+| `title` / `message` | `text` | Content |
+| `variant` | `text` | info / warning / alert / sale / maintenance |
+| `priority` | `integer` | Display order |
+| `starts_at` / `expires_at` | `timestamptz` | Scheduling |
+| `bg_image_url` / `link_url` / `link_text` | `text` | Media & CTA |
+| `active` | `boolean` | On/off toggle |
+
+Global table (no `shop_id`). Dismissals tracked per shop in `announcement_dismissals`.
 
 ### Other tables
-`sales`, `payments`, `posts`, `stock_movements`, `page_views` — all with `shop_id`.
+`sales`, `payments`, `posts`, `stock_movements`, `page_views`, `announcement_dismissals` — all with `shop_id`.
+
+### Category & Attribute System
+`categories`, `category_attributes`, `product_attribute_values`, `catalogue_attribute_values` — data-driven variant fields per business category.
 
 ---
 
@@ -165,6 +186,10 @@ Extended: `website_url`, `whatsapp`, `business_hours` (jsonb — `{Monday:{open,
 - **Website Integration section** — 3 catalogue screenshots with infinite marquee loop on mobile
 - **Public pages** — Features, Use Cases, About pages with in-depth content
 - **ScrollToTop** — auto-scrolls to top on every route change
+- **SEO** — per-page title/description/OG tags via react-helmet-async, robots.txt + sitemap.xml
+- **Global announcements** — server-scheduled carousel banners (info/warning/alert/sale/maintenance) with per-shop dismissals
+- **Subscription lockout** — expired subscription blocks dashboard access with lockout screen
+- **Barcode scanning** — camera-based scanning for electronics/electricals categories
 
 ---
 

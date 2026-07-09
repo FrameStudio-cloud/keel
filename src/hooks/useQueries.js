@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
 import { useSettings } from "./useSettings";
@@ -75,5 +75,36 @@ export function useLowStockProducts() {
     refetchInterval: 30_000,
     retry: 2,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
+  });
+}
+
+export function useAnnouncements() {
+  return useQuery({
+    queryKey: ["announcements"],
+    queryFn: async () => {
+      const shopId = await getShopId();
+      const now = new Date().toISOString();
+
+      const { data: announcements } = await supabase
+        .from("announcements")
+        .select("*")
+        .eq("active", true)
+        .lte("starts_at", now)
+        .or(`expires_at.is.null,expires_at.gt.${now}`)
+        .order("priority", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      if (!announcements?.length || !shopId) return announcements || [];
+
+      const { data: dismissals } = await supabase
+        .from("announcement_dismissals")
+        .select("announcement_id")
+        .eq("shop_id", shopId);
+
+      const dismissedIds = new Set((dismissals || []).map((d) => d.announcement_id));
+      return announcements.filter((a) => !dismissedIds.has(a.id));
+    },
+    staleTime: 120_000,
   });
 }

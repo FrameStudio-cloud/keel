@@ -41,6 +41,7 @@ export default function Inventory() {
   const [publishingId, setPublishingId] = useState(null);
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
   const debouncedSearch = useDebounce(searchQuery, 300);
 
   useEffect(() => {
@@ -67,7 +68,7 @@ export default function Inventory() {
       setLoading(false);
     })();
     return () => { cancelled = true; };
-  }, [page, debouncedSearch]);
+  }, [page, debouncedSearch, refreshKey]);
 
   useEffect(() => {
     fetchCatalogue();
@@ -379,7 +380,7 @@ export default function Inventory() {
       {showModal && (
         <AddProductModal
           onClose={() => setShowModal(false)}
-          onAdded={() => { setPage(0); queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }); }}
+          onAdded={() => { setPage(0); setRefreshKey(k => k + 1); queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }); queryClient.invalidateQueries({ queryKey: ["lowStockCount"] }); queryClient.invalidateQueries({ queryKey: ["lowStockProducts"] }); }}
         />
       )}
 
@@ -387,7 +388,7 @@ export default function Inventory() {
         <EditProductModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
-          onUpdated={() => { setPage(0); queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }); }}
+          onUpdated={() => { setRefreshKey(k => k + 1); queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }); queryClient.invalidateQueries({ queryKey: ["lowStockCount"] }); queryClient.invalidateQueries({ queryKey: ["lowStockProducts"] }); }}
         />
       )}
 
@@ -395,7 +396,7 @@ export default function Inventory() {
         <StockAdjustModal
           product={adjustProduct}
           onClose={() => setAdjustProduct(null)}
-          onAdjusted={() => { setPage(0); queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }); }}
+          onAdjusted={() => { setRefreshKey(k => k + 1); queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }); queryClient.invalidateQueries({ queryKey: ["lowStockCount"] }); queryClient.invalidateQueries({ queryKey: ["lowStockProducts"] }); }}
         />
       )}
     </PageLayout>

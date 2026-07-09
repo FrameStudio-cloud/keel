@@ -28,7 +28,7 @@ npm run lint    # ESLint (flat config)
 ```
 
 Current lint: 1 error (pre-existing `react-refresh/only-export-components` on AuthContext — excluded).
-Dependencies: `@tanstack/react-query` added for caching/deduplication.
+Dependencies: `@tanstack/react-query` for caching/deduplication; `react-helmet-async` for per-page meta tags.
 **Vercel `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` must match local `.env`** — RPC functions (`get_dashboard_summary`, `get_profit_margins`) live in the Supabase project linked to local `.env`. If Vercel uses a different Supabase project, those RPCs will 404.
 
 ## Renamed
@@ -138,6 +138,8 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - `category_attributes` — id, category_id (FK), name, type (select/text/number), options (jsonb), required, sort_order
 - `product_attribute_values` — id, product_id (FK), attribute_id (FK), value, shop_id; UNIQUE(product_id, attribute_id)
 - `catalogue_attribute_values` — id, catalogue_id (FK), attribute_id (FK), value, shop_id; UNIQUE(catalogue_id, attribute_id)
+- `announcements` — id, title, message, bg_image_url, link_url, link_text, variant (info/warning/alert/sale/maintenance), priority, starts_at, expires_at, active, created_at; global table (no shop_id)
+- `announcement_dismissals` — id, announcement_id (FK), shop_id (FK), dismissed_at; UNIQUE(announcement_id, shop_id)
 
 ## Key Files
 
@@ -154,6 +156,7 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - `src/pages/Website.jsx` — tabbed website management: Listings, Banners, Business Info, Gallery
 - `src/components/website/` — ListingsTab (no mockItems), BannersTab (fixed state mutation in moveUp), BusinessTab (reads businessHours from useSettings), GalleryTab
 - `src/components/website/ChatWidgetTab.jsx` — 5 multi-tenant leak fixes (all queries shop-filtered); reads whatsapp from useSettings
+- `src/components/AnnouncementBanner.jsx` — carousel of up to 5 global announcements on Overview, auto-advances every 6s, variant-based gradients/icons (info/warning/alert/sale/maintenance), server-side dismissals via `announcement_dismissals` table, custom link text, bg image support
 
 ### Category & Attribute System
 
@@ -177,7 +180,7 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - `src/components/layout/Sidebar.jsx` — reads storeName + lowStockThreshold from useSettings; uses `useLowStockCount` hook
 - `src/components/layout/Topbar.jsx` — reads storeName from useSettings; uses `useLowStockProducts` hook
 - `src/components/SlowMovingStock.jsx` — uses `useSlowMovingStock` React Query hook
-- `src/hooks/useQueries.js` — shared React Query hooks: `useLowStockCount`, `useLowStockProducts`, `useSlowMovingStock`
+- `src/hooks/useQueries.js` — shared React Query hooks: `useLowStockCount`, `useLowStockProducts`, `useSlowMovingStock`, `useAnnouncements`
 - `src/hooks/useFocusTrap.js` — focus trap hook for modal keyboard accessibility
 - `src/App.jsx` — wrapped in `QueryClientProvider`; `HomeOrDashboard` wrapper routes `/` to Homepage or Overview based on auth; includes `ScrollToTop` component (scrolls to top on every route change)
 - `src/pages/Homepage.jsx` — landing page with 10 sections (Nav, Hero, Preview, Features, How It Works, Website Integration, Testimonials, FAQ, Contact, CTA, Footer). How It Works uses CSS keyframe flashcard stack. Website Integration uses 3 catalogue screenshots with infinite marquee loop on mobile. Footer links to Features, Use Cases, About, and Framestudio.
@@ -277,6 +280,15 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - `AboutFramestudio.jsx` — removed unused `FiGithub` import
 - `Features.jsx` — removed unused `FiMoon` import
 - `esbuild` removed from `devDependencies` — Vite 8 uses Rolldown native minifier (was `minify: "esbuild"` in vite.config.js, now uses default)
+- `robots.txt` + `sitemap.xml` added to `public/` — disallows dashboard routes, 6 marketing URLs point to `https://keel-nu.vercel.app`
+- `react-helmet-async` installed — `<HelmetProvider>` wraps `<App />` in `src/main.jsx`; `<Helmet>` with title + description + OG tags on all marketing pages (Homepage, Features, UseCases, AboutFramestudio, Terms, Login); basic `<Helmet>` titles on dashboard pages
+- LockoutScreen: added `refreshSettings()` to SettingsProvider + context; "Check Subscription Status" button calls `refreshSettings()`; `renewShop()` in framestudio-dashboard DataContext now also writes `subscription_expires_at` to `shops` table (Keel reads from `shops`, not `keel_shops`)
+- `useAnnouncements()` React Query hook — fetches active announcements within `starts_at`/`expires_at` schedule, filters out server-side dismissals per shop, 2min staleTime
+- `AnnouncementBanner.jsx` — carousel rendering up to 5 announcements (top 3 shown) with auto-advance (6s), arrow navigation, dot indicators; each announcement uses variant-based gradient + icon fallback (info/warning/alert/sale/maintenance), `bg_image_url` for custom backgrounds, `link_text` for CTA; dismiss calls server-side INSERT to `announcement_dismissals` + query invalidation
+- Migration `20260709_create_announcements.sql` — creates `announcements` table (title, message, bg_image_url, link_url, link_text, variant, priority, starts_at, expires_at, active, created_at) and `announcement_dismissals` table (announcement_id, shop_id, dismissed_at) with unique constraint
+- Inventory.jsx stale state fix: added `refreshKey` state incremented after mutations so the `useEffect` refetches the product list immediately; `onUpdated`/`onAdjusted` no longer reset page to 0 (stays on current page); all three mutation callbacks (`onAdded`/`onUpdated`/`onAdjusted`) now also invalidate `["lowStockCount"]` and `["lowStockProducts"]` so Sidebar/Topbar badges update instantly
+- Framestudio Dashboard `DataContext.jsx`: added announcements CRUD (`addAnnouncement`, `updateAnnouncement`, `deleteAnnouncement`) + `.limit(50)` safeguard
+- Framestudio Dashboard `KeelPulse.jsx`: Announcements tab with variant picker (5 colored radio cards), priority input, scheduling (start/end datetime + "Never" toggle), link text field, live preview banner, dismissal counts per announcement, active/inactive badge
 
 ### Still broken
 - `eslint-plugin-react` and `eslint-plugin-jsx-a11y` skipped — ESLint 10 peer dep conflict; existing react-hooks + react-refresh plugins sufficient

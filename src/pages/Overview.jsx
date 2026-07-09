@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import PageLayout from "../components/layout/PageLayout";
+import AnnouncementBanner from "../components/AnnouncementBanner";
 import StatCard from "../components/StatCard";
 import WeeklySalesChart from "../components/WeeklySalesChart";
 import TopProducts from "../components/TopProducts";
@@ -131,6 +132,7 @@ export default function Overview() {
         </div>
       ) : (
         <>
+          <AnnouncementBanner />
           <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-3">Sales Overview</p>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
             <StatCard label="Sales today" value={formatPrice(stats.salesToday)} change={stats.salesToday > 0 ? "From today's transactions" : "No sales yet today"} up={stats.salesToday > 0} />
