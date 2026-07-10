@@ -19,9 +19,16 @@ export default function SettingsProvider({ children }) {
     theme: "light",
     websiteUrl: "",
     whatsapp: "",
+    email: "",
+    description: "",
+    instagram: "",
+    facebook: "",
+    tiktok: "",
+    logoUrl: null,
     businessHours: null,
     businessCategory: "general",
     subscriptionExpiresAt: null,
+    scheduledDeletionAt: null,
     loading: true,
   });
 
@@ -35,7 +42,7 @@ export default function SettingsProvider({ children }) {
 
       const { data: shop } = await supabase
         .from("shops")
-        .select("business_category, subscription_expires_at")
+        .select("business_category, subscription_expires_at, scheduled_deletion_at")
         .eq("id", shopId)
         .maybeSingle();
 
@@ -64,9 +71,16 @@ export default function SettingsProvider({ children }) {
           theme,
           websiteUrl: store.website_url || "",
           whatsapp: store.whatsapp || "",
+          email: store.email || "",
+          description: store.description || "",
+          instagram: store.instagram || "",
+          facebook: store.facebook || "",
+          tiktok: store.tiktok || "",
+          logoUrl: store.logo_url || null,
           businessHours: store.business_hours || null,
           businessCategory: shop?.business_category || "general",
           subscriptionExpiresAt: shop?.subscription_expires_at || null,
+          scheduledDeletionAt: shop?.scheduled_deletion_at || null,
           loading: false,
         });
       } else {
@@ -74,6 +88,7 @@ export default function SettingsProvider({ children }) {
           ...prev,
           businessCategory: shop?.business_category || "general",
           subscriptionExpiresAt: shop?.subscription_expires_at || null,
+          scheduledDeletionAt: shop?.scheduled_deletion_at || null,
           loading: false,
         }));
       }

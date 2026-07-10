@@ -14,6 +14,7 @@ export const SettingsContext = createContext({
   businessHours: null,
   businessCategory: "general",
   subscriptionExpiresAt: null,
+  scheduledDeletionAt: null,
   loading: true,
   refreshSettings: async () => {},
 });

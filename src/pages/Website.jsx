@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
-import ListingsTab from "../components/website/ListingsTab";
 import BannersTab from "../components/website/BannersTab";
 import BusinessTab from "../components/website/BusinessTab";
 import GalleryTab from "../components/website/GalleryTab";
 import ChatWidgetTab from "../components/website/ChatWidgetTab";
 
 const TABS = [
-  { id: "listings", label: "Listings" },
   { id: "banners", label: "Banners" },
   { id: "business", label: "Business Info" },
   { id: "gallery", label: "Gallery" },
@@ -16,7 +14,7 @@ const TABS = [
 ];
 
 export default function Website() {
-  const [activeTab, setActiveTab] = useState("listings");
+  const [activeTab, setActiveTab] = useState("banners");
 
   return (
     <PageLayout title="Website">
@@ -37,7 +35,6 @@ export default function Website() {
         ))}
       </div>
 
-      {activeTab === "listings" && <ListingsTab />}
       {activeTab === "banners" && <BannersTab />}
       {activeTab === "business" && <BusinessTab />}
       {activeTab === "gallery" && <GalleryTab />}

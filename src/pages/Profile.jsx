@@ -25,6 +25,7 @@ export default function Profile() {
     currencySymbol,
     defaultPayment,
     theme,
+    logoUrl,
     loading,
   } = settings;
 
@@ -59,11 +60,15 @@ export default function Profile() {
       <Helmet><title>Store Profile — Keel</title></Helmet>
       <div className="max-w-2xl mx-auto">
         <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-6 mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mb-4">
-            <span className="text-2xl font-bold text-blue-400">
-              {(storeName || "K")[0]}
-            </span>
-          </div>
+          {logoUrl ? (
+            <img src={logoUrl} alt={storeName} className="w-16 h-16 rounded-2xl object-cover mb-4 border border-white/10" />
+          ) : (
+            <div className="w-16 h-16 rounded-2xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mb-4">
+              <span className="text-2xl font-bold text-blue-400">
+                {(storeName || "K")[0]}
+              </span>
+            </div>
+          )}
           <h2 className="text-slate-900 dark:text-white font-bold text-xl">
             {storeName}
           </h2>

@@ -98,11 +98,11 @@ export default function Inventory() {
     const shopId = await getShopId();
     const { data } = await supabase
       .from("catalogue")
-      .select("id, name")
+      .select("id, name, product_id")
       .eq("shop_id", shopId);
     if (data) {
       const map = {};
-      data.forEach((item) => { map[item.id] = item; });
+      data.forEach((item) => { if (item.product_id) map[item.product_id] = item; });
       setPublishedMap(map);
     }
   }
@@ -116,6 +116,12 @@ export default function Inventory() {
       price: product.price,
       image: product.image || null,
       available: true,
+      new_arrival: product.new_arrival || false,
+      badge: product.badge || "",
+      badge_ends_at: product.badge_ends_at || null,
+      sale_price: product.sale_price || null,
+      sale_ends_at: product.sale_ends_at || null,
+      product_id: product.id,
     }));
     setPublishingId(null);
     fetchCatalogue();
@@ -124,8 +130,8 @@ export default function Inventory() {
   async function handleUnpublish(product) {
     const shopId = await getShopId();
     const item = publishedMap[product.id];
-    if (!item) return;
     setPublishingId(product.id);
+    if (!item) { setPublishingId(null); return; }
     await supabase.from("catalogue").delete().eq("id", item.id).eq("shop_id", shopId);
     setPublishingId(null);
     fetchCatalogue();
@@ -208,6 +214,15 @@ export default function Inventory() {
                           <Badge label={status.label} color={status.color} />
                           <span className="text-xs text-slate-600 dark:text-slate-400">Stock: {p.stock}</span>
                           {p.new_arrival && <span className="text-[10px] font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-500/20 px-1.5 py-0.5 rounded">New</span>}
+                          {p.badge && (
+                            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
+                              p.badge === "New" ? "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-500/20" :
+                              p.badge === "Best Seller" ? "text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-500/20" :
+                              p.badge === "Sale" ? "text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-500/20" :
+                              p.badge === "Hot" ? "text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/20" :
+                              "text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-500/20"
+                            }`}>{p.badge}</span>
+                          )}
                           {showBarcode && p.barcode && (
                             <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">{p.barcode}</span>
                           )}
@@ -224,9 +239,16 @@ export default function Inventory() {
                       </div>
                     </div>
                     <div className="flex items-center justify-between border-t border-gray-200 dark:border-white/10 pt-3">
-                      <p className="text-blue-600 dark:text-blue-400 text-base font-bold">
-                        {formatPrice(p.price)}
-                      </p>
+                      <div>
+                        {p.sale_price != null ? (
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs text-gray-400 dark:text-slate-500 line-through">{formatPrice(p.price)}</span>
+                            <span className="text-red-600 dark:text-red-400 text-base font-bold">{formatPrice(p.sale_price)}</span>
+                          </div>
+                        ) : (
+                          <p className="text-blue-600 dark:text-blue-400 text-base font-bold">{formatPrice(p.price)}</p>
+                        )}
+                      </div>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setSelectedProduct(p)}
@@ -240,7 +262,7 @@ export default function Inventory() {
                         >
                           Stock
                         </button>
-                        {publishedMap[p.name.toLowerCase()] ? (
+                        {publishedMap[p.id] ? (
                           <button
                             onClick={() => handleUnpublish(p)}
                             disabled={publishingId === p.id}
@@ -341,7 +363,7 @@ export default function Inventory() {
                         <Badge label={status.label} color={status.color} />
                       </td>
                       <td className="px-4 py-3">
-                        {publishedMap[p.name.toLowerCase()] ? (
+                        {publishedMap[p.id] ? (
                           <button
                             onClick={() => handleUnpublish(p)}
                             disabled={publishingId === p.id}

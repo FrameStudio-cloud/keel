@@ -22,15 +22,6 @@ export default function PublicProduct() {
         .eq("id", id)
         .maybeSingle();
 
-      if (!item) {
-        const { data: product } = await supabase
-          .from("products")
-          .select("*")
-          .eq("id", id)
-          .maybeSingle();
-        item = product;
-      }
-
       if (!item) { setNotFound(true); setLoading(false); return; }
 
       setProduct(item);
@@ -125,27 +116,61 @@ export default function PublicProduct() {
           <div className="p-5">
             <div className="flex items-start justify-between mb-2">
               <div>
-                {product.new_arrival && (
-                  <span className="inline-block bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 text-xs font-semibold px-2 py-0.5 rounded-md mb-2">
-                    New Arrival
-                  </span>
-                )}
-                {product.badge && (
-                  <span className="inline-block bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 text-xs font-semibold px-2 py-0.5 rounded-md mb-2">
-                    {product.badge}
-                  </span>
-                )}
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {product.new_arrival && (
+                    <span className="inline-block bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 text-xs font-semibold px-2 py-0.5 rounded-md">
+                      New Arrival
+                    </span>
+                  )}
+                  {(() => {
+                    const badgeColors = {
+                      "New": "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400",
+                      "Best Seller": "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400",
+                      "Sale": "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400",
+                      "Hot": "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400",
+                    };
+                    if (!product.badge) return null;
+                    return (
+                      <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-md ${badgeColors[product.badge] || "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300"}`}>
+                        {product.badge}
+                      </span>
+                    );
+                  })()}
+                </div>
                 <h1 className="text-lg font-semibold text-gray-900 dark:text-white">{product.name}</h1>
                 <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5 capitalize">{product.category} · {product.type}</p>
               </div>
             </div>
 
-            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-3">
-              {formatPrice(product.price)}
-            </p>
-            {product.price_label && (
-              <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">{product.price_label}</p>
-            )}
+            <div className="mt-3">
+              {product.sale_price != null ? (
+                <div className="flex items-baseline gap-2">
+                  <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                    {formatPrice(product.sale_price)}
+                  </p>
+                  <p className="text-base text-gray-400 dark:text-slate-500 line-through">
+                    {formatPrice(product.price)}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {formatPrice(product.price)}
+                </p>
+              )}
+              {product.price_label && (
+                <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">{product.price_label}</p>
+              )}
+              {product.sale_ends_at && (
+                <p className="text-[11px] text-orange-500 dark:text-orange-400 mt-1">
+                  Sale ends {new Date(product.sale_ends_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                </p>
+              )}
+              {product.badge && product.badge_ends_at && (
+                <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-1">
+                  "{product.badge}" badge expires {new Date(product.badge_ends_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                </p>
+              )}
+            </div>
 
             {product.description && (
               <p className="text-sm text-gray-600 dark:text-slate-400 mt-4">{product.description}</p>

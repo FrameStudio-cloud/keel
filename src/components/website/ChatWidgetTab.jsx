@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { getShopId } from "../../lib/shop";
 import { useSettings } from "../../hooks/useSettings";
+import { FiCheck, FiPlus, FiTrash2, FiChevronUp, FiChevronDown, FiCopy, FiMessageCircle, FiSend, FiCheckCircle } from "react-icons/fi";
 import Pagination from "../Pagination";
 
 const MSG_PAGE_SIZE = 50;
-import { FiCheck, FiPlus, FiTrash2, FiChevronUp, FiChevronDown, FiCopy, FiMessageCircle, FiSend, FiCheckCircle } from "react-icons/fi";
 
 const POSITIONS = [
   { value: "right", label: "Bottom Right" },
@@ -44,8 +44,10 @@ export default function ChatWidgetTab() {
   }
 
   useEffect(() => {
+    let cancelled = false;
     (async () => {
       const id = await getShopId();
+      if (cancelled) return;
       if (!id) { setLoading(false); return; }
       setShopId(id);
 
@@ -76,12 +78,14 @@ export default function ChatWidgetTab() {
         .order("sort_order", { ascending: true })
         .limit(200);
 
+      if (cancelled) return;
       if (faqErr) { showToast(faqErr.message, "error"); setLoading(false); return; }
 
       if (faqData) setFaqs(faqData);
 
       setLoading(false);
     })();
+    return () => { cancelled = true; };
   }, [whatsapp]);
 
   useEffect(() => {
@@ -129,7 +133,7 @@ export default function ChatWidgetTab() {
 
   async function addFaq() {
     if (!shopId || !newFaq.question.trim() || !newFaq.answer.trim()) return;
-    const maxOrder = faqs.reduce((max, f) => Math.max(max, f.sort_order), -1);
+    const maxOrder = faqs.reduce((max, f) => Math.max(max, f.sort_order ?? -1), -1);
     const { data, error } = await supabase
       .from("chat_faqs")
       .insert({
@@ -235,7 +239,7 @@ export default function ChatWidgetTab() {
         </div>
       )}
 
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5">
+      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-medium text-slate-800 dark:text-white">Widget Settings</h3>
           <button
@@ -304,7 +308,7 @@ export default function ChatWidgetTab() {
         </button>
       </div>
 
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5">
+      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
         <h3 className="text-sm font-medium text-slate-800 dark:text-white mb-4">FAQs</h3>
 
         {faqs.map((faq, i) => (
@@ -413,7 +417,7 @@ export default function ChatWidgetTab() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5">
+      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
           <FiMessageCircle size={14} className="text-slate-400" />
           <div className="flex gap-1 bg-slate-100 dark:bg-[#1a1a2e] rounded-lg p-0.5">
@@ -526,7 +530,7 @@ export default function ChatWidgetTab() {
         )}
       </div>
 
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5">
+      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
         <h3 className="text-sm font-medium text-slate-800 dark:text-white mb-2">Integration</h3>
         <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
           Import the ChatWidget component into your React website:

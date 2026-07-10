@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiCheck } from "react-icons/fi";
 import { supabase } from "../../lib/supabase";
 import { getShopId } from "../../lib/shop";
 import { useSettings } from "../../hooks/useSettings";
+import ImageUploader from "../ImageUploader";
+import { uploadImage } from "../../lib/storage";
 
 const DAYS = [
   { key: "mon", label: "Mon" },
@@ -22,11 +24,36 @@ function hoursFromSettings(businessHours) {
   });
 }
 
+const inputClass = "w-full bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 transition-colors";
+
 export default function BusinessTab() {
-  const { businessHours } = useSettings();
-  const [hours, setHours] = useState(() => hoursFromSettings(businessHours));
+  const settings = useSettings();
+  const [form, setForm] = useState({
+    email: settings.email || "",
+    description: settings.description || "",
+    instagram: settings.instagram || "",
+    facebook: settings.facebook || "",
+    tiktok: settings.tiktok || "",
+    logo_url: settings.logoUrl || null,
+  });
+  const [logoFile, setLogoFile] = useState(null);
+  const [hours, setHours] = useState(() => hoursFromSettings(settings.businessHours));
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
+
+  useEffect(() => {
+    if (settings.loading) return;
+    setForm({
+      email: settings.email || "",
+      description: settings.description || "",
+      instagram: settings.instagram || "",
+      facebook: settings.facebook || "",
+      tiktok: settings.tiktok || "",
+      logo_url: settings.logoUrl || null,
+    });
+    setLogoFile(null);
+    setHours(hoursFromSettings(settings.businessHours));
+  }, [settings]);
 
   function showToast(msg, type = "success") {
     setToast({ msg, type });
@@ -40,20 +67,45 @@ export default function BusinessTab() {
   async function handleSave() {
     setSaving(true);
 
+    const shopId = await getShopId();
+    if (!shopId) {
+      setSaving(false);
+      showToast("Shop not found", "error");
+      return;
+    }
+
+    let logo_url = form.logo_url;
+    if (logoFile) {
+      try {
+        logo_url = await uploadImage(logoFile, shopId);
+      } catch (err) {
+        setSaving(false);
+        showToast("Failed to upload logo", "error");
+        return;
+      }
+    }
+
     const businessHours = {};
     hours.forEach((h) => {
       businessHours[h.key] = { open: h.open, close: h.close, active: h.active };
     });
 
-    const shopId = await getShopId();
     const { error } = await supabase
       .from("store_settings")
-      .update({ business_hours: businessHours })
-      .eq("shop_id", shopId);
+      .upsert({
+        email: form.email,
+        description: form.description,
+        instagram: form.instagram,
+        facebook: form.facebook,
+        tiktok: form.tiktok,
+        logo_url,
+        business_hours: businessHours,
+        shop_id: shopId,
+      }, { onConflict: "shop_id" });
 
     setSaving(false);
     if (error) return showToast("Something went wrong", "error");
-    showToast("Business hours saved!");
+    showToast("Business info saved!");
   }
 
   return (
@@ -66,10 +118,50 @@ export default function BusinessTab() {
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="space-y-6">
 
-        <div>
-          <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2 uppercase tracking-wider">Business Hours</label>
+        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5 shadow-sm">
+          <h3 className="text-sm font-medium text-gray-800 dark:text-white mb-3">Store Description</h3>
+          <textarea
+            rows={3}
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            placeholder="A short description of your store for the public website"
+            className={`${inputClass} resize-none`}
+          />
+        </div>
+
+        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5 shadow-sm">
+          <h3 className="text-sm font-medium text-gray-800 dark:text-white mb-3">Contact & Social</h3>
+          <div className="flex flex-col gap-3">
+            <div>
+              <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Email</label>
+              <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputClass} />
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Instagram</label>
+                <input type="text" value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="https://instagram.com/..." className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Facebook</label>
+                <input type="text" value={form.facebook} onChange={(e) => setForm({ ...form, facebook: e.target.value })} placeholder="https://facebook.com/..." className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">TikTok</label>
+                <input type="text" value={form.tiktok} onChange={(e) => setForm({ ...form, tiktok: e.target.value })} placeholder="https://tiktok.com/..." className={inputClass} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5 shadow-sm">
+          <h3 className="text-sm font-medium text-gray-800 dark:text-white mb-3">Store Logo</h3>
+          <ImageUploader currentImage={form.logo_url} onImageChange={(file) => setLogoFile(file)} />
+        </div>
+
+        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5 shadow-sm">
+          <h3 className="text-sm font-medium text-gray-800 dark:text-white mb-3">Business Hours</h3>
           <div className="bg-slate-50 dark:bg-[#1a1a2e] rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
             {hours.map((h, i) => (
               <div

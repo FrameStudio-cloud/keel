@@ -4,6 +4,8 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
 import { AuthContext } from "../context/AuthContext";
+import ImageUploader from "../components/ImageUploader";
+import { uploadImage } from "../lib/storage";
 
 const CATEGORIES = [
   { id: "clothing", label: "Clothing", desc: "Sizes, colors, and styles" },
@@ -27,6 +29,7 @@ export default function SetupWizard() {
     defaultPayment: "Cash",
     lowStockThreshold: 6,
   });
+  const [logoFile, setLogoFile] = useState(null);
   const [saving, setSaving] = useState(false);
 
   async function handleFinish() {
@@ -34,30 +37,33 @@ export default function SetupWizard() {
     const shopId = await getShopId();
     if (!shopId) return;
 
+    let logo_url = null;
+    if (logoFile) {
+      try {
+        logo_url = await uploadImage(logoFile, shopId);
+      } catch (err) {
+        console.error("Logo upload failed:", err);
+      }
+    }
+
     await supabase.from("shops").update({ business_category: form.category }).eq("id", shopId);
+
+    const payload = {
+      store_name: form.storeName,
+      store_phone: form.storePhone,
+      store_address: form.storeAddress,
+      currency_symbol: form.currencySymbol,
+      default_payment: form.defaultPayment,
+      low_stock_threshold: form.lowStockThreshold,
+      theme: "light",
+      logo_url,
+    };
 
     const { data: existing } = await supabase.from("store_settings").select("id").eq("shop_id", shopId).maybeSingle();
     if (existing) {
-      await supabase.from("store_settings").update({
-        store_name: form.storeName,
-        store_phone: form.storePhone,
-        store_address: form.storeAddress,
-        currency_symbol: form.currencySymbol,
-        default_payment: form.defaultPayment,
-        low_stock_threshold: form.lowStockThreshold,
-        theme: "light",
-      }).eq("shop_id", shopId);
+      await supabase.from("store_settings").update(payload).eq("shop_id", shopId);
     } else {
-      await supabase.from("store_settings").insert({
-        shop_id: shopId,
-        store_name: form.storeName,
-        store_phone: form.storePhone,
-        store_address: form.storeAddress,
-        currency_symbol: form.currencySymbol,
-        default_payment: form.defaultPayment,
-        low_stock_threshold: form.lowStockThreshold,
-        theme: "light",
-      });
+      await supabase.from("store_settings").insert({ ...payload, shop_id: shopId });
     }
 
     setSaving(false);
@@ -145,13 +151,16 @@ export default function SetupWizard() {
           )}
 
           {STEPS[step] === "store" && (
-            <input
-              type="text"
-              placeholder="e.g. Lewis Electronics"
-              value={form.storeName}
-              onChange={(e) => setForm({ ...form, storeName: e.target.value })}
-              className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500/50"
-            />
+            <>
+              <input
+                type="text"
+                placeholder="e.g. Lewis Electronics"
+                value={form.storeName}
+                onChange={(e) => setForm({ ...form, storeName: e.target.value })}
+                className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500/50"
+              />
+              <ImageUploader currentImage={null} onImageChange={(file) => setLogoFile(file)} />
+            </>
           )}
 
           {STEPS[step] === "details" && (

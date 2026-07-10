@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
 import Skeleton from "../components/Skeleton";
@@ -7,7 +7,8 @@ import { getShopId } from "../lib/shop";
 import { setCurrency } from "../lib/format";
 import { setPaymentConfig } from "../lib/paymentConfig";
 import { useSettings } from "../hooks/useSettings";
-import { FiSave, FiDownload, FiShoppingBag, FiDollarSign, FiMonitor, FiFileText, FiSun, FiMoon, FiCheck, FiClock } from "react-icons/fi";
+import { AuthContext } from "../context/AuthContext";
+import { FiSave, FiDownload, FiShoppingBag, FiDollarSign, FiMonitor, FiFileText, FiSun, FiMoon, FiCheck, FiClock, FiAlertTriangle, FiTrash2, FiX } from "react-icons/fi";
 
 const CATEGORIES = ["general", "clothing", "electronics", "electricals"];
 const DAYS = [
@@ -49,6 +50,9 @@ export default function Settings() {
     business_category: settings.businessCategory,
   });
   const [hours, setHours] = useState(() => hoursFromSettings(settings.businessHours));
+  const { logout } = useContext(AuthContext);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -164,6 +168,45 @@ export default function Settings() {
     showToast("Export downloaded!");
   }
 
+  async function handleRequestDeletion() {
+    const shopId = await getShopId();
+    if (!shopId) { showToast("Shop not found.", "error"); return; }
+
+    const deletionDate = new Date();
+    deletionDate.setDate(deletionDate.getDate() + 30);
+
+    const { error } = await supabase
+      .from("shops")
+      .update({ scheduled_deletion_at: deletionDate.toISOString() })
+      .eq("id", shopId);
+
+    if (error) {
+      showToast(error.message || "Failed to schedule deletion", "error");
+      return;
+    }
+
+    setShowDeleteModal(false);
+    setDeleteConfirmText("");
+    logout();
+  }
+
+  async function handleCancelDeletion() {
+    const shopId = await getShopId();
+    if (!shopId) { showToast("Shop not found.", "error"); return; }
+
+    const { error } = await supabase
+      .from("shops")
+      .update({ scheduled_deletion_at: null })
+      .eq("id", shopId);
+
+    if (error) {
+      showToast(error.message || "Failed to cancel deletion", "error");
+      return;
+    }
+
+    showToast("Deletion cancelled. Your shop is safe.");
+  }
+
   if (settings.loading) {
     return (
       <PageLayout title="Settings">
@@ -233,7 +276,6 @@ export default function Settings() {
             </div>
           </div>
         </div>
-
         <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5">
           <div className="flex items-center gap-2 mb-4">
             <FiShoppingBag size={14} className="text-gray-400" />
@@ -275,10 +317,6 @@ export default function Settings() {
             <div>
               <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Low Stock Threshold</label>
               <input type="number" value={form.low_stock_threshold} onChange={(e) => setForm({ ...form, low_stock_threshold: parseInt(e.target.value) || 0 })} className={inputClass} />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Website URL</label>
-              <input type="text" value={form.website_url} onChange={(e) => setForm({ ...form, website_url: e.target.value })} className={inputClass} />
             </div>
           </div>
         </div>
@@ -404,7 +442,122 @@ export default function Settings() {
           </div>
         </div>
 
+        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-red-200 dark:border-red-500/20 p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <FiAlertTriangle size={14} className="text-red-500" />
+            <h3 className="text-sm font-medium text-gray-800 dark:text-white">Delete Shop</h3>
+          </div>
+
+          {settings.scheduledDeletionAt ? (
+            <>
+              <p className="text-xs text-gray-600 dark:text-slate-400 mb-1">
+                Your shop is scheduled for permanent deletion on{" "}
+                <strong className="text-red-600 dark:text-red-400">
+                  {new Date(settings.scheduledDeletionAt).toLocaleDateString("en-US", {
+                    year: "numeric", month: "long", day: "numeric",
+                  })}
+                </strong>
+                . You can cancel this at any time before then.
+              </p>
+              <button
+                onClick={handleCancelDeletion}
+                className="mt-3 px-4 py-2 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg text-xs transition-all"
+              >
+                Cancel Deletion
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-xs text-gray-600 dark:text-slate-400 mb-1">
+                Permanently delete this shop and all its data. The deletion is delayed by 30 days
+                and can be cancelled during that period. After deletion, you can create a new shop
+                with the same email address.
+              </p>
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg text-xs transition-all flex items-center gap-2"
+              >
+                <FiTrash2 size={13} />
+                Delete Shop
+              </button>
+            </>
+          )}
+        </div>
+
       </div>
+
+      {showDeleteModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+          onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(""); }}
+        >
+          <div
+            className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/10 flex items-center justify-center flex-shrink-0">
+                  <FiAlertTriangle size={18} className="text-red-600 dark:text-red-400" />
+                </div>
+                <h3 className="text-base font-bold text-gray-900 dark:text-white">Delete this shop?</h3>
+              </div>
+              <button
+                onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(""); }}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors"
+              >
+                <FiX size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-sm text-gray-600 dark:text-slate-400">
+              <p>This will permanently delete everything associated with this shop:</p>
+              <ul className="list-disc list-inside text-xs space-y-1">
+                <li>All products, inventory, and stock history</li>
+                <li>All sales records, payments, and expenses</li>
+                <li>All catalogue listings, banners, and website settings</li>
+                <li>All posts, page views, and analytics data</li>
+                <li>All store settings and preferences</li>
+              </ul>
+              <p className="pt-1 border-t border-gray-100 dark:border-white/10">
+                <strong>This action is delayed by 30 days.</strong> You can cancel by logging in
+                and visiting Settings within that period. After deletion, you can create a new
+                shop with the same email address.
+              </p>
+            </div>
+
+            <div className="mt-4">
+              <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1.5">
+                Type <span className="font-bold text-red-600 dark:text-red-400">DELETE</span> to confirm
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder="DELETE"
+                className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400/20"
+              />
+            </div>
+
+            <div className="flex gap-2 mt-5">
+              <button
+                onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(""); }}
+                className="flex-1 py-2.5 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-slate-400 text-sm font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRequestDeletion}
+                disabled={deleteConfirmText !== "DELETE"}
+                className="flex-1 py-2.5 bg-red-600 hover:bg-red-500 disabled:bg-red-300 dark:disabled:bg-red-800 text-white text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 disabled:cursor-not-allowed"
+              >
+                <FiTrash2 size={13} />
+                Delete Shop
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </PageLayout>
   );
 }

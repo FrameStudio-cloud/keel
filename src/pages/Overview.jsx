@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiPackage } from "react-icons/fi";
 import PageLayout from "../components/layout/PageLayout";
 import AnnouncementBanner from "../components/AnnouncementBanner";
@@ -83,6 +83,10 @@ export default function Overview() {
     },
     staleTime: 30_000,
   });
+
+  useEffect(() => {
+    supabase.rpc("cleanup_expired_shops").then(() => {}).catch(() => {});
+  }, []);
 
   const chartData = buildChartData(data?.chartData, timeRange);
 

@@ -68,6 +68,12 @@ We went with `accessToken` because it was the only approach that eliminated the 
 
 Session is stored in `localStorage` under `sb-{project-ref}-auth-token` (same key GoTrueClient uses). We compute the key deterministically from `VITE_SUPABASE_URL` rather than searching with `Object.keys().find()` — the search approach failed silently when no matching key existed yet (fresh login), preventing the session from being saved and breaking `getAccessToken()` / `getShopId()`.
 
+### Signup auth_user_id mismatch (Login.jsx)
+
+When signing up, `authSignUp` returns a user ID that may differ from the user ID returned by `authLogin` — this happens when Supabase Auth has "Allow multiple accounts with the same email" enabled. Previously, Login.jsx created the `users` record with `authData.user.id` (from signup), but `getShopId()` queried by the login session's `user.id`, finding no match → returned null → all queries ran without a shop filter.
+
+**Fix:** `Login.jsx:47` calls `authLogin()` immediately after `authSignUp()`, then uses `loginData.user.id` when creating the `users` record. The subsequent `login()` call (which triggers `ensureUserRecordsInner`) finds the record immediately, and `getShopId()` queries by the correct ID.
+
 ### Duplicate shop creation prevention
 
 `ensureUserRecords()` in AuthContext first checks `users` table by `auth_user_id`. If no match, it falls back to matching by `email`. If a user record exists with the same email but different `auth_user_id`, it **updates** the `auth_user_id` to the current one and returns the existing shop — preventing duplicate shop creation when Supabase Auth assigns a different auth user ID (e.g. if "Allow multiple accounts with the same email" is enabled in Supabase Auth settings, or if the auth user was deleted and recreated).
@@ -122,7 +128,7 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 
 ## Supabase Tables
 
-- `shops` — id, name, slug, business_category, created_at
+- `shops` — id, name, slug, business_category, subscription_expires_at, scheduled_deletion_at, created_at
 - `products` — id, name, category, price, stock, variants (jsonb), barcode, cost_price, image, shop_id, created_at
 - `catalogue` — id, name, type, category, price, image, available, featured, variants (jsonb), specs, includes, shop_id, created_at
 - `banners` — id, type (hero/sale/info/alert), title, subtitle, message, image_url, link_url, active, sort_order, shop_id
@@ -149,7 +155,7 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - `src/context/settingsContext.js` — default theme `"light"`.
 - `src/lib/shop.js` — `getShopId()` singleton with promise deduplication (reads `STORAGE_KEY` via `getPersistedSession()`, queries `users` by `auth_user_id`), `withShop()` singleton
 - `src/pages/Overview.jsx` — single `supabase.rpc("get_dashboard_summary")` call for all KPIs, chart, top products; real website analytics section querying `page_views` table (gated by `hasWebsite`)
-- `src/pages/Settings.jsx` — flat scroll design, reads initial form values from useSettings; upsert uses `onConflict: "shop_id"`; export uses `Promise.allSettled()`
+- `src/pages/Settings.jsx` — flat scroll design, reads initial form values from useSettings; upsert uses `onConflict: "shop_id"`; export uses `Promise.allSettled()`; Delete Shop section with type-to-confirm modal, sets `shops.scheduled_deletion_at` to 30 days out and logs user out
 - `src/pages/Terms.jsx` — public Terms of Service page, imports from `src/data/terms.json` (static), no DB dependency
 - `src/pages/SetupWizard.jsx` — onboarding flow, saves `"light"` theme
 - `src/pages/Login.jsx` — signup defaults to `"light"` theme, uses `/keel icon.png` logo
