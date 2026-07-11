@@ -8,7 +8,7 @@ import { setCurrency } from "../lib/format";
 import { setPaymentConfig } from "../lib/paymentConfig";
 import { useSettings } from "../hooks/useSettings";
 import { AuthContext } from "../context/AuthContext";
-import { FiSave, FiDownload, FiShoppingBag, FiDollarSign, FiMonitor, FiFileText, FiSun, FiMoon, FiCheck, FiClock, FiAlertTriangle, FiTrash2, FiX } from "react-icons/fi";
+import { FiSave, FiDownload, FiShoppingBag, FiDollarSign, FiMonitor, FiFileText, FiSun, FiMoon, FiCheck, FiClock, FiAlertTriangle, FiTrash2, FiX, FiGlobe } from "react-icons/fi";
 
 const CATEGORIES = ["general", "clothing", "electronics", "electricals"];
 const DAYS = [
@@ -273,6 +273,14 @@ export default function Settings() {
             <div>
               <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Address</label>
               <input type="text" value={form.store_address} onChange={(e) => setForm({ ...form, store_address: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Website URL</label>
+              <div className="relative">
+                <FiGlobe size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input type="text" value={form.website_url} onChange={(e) => setForm({ ...form, website_url: e.target.value })} placeholder="https://your-shop.vercel.app" className={`${inputClass} pl-9`} />
+              </div>
+              <p className="text-[10px] text-gray-400 dark:text-slate-500 mt-1">Enables website analytics on Overview and Website management page</p>
             </div>
           </div>
         </div>
