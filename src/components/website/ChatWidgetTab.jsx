@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { getShopId } from "../../lib/shop";
 import { useSettings } from "../../hooks/useSettings";
-import { FiCheck, FiPlus, FiTrash2, FiChevronUp, FiChevronDown, FiCopy, FiMessageCircle, FiSend, FiCheckCircle } from "react-icons/fi";
+import { FiCheck, FiPlus, FiTrash2, FiChevronUp, FiChevronDown, FiCopy, FiMessageCircle, FiSend, FiCheckCircle, FiPhone, FiAlertCircle, FiLock } from "react-icons/fi";
 import Pagination from "../Pagination";
 
 const MSG_PAGE_SIZE = 50;
@@ -24,6 +24,9 @@ export default function ChatWidgetTab() {
     widget_color: "#3B82F6",
     position: "right",
     whatsapp_number: "",
+    pro_until: null,
+    groq_api_key: null,
+    plan_tier: "free",
   });
   const [faqs, setFaqs] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -37,6 +40,8 @@ export default function ChatWidgetTab() {
   const [newFaq, setNewFaq] = useState({ question: "", answer: "" });
   const [editingFaq, setEditingFaq] = useState(null);
   const [sendingReply, setSendingReply] = useState(null);
+  const [callbacks, setCallbacks] = useState([]);
+  const [stockAlerts, setStockAlerts] = useState([]);
 
   function showToast(msg, type = "success") {
     setToast({ msg, type });
@@ -66,6 +71,9 @@ export default function ChatWidgetTab() {
           widget_color: cfg.widget_color || "#3B82F6",
           position: cfg.position || "right",
           whatsapp_number: cfg.whatsapp_number || "",
+          pro_until: cfg.pro_until || null,
+          groq_api_key: cfg.groq_api_key || null,
+          plan_tier: cfg.plan_tier || "free",
         });
       } else if (whatsapp) {
         setConfig((prev) => ({ ...prev, whatsapp_number: whatsapp }));
@@ -82,6 +90,15 @@ export default function ChatWidgetTab() {
       if (faqErr) { showToast(faqErr.message, "error"); setLoading(false); return; }
 
       if (faqData) setFaqs(faqData);
+
+      const [cbRes, saRes] = await Promise.all([
+        supabase.from("chat_callbacks").select("*").eq("shop_id", id).order("created_at", { ascending: false }).limit(100),
+        supabase.from("chat_stock_alerts").select("*").eq("shop_id", id).order("created_at", { ascending: false }).limit(100),
+      ])
+      if (!cancelled) {
+        if (cbRes.data) setCallbacks(cbRes.data)
+        if (saRes.data) setStockAlerts(saRes.data)
+      }
 
       setLoading(false);
     })();
@@ -217,6 +234,21 @@ export default function ChatWidgetTab() {
     }
   }
 
+  async function markCallbackCalled(id) {
+    const { error } = await supabase.from("chat_callbacks").update({ status: "called" }).eq("id", id).eq("shop_id", shopId);
+    if (error) return showToast(error.message, "error");
+    setCallbacks(callbacks.map(c => c.id === id ? { ...c, status: "called" } : c));
+    showToast("Marked as called!");
+  }
+
+  async function toggleRestocked(id, current) {
+    const next = current === "restocked" ? "pending" : "restocked";
+    const { error } = await supabase.from("chat_stock_alerts").update({ status: next }).eq("id", id).eq("shop_id", shopId);
+    if (error) return showToast(error.message, "error");
+    setStockAlerts(stockAlerts.map(s => s.id === id ? { ...s, status: next } : s));
+    showToast(next === "restocked" ? "Marked as restocked!" : "Marked as pending");
+  }
+
   if (loading) {
     return (
       <div className="space-y-3">
@@ -236,6 +268,97 @@ export default function ChatWidgetTab() {
           toast.type === "error" ? "bg-red-500 text-white" : "bg-blue-600 text-white"
         }`}>
           {toast.msg}
+        </div>
+      )}
+
+      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-medium text-slate-800 dark:text-white flex items-center gap-2">
+            <FiLock size={14} className="text-slate-400" />
+            Subscription
+          </h3>
+          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize ${
+            config.plan_tier === "pro" && config.pro_until && new Date(config.pro_until) > new Date()
+              ? "bg-purple-100 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400"
+              : config.plan_tier === "beta"
+              ? "bg-cyan-100 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400"
+              : config.plan_tier === "starter"
+              ? "bg-blue-100 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400"
+              : "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400"
+          }`}>{config.plan_tier || "free"}</span>
+        </div>
+        <div className="space-y-2 text-xs">
+          <p className="text-slate-600 dark:text-slate-400">Tier: <span className="font-medium text-slate-800 dark:text-white capitalize">{config.plan_tier || "free"}</span></p>
+          <p className="text-slate-600 dark:text-slate-400">Expires: <span className={`font-medium ${config.pro_until && new Date(config.pro_until) > new Date() ? "text-slate-800 dark:text-white" : "text-slate-400"}`}>{config.pro_until ? new Date(config.pro_until).toLocaleDateString() : "—"}</span></p>
+          <p className="text-slate-600 dark:text-slate-400">Groq key: <span className={config.groq_api_key ? "text-green-600" : "text-slate-400"}>{config.groq_api_key ? "Configured" : "Using default"}</span></p>
+        </div>
+      </div>
+
+      {callbacks.length > 0 && (
+        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <FiPhone size={14} className="text-slate-400" />
+            <h3 className="text-sm font-medium text-slate-800 dark:text-white">Callback Requests</h3>
+            <span className="text-[10px] bg-amber-100 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold px-2 py-0.5 rounded-full ml-auto">{callbacks.filter(c => c.status === "pending").length} pending</span>
+          </div>
+          <div className="space-y-2">
+            {callbacks.slice(0, 20).map(cb => (
+              <div key={cb.id} className="bg-slate-50 dark:bg-[#1a1a2e] rounded-lg border border-slate-200 dark:border-white/10 p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">{cb.name}</p>
+                    <p className="text-xs text-blue-600 dark:text-blue-400">{cb.phone}</p>
+                    {cb.question && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{cb.question}</p>}
+                    <p className="text-[10px] text-slate-400 mt-1">{new Date(cb.created_at).toLocaleDateString()}</p>
+                  </div>
+                  {cb.status === "pending" && (
+                    <button
+                      onClick={() => markCallbackCalled(cb.id)}
+                      className="shrink-0 px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white text-[10px] font-semibold rounded-lg transition-all"
+                    >
+                      Mark Called
+                    </button>
+                  )}
+                  {cb.status !== "pending" && (
+                    <span className="shrink-0 text-[10px] text-slate-400 font-medium uppercase">{cb.status}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {stockAlerts.length > 0 && (
+        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <FiAlertCircle size={14} className="text-slate-400" />
+            <h3 className="text-sm font-medium text-slate-800 dark:text-white">Stock Alerts</h3>
+            <span className="text-[10px] bg-amber-100 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold px-2 py-0.5 rounded-full ml-auto">{stockAlerts.filter(s => s.status === "pending").length} pending</span>
+          </div>
+          <div className="space-y-2">
+            {stockAlerts.slice(0, 20).map(sa => (
+              <div key={sa.id} className="bg-slate-50 dark:bg-[#1a1a2e] rounded-lg border border-slate-200 dark:border-white/10 p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">{sa.product_name}</p>
+                    {sa.customer_note && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">{sa.customer_note}</p>}
+                    <p className="text-[10px] text-slate-400 mt-1">{new Date(sa.created_at).toLocaleDateString()}</p>
+                  </div>
+                  <button
+                    onClick={() => toggleRestocked(sa.id, sa.status)}
+                    className={`shrink-0 px-3 py-1.5 text-[10px] font-semibold rounded-lg transition-all ${
+                      sa.status === "restocked"
+                        ? "bg-green-100 dark:bg-green-500/10 text-green-600 dark:text-green-400"
+                        : "bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400 hover:bg-green-600 hover:text-white"
+                    }`}
+                  >
+                    {sa.status === "restocked" ? "Restocked" : "Mark Restocked"}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
