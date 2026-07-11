@@ -14,4 +14,4 @@ Disallow: /setup
 Disallow: /finance
 Disallow: /api/
 
-Sitemap: https://keel-nu.vercel.app/sitemap.xml
+Sitemap: https://keel.framestudio.co.ke/sitemap.xml
