@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { useState, useEffect } from "react";
-import { FiPackage } from "react-icons/fi";
+
 import PageLayout from "../components/layout/PageLayout";
 import AnnouncementBanner from "../components/AnnouncementBanner";
 import StatCard from "../components/StatCard";
@@ -8,7 +8,6 @@ import WeeklySalesChart from "../components/WeeklySalesChart";
 import TopProducts from "../components/TopProducts";
 import SlowMovingStock from "../components/SlowMovingStock";
 import Skeleton from "../components/Skeleton";
-import EmptyState from "../components/EmptyState";
 import { formatPrice } from "../lib/format";
 import { useSettings } from "../hooks/useSettings";
 import { useQuery } from "@tanstack/react-query";
@@ -136,14 +135,6 @@ export default function Overview() {
             <Skeleton className="h-64 rounded-xl" />
           </div>
         </div>
-      ) : stats.totalProducts === 0 ? (
-        <EmptyState
-          icon={FiPackage}
-          title="Welcome to Keel"
-          description="Your dashboard is empty because you haven't added any products yet. Start by adding your first product."
-          actionLabel="Add your first product"
-          to="/inventory"
-        />
       ) : (
         <>
           <AnnouncementBanner />

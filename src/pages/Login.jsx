@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase, authSignUp, authLogin, authResetPassword, authUpdatePassword, saveSession } from "../lib/supabase";
@@ -21,9 +21,10 @@ export default function Login() {
   const [shopName, setShopName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const signedUpRef = useRef(false);
 
   useEffect(() => {
-    if (user && !authLoading) navigate("/", { replace: true });
+    if (user && !authLoading && !signedUpRef.current) navigate("/", { replace: true });
   }, [user, authLoading, navigate]);
 
   async function handleSubmit(e) {
@@ -73,6 +74,7 @@ export default function Login() {
           });
 
           saveSession(loginData);
+          signedUpRef.current = true;
           await login(email, password);
           navigate("/setup", { replace: true });
         } else {
