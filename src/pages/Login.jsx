@@ -1,13 +1,13 @@
-import { useState, useContext, useEffect, useRef } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { supabase, authSignUp, authLogin, authResetPassword, authUpdatePassword, saveSession } from "../lib/supabase";
+import { supabase, authSignUp, authLogin, authResetPassword, authUpdatePassword } from "../lib/supabase";
 import { AuthContext } from "../context/AuthContext";
 import { FiMail, FiCheckCircle } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 
 export default function Login() {
-  const { user, loading: authLoading, login, signInWithGoogle } = useContext(AuthContext);
+  const { login, setupSignup, signInWithGoogle } = useContext(AuthContext);
   const navigate = useNavigate();
   const [mode, setMode] = useState(() => {
     const hash = window.location.hash.replace(/^#/, "");
@@ -21,11 +21,6 @@ export default function Login() {
   const [shopName, setShopName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const signedUpRef = useRef(false);
-
-  useEffect(() => {
-    if (user && !authLoading && !signedUpRef.current) navigate("/", { replace: true });
-  }, [user, authLoading, navigate]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -73,10 +68,7 @@ export default function Login() {
             email,
           });
 
-          saveSession(loginData);
-          signedUpRef.current = true;
-          await login(email, password);
-          navigate("/setup", { replace: true });
+          await setupSignup(loginData);
         } else {
           setMode("check_email");
         }

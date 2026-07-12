@@ -4,10 +4,13 @@ import PageLayout from "../components/layout/PageLayout";
 import Pagination from "../components/Pagination";
 import { getShopId } from "../lib/shop";
 import { paginateQuery } from "../lib/paginate";
+import { useDebounce } from "../hooks/useDebounce";
 
 const PAGE_SIZE = 50;
 
 export default function StockHistory() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const [movements, setMovements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -24,6 +27,8 @@ export default function StockHistory() {
         pageSize: PAGE_SIZE,
         orderBy: "created_at",
         ascending: false,
+        searchTerm: debouncedSearch || "",
+        searchColumns: ["product_name"],
       });
       if (!error) {
         setMovements(data || []);
@@ -31,10 +36,10 @@ export default function StockHistory() {
       }
       setLoading(false);
     })();
-  }, [page]);
+  }, [page, debouncedSearch]);
 
   return (
-    <PageLayout title="Stock History">
+    <PageLayout title="Stock History" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <Helmet><title>Stock History — Keel</title></Helmet>
       {loading ? (
         <div className="space-y-3">

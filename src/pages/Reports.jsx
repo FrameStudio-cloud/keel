@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
 import Skeleton from "../components/Skeleton";
@@ -8,8 +8,11 @@ import { formatPrice } from "../lib/format";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
+import { useDebounce } from "../hooks/useDebounce";
 
 export default function Reports() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const [timeRange, setTimeRange] = useState("week");
   const [profitData, setProfitData] = useState([]);
   const [pnlData, setPnlData] = useState([]);
@@ -140,10 +143,15 @@ export default function Reports() {
   }
 
   const hasData = profitData.length > 0 || pnlData.some((d) => d.revenue > 0 || d.expenses > 0);
+  const filteredProfitData = useMemo(() => {
+    if (!debouncedSearch) return profitData;
+    const q = debouncedSearch.toLowerCase();
+    return profitData.filter((p) => p.name?.toLowerCase().includes(q));
+  }, [profitData, debouncedSearch]);
 
   if (loading) {
     return (
-      <PageLayout title="Reports">
+      <PageLayout title="Reports" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
         <div className="space-y-6">
           <Skeleton className="h-10 sm:hidden rounded-xl" />
           <Skeleton className="h-64 sm:h-52 rounded-xl" />
@@ -154,13 +162,8 @@ export default function Reports() {
   }
 
   return (
-    <PageLayout title="Reports">
+    <PageLayout title="Reports" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <Helmet><title>Reports — Keel</title></Helmet>
-      {!hasData && !loading && (
-        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl text-xs text-blue-700 dark:text-blue-300">
-          No data yet. Go to <strong>Finance</strong> and click <strong>"Load demo data"</strong> to populate sample sales and expenses.
-        </div>
-      )}
       <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <p className="text-sm font-medium text-gray-800 dark:text-white">Profit Margin per Product</p>
@@ -185,10 +188,14 @@ export default function Reports() {
           <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-6">
             No sales data yet. Start logging sales to see profit margins.
           </p>
+        ) : filteredProfitData.length === 0 ? (
+          <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-6">
+            No products match your search.
+          </p>
         ) : (
           <>
             <div className="sm:hidden space-y-2">
-              {profitData.map((p) => (
+              {filteredProfitData.map((p) => (
                 <div key={p.name} className="bg-slate-50 dark:bg-[#1a1a2e] rounded-xl p-3">
                   <p className="text-sm font-semibold text-gray-800 dark:text-white mb-2">{p.name}</p>
                   <div className="grid grid-cols-2 gap-y-1.5 text-xs">
@@ -227,8 +234,8 @@ export default function Reports() {
                   </tr>
                 </thead>
                 <tbody>
-                  {profitData.map((p, i) => (
-                    <tr key={p.name} className={`border-b border-white/5 hover:bg-black/[0.03] dark:hover:bg-white/[0.05] transition-colors ${i === profitData.length - 1 ? "border-0" : ""}`}>
+                  {filteredProfitData.map((p, i) => (
+                    <tr key={p.name} className={`border-b border-white/5 hover:bg-black/[0.03] dark:hover:bg-white/[0.05] transition-colors ${i === filteredProfitData.length - 1 ? "border-0" : ""}`}>
                       <td className="px-3 py-2.5 font-medium text-gray-800 dark:text-white">{p.name}</td>
                       <td className="px-3 py-2.5 text-right text-gray-600 dark:text-slate-400">{p.qty}</td>
                       <td className="px-3 py-2.5 text-right font-medium text-gray-800 dark:text-white">{formatPrice(p.revenue)}</td>

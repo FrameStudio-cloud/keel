@@ -1,4 +1,5 @@
 import { lazy, Suspense, useContext, useEffect } from "react";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import posthog from "./lib/posthog";
 
@@ -93,6 +94,7 @@ function AppRoutes() {
   }
 
   return (
+    <ErrorBoundary>
     <Suspense fallback={<Loading />}>
       <TourGuide />
       <Routes>
@@ -116,6 +118,7 @@ function AppRoutes() {
         <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
       </Routes>
     </Suspense>
+    </ErrorBoundary>
   );
 }
 

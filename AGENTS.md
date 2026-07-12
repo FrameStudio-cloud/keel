@@ -27,7 +27,7 @@ npm run build   # Vite production build
 npm run lint    # ESLint (flat config)
 ```
 
-Current lint: 1 error (pre-existing `react-refresh/only-export-components` on AuthContext — excluded).
+Current lint: multiple pre-existing errors (Sidebar `IoRocketOutline` unused, BusinessTab `set-state-in-effect`, AuthContext `only-export-components`, SettingsProvider `set-state-in-effect`, useQueries `useQueryClient` unused, Finance `seeding`/`handleSeed`, Reports `hasData`, Homepage `FiTwitter`, Social `FiClock`). No lint errors introduced by current session code.
 Dependencies: `@tanstack/react-query` for caching/deduplication; `react-helmet-async` for per-page meta tags.
 **Vercel `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` must match local `.env`** — RPC functions (`get_dashboard_summary`, `get_profit_margins`) live in the Supabase project linked to local `.env`. If Vercel uses a different Supabase project, those RPCs will 404.
 
@@ -183,8 +183,12 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - `src/components/Bots.jsx` — WhatsApp + Telegram bot cards per shop
 - `src/lib/format.js` — formatPrice, setCurrency, getCurrency
 - `src/payment/paymentConfig.js` — getPaymentMethods, setPaymentConfig, getDefaultPayment
+- `src/pages/Marketing.jsx` — promotions, badges, sale prices, QR codes, print catalog; client-side search by name + category via `useDebounce` + `useMemo`; select-all scoped to filtered results
+- `src/pages/Finance.jsx` — today's revenue, payment pie chart, expense CRUD; client-side search by description + category + payment_method via `useDebounce` + `useMemo`
+- `src/pages/Reports.jsx` — profit margins per product, P&L bar chart (week/month toggle, CSV/PDF export); client-side search by product name via `useDebounce` + `useMemo`
+- `src/pages/StockHistory.jsx` — paginated stock movement log; server-side search by product name via `paginateQuery({ searchTerm, searchColumns: ["product_name"] })`; refetches on debounced input
 - `src/components/layout/Sidebar.jsx` — reads storeName + lowStockThreshold from useSettings; uses `useLowStockCount` hook
-- `src/components/layout/Topbar.jsx` — reads storeName from useSettings; uses `useLowStockProducts` hook
+- `src/components/layout/Topbar.jsx` — reads storeName from useSettings; uses `useLowStockProducts` hook; redesigned search button with pill input (`rounded-full`), inline `CiSearch` icon, animated width expand/collapse (300ms ease-in-out), `FiX` toggle icon when open, `Escape` clears + closes, placeholder "Search products, expenses..."; passes `searchQuery`/`setSearchQuery` props to pages via `PageLayout`
 - `src/components/SlowMovingStock.jsx` — uses `useSlowMovingStock` React Query hook
 - `src/hooks/useQueries.js` — shared React Query hooks: `useLowStockCount`, `useLowStockProducts`, `useSlowMovingStock`, `useAnnouncements`
 - `src/hooks/useFocusTrap.js` — focus trap hook for modal keyboard accessibility
@@ -205,8 +209,11 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 | `/features` | Features.jsx | 12 deep-dive features with shop-type badges |
 | `/use-cases` | UseCases.jsx | 8 real-world situations (Situation → Cost → How Keel Helps) |
 | `/about` | AboutFramestudio.jsx | Who Framestudio is, why Keel was built |
-| `/inventory` | Inventory.jsx | Products CRUD, stock adjust, search, Publish button |
+| `/inventory` | Inventory.jsx | Products CRUD, stock adjust, debounced search, Publish button |
 | `/sales` | Sales.jsx | Sales list, log sale, receipt modal, debounced search |
+| `/marketing` | Marketing.jsx | Promotions, badges, sale prices, QR codes, print catalog; client-side search by name + category |
+| `/finance` | Finance.jsx | Today's revenue, payment pie chart, expense CRUD; client-side search by description + category + payment_method |
+| `/reports` | Reports.jsx | Profit margins per product, P&L bar chart; client-side search by product name |
 | `/social` | Social.jsx | Post scheduler, Instagram "Connect" placeholder |
 | `/bots` | Bots.jsx | WhatsApp + Telegram bot management |
 | `/website` | Website.jsx | Listings, Banners, Business Info, Gallery tabs |
@@ -214,7 +221,7 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 | `/profile` | Profile.jsx | Store info display |
 | `/login` | Login.jsx | Auth page with email/password + Google OAuth |
 | `/setup` | SetupWizard.jsx | First-run onboarding |
-| `/stock-history` | StockHistory.jsx | Stock movement log |
+| `/stock-history` | StockHistory.jsx | Stock movement log, server-side search by product name |
 | `/terms` | Terms.jsx | Public Terms of Service (?slug= for shop scoping) |
 
 ## Barcode Scanning
@@ -295,6 +302,16 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - Inventory.jsx stale state fix: added `refreshKey` state incremented after mutations so the `useEffect` refetches the product list immediately; `onUpdated`/`onAdjusted` no longer reset page to 0 (stays on current page); all three mutation callbacks (`onAdded`/`onUpdated`/`onAdjusted`) now also invalidate `["lowStockCount"]` and `["lowStockProducts"]` so Sidebar/Topbar badges update instantly
 - Framestudio Dashboard `DataContext.jsx`: added announcements CRUD (`addAnnouncement`, `updateAnnouncement`, `deleteAnnouncement`) + `.limit(50)` safeguard
 - Framestudio Dashboard `KeelPulse.jsx`: Announcements tab with variant picker (5 colored radio cards), priority input, scheduling (start/end datetime + "Never" toggle), link text field, live preview banner, dismissal counts per announcement, active/inactive badge
+
+- RLS policies applied to all 26 public tables with `auth.uid()` → `shop_id` tenant isolation; reference tables (categories, announcements) authenticated read-only; framestudio tables (`keel_*`) blocked entirely
+- 10 compound indexes on `(shop_id, created_at DESC)` created; `set search_path='public'` on RPC functions; anon/authenticated EXECUTE revoked on cron-only functions
+- `ErrorBoundary.jsx` (class component) wraps all lazy routes in `App.jsx`
+- Vitest + testing-library + jsdom set up (18 tests passing: constants, format, shop helpers)
+- 4 stale local migration files deleted
+- `category_changed_at timestamptz` column added to `shops` for 30-day business category cooldown
+- Topbar search redesigned: pill input with inline `CiSearch` icon, animated width, `FiX` toggle, Escape-to-close; blocked from crashing on pages without search props
+- Search added to 4 pages: Marketing (name + category), Finance (description + category + method), Reports (product name), StockHistory (server-side via `paginateQuery`)
+- Added missing `/marketing`, `/finance`, `/reports` entries to Pages & Routes table
 
 ### Still broken
 - `eslint-plugin-react` and `eslint-plugin-jsx-a11y` skipped — ESLint 10 peer dep conflict; existing react-hooks + react-refresh plugins sufficient

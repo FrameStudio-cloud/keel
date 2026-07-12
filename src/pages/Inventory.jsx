@@ -109,20 +109,52 @@ export default function Inventory() {
 
   async function handlePublish(product) {
     setPublishingId(product.id);
-    await supabase.from("catalogue").insert(withShop({
-      name: product.name,
-      category: product.category,
-      type: "product",
-      price: product.price,
-      image: product.image || null,
-      available: true,
-      new_arrival: product.new_arrival || false,
-      badge: product.badge || "",
-      badge_ends_at: product.badge_ends_at || null,
-      sale_price: product.sale_price || null,
-      sale_ends_at: product.sale_ends_at || null,
-      product_id: product.id,
-    }));
+
+    const { data: attrVals } = await supabase
+      .from("product_attribute_values")
+      .select("attribute_id, value, attribute:attribute_id(name)")
+      .eq("product_id", product.id);
+
+    let variants = null;
+    if (attrVals && attrVals.length > 0) {
+      variants = {};
+      attrVals.forEach((v) => {
+        const name = v.attribute?.name || v.attribute;
+        variants[name] = v.value;
+      });
+    }
+
+    const { data: newItem } = await supabase
+      .from("catalogue")
+      .insert(withShop({
+        name: product.name,
+        category: product.category,
+        type: "product",
+        price: product.price,
+        image: product.image || null,
+        available: true,
+        new_arrival: product.new_arrival || false,
+        badge: product.badge || "",
+        badge_ends_at: product.badge_ends_at || null,
+        sale_price: product.sale_price || null,
+        sale_ends_at: product.sale_ends_at || null,
+        product_id: product.id,
+        variants,
+      }))
+      .select("id");
+
+    if (newItem && newItem.length > 0 && attrVals && attrVals.length > 0) {
+      const catalogueId = newItem[0].id;
+      const entries = attrVals.map((v) => ({
+        catalogue_id: catalogueId,
+        attribute_id: v.attribute_id,
+        value: v.value,
+      }));
+      await supabase.from("catalogue_attribute_values").insert(
+        entries.map((e) => withShop(e))
+      );
+    }
+
     setPublishingId(null);
     fetchCatalogue();
   }

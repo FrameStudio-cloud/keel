@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
 import StatCard from "../components/StatCard";
@@ -9,12 +9,15 @@ import { seedDemoData } from "../lib/seedData";
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
 } from "recharts";
-import { FiEdit2, FiTrash2, FiPlus, FiDatabase } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiPlus } from "react-icons/fi";
+import { useDebounce } from "../hooks/useDebounce";
 
 const PAYMENT_COLORS = { Cash: "#10b981", "M-Pesa": "#3b82f6", Bank: "#f59e0b" };
 const EXPENSE_CATEGORIES = ["Supplies", "Utilities", "Transport", "Marketing", "Maintenance", "Salary", "General"];
 
 export default function Finance() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const [summary, setSummary] = useState({ revenue: 0, transactions: 0, expenses: 0 });
   const [paymentData, setPaymentData] = useState([]);
   const [expenses, setExpenses] = useState([]);
@@ -145,10 +148,19 @@ export default function Finance() {
   }
 
   const net = summary.revenue - summary.expenses;
+  const filteredExpenses = useMemo(() => {
+    if (!debouncedSearch) return expenses;
+    const q = debouncedSearch.toLowerCase();
+    return expenses.filter((e) =>
+      e.description?.toLowerCase().includes(q) ||
+      e.category?.toLowerCase().includes(q) ||
+      e.payment_method?.toLowerCase().includes(q)
+    );
+  }, [expenses, debouncedSearch]);
 
   if (loading) {
     return (
-      <PageLayout title="Finance">
+      <PageLayout title="Finance" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
         <div className="space-y-3">
           {[...Array(4)].map((_, i) => <div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse" />)}
         </div>
@@ -157,23 +169,8 @@ export default function Finance() {
   }
 
   return (
-    <PageLayout title="Finance">
+    <PageLayout title="Finance" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <Helmet><title>Finance — Keel</title></Helmet>
-      {summary.revenue === 0 && summary.expenses === 0 && !loading && (
-        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl flex items-center justify-between">
-          <p className="text-xs text-blue-700 dark:text-blue-300">
-            No data yet. Load demo products, sales, and expenses to preview the page.
-          </p>
-          <button
-            onClick={handleSeed}
-            disabled={seeding}
-            className="flex items-center gap-1.5 bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50"
-          >
-            <FiDatabase size={14} />
-            {seeding ? "Loading..." : "Load demo data"}
-          </button>
-        </div>
-      )}
       {seedMsg && (
         <div className={`mb-4 p-3 border rounded-xl text-xs ${
           seedMsg.includes("already exist")
@@ -298,9 +295,11 @@ export default function Finance() {
           )}
           {expenses.length === 0 ? (
             <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-4">No expenses logged today</p>
+          ) : filteredExpenses.length === 0 ? (
+            <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-4">No matching expenses</p>
           ) : (
             <div className="space-y-1.5 mt-2">
-              {expenses.map((e) => (
+              {filteredExpenses.map((e) => (
                 <div key={e.id} className="flex items-center justify-between text-sm py-1.5 border-b border-gray-50 dark:border-white/5 last:border-0">
                   <div className="flex-1 min-w-0">
                     <p className="text-gray-800 dark:text-white truncate">{e.description}</p>

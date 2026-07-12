@@ -9,6 +9,7 @@ export const AuthContext = createContext({
   loading: true,
   needsSetup: false,
   login: async () => {},
+  setupSignup: async () => {},
   signInWithGoogle: async () => {},
   logout: async () => {},
   completeSetup: () => {},
@@ -199,6 +200,13 @@ export default function AuthProvider({ children }) {
     setUser(data.user);
   }
 
+  async function setupSignup(sessionData) {
+    saveSession(sessionData);
+    setSession(sessionData);
+    setUser(sessionData.user);
+    setNeedsSetup(true);
+  }
+
   async function signInWithGoogle() {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const redirectTo = `${window.location.origin}/login`;
@@ -223,7 +231,7 @@ export default function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, needsSetup, login, signInWithGoogle, logout, completeSetup }}>
+    <AuthContext.Provider value={{ user, session, loading, needsSetup, login, setupSignup, signInWithGoogle, logout, completeSetup }}>
       {children}
     </AuthContext.Provider>
   );

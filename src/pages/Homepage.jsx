@@ -5,10 +5,12 @@ import { useFocusTrap } from "../hooks/useFocusTrap";
 import fashionCatalogue from "../assets/catalogue/zurifashion-catalogue-shot.png";
 import wixCatalogue from "../assets/catalogue/wix-collection-shot.png";
 import electricalsCatalogue from "../assets/catalogue/mini-electricals-shots.png";
+import { FaTiktok } from "react-icons/fa6";
 import {
   FiPackage, FiTrendingUp,
   FiChevronDown, FiMail, FiPhone, FiInstagram, FiTwitter, FiGithub,
-  FiArrowRight, FiMenu, FiX, FiUserPlus, FiShield, FiCreditCard, FiMapPin
+  FiArrowRight, FiMenu, FiX, FiUserPlus, FiShield, FiCreditCard, FiMapPin,
+  FiMonitor, FiMessageSquare, FiHelpCircle, FiLayers, FiBriefcase, FiInfo, FiExternalLink
 } from "react-icons/fi";
 
 const howItWorks = [
@@ -58,9 +60,18 @@ const faqs = [
 ];
 
 const socialLinks = [
-  { icon: FiInstagram, href: "#", label: "Instagram" },
-  { icon: FiTwitter, href: "#", label: "Twitter" },
-  { icon: FiGithub, href: "#", label: "GitHub" },
+  { icon: FiInstagram, href: "https://www.instagram.com/frame.studio12?igsh=ZWdieTk4ZGI4cjll", label: "Instagram" },
+  { icon: FaTiktok, href: "https://vm.tiktok.com/ZS9MrQG9sjXfK-jv0Wd/", label: "TikTok" },
+  { icon: FiGithub, href: "https://github.com/FrameStudio-cloud", label: "GitHub" },
+];
+
+const navLinks = [
+  { href: "#features", label: "Features", icon: FiLayers },
+  { href: "#how-it-works", label: "How It Works", icon: FiTrendingUp },
+  { href: "#website-integration", label: "Website", icon: FiMonitor },
+  { href: "#testimonials", label: "Testimonials", icon: FiMessageSquare },
+  { href: "#faq", label: "FAQ", icon: FiHelpCircle },
+  { href: "#contact", label: "Contact", icon: FiMail },
 ];
 
 export default function Homepage() {
@@ -129,6 +140,10 @@ export default function Homepage() {
         <meta property="og:description" content="Track inventory, manage sales, view reports, and grow your business — all from one clean dashboard." />
         <meta property="og:url" content="https://keel-nu.vercel.app/" />
       </Helmet>
+      <style>{`
+@keyframes fade-slide-in { 0% { opacity: 0; transform: translateY(12px); } 100% { opacity: 1; transform: translateY(0); } }
+.nav-item { animation: fade-slide-in 0.3s ease-out both; }
+`}</style>
     <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] text-slate-900 dark:text-white">
       {/* NAV */}
       <nav className="sticky top-0 z-50 bg-white/80 dark:bg-[#16213e]/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10">
@@ -194,70 +209,53 @@ export default function Homepage() {
           </button>
         </div>
 
-        {/* Mobile nav dropdown */}
-        {mobileNavOpen && (
-          <>
-            <div
-              className="fixed inset-0 z-40 bg-black/40 sm:hidden"
+      </nav>
+
+      {/* Mobile nav overlay */}
+      {mobileNavOpen && (
+        <div className="fixed inset-0 z-50 sm:hidden" ref={navTrapRef}>
+          <div className="absolute inset-0 bg-black/60" onClick={() => setMobileNavOpen(false)} />
+          <div className="relative z-10 bg-white dark:bg-[#16213e] h-full w-full flex flex-col px-6 pt-16 pb-8 overflow-y-auto">
+            <button
               onClick={() => setMobileNavOpen(false)}
-            />
-            <div
-              ref={navTrapRef}
-              className="sm:hidden border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] px-4 py-3 space-y-2 text-sm shadow-xl"
+              className="absolute top-5 right-6 p-1 text-slate-600 dark:text-slate-400"
+              aria-label="Close navigation"
             >
-              <a
-                href="#features"
-                onClick={() => setMobileNavOpen(false)}
-                className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400"
-              >
-                Features
-              </a>
-              <a
-                href="#how-it-works"
-                onClick={() => setMobileNavOpen(false)}
-                className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400"
-              >
-                How It Works
-              </a>
-              <a
-                href="#website-integration"
-                onClick={() => setMobileNavOpen(false)}
-                className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400"
-              >
-                Website
-              </a>
-              <a
-                href="#testimonials"
-                onClick={() => setMobileNavOpen(false)}
-                className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400"
-              >
-                Testimonials
-              </a>
-              <a
-                href="#faq"
-                onClick={() => setMobileNavOpen(false)}
-                className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400"
-              >
-                FAQ
-              </a>
-              <a
-                href="#contact"
-                onClick={() => setMobileNavOpen(false)}
-                className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400"
-              >
-                Contact
-              </a>
-              <Link
-                to="/login"
-                onClick={() => setMobileNavOpen(false)}
-                className="block text-blue-600 dark:text-blue-400 font-semibold"
-              >
-                Sign In
+              <FiX size={22} />
+            </button>
+            <div className="mb-10">
+              <Link to="/" className="inline-flex items-center gap-2 font-bold text-sm">
+                <img src="/keel icon.png" alt="Keel" className="w-7 h-7" />
+                Keel
               </Link>
             </div>
-          </>
-        )}
-      </nav>
+            <div className="flex-1 space-y-1">
+              {navLinks.map((link, i) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileNavOpen(false)}
+                  className="nav-item flex items-center gap-3.5 px-4 py-3.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-sm font-medium text-slate-700 dark:text-slate-300"
+                  style={{ animationDelay: `${i * 0.07}s` }}
+                >
+                  <link.icon className="text-blue-600 shrink-0" size={18} />
+                  {link.label}
+                </a>
+              ))}
+            </div>
+            <Link
+              to="/login"
+              onClick={() => setMobileNavOpen(false)}
+              className="block w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-xl text-center transition-all"
+            >
+              Sign In
+            </Link>
+            <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-4">
+              Keel by Framestudio
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* HERO */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-16 sm:pt-28 sm:pb-28">
@@ -792,34 +790,35 @@ export default function Homepage() {
               <img src="/keel icon.png" alt="Keel" className="w-5 h-5" />
               &copy; {new Date().getFullYear()} Keel. All rights reserved.
             </div>
-            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-500">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-500">
               <Link
                 to="/features"
-                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className="inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
+                <FiLayers size={12} />
                 Features
               </Link>
-              <span>&middot;</span>
               <Link
                 to="/use-cases"
-                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className="inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
+                <FiBriefcase size={12} />
                 Use Cases
               </Link>
-              <span>&middot;</span>
               <Link
                 to="/about"
-                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className="inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
+                <FiInfo size={12} />
                 About
               </Link>
-              <span>&middot;</span>
               <a
                 href="https://framestudio.co.ke"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className="inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
+                <FiExternalLink size={12} />
                 Made by Framestudio
               </a>
             </div>

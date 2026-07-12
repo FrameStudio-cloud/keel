@@ -27,6 +27,7 @@ export default function SettingsProvider({ children }) {
     logoUrl: null,
     businessHours: null,
     businessCategory: "general",
+    categoryChangedAt: null,
     subscriptionExpiresAt: null,
     scheduledDeletionAt: null,
     loading: true,
@@ -42,7 +43,7 @@ export default function SettingsProvider({ children }) {
 
       const { data: shop } = await supabase
         .from("shops")
-        .select("business_category, subscription_expires_at, scheduled_deletion_at")
+        .select("business_category, subscription_expires_at, scheduled_deletion_at, category_changed_at")
         .eq("id", shopId)
         .maybeSingle();
 
@@ -79,6 +80,7 @@ export default function SettingsProvider({ children }) {
           logoUrl: store.logo_url || null,
           businessHours: store.business_hours || null,
           businessCategory: shop?.business_category || "general",
+          categoryChangedAt: shop?.category_changed_at || null,
           subscriptionExpiresAt: shop?.subscription_expires_at || null,
           scheduledDeletionAt: shop?.scheduled_deletion_at || null,
           loading: false,
@@ -87,6 +89,7 @@ export default function SettingsProvider({ children }) {
         setSettings((prev) => ({
           ...prev,
           businessCategory: shop?.business_category || "general",
+          categoryChangedAt: shop?.category_changed_at || null,
           subscriptionExpiresAt: shop?.subscription_expires_at || null,
           scheduledDeletionAt: shop?.scheduled_deletion_at || null,
           loading: false,

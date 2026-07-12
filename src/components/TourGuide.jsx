@@ -303,7 +303,7 @@ export default function TourGuide() {
     const shopId = await getShopId();
     if (!shopId) return;
 
-    await supabase.from("shops").update({ business_category: form.businessCategory }).eq("id", shopId);
+    await supabase.from("shops").update({ business_category: form.businessCategory, category_changed_at: new Date().toISOString() }).eq("id", shopId);
 
     await supabase.from("store_settings").upsert({
       store_name: form.storeName,

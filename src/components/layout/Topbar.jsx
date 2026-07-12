@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useContext } from "react";
 import { CiBellOn, CiSearch, CiMenuBurger } from "react-icons/ci";
+import { FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { CRITICAL_STOCK_THRESHOLD } from "../../lib/constants";
 import { AuthContext } from "../../context/AuthContext";
@@ -58,26 +59,35 @@ export default function Topbar({ title, searchQuery, setSearchQuery, onToggleSid
         <h1 className="text-sm font-medium text-gray-800 dark:text-white">{title}</h1>
       </div>
 
-      <div className="flex items-center gap-2">
-        {isSearchOpen && (
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search..."
-            autoFocus
-            className="text-sm border border-gray-200 dark:border-white/10 rounded-lg px-3 py-1.5 w-28 focus:outline-none focus:border-blue-400 dark:focus:border-blue-300 bg-slate-100 dark:bg-[#1a1a2e] text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
-          />
+      <div className="flex items-center gap-1">
+        {setSearchQuery && (
+          <>
+            <div className={`overflow-hidden transition-all duration-200 ease-in-out ${isSearchOpen ? "w-52 opacity-100" : "w-0 opacity-0"}`}>
+              {isSearchOpen && (
+                <div className="relative">
+                  <CiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 pointer-events-none" size={16} />
+                  <input
+                    type="text"
+                    value={searchQuery || ""}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search products, expenses..."
+                    autoFocus
+                    onKeyDown={(e) => { if (e.key === "Escape") { setSearchQuery(""); setIsSearchOpen(false); } }}
+                    className="w-full pl-9 pr-3 py-1.5 text-sm bg-slate-100 dark:bg-[#1a1a2e] border border-gray-200 dark:border-white/10 rounded-full focus:outline-none focus:border-blue-400 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 transition-all"
+                  />
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => { setIsSearchOpen((v) => !v); if (isSearchOpen) setSearchQuery(""); }}
+              aria-label={isSearchOpen ? "Close search" : "Open search"}
+              aria-expanded={isSearchOpen}
+              className="w-8 h-8 rounded-lg border border-gray-200 dark:border-white/10 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-400 transition-all flex-shrink-0"
+            >
+              {isSearchOpen ? <FiX size={18} /> : <CiSearch />}
+            </button>
+          </>
         )}
-
-        <button
-          onClick={() => setIsSearchOpen(!isSearchOpen)}
-          aria-label={isSearchOpen ? "Close search" : "Open search"}
-          aria-expanded={isSearchOpen}
-          className="w-8 h-8 rounded-lg border border-gray-200 dark:border-white/10 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-400 transition-all"
-        >
-          <CiSearch />
-        </button>
 
         <div className="relative" ref={notifRef}>
           <button

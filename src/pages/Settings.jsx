@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
 import Skeleton from "../components/Skeleton";
@@ -8,7 +8,7 @@ import { setCurrency } from "../lib/format";
 import { setPaymentConfig } from "../lib/paymentConfig";
 import { useSettings } from "../hooks/useSettings";
 import { AuthContext } from "../context/AuthContext";
-import { FiSave, FiDownload, FiShoppingBag, FiDollarSign, FiMonitor, FiFileText, FiSun, FiMoon, FiCheck, FiClock, FiAlertTriangle, FiTrash2, FiX, FiGlobe } from "react-icons/fi";
+import { FiSave, FiDownload, FiShoppingBag, FiDollarSign, FiMonitor, FiFileText, FiSun, FiMoon, FiCheck, FiClock, FiAlertTriangle, FiTrash2, FiX, FiGlobe, FiLock } from "react-icons/fi";
 
 const CATEGORIES = ["general", "clothing", "electronics", "electricals"];
 const DAYS = [
@@ -118,9 +118,14 @@ export default function Settings() {
       shop_id: shopId,
     };
 
+    const categoryChanged = form.business_category !== settings.businessCategory;
+    const shopUpdate = categoryChanged
+      ? { business_category: form.business_category, category_changed_at: new Date().toISOString() }
+      : { business_category: form.business_category };
+
     const [storeResult, shopResult] = await Promise.all([
       supabase.from("store_settings").upsert(payload, { onConflict: "shop_id" }).select().single(),
-      supabase.from("shops").update({ business_category: form.business_category }).eq("id", shopId),
+      supabase.from("shops").update(shopUpdate).eq("id", shopId),
     ]);
 
     setSaving(false);
@@ -132,6 +137,8 @@ export default function Settings() {
     }
     if (shopResult.error) {
       console.error("Category update error:", shopResult.error);
+      showToast(shopResult.error.message || "Failed to update category", "error");
+      return;
     }
 
     setCurrency(form.currency_symbol);
@@ -207,6 +214,20 @@ export default function Settings() {
     showToast("Deletion cancelled. Your shop is safe.");
   }
 
+  const [now] = useState(() => Date.now());
+  const categoryLocked = useMemo(() => {
+    if (!settings.categoryChangedAt) return false;
+    const diff = now - new Date(settings.categoryChangedAt).getTime();
+    const daysSince = Math.floor(diff / 86400000);
+    return daysSince < 30;
+  }, [settings.categoryChangedAt, now]);
+
+  const categoryRemainingDays = useMemo(() => {
+    if (!settings.categoryChangedAt) return 0;
+    const diff = now - new Date(settings.categoryChangedAt).getTime();
+    return Math.max(0, 30 - Math.floor(diff / 86400000));
+  }, [settings.categoryChangedAt, now]);
+
   if (settings.loading) {
     return (
       <PageLayout title="Settings">
@@ -228,7 +249,9 @@ export default function Settings() {
 
   const catClass = (cat) =>
     `flex-1 py-2 rounded-lg text-xs font-semibold border transition-all ${
-      form.business_category === cat
+      categoryLocked && form.business_category !== cat
+        ? "opacity-40 cursor-not-allowed bg-white dark:bg-[#1a1a2e] text-gray-500 dark:text-slate-400 border-gray-200 dark:border-white/10"
+        : form.business_category === cat
         ? "bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/25"
         : "bg-white dark:bg-[#1a1a2e] text-gray-500 dark:text-slate-400 border-gray-200 dark:border-white/10 hover:text-gray-800 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/20"
     }`;
@@ -294,13 +317,22 @@ export default function Settings() {
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setForm({ ...form, business_category: cat })}
+                onClick={() => {
+                  if (categoryLocked && form.business_category !== cat) return;
+                  setForm({ ...form, business_category: cat });
+                }}
                 className={catClass(cat)}
               >
                 {cat.charAt(0).toUpperCase() + cat.slice(1)}
               </button>
             ))}
           </div>
+          {categoryLocked && (
+            <div className="mt-3 flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-lg px-3 py-2">
+              <FiLock size={12} className="shrink-0" />
+              <span>You can change your business category again in <strong>{categoryRemainingDays}</strong> {categoryRemainingDays === 1 ? "day" : "days"}.</span>
+            </div>
+          )}
         </div>
 
         <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5">

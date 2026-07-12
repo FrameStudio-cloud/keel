@@ -7,6 +7,7 @@ import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { formatPrice } from "../lib/format";
 import { useSettings } from "../hooks/useSettings";
+import { useDebounce } from "../hooks/useDebounce";
 import QRCode from "qrcode";
 import {
   FiLink, FiCopy, FiShare2, FiSmartphone, FiFileText, FiGrid, FiStar, FiDownload, FiCheck,
@@ -33,6 +34,8 @@ const BADGE_COLORS = {
 
 export default function Marketing() {
   const { whatsapp, websiteUrl } = useSettings();
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const [products, setProducts] = useState([]);
   const [selectedId, setSelectedId] = useState("");
   const [generatedLink, setGeneratedLink] = useState("");
@@ -62,6 +65,14 @@ export default function Marketing() {
 
   const publishedIds = useMemo(() => new Set(Object.keys(catalogueMap)), [catalogueMap]);
   const selectedProduct = products.find((c) => c.id === selectedId);
+  const filteredProducts = useMemo(() => {
+    if (!debouncedSearch) return products;
+    const q = debouncedSearch.toLowerCase();
+    return products.filter((p) =>
+      p.name?.toLowerCase().includes(q) ||
+      p.category?.toLowerCase().includes(q)
+    );
+  }, [products, debouncedSearch]);
 
   useEffect(() => {
     (async () => {
@@ -176,9 +187,9 @@ export default function Marketing() {
         @media print { body { padding: 20px; } }
       </style></head><body>
       <h1>Product Catalog</h1>
-      <p class="sub">${products.length} product(s)</p>
+      <p class="sub">${filteredProducts.length} product(s)</p>
       <table><thead><tr><th>Product</th><th>Category</th><th>Badge</th><th>Price</th></tr></thead><tbody>
-      ${products.map((p) => {
+      ${filteredProducts.map((p) => {
         const badgeHtml = p.badge
           ? `<span class="badge badge-${p.badge === "New" ? "new" : p.badge === "Sale" ? "sale" : p.badge === "Best Seller" ? "best" : p.badge === "Hot" ? "hot" : "other"}">${htmlEscape(p.badge)}</span>`
           : "";
@@ -278,10 +289,10 @@ export default function Marketing() {
   }
 
   function toggleSelectAll() {
-    if (bulkSelection.size === products.length) {
+    if (bulkSelection.size === filteredProducts.length) {
       setBulkSelection(new Set());
     } else {
-      setBulkSelection(new Set(products.map((p) => p.id)));
+      setBulkSelection(new Set(filteredProducts.map((p) => p.id)));
     }
   }
 
@@ -330,7 +341,7 @@ export default function Marketing() {
   if (loading) {
     return (
       <>
-      <PageLayout title="Marketing">
+      <PageLayout title="Marketing" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
         <div className="space-y-3">{[...Array(5)].map((_, i) => <div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse" />)}</div>
       </PageLayout>
       </>
@@ -346,7 +357,7 @@ export default function Marketing() {
         <meta property="og:description" content="Promotions, product links, QR codes, and marketing tools." />
         <meta property="og:url" content="https://keel-nu.vercel.app/marketing" />
       </Helmet>
-    <PageLayout title="Marketing">
+    <PageLayout title="Marketing" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <p className="text-xs text-gray-400 dark:text-slate-500 mb-5">Manage promotions, badges, sale prices, share links, QR codes, and more.</p>
       {products.length === 0 ? (
         <EmptyState
@@ -356,6 +367,10 @@ export default function Marketing() {
           actionLabel="Go to Inventory"
           to="/inventory"
         />
+      ) : filteredProducts.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-sm text-gray-400 dark:text-slate-500">No products match your search.</p>
+        </div>
       ) : (
       <>
 
@@ -463,7 +478,7 @@ export default function Marketing() {
                   <th className="px-2 py-2 w-8">
                     <input
                       type="checkbox"
-                      checked={bulkSelection.size === products.length && products.length > 0}
+                      checked={bulkSelection.size === filteredProducts.length && filteredProducts.length > 0}
                       onChange={toggleSelectAll}
                       className="rounded border-gray-300 dark:border-white/20 text-blue-600 focus:ring-blue-500"
                     />
@@ -478,10 +493,10 @@ export default function Marketing() {
                 </tr>
               </thead>
               <tbody>
-                {products.map((item, i) => {
+                {filteredProducts.map((item, i) => {
                   const isSaving = savingId === item.id;
                   return (
-                    <tr key={item.id} className={`border-b border-white/5 hover:bg-black/[0.03] dark:hover:bg-white/[0.05] transition-colors ${i === products.length - 1 ? "border-0" : ""}`}>
+                    <tr key={item.id} className={`border-b border-white/5 hover:bg-black/[0.03] dark:hover:bg-white/[0.05] transition-colors ${i === filteredProducts.length - 1 ? "border-0" : ""}`}>
                       <td className="px-2 py-2.5">
                         <input
                           type="checkbox"
@@ -720,11 +735,11 @@ export default function Marketing() {
               <h3 className="text-sm font-medium text-gray-800 dark:text-white">Print Catalog</h3>
             </div>
             <p className="text-xs text-gray-400 dark:text-slate-500 mb-3">
-              {products.length} product(s){products.length === 100 ? " (showing first 100)" : ""}. Includes badges and sale prices.
+              {filteredProducts.length} product(s){products.length === 100 ? " (showing first 100)" : ""}. Includes badges and sale prices.
             </p>
             <button
               onClick={printCatalog}
-              disabled={products.length === 0}
+              disabled={filteredProducts.length === 0}
               className="flex items-center gap-2 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50"
             >
               <FiFileText size={16} /> Generate & Print
