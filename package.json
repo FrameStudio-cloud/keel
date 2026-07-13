@@ -21,6 +21,7 @@
     "@tanstack/react-query": "^5.101.0",
     "@tauri-apps/plugin-process": "^2.3.1",
     "@tauri-apps/plugin-updater": "^2.10.1",
+    "@vercel/analytics": "^2.0.1",
     "html5-qrcode": "^2.3.8",
     "posthog-js": "^1.396.5",
     "qrcode": "^1.5.4",
