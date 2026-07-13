@@ -2,6 +2,7 @@ import { lazy, Suspense, useContext, useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import posthog from "./lib/posthog";
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -136,6 +137,7 @@ export default function App() {
             <UpdateChecker />
             <WebUpdateChecker />
             <AppRoutes />
+            <SpeedInsights />
           </BrowserRouter>
         </SettingsProvider>
       </AuthProvider>
