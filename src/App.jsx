@@ -22,6 +22,7 @@ const queryClient = new QueryClient({
 import Homepage from "./pages/Homepage";
 import TourGuide from "./components/TourGuide";
 import UpdateChecker from "./components/UpdateChecker";
+import WebUpdateChecker from "./components/WebUpdateChecker";
 import SettingsProvider from "./context/SettingsProvider";
 import AuthProvider, { AuthContext } from "./context/AuthContext";
 import { useSettings } from "./hooks/useSettings";
@@ -133,6 +134,7 @@ export default function App() {
             <ScrollToTop />
             <PostHogPageView />
             <UpdateChecker />
+            <WebUpdateChecker />
             <AppRoutes />
           </BrowserRouter>
         </SettingsProvider>
