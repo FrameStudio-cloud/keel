@@ -159,7 +159,7 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - `src/pages/Terms.jsx` — public Terms of Service page, imports from `src/data/terms.json` (static), no DB dependency
 - `src/pages/SetupWizard.jsx` — onboarding flow, saves `"light"` theme
 - `src/pages/Login.jsx` — signup defaults to `"light"` theme, uses `/keel icon.png` logo
-- `src/pages/Website.jsx` — tabbed website management: Listings, Banners, Business Info, Gallery
+- `src/pages/Website.jsx` — tabbed website management: Banners, Business Info, Gallery, Chat Widget; guarded with lock screen (mesh gradient, 4 mini-preview cards) when `websiteUrl` is not configured
 - `src/components/website/` — ListingsTab (no mockItems), BannersTab (fixed state mutation in moveUp), BusinessTab (reads businessHours from useSettings), GalleryTab
 - `src/components/website/ChatWidgetTab.jsx` — 5 multi-tenant leak fixes (all queries shop-filtered); reads whatsapp from useSettings
 - `src/components/AnnouncementBanner.jsx` — carousel of up to 5 global announcements on Overview, auto-advances every 6s, variant-based gradients/icons (info/warning/alert/sale/maintenance), server-side dismissals via `announcement_dismissals` table, custom link text, bg image support
@@ -176,14 +176,14 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - Inventory displays attribute badges from `product_attribute_values`
 - Adding a new category = DB insert only, zero code changes
 - **`catalogue_attribute_values` — deferred.** Table exists in schema + seed data, but no frontend reads/writes it yet. The mini-catalogue reads from the legacy `variants` JSONB column instead. To complete: (1) copy `product_attribute_values` → `catalogue_attribute_values` on Inventory publish, (2) add dynamic attribute fields + badges to ListingsTab, (3) update mini-catalogue to read from `catalogue_attribute_values` instead of JSONB. Not critical — products sell fine without variant toggles on the public site.
-- `src/pages/Inventory.jsx` — product CRUD, stock adjust, debounced search, variant badges from `product_attribute_values`, one-tap publish to catalogue (includes shop_id filter)
+- `src/pages/Inventory.jsx` — product CRUD, stock adjust, debounced search, variant badges from `product_attribute_values`, one-tap publish to catalogue (includes shop_id filter); publish buttons disabled with banner notice when no `websiteUrl` set
 - `src/pages/Social.jsx` — replaced fake Instagram stats with "Connect" placeholder
 - `src/components/AddProductModal.jsx` — dynamic attribute fields from `category_attributes` query (not hardcoded), saves to `product_attribute_values`
 - `src/components/EditProductModal.jsx` — same dynamic fields, pre-filled from `product_attribute_values`, upserts on save
 - `src/components/Bots.jsx` — WhatsApp + Telegram bot cards per shop
 - `src/lib/format.js` — formatPrice, setCurrency, getCurrency
 - `src/payment/paymentConfig.js` — getPaymentMethods, setPaymentConfig, getDefaultPayment
-- `src/pages/Marketing.jsx` — promotions, badges, sale prices, QR codes, print catalog; client-side search by name + category via `useDebounce` + `useMemo`; select-all scoped to filtered results
+- `src/pages/Marketing.jsx` — promotions, badges, sale prices, QR codes, print catalog; client-side search by name + category via `useDebounce` + `useMemo`; select-all scoped to filtered results; website/product QR tabs disabled when no `websiteUrl` (WhatsApp QR unaffected)
 - `src/pages/Finance.jsx` — today's revenue, payment pie chart, expense CRUD; client-side search by description + category + payment_method via `useDebounce` + `useMemo`
 - `src/pages/Reports.jsx` — profit margins per product, P&L bar chart (week/month toggle, CSV/PDF export); client-side search by product name via `useDebounce` + `useMemo`
 - `src/pages/StockHistory.jsx` — paginated stock movement log; server-side search by product name via `paginateQuery({ searchTerm, searchColumns: ["product_name"] })`; refetches on debounced input
@@ -213,14 +213,14 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 | `/features` | Features.jsx | 12 deep-dive features with shop-type badges |
 | `/use-cases` | UseCases.jsx | 8 real-world situations (Situation → Cost → How Keel Helps) |
 | `/about` | AboutFramestudio.jsx | Who Framestudio is, why Keel was built |
-| `/inventory` | Inventory.jsx | Products CRUD, stock adjust, debounced search, Publish button |
+| `/inventory` | Inventory.jsx | Products CRUD, stock adjust, debounced search, Publish button (disabled when no websiteUrl) |
 | `/sales` | Sales.jsx | Sales list, log sale, receipt modal, debounced search |
-| `/marketing` | Marketing.jsx | Promotions, badges, sale prices, QR codes, print catalog; client-side search by name + category |
+| `/marketing` | Marketing.jsx | Promotions, badges, sale prices, QR codes (website/product gated by websiteUrl), print catalog; client-side search by name + category |
 | `/finance` | Finance.jsx | Today's revenue, payment pie chart, expense CRUD; client-side search by description + category + payment_method |
 | `/reports` | Reports.jsx | Profit margins per product, P&L bar chart; client-side search by product name |
 | `/social` | Social.jsx | Post scheduler, Instagram "Connect" placeholder |
 | `/bots` | Bots.jsx | WhatsApp + Telegram bot management |
-| `/website` | Website.jsx | Listings, Banners, Business Info, Gallery tabs |
+| `/website` | Website.jsx | Banners, Business Info, Gallery, Chat Widget tabs; guarded with lock screen when no websiteUrl |
 | `/settings` | Settings.jsx | Tabbed (7 tabs): store details, preferences, notifications, billing, security, data, danger zone |
 | `/profile` | Profile.jsx | Tabbed (3 tabs): About (branding + contact), Account (email + subscription), Quick Access (nav + actions) |
 | `/login` | Login.jsx | Auth page with email/password + Google OAuth |
@@ -325,6 +325,10 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - WebUpdateChecker — `/version.json` generated on every build, polls every 5 min, Chrome-style "new version available" bar
 - Custom 404 NotFound page with compass icon, replaces blank screen on unmatched routes
 - Action buttons on Inventory, Sales, and Finance changed from inline text links to pill buttons (`px-3 py-1.5`, rounded-lg, border) for larger tap targets
+- `Sales.jsx` — added `refreshKey` state so sales list refetches immediately after logging a sale (same pattern as Inventory)
+- `Website.jsx` — guard page with mesh gradient background + 4 mini-preview cards (Banner stripes, Business info, Gallery grid, Chat bubble) when `websiteUrl` is empty; tabs render only when `hasWebsite` is true
+- `Inventory.jsx` — publish buttons disabled with amber notice banner + native tooltip when no `websiteUrl` set
+- `Marketing.jsx` — QR code "Website" and "Product" tabs disabled when no `websiteUrl`; removed unsafe `window.location.origin` fallback from QR code and shareable link generator; WhatsApp QR still works independently
 
 ### Still broken
 - `eslint-plugin-react` and `eslint-plugin-jsx-a11y` skipped — ESLint 10 peer dep conflict; existing react-hooks + react-refresh plugins sufficient
