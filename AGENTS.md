@@ -136,7 +136,7 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - `payments` — id, invoice_id, provider, amount, status, shop_id, created_at
 - `posts` — id, platform, caption, status, scheduled_at, likes, comments, reach, shop_id, created_at
 - `expenses` — id, shop_id, description, amount, category, payment_method, expense_date, created_at
-- `store_settings` — store_name, store_phone, store_address, currency_symbol, low_stock_threshold, default_payment, receipt_footer, theme, website_url, whatsapp, business_hours (jsonb), shop_id, terms_of_service
+- `store_settings` — store_name, store_phone, store_address, currency_symbol, low_stock_threshold, default_payment, receipt_footer, theme, website_url, whatsapp, business_hours (jsonb), notification_preferences (jsonb), shop_id, terms_of_service
 - `stock_movements` — id, product_id, product_name, change, reason, shop_id, created_at
 - `page_views` — id, page, product_name, referrer, user_agent, shop_id, created_at
 - `users` — id, auth_user_id (UUID), shop_id, name, email, created_at
@@ -155,7 +155,7 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - `src/context/settingsContext.js` — default theme `"light"`.
 - `src/lib/shop.js` — `getShopId()` singleton with promise deduplication (reads `STORAGE_KEY` via `getPersistedSession()`, queries `users` by `auth_user_id`), `withShop()` singleton
 - `src/pages/Overview.jsx` — single `supabase.rpc("get_dashboard_summary")` call for all KPIs, chart, top products; real website analytics section querying `page_views` table (gated by `hasWebsite`)
-- `src/pages/Settings.jsx` — flat scroll design, reads initial form values from useSettings; upsert uses `onConflict: "shop_id"`; export uses `Promise.allSettled()`; Delete Shop section with type-to-confirm modal, sets `shops.scheduled_deletion_at` to 30 days out and logs user out
+- `src/pages/Settings.jsx` — tabbed 25/75 layout orchestration layer (~311 lines) with 7 tabs (Store, Preferences, Notifications, Billing, Security, Data, Danger Zone). Split into `src/components/settings/` (12 files). Reads initial form values from useSettings; upsert uses `onConflict: "shop_id"`; export uses `Promise.allSettled()`; Delete Shop with type-to-confirm modal
 - `src/pages/Terms.jsx` — public Terms of Service page, imports from `src/data/terms.json` (static), no DB dependency
 - `src/pages/SetupWizard.jsx` — onboarding flow, saves `"light"` theme
 - `src/pages/Login.jsx` — signup defaults to `"light"` theme, uses `/keel icon.png` logo
@@ -199,6 +199,10 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - `src/pages/AboutFramestudio.jsx` — public page: who Framestudio is, why Keel was built, beliefs, contact
 - `src/data/terms.json` — static Terms of Service content
 - `src/assets/catalogue/` — 3 catalogue screenshots (zurifashion-catalogue-shot.png, wix-collection-shot.png, mini-electricals-shots.png) used in Website Integration section
+- `src/pages/NotFound.jsx` — custom 404 page with `FiCompass` icon, "Page not found" message, Go Home link
+- `src/components/WebUpdateChecker.jsx` — polls `/version.json?t=...` every 5 min; shows Chrome-style bottom bar ("A new version is available [Refresh]") when a new deployment is detected. Works alongside Tauri UpdateChecker without conflict.
+- `src/components/settings/` — 12 component files: StoreTab, PreferencesTab, NotificationsTab, BillingTab, SecurityTab, DataTab, DangerZoneTab, DeleteShopModal, SectionCard, TabButton, SettingsSaveBar, settingsStyles
+- `src/components/profile/` — 4 component files: ProfileAboutTab, ProfileAccountTab, ProfileQuickAccessTab, SignOutModal
 
 ## Pages & Routes
 
@@ -217,12 +221,13 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 | `/social` | Social.jsx | Post scheduler, Instagram "Connect" placeholder |
 | `/bots` | Bots.jsx | WhatsApp + Telegram bot management |
 | `/website` | Website.jsx | Listings, Banners, Business Info, Gallery tabs |
-| `/settings` | Settings.jsx | Store details, currency, theme, data export, Terms link |
-| `/profile` | Profile.jsx | Store info display |
+| `/settings` | Settings.jsx | Tabbed (7 tabs): store details, preferences, notifications, billing, security, data, danger zone |
+| `/profile` | Profile.jsx | Tabbed (3 tabs): About (branding + contact), Account (email + subscription), Quick Access (nav + actions) |
 | `/login` | Login.jsx | Auth page with email/password + Google OAuth |
 | `/setup` | SetupWizard.jsx | First-run onboarding |
 | `/stock-history` | StockHistory.jsx | Stock movement log, server-side search by product name |
 | `/terms` | Terms.jsx | Public Terms of Service (?slug= for shop scoping) |
+| `*` (404) | NotFound.jsx | Custom 404 page with compass icon, "Page not found" message, Go Home link |
 
 ## Barcode Scanning
 - `html5-qrcode` (2.x) — camera-based barcode scanning, all client-side, no API key
@@ -245,7 +250,7 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - Removed stray `className` string rendering as raw text in ListingsTab
 - Fixed badge contrast (text-*-300 → text-*-700 for light mode)
 - Added sidebar scrollability (`overflow-y-auto` on nav)
-- Settings page reads initial form values from useSettings (2 fewer Supabase calls)
+- Settings page reads initial form values from useSettings (2 fewer Supabase calls); redesigned as tabbed 25/75 layout with 7 tabs, split into 12 component files
 - BusinessTab reads businessHours from useSettings (1 fewer Supabase call)
 - ChatWidgetTab reads whatsapp from useSettings (1 fewer Supabase call)
 - Added unique constraint `store_settings_shop_id_key` for `onConflict: "shop_id"` upsert
@@ -312,6 +317,14 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - Topbar search redesigned: pill input with inline `CiSearch` icon, animated width, `FiX` toggle, Escape-to-close; blocked from crashing on pages without search props
 - Search added to 4 pages: Marketing (name + category), Finance (description + category + method), Reports (product name), StockHistory (server-side via `paginateQuery`)
 - Added missing `/marketing`, `/finance`, `/reports` entries to Pages & Routes table
+- Settings page redesigned from flat scroll to tabbed 25/75 layout with 7 tabs, split into 12 component files
+- Profile page redesigned with same tabbed layout (3 tabs), split into 4 component files
+- Notifications tab rebuilt from placeholder to full UI with email input, 5 toggle switches, low-stock threshold, WhatsApp display
+- `notification_preferences` JSONB column added to `store_settings` (migration 20260713)
+- Low-stock threshold input moved from Preferences tab to Notifications tab
+- WebUpdateChecker — `/version.json` generated on every build, polls every 5 min, Chrome-style "new version available" bar
+- Custom 404 NotFound page with compass icon, replaces blank screen on unmatched routes
+- Action buttons on Inventory, Sales, and Finance changed from inline text links to pill buttons (`px-3 py-1.5`, rounded-lg, border) for larger tap targets
 
 ### Still broken
 - `eslint-plugin-react` and `eslint-plugin-jsx-a11y` skipped — ESLint 10 peer dep conflict; existing react-hooks + react-refresh plugins sufficient
