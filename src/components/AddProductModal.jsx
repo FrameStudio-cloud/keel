@@ -29,6 +29,7 @@ export default function AddProductModal({ onClose, onAdded }) {
   const [showScanner, setShowScanner] = useState(false);
   const [attributes, setAttributes] = useState([]);
   const [attributeValues, setAttributeValues] = useState({});
+  const [customAttrValues, setCustomAttrValues] = useState({});
 
   async function fetchAttributes() {
     const { data: cat } = await supabase
@@ -116,7 +117,7 @@ export default function AddProductModal({ onClose, onAdded }) {
       ).map(([attrId, val]) => ({
           product_id: newProduct.id,
           attribute_id: attrId,
-          value: val,
+          value: val === "__other__" ? (customAttrValues[attrId] || "") : val,
           shop_id: shopId,
         }));
       if (attrEntries.length > 0) {
@@ -261,16 +262,28 @@ export default function AddProductModal({ onClose, onAdded }) {
                       {attr.required && <span className="text-red-400 ml-0.5">*</span>}
                     </label>
                     {attr.type === "select" && attr.options ? (
-                      <select
-                        value={attributeValues[attr.id] || ""}
-                        onChange={(e) => handleAttrChange(attr.id, e.target.value)}
-                        className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
-                      >
-                        <option value="">{attr.required ? `Select ${attr.name.toLowerCase()}` : "Optional"}</option>
-                        {attr.options.map((opt) => (
-                          <option key={opt} value={opt}>{opt}</option>
-                        ))}
-                      </select>
+                      <div>
+                        <select
+                          value={attributeValues[attr.id] || ""}
+                          onChange={(e) => { handleAttrChange(attr.id, e.target.value); if (e.target.value !== "__other__") setCustomAttrValues((prev) => ({ ...prev, [attr.id]: "" })); }}
+                          className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                        >
+                          <option value="">{attr.required ? `Select ${attr.name.toLowerCase()}` : "Optional"}</option>
+                          {attr.options.map((opt) => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                          <option value="__other__">Other</option>
+                        </select>
+                        {attributeValues[attr.id] === "__other__" && (
+                          <input
+                            value={customAttrValues[attr.id] || ""}
+                            onChange={(e) => setCustomAttrValues((prev) => ({ ...prev, [attr.id]: e.target.value }))}
+                            placeholder={`Type custom ${attr.name.toLowerCase()}`}
+                            className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 mt-2"
+                            autoFocus
+                          />
+                        )}
+                      </div>
                     ) : (
                       <input
                         value={attributeValues[attr.id] || ""}
