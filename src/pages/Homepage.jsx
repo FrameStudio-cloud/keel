@@ -8,7 +8,7 @@ import electricalsCatalogue from "../assets/catalogue/mini-electricals-shots.png
 import { FaTiktok } from "react-icons/fa6";
 import {
   FiPackage, FiTrendingUp,
-  FiChevronDown, FiMail, FiPhone, FiInstagram, FiTwitter, FiGithub,
+  FiChevronDown, FiMail, FiPhone, FiInstagram, FiGithub,
   FiArrowRight, FiMenu, FiX, FiUserPlus, FiShield, FiCreditCard, FiMapPin,
   FiMonitor, FiMessageSquare, FiHelpCircle, FiLayers, FiBriefcase, FiInfo, FiExternalLink
 } from "react-icons/fi";

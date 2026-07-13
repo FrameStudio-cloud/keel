@@ -4,7 +4,7 @@ import { GoGraph } from "react-icons/go";
 import { FaBoxOpen } from "react-icons/fa";
 import { FcSalesPerformance } from "react-icons/fc";
 import { MdOutlinePhoneIphone } from "react-icons/md";
-import { IoGlobeOutline, IoRocketOutline, IoSettingsOutline, IoPersonOutline, IoTimeOutline, IoWalletOutline, IoStatsChartOutline, IoMegaphoneOutline } from "react-icons/io5";
+import { IoGlobeOutline, IoSettingsOutline, IoPersonOutline, IoTimeOutline, IoWalletOutline, IoStatsChartOutline, IoMegaphoneOutline } from "react-icons/io5";
 import { BsBuildingsFill } from "react-icons/bs";
 import { useSettings } from "../../hooks/useSettings";
 import { useLowStockCount } from "../../hooks/useQueries";

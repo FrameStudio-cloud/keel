@@ -5,7 +5,6 @@ import StatCard from "../components/StatCard";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { formatPrice } from "../lib/format";
-import { seedDemoData } from "../lib/seedData";
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
 } from "recharts";
@@ -26,9 +25,6 @@ export default function Finance() {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [seeding, setSeeding] = useState(false);
-  const [seedMsg, setSeedMsg] = useState("");
-
   useEffect(() => {
     (async () => {
       const shopId = await getShopId();
@@ -125,16 +121,6 @@ export default function Finance() {
     setRefreshKey((k) => k + 1);
   }
 
-  async function handleSeed() {
-    if (!window.confirm("This will delete ALL existing sales and expenses for today and replace them with demo data. Continue?")) return;
-    setSeeding(true);
-    setSeedMsg("");
-    const result = await seedDemoData();
-    setSeedMsg(result.ok ? "Demo data loaded!" : result.error);
-    setSeeding(false);
-    if (result.ok) setRefreshKey((k) => k + 1);
-  }
-
   function startEdit(expense) {
     setEditingExpense(expense);
     setExpenseForm({
@@ -171,17 +157,6 @@ export default function Finance() {
   return (
     <PageLayout title="Finance" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <Helmet><title>Finance — Keel</title></Helmet>
-      {seedMsg && (
-        <div className={`mb-4 p-3 border rounded-xl text-xs ${
-          seedMsg.includes("already exist")
-            ? "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-300"
-            : seedMsg.includes("Demo")
-              ? "bg-green-50 dark:bg-green-500/10 border-green-200 dark:border-green-500/20 text-green-700 dark:text-green-300"
-              : "bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-300"
-        }`}>
-          {seedMsg}
-        </div>
-      )}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <StatCard label="Revenue today" value={formatPrice(summary.revenue)} change={`${summary.transactions} transaction(s)`} up={summary.revenue > 0} />
         <StatCard label="Expenses today" value={formatPrice(summary.expenses)} change={summary.expenses > 0 ? "Logged today" : "None"} up={summary.expenses === 0} />

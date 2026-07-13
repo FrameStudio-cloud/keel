@@ -78,7 +78,7 @@ export default function BusinessTab() {
     if (logoFile) {
       try {
         logo_url = await uploadImage(logoFile, shopId);
-      } catch (err) {
+      } catch {
         setSaving(false);
         showToast("Failed to upload logo", "error");
         return;

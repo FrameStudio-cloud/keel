@@ -142,7 +142,6 @@ export default function Reports() {
     window.print();
   }
 
-  const hasData = profitData.length > 0 || pnlData.some((d) => d.revenue > 0 || d.expenses > 0);
   const filteredProfitData = useMemo(() => {
     if (!debouncedSearch) return profitData;
     const q = debouncedSearch.toLowerCase();
