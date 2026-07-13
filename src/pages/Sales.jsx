@@ -132,7 +132,7 @@ export default function Sales() {
                     <Badge label="Paid" color="green" />
                     <button
                       onClick={(e) => { e.stopPropagation(); setReceiptSale(s); }}
-                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline ml-auto"
+                      className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all ml-auto"
                     >
                       Receipt
                     </button>
@@ -190,7 +190,7 @@ export default function Sales() {
                     <td className="px-4 py-3">
                       <button
                         onClick={(e) => { e.stopPropagation(); setReceiptSale(s); }}
-                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                        className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all"
                       >
                         Receipt
                       </button>

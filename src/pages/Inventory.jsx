@@ -413,7 +413,7 @@ export default function Inventory() {
                             onClick={() => handleUnpublish(p)}
                             disabled={!hasWebsite || publishingId === p.id}
                             title={!hasWebsite ? "Set your website URL in Settings first" : ""}
-                            className="inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400 hover:text-red-500 dark:hover:text-red-400 transition-colors disabled:opacity-50"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-500 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-500/30 transition-all disabled:opacity-50"
                           >
                             <FiGlobe size={12} />
                             {publishingId === p.id ? "..." : "Unpublish"}
@@ -423,7 +423,7 @@ export default function Inventory() {
                             onClick={() => handlePublish(p)}
                             disabled={!hasWebsite || publishingId === p.id}
                             title={!hasWebsite ? "Set your website URL in Settings first" : ""}
-                            className="text-xs text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors disabled:opacity-50"
+                            className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-500/30 transition-all disabled:opacity-50"
                           >
                             {publishingId === p.id ? "..." : "Publish"}
                           </button>
@@ -433,13 +433,13 @@ export default function Inventory() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setSelectedProduct(p)}
-                            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                            className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all"
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => setAdjustProduct(p)}
-                            className="text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:underline"
+                            className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-50 dark:hover:bg-white/[0.05] transition-all"
                           >
                             Stock
                           </button>

@@ -307,8 +307,8 @@ export default function Finance() {
                   </div>
                   <div className="flex items-center gap-2 ml-2">
                     <span className="font-medium text-red-500 dark:text-red-400 text-sm">{formatPrice(e.amount)}</span>
-                    <button onClick={() => startEdit(e)} className="text-gray-400 hover:text-blue-500"><FiEdit2 size={14} /></button>
-                    <button onClick={() => handleDeleteExpense(e.id)} className="text-gray-400 hover:text-red-500"><FiTrash2 size={14} /></button>
+                    <button onClick={() => startEdit(e)} className="px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-500/30 transition-all"><FiEdit2 size={13} className="mr-1 inline" /> Edit</button>
+                    <button onClick={() => handleDeleteExpense(e.id)} className="px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-500 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-500/30 transition-all"><FiTrash2 size={13} className="mr-1 inline" /> Delete</button>
                   </div>
                 </div>
               ))}
