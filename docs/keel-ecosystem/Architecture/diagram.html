@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Keel Ecosystem Architecture Diagram</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    background: #0f0f1a;
+    font-family: 'Inter', -apple-system, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+
+  .diagram {
+    max-width: 1200px;
+    width: 100%;
+    background: #1a1a2e;
+    border-radius: 24px;
+    padding: 40px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  h1 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #e2e8f0;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 32px;
+    font-weight: 400;
+  }
+
+  .layer-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #475569;
+    margin-bottom: 16px;
+    padding-left: 4px;
+  }
+
+  .grid {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .layer {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 16px;
+    padding: 20px 24px 24px;
+  }
+
+  .blocks {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .block {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 16px 20px;
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+
+  .block:hover { border-color: rgba(59,130,246,0.3); }
+
+  .block.primary {
+    background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.04));
+    border-color: rgba(59,130,246,0.2);
+  }
+
+  .block.secondary {
+    background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04));
+    border-color: rgba(16,185,129,0.2);
+  }
+
+  .block.accent {
+    background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.04));
+    border-color: rgba(245,158,11,0.2);
+  }
+
+  .block.purple {
+    background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(139,92,246,0.04));
+    border-color: rgba(139,92,246,0.2);
+  }
+
+  .block.danger {
+    background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(239,68,68,0.04));
+    border-color: rgba(239,68,68,0.2);
+  }
+
+  .block-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin-bottom: 4px;
+  }
+
+  .block-desc {
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.4;
+  }
+
+  .block-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+  }
+
+  .badge-blue { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .badge-green { background: rgba(16,185,129,0.15); color: #34d399; }
+  .badge-amber { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .badge-purple { background: rgba(139,92,246,0.15); color: #a78bfa; }
+  .badge-red { background: rgba(239,68,68,0.15); color: #f87171; }
+  .badge-slate { background: rgba(100,116,139,0.15); color: #94a3b8; }
+
+  .arrow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 4px 0;
+    position: relative;
+  }
+
+  .arrow-row .label {
+    font-size: 10px;
+    color: #475569;
+    font-weight: 500;
+  }
+
+  .arrow {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #475569;
+  }
+
+  .arrow svg { width: 80px; height: 20px; }
+
+  .arrow-down {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #475569;
+    padding: 0;
+  }
+
+  .arrow-down svg { width: 20px; height: 24px; }
+
+  .note {
+    font-size: 10px;
+    color: #475569;
+    border: 1px dashed rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  .note strong { color: #94a3b8; font-weight: 600; }
+
+  .gap-box {
+    background: repeating-linear-gradient(
+      -45deg,
+      rgba(239,68,68,0.06),
+      rgba(239,68,68,0.06) 8px,
+      rgba(239,68,68,0.1) 8px,
+      rgba(239,68,68,0.1) 16px
+    );
+    border: 1px dashed rgba(239,68,68,0.3);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-top: 8px;
+  }
+
+  .gap-box .block-name { color: #f87171; }
+  .gap-box .block-desc { color: #fca5a5; }
+
+  .connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 0;
+    position: relative;
+  }
+
+  .connector-line {
+    width: 2px;
+    height: 24px;
+    background: linear-gradient(to bottom, transparent, rgba(100,116,139,0.2), transparent);
+  }
+
+  .connector-dot {
+    width: 8px;
+    height: 8px;
+    background: rgba(100,116,139,0.3);
+    border-radius: 50%;
+  }
+
+  .two-col { display: flex; gap: 16px; }
+  .two-col > .block { flex: 1; }
+
+  .legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #64748b;
+  }
+
+  .legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+  }
+
+  .swatch-primary { background: rgba(59,130,246,0.5); }
+  .swatch-secondary { background: rgba(16,185,129,0.5); }
+  .swatch-accent { background: rgba(245,158,11,0.5); }
+  .swatch-purple { background: rgba(139,92,246,0.5); }
+  .swatch-gap { background: rgba(239,68,68,0.5); }
+
+  .footer-note {
+    margin-top: 20px;
+    font-size: 10px;
+    color: #334155;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="diagram">
+  <h1>Keel Ecosystem — Architecture Diagram</h1>
+  <p class="subtitle">One Supabase project · Two app types · N shops · End-to-end data flow</p>
+
+  <div class="grid">
+
+    <!-- ===== LAYER 1: SUPABASE ===== -->
+    <div class="layer">
+      <div class="layer-title">Supabase (Single Project — hmcowpwfefeeossztuem)</div>
+      <div class="blocks">
+        <div class="block primary">
+          <div class="block-badge badge-blue">Database</div>
+          <div class="block-name">20+ Tables</div>
+          <div class="block-desc">shops, products, catalogue, banners, sales, expenses, store_settings, categories, category_attributes, product_attribute_values, stock_movements, page_views, announcements, users, posts, payments</div>
+        </div>
+        <div class="block primary">
+          <div class="block-badge badge-blue">Auth</div>
+          <div class="block-name">Supabase Auth</div>
+          <div class="block-desc">Email/password login, Google OAuth, session management. Accessed via direct REST API (not GoTrueClient). RLS disabled (all queries use shop_id filtering instead)</div>
+        </div>
+        <div class="block primary">
+          <div class="block-badge badge-blue">RPCs</div>
+          <div class="block-name">Postgres Functions</div>
+          <div class="block-desc">get_dashboard_summary, get_profit_margins — server-side aggregations called by the dashboard</div>
+        </div>
+      </div>
+
+      <!-- Arrow: Supabase serves both -->
+      <div class="connector">
+        <div class="connector-line"></div>
+        <div class="connector-dot"></div>
+        <div class="connector-line" style="height:8px;"></div>
+      </div>
+      <div style="display:flex;justify-content:center;">
+        <span class="note" style="margin-top:0;border-style:solid;">
+          <strong>↑</strong> All reads/writes go to the same Supabase project, filtered by <code>shop_id</code>
+        </span>
+      </div>
+    </div>
+
+    <!-- Connector down -->
+    <div class="arrow-row">
+      <div class="arrow-down">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 4v16M5 13l7 7 7-7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ===== LAYER 2: DASHBOARD ===== -->
+    <div class="layer">
+      <div class="layer-title">Keel Dashboard (Single Deployment — keel-nu.vercel.app)</div>
+      <div class="blocks">
+        <div class="block secondary">
+          <div class="block-badge badge-green">React 19 + Vite 8</div>
+          <div class="block-name">Pages (20+ routes)</div>
+          <div class="block-desc">Overview, Inventory, Sales, Finance, Reports, Marketing, Social, Website, Settings, Profile, StockHistory, Login, Setup, Features, UseCases, About, Terms, NotFound</div>
+        </div>
+        <div class="block secondary">
+          <div class="block-badge badge-green">Context</div>
+          <div class="block-name">AuthContext + SettingsProvider</div>
+          <div class="block-desc">Auth state (login/logout via REST API), settings (fetched once, consumed via useSettings), theme toggle (light default), currency, payment config</div>
+        </div>
+        <div class="block secondary">
+          <div class="block-badge badge-green">Modals</div>
+          <div class="block-name">8 Modal Components</div>
+          <div class="block-desc">AddProduct, EditProduct (with "Other" attribute option), LogSale, BarcodeScanner, ImageUploader, DeleteShop, SignOut — all with focus traps</div>
+        </div>
+        <div class="block secondary">
+          <div class="block-badge badge-green">Settings</div>
+          <div class="block-name">12 Settings Components</div>
+          <div class="block-desc">7 tabs (Store, Preferences, Notifications, Billing, Security, Data, Danger Zone) + shared SectionCard, TabButton, SaveBar, styles</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connector: Dashboard writes to Supabase -->
+    <div class="arrow-row">
+      <span class="label">↑ writes product data, sales, etc.</span>
+    </div>
+
+    <!-- ===== LAYER 3: DATA LAYER ===== -->
+    <div class="layer">
+      <div class="layer-title">Data Layer (Tables + Relationships)</div>
+      <div class="blocks" style="gap: 10px;">
+        <div class="block purple" style="flex:0 0 auto;min-width:160px;">
+          <div class="block-badge badge-purple">Core</div>
+          <div class="block-name">shops</div>
+          <div class="block-desc">slug, business_category, subscription_expires_at</div>
+        </div>
+        <div class="block purple" style="flex:0 0 auto;min-width:160px;">
+          <div class="block-badge badge-purple">Products</div>
+          <div class="block-name">products</div>
+          <div class="block-desc">name, price, stock, barcode, cost_price, variants</div>
+        </div>
+        <div class="block purple" style="flex:0 0 auto;min-width:160px;">
+          <div class="block-badge badge-purple">Catalogue</div>
+          <div class="block-name">catalogue</div>
+          <div class="block-desc">name, price, image, available, featured, specs, variants</div>
+        </div>
+        <div class="block purple" style="flex:0 0 auto;min-width:160px;">
+          <div class="block-badge badge-purple">Attributes</div>
+          <div class="block-name">category_attributes</div>
+          <div class="block-desc">23 attribute definitions across 5 categories</div>
+        </div>
+        <div class="block purple" style="flex:0 0 auto;min-width:160px;">
+          <div class="block-badge badge-purple">Transactions</div>
+          <div class="block-name">sales, expenses, payments</div>
+          <div class="block-desc">Daily revenue, profit tracking</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 way split: Dashboard publishes → catalogue, CLI generates → sites, sites display -->
+    <div class="arrow-row" style="padding: 8px 0;">
+      <div style="display:flex;gap:16px;align-items:center;">
+        <span class="note" style="margin:0;">
+          <strong>Publish flow:</strong> Dashboard → writes to catalogue + catalogue_attribute_values tables
+        </span>
+        <span style="color:#334155;">→</span>
+        <span class="note" style="margin:0;">
+          <strong>Scaffold flow:</strong> CLI reads catalogue table → generates site files
+        </span>
+        <span style="color:#334155;">→</span>
+        <span class="note" style="margin:0;">
+          <strong>Display flow:</strong> Site renders catalogue data in <code>cite-ui</code> components
+        </span>
+      </div>
+    </div>
+
+    <!-- ===== LAYER 4: MINI-CATALOGUE SITES ===== -->
+    <div class="layer">
+      <div class="layer-title">Mini-Catalogue Sites (N Deployments — One per Shop)</div>
+      <div class="blocks">
+        <div class="block accent">
+          <div class="block-badge badge-amber">Zuri Fashion</div>
+          <div class="block-name">mini-catalogue-phase2</div>
+          <div class="block-desc">Clothing shop. Deployed to Vercel as standalone project. Uses cite-ui components: Navbar, Hero slideshow, CatalogueGrid, Footer, WhatsAppFloat.</div>
+        </div>
+        <div class="block accent">
+          <div class="block-badge badge-amber">Electricals</div>
+          <div class="block-name">mini-catalogue-electricals</div>
+          <div class="block-desc">Electronics / electricals shop. Same generated codebase, different config/site.js data. Hero banner + product grid layout.</div>
+        </div>
+        <div class="block accent">
+          <div class="block-badge badge-amber">Lumière Hair</div>
+          <div class="block-name">wix (Wix Collection)</div>
+          <div class="block-desc">Wigs shop. Same template, configured for hair products with different colour scheme and banner images.</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:#475569;text-align:center;">
+        Each site = separate Vercel project · same generated code · only config/site.js differs · Tailwind v3 + React 18 + cite-ui
+      </div>
+    </div>
+
+    <!-- ===== AUTOMATION GAP ===== -->
+    <div class="layer">
+      <div class="layer-title" style="color:#ef4444;">Automation Gap (Not Yet Built)</div>
+      <div class="gap-box">
+        <div class="block-name">The Manual Step</div>
+        <div class="block-desc" style="margin-top:8px;">
+          Today, publishing a product writes to the catalogue table in Supabase — but the public site won't show it until someone manually runs create-mini-catalogue and redeploys to Vercel.
+        </div>
+        <div style="margin-top:12px;">
+          <span class="note" style="border-color:rgba(239,68,68,0.2);background:rgba(239,68,68,0.04);">
+            <strong>To automate:</strong> Supabase webhook → Vercel API → auto-deploy → <code>*.keel.framestudio.co.ke</code>
+            &nbsp;&nbsp;·&nbsp;&nbsp;
+            Or: mini-catalogue reads live from Supabase (no deploy needed)
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TOOLING LAYER ===== -->
+    <div class="layer">
+      <div class="layer-title">Tooling &amp; Infrastructure</div>
+      <div class="blocks">
+        <div class="block" style="border-color:rgba(255,255,255,0.03);">
+          <div class="block-badge badge-slate">create-mini-catalogue</div>
+          <div class="block-name">CLI Scaffold Tool</div>
+          <div class="block-desc">C:\Users\Administrator\projects\create-mini-catalogue\<br>Node.js CLI using Commander + EJS. Reads Supabase by slug, renders template files, outputs standalone Vite project.</div>
+        </div>
+        <div class="block" style="border-color:rgba(255,255,255,0.03);">
+          <div class="block-badge badge-slate">opencode</div>
+          <div class="block-name">AI Agent (catalogue-builder)</div>
+          <div class="block-desc">C:\Users\Administrator\.config\opencode\agents\catalogue-builder.md<br>Subagent with KEEL_SUPABASE_KEY. Automates the CLI execution: set key → run create → install deps → start dev server.</div>
+        </div>
+        <div class="block" style="border-color:rgba(255,255,255,0.03);">
+          <div class="block-badge badge-slate">GitHub Actions</div>
+          <div class="block-name">CI Pipeline</div>
+          <div class="block-desc">.github/workflows/ci.yml<br>npm ci → npm run lint → npm run build on every push to main. Blocks Vercel deploy if either fails.</div>
+        </div>
+        <div class="block" style="border-color:rgba(255,255,255,0.03);">
+          <div class="block-badge badge-slate">Vercel</div>
+          <div class="block-name">Hosting</div>
+          <div class="block-desc">Dashboard: keel-nu.vercel.app<br>Mini-catalogue: each shop gets its own project<br>Analytics: @vercel/analytics tracking page views</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LEGEND ===== -->
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch swatch-primary"></div> Supabase</div>
+      <div class="legend-item"><div class="legend-swatch swatch-secondary"></div> Keel Dashboard</div>
+      <div class="legend-item"><div class="legend-swatch swatch-accent"></div> Mini-Catalogue Sites</div>
+      <div class="legend-item"><div class="legend-swatch swatch-purple"></div> Data Layer</div>
+      <div class="legend-item"><div class="legend-swatch swatch-gap"></div> Automation Gap</div>
+    </div>
+
+    <div class="footer-note">
+      Keel Ecosystem · Built by Framestudio · Updated July 2026
+    </div>
+  </div>
+</div>
+</body>
+</html>
