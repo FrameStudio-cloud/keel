@@ -25,6 +25,7 @@ export default function Sales() {
   const [receiptSale, setReceiptSale] = useState(null);
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
   const debouncedSearch = useDebounce(searchQuery, 300);
 
   useEffect(() => {
@@ -52,7 +53,7 @@ export default function Sales() {
       setLoading(false);
     })();
     return () => { cancelled = true; };
-  }, [page, debouncedSearch]);
+  }, [page, debouncedSearch, refreshKey]);
 
   function formatDate(timestamp) {
     const date = new Date(timestamp);
@@ -206,7 +207,7 @@ export default function Sales() {
       {showModal && (
         <LogSaleModal
           onClose={() => setShowModal(false)}
-          onAdded={() => { setPage(0); queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }); }}
+          onAdded={() => { setPage(0); setRefreshKey(k => k + 1); queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }); }}
         />
       )}
 
