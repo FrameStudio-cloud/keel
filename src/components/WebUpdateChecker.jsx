@@ -30,8 +30,8 @@ export default function WebUpdateChecker() {
   if (buildTime === null || dismissed) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
-      <div className="bg-blue-600 text-white rounded-t-xl shadow-2xl px-5 py-3 flex items-center gap-4 text-sm pointer-events-auto animate-[slideUp_0.3s_ease-out] max-w-lg w-full mx-4 mb-0">
+    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
+      <div className="bg-blue-600 text-white rounded-b-xl shadow-2xl px-5 py-3 flex items-center gap-4 text-sm pointer-events-auto animate-[slideDown_0.3s_ease-out] max-w-lg w-full mx-4 mt-0">
         <div className="flex items-center gap-2 min-w-0">
           <FiRefreshCw size={14} className="shrink-0" />
           <span className="font-medium truncate">A new version of Keel is available</span>
@@ -50,7 +50,7 @@ export default function WebUpdateChecker() {
           <FiX size={16} />
         </button>
       </div>
-      <style>{`@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}`}</style>
+      <style>{`@keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}`}</style>
     </div>
   );
 }
