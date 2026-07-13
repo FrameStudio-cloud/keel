@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import { FiImage, FiGlobe, FiPackage } from "react-icons/fi";
@@ -22,8 +23,9 @@ const PAGE_SIZE = 50;
 
 export default function Inventory() {
   const queryClient = useQueryClient();
-  const { lowStockThreshold, businessCategory } = useSettings();
+  const { lowStockThreshold, businessCategory, websiteUrl } = useSettings();
   const threshold = lowStockThreshold ?? 6;
+  const hasWebsite = !!websiteUrl;
   const showBarcode = businessCategory === "electricals" || businessCategory === "electronics";
 
   function getStatus(stock) {
@@ -188,6 +190,15 @@ export default function Inventory() {
         </button>
       </div>
 
+      {!hasWebsite && (
+        <div className="mb-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl px-4 py-2.5 flex items-center gap-2.5">
+          <FiGlobe size={14} className="text-amber-500 shrink-0" />
+          <p className="text-xs text-amber-700 dark:text-amber-400">
+            Set your website URL in <Link to="/settings" className="font-semibold underline hover:no-underline">Settings</Link> to publish products to your mini-catalogue.
+          </p>
+        </div>
+      )}
+
       <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden">
         {loading ? (
           <div className="space-y-2 p-3">
@@ -297,7 +308,8 @@ export default function Inventory() {
                         {publishedMap[p.id] ? (
                           <button
                             onClick={() => handleUnpublish(p)}
-                            disabled={publishingId === p.id}
+                            disabled={!hasWebsite || publishingId === p.id}
+                            title={!hasWebsite ? "Set your website URL in Settings first" : ""}
                             className="px-3 py-1.5 text-xs font-medium bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-100 dark:hover:bg-green-500/20 transition-all disabled:opacity-50"
                           >
                             {publishingId === p.id ? "..." : "Published"}
@@ -305,7 +317,8 @@ export default function Inventory() {
                         ) : (
                           <button
                             onClick={() => handlePublish(p)}
-                            disabled={publishingId === p.id}
+                            disabled={!hasWebsite || publishingId === p.id}
+                            title={!hasWebsite ? "Set your website URL in Settings first" : ""}
                             className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-gray-200 dark:border-white/10 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all disabled:opacity-50"
                           >
                             {publishingId === p.id ? "..." : "Publish"}
@@ -398,7 +411,8 @@ export default function Inventory() {
                         {publishedMap[p.id] ? (
                           <button
                             onClick={() => handleUnpublish(p)}
-                            disabled={publishingId === p.id}
+                            disabled={!hasWebsite || publishingId === p.id}
+                            title={!hasWebsite ? "Set your website URL in Settings first" : ""}
                             className="inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400 hover:text-red-500 dark:hover:text-red-400 transition-colors disabled:opacity-50"
                           >
                             <FiGlobe size={12} />
@@ -407,7 +421,8 @@ export default function Inventory() {
                         ) : (
                           <button
                             onClick={() => handlePublish(p)}
-                            disabled={publishingId === p.id}
+                            disabled={!hasWebsite || publishingId === p.id}
+                            title={!hasWebsite ? "Set your website URL in Settings first" : ""}
                             className="text-xs text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors disabled:opacity-50"
                           >
                             {publishingId === p.id ? "..." : "Publish"}

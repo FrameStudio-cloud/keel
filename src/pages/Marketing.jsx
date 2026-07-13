@@ -130,9 +130,8 @@ export default function Marketing() {
   }, [products]);
 
   function generateLink() {
-    if (!selectedProduct) return;
-    const base = websiteUrl || window.location.origin;
-    setGeneratedLink(`${base}/p/${selectedProduct.id}`);
+    if (!selectedProduct || !websiteUrl) return;
+    setGeneratedLink(`${websiteUrl}/p/${selectedProduct.id}`);
     setCopied(false);
   }
 
@@ -208,15 +207,15 @@ export default function Marketing() {
 
   useEffect(() => {
     (async () => {
+      if (!websiteUrl && qrType !== "whatsapp") { setQrUrl(""); return; }
       const raw = whatsapp?.replace(/[^0-9]/g, "");
       let text = "";
       if (qrType === "website") {
-        text = websiteUrl || window.location.origin;
+        text = websiteUrl;
       } else if (qrType === "whatsapp") {
         text = raw ? `https://wa.me/${raw}` : "";
       } else if (qrType === "product" && selectedProduct) {
-        const base = websiteUrl || window.location.origin;
-        text = `${base}/p/${selectedProduct.id}`;
+        text = `${websiteUrl}/p/${selectedProduct.id}`;
       }
       setQrUrl(text);
       if (qrCanvasRef.current && text) {
@@ -625,7 +624,9 @@ export default function Marketing() {
               <h3 className="text-sm font-medium text-gray-800 dark:text-white">Shareable Product Links</h3>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 mb-3">
-              {products.filter((c) => publishedIds.has(c.id)).length === 0 ? (
+              {!websiteUrl ? (
+                <p className="text-xs text-gray-400 dark:text-slate-500 italic py-2">Set your website URL in <Link to="/settings" className="font-semibold underline hover:no-underline">Settings</Link> to generate shareable links.</p>
+              ) : products.filter((c) => publishedIds.has(c.id)).length === 0 ? (
                 <p className="text-xs text-gray-400 dark:text-slate-500 italic py-2">Publish products from Inventory to generate shareable links.</p>
               ) : (
               <select
@@ -668,9 +669,9 @@ export default function Marketing() {
             </div>
             <div className="flex gap-2 mb-4">
               {[
-                { key: "website", label: "Website" },
+                { key: "website", label: "Website", disabled: !websiteUrl },
                 { key: "whatsapp", label: "WhatsApp" },
-                { key: "product", label: "Product", disabled: !selectedProduct || !publishedIds.has(selectedProduct.id) },
+                { key: "product", label: "Product", disabled: !selectedProduct || !publishedIds.has(selectedProduct.id) || !websiteUrl },
               ].map((tab) => (
                 <button
                   key={tab.key}
