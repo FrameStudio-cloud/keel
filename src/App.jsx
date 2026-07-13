@@ -45,6 +45,7 @@ const Terms = lazy(() => import("./pages/Terms"));
 const UseCases = lazy(() => import("./pages/UseCases"));
 const AboutFramestudio = lazy(() => import("./pages/AboutFramestudio"));
 const Features = lazy(() => import("./pages/Features"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 function Loading() {
   return (
@@ -116,6 +117,7 @@ function AppRoutes() {
         <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
         <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
         <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
     </ErrorBoundary>

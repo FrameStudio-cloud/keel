@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
 import { setCurrency } from "../lib/format";
 import { setPaymentConfig } from "../lib/paymentConfig";
-import { SettingsContext } from "./settingsContext";
+import { SettingsContext, DEFAULT_NOTIF_PREFS } from "./settingsContext";
 import { AuthContext } from "./AuthContext";
 
 export default function SettingsProvider({ children }) {
@@ -30,6 +30,7 @@ export default function SettingsProvider({ children }) {
     categoryChangedAt: null,
     subscriptionExpiresAt: null,
     scheduledDeletionAt: null,
+    notificationPreferences: DEFAULT_NOTIF_PREFS,
     loading: true,
   });
 
@@ -79,6 +80,7 @@ export default function SettingsProvider({ children }) {
           tiktok: store.tiktok || "",
           logoUrl: store.logo_url || null,
           businessHours: store.business_hours || null,
+          notificationPreferences: { ...DEFAULT_NOTIF_PREFS, ...(store.notification_preferences || {}) },
           businessCategory: shop?.business_category || "general",
           categoryChangedAt: shop?.category_changed_at || null,
           subscriptionExpiresAt: shop?.subscription_expires_at || null,
