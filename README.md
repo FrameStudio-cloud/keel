@@ -1,6 +1,6 @@
 # Keel
 
-A **multi-tenant shop management dashboard** with website management features. Built with React 19, Vite, Tailwind CSS v4, and Supabase. Provides inventory tracking, sales logging, bot management (WhatsApp + Telegram), social media post planning, website catalogue/banner management, business info, dark mode, and public information pages (Features, Use Cases, About).
+A **multi-tenant shop management dashboard** for small businesses in Kenya. Provides inventory tracking, sales logging, expense tracking, profit/loss reporting, marketing promotions, bot management (WhatsApp + Telegram), social media post planning, website catalogue/banner management, self-service storefront deployment, and public info pages. Built with React 19, Vite 8, Tailwind CSS v4, and Supabase.
 
 ---
 
@@ -9,22 +9,24 @@ A **multi-tenant shop management dashboard** with website management features. B
 | Layer | Technology |
 |---|---|
 | **UI Library** | React 19 |
-| **Build Tool** | Vite 8 |
-| **Styling** | Tailwind CSS v4 (via `@tailwindcss/vite` plugin) |
+| **Build Tool** | Vite 8 (Rolldown) |
+| **Styling** | Tailwind CSS v4 (via `@tailwindcss/vite` plugin, `@variant dark` for dark mode) |
 | **Routing** | React Router 7 |
-| **Charts** | Recharts 3 (bar chart) |
+| **Charts** | Recharts 3 (lazy-loaded, split to separate chunk) |
 | **Icons** | React Icons 5 |
-| **Backend / DB** | Supabase (PostgreSQL + REST API) |
+| **Data Fetching** | `@tanstack/react-query` (caching, deduplication); Supabase JS client (`accessToken` option — no GoTrueClient) |
+| **Backend / DB** | Supabase (PostgreSQL + REST API, RLS enabled on all tables) |
 | **Storefront Backend** | storefront-provisioner (Node.js + Hono + EJS, deployed on Railway) |
 | **Linting** | ESLint 10 |
 | **Toasts** | cite-ui |
-| **SEO** | react-helmet-async |
+| **SEO** | react-helmet-async (per-page OG tags, robots.txt, sitemap.xml) |
+| **Barcode** | html5-qrcode (dynamic import, client-side only) |
 
 ---
 
 ## Architecture
 
-Single-page application — all pages client-side rendered, data fetched directly from Supabase via `@supabase/supabase-js`. No custom API server. Multi-tenant via `shop_id` foreign key on every table. Settings shared globally via React Context (`SettingsProvider`).
+Single-page application — most pages client-side rendered, data fetched directly from Supabase. Multi-tenant via `shop_id` FK on every table. Settings shared globally via React Context (`SettingsProvider`). Auth bypasses GoTrueClient (uses direct REST calls to Supabase Auth API with `accessToken` option).
 
 ```
 Browser → React SPA → supabase-js → Supabase (PostgreSQL)
@@ -36,54 +38,70 @@ Browser → React SPA → supabase-js → Supabase (PostgreSQL)
 ## Project Structure
 
 ```
-mitho-dash/
-├── .env                        # VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+keel/
+├── .env                        # VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_PROVISIONER_URL
 ├── AGENTS.md                   # AI assistant session context
 ├── src/
-│   ├── main.jsx
-│   ├── index.css               # Tailwind + dark mode CSS variables
-│   ├── App.jsx                 # SettingsProvider + BrowserRouter + Routes
+│   ├── main.jsx                # Entry point (HelmetProvider, QueryClientProvider)
+│   ├── index.css               # Tailwind v4 imports + dark mode variant
+│   ├── App.jsx                 # SettingsProvider + BrowserRouter + Routes + ErrorBoundary
 │   ├── lib/
-│   │   ├── supabase.js         # Supabase client
+│   │   ├── supabase.js         # Supabase client (accessToken bypass), auth helpers, session storage
 │   │   ├── shop.js             # getShopId(), withShop() multi-tenant helpers
 │   │   ├── format.js           # formatPrice(), currency singleton
 │   │   ├── paymentConfig.js    # Payment methods singleton
-│   │   └── constants.js        # CRITICAL_STOCK_THRESHOLD
+│   │   └── constants.js        # CRITICAL_STOCK_THRESHOLD, PROVISIONER_URL
 │   ├── context/
-│   │   ├── SettingsProvider.jsx # Fetch settings + shop, apply side-effects
+│   │   ├── AuthContext.jsx     # Auth state, login/logout, shop creation (email fallback)
+│   │   ├── SettingsProvider.jsx# Fetch settings + shop + chat_config, side-effects, planTier
 │   │   └── settingsContext.js
 │   ├── hooks/
 │   │   ├── useSettings.js
-│   │   ├── useDebounce.js
+│   │   ├── useDebounce.js      # Debounces search input (300ms)
 │   │   ├── useQueries.js       # Shared React Query hooks (low stock, announcements, etc.)
-│   │   └── useFocusTrap.js     # Modal keyboard accessibility
+│   │   ├── useFocusTrap.js     # Modal keyboard accessibility
+│   │   └── usePageTracking.js  # Website analytics tracking
 │   ├── pages/
-│   │   ├── Overview.jsx        # Dashboard KPIs, charts, website analytics
-│   │   ├── Inventory.jsx       # Product CRUD, stock adjust, publish to website
-│   │   ├── Sales.jsx           # Sales logging, receipts
-│   │   ├── Social.jsx          # Post scheduler
-│   │   ├── Storefront.jsx      # Self-service Vercel storefront deployment
-│   │   ├── Website.jsx         # Website management (listings, banners, biz info, gallery)
-│   │   ├── Settings.jsx        # Store, currency, theme, export, category
+│   │   ├── Overview.jsx        # KPIs, weekly chart, top products, announcement banner, website analytics
+│   │   ├── Inventory.jsx       # Product CRUD, stock adjust, search, barcode scan, publish to catalogue
+│   │   ├── Sales.jsx           # Sales list, log sale, receipt modal, search
+│   │   ├── Marketing.jsx       # Promotions, badges, sale prices, QR codes, print catalog
+│   │   ├── Finance.jsx         # Today's revenue, payment pie chart, expense CRUD, search
+│   │   ├── Reports.jsx         # Profit margins per product, P&L bar chart, CSV/PDF export, search
+│   │   ├── Social.jsx          # Post scheduler, Instagram placeholder
+│   │   ├── StockHistory.jsx    # Paginated stock movement log, server-side search
+│   │   ├── Bots.jsx            # WhatsApp + Telegram bot management
+│   │   ├── Storefront.jsx      # Self-service Vercel storefront deployment (Pro/Beta guard)
+│   │   ├── Website.jsx         # Banners, Business Info, Gallery, Chat Widget tabs
+│   │   ├── Settings.jsx        # Tabbed 25/75 layout — Store, Preferences, Notifications, Billing, Security, Data, Danger Zone
+│   │   ├── Profile.jsx         # Tabbed 25/75 layout — About, Account, Quick Access
 │   │   ├── SetupWizard.jsx     # First-run onboarding
-│   │   ├── Profile.jsx
-│   │   ├── Bots.jsx            # WhatsApp + Telegram bots
-│   │   ├── Login.jsx
+│   │   ├── LockoutScreen.jsx   # Subscription expired lockout
+│   │   ├── Login.jsx           # Email/password + Google OAuth
+│   │   ├── Homepage.jsx        # Landing page (10 sections: Nav, Hero, Preview, Features, How It Works, Website Integration, Testimonials, FAQ, Contact, CTA, Footer)
 │   │   ├── Features.jsx        # Public: 12 deep-dive features with shop-type badges
 │   │   ├── UseCases.jsx        # Public: 8 problem/solution narratives
-│   │   ├── AboutFramestudio.jsx # Public: team info, beliefs, contact
-│   │   └── Terms.jsx           # Public: Terms of Service (static JSON)
+│   │   ├── AboutFramestudio.jsx# Public: team info, beliefs, contact
+│   │   ├── Terms.jsx           # Public: Terms of Service (static JSON)
+│   │   └── NotFound.jsx        # Custom 404 page
 │   ├── components/
-│   │   ├── layout/             # PageLayout, Sidebar, Topbar
-│   │   ├── website/            # ListingsTab, BannersTab, BusinessTab, GalleryTab
+│   │   ├── layout/             # PageLayout, Sidebar, Topbar (animated search pill)
+│   │   ├── storefront/         # TemplatePreview, TemplateModal, ConfigModal, DeployProgressModal
+│   │   ├── settings/           # 12 files: StoreTab, PreferencesTab, NotificationsTab, BillingTab, SecurityTab, DataTab, DangerZoneTab, DeleteShopModal, SectionCard, TabButton, SettingsSaveBar, settingsStyles
+│   │   ├── profile/            # 4 files: ProfileAboutTab, ProfileAccountTab, ProfileQuickAccessTab, SignOutModal
+│   │   ├── website/            # ListingsTab, BannersTab, BusinessTab, GalleryTab, ChatWidgetTab
 │   │   ├── AnnouncementBanner.jsx # Carousel of global announcements (Overview)
 │   │   ├── BarcodeScanner.jsx     # Camera-based barcode scanning
 │   │   ├── SlowMovingStock.jsx    # Slow-moving stock table
-│   │   ├── AddProductModal.jsx # Variant fields based on business category
+│   │   ├── LockoutScreen.jsx      # Subscription expired display
+│   │   ├── ErrorBoundary.jsx      # Class component wrapping lazy routes
+│   │   ├── WebUpdateChecker.jsx   # Polls /version.json for new deployments
+│   │   ├── ImageUploader.jsx
+│   │   ├── AddProductModal.jsx    # Dynamic variant fields from category_attributes
 │   │   ├── EditProductModal.jsx
 │   │   ├── LogSaleModal.jsx
 │   │   ├── ReceiptModal.jsx
-│   │   └── ...
+│   │   └── ScrollToTop.jsx
 │   └── payment/                # Payment methods
 └── dist/
 ```
@@ -94,27 +112,33 @@ mitho-dash/
 
 | Path | Page | Description |
 |---|---|---|---|
-| `/` | Overview | KPIs, weekly sales chart, top products, website analytics |
+| `/` | Overview | KPIs, weekly chart, top products, website analytics, announcement carousel |
+| `/` (unauthenticated) | Homepage | Landing page: Nav, Hero, Preview, Features, How It Works, Website Integration, Testimonials, FAQ, Contact, CTA, Footer |
 | `/features` | Features | 12 deep-dive features with shop-type badges |
 | `/use-cases` | UseCases | 8 real-world situations (Situation → Cost → How Keel Helps) |
 | `/about` | AboutFramestudio | Who Framestudio is, why Keel was built |
-| `/inventory` | Inventory | Product table, CRUD, stock adjust, search, publish |
-| `/sales` | Sales | Sales list, log sale, receipt |
-| `/social` | Social | Post scheduler, post feed |
-| `/storefront` | Storefront | Self-service Vercel storefront deployment — template pick, subdomain, deploy progress (Pro/Beta) |
+| `/inventory` | Inventory | Product CRUD, stock adjust, search, barcode scan, publish to website |
+| `/sales` | Sales | Sales list, log sale, receipt modal, search |
+| `/marketing` | Marketing | Promotions, badges, sale prices, QR codes, print catalog; search by name + category |
+| `/finance` | Finance | Today's revenue, payment pie chart, expense CRUD; search by description + category + method |
+| `/reports` | Reports | Profit margins per product, P&L bar chart (week/month), CSV/PDF export; search by product name |
+| `/social` | Social | Post scheduler, Instagram "Connect" placeholder |
 | `/bots` | Bots | WhatsApp + Telegram bot management |
-| `/website` | Website | Listings, Banners, Business Info, Gallery |
-| `/settings` | Settings | Store details, category, currency, theme, export |
-| `/profile` | Profile | Store info display |
-| `/login` | Login | Email/password sign-in + Google OAuth |
+| `/storefront` | Storefront | Self-service Vercel storefront deployment (Pro/Beta only) |
+| `/website` | Website | Banners, Business Info, Gallery, Chat Widget tabs (gated by websiteUrl) |
+| `/settings` | Settings | Tabbed (7 tabs): Store, Preferences, Notifications, Billing, Security, Data, Danger Zone |
+| `/profile` | Profile | Tabbed (3 tabs): About, Account, Quick Access |
+| `/login` | Login | Email/password + Google OAuth |
 | `/setup` | SetupWizard | First-run onboarding |
+| `/stock-history` | StockHistory | Stock movement log, server-side search by product name |
 | `/terms` | Terms | Public Terms of Service |
+| `*` (404) | NotFound | Custom 404 page with compass icon |
 
 ---
 
 ## Multi-Tenant
 
-Every table has a `shop_id` column referencing `shops(id)`. The `getShopId()` singleton resolves the current shop ID on first call. Use `withShop(payload)` to auto-inject `shop_id` into inserts.
+Every table has a `shop_id` column referencing `shops(id)`. The `getShopId()` singleton resolves the current shop ID on first call (reads `STORAGE_KEY` from localStorage, queries `users` by `auth_user_id`). Use `withShop(payload)` to auto-inject `shop_id` into INSERTs.
 
 ## Business Categories
 
@@ -124,78 +148,165 @@ Every table has a `shop_id` column referencing `shops(id)`. The `getShopId()` si
 | clothing | Color, Size |
 | electronics | Color, Storage |
 | electricals | None |
+| wigs | Hair Type, Texture, Length, Color, Weight |
 
-Category is set during SetupWizard and can be changed in Settings.
-
----
-
-## Supabase Database Schema
-
-### `shops`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `uuid` | PK |
-| `name` | `text` | Shop name |
-| `slug` | `text` | Unique slug for URL |
-| `business_category` | `text` | general / clothing / electronics / electricals |
-
-### `products`
-Standard columns + `variants` (jsonb — `{colors:[], sizes:[], storage:[]}`)
-
-### `catalogue`
-Website product listings — name, type (product/service), category, price, image, available, featured, variants, specs, includes.
-
-### `banners`
-| Column | Type | Notes |
-|---|---|---|
-| `type` | `text` | hero / sale / info / alert |
-| `title` / `subtitle` / `message` | `text` | Content |
-| `image_url` / `link_url` | `text` | Media |
-| `active` | `boolean` | On/off toggle |
-| `sort_order` | `integer` | Display order |
-
-### `store_settings`
-Extended: `website_url`, `whatsapp`, `business_hours` (jsonb — `{Monday:{open,close,closed}, ...}`), `payment_methods` (jsonb)
-
-### `announcements`
-| Column | Type | Notes |
-|---|---|---|
-| `title` / `message` | `text` | Content |
-| `variant` | `text` | info / warning / alert / sale / maintenance |
-| `priority` | `integer` | Display order |
-| `starts_at` / `expires_at` | `timestamptz` | Scheduling |
-| `bg_image_url` / `link_url` / `link_text` | `text` | Media & CTA |
-| `active` | `boolean` | On/off toggle |
-
-Global table (no `shop_id`). Dismissals tracked per shop in `announcement_dismissals`.
-
-### Other tables
-`sales`, `payments`, `posts`, `stock_movements`, `page_views`, `announcement_dismissals` — all with `shop_id`.
-
-### Category & Attribute System
-`categories`, `category_attributes`, `product_attribute_values`, `catalogue_attribute_values` — data-driven variant fields per business category.
+Category is set during SetupWizard and can be changed in Settings (30-day cooldown via `category_changed_at`).
 
 ---
 
 ## Key Features
 
 - **Multi-tenant** — single Supabase project for 10+ shops
-- **Website management** — manage catalogue listings, banners, business info, gallery from dashboard
-- **One-tap publish** — publish inventory products to website catalogue
-- **Business categories** — tailored variant fields per category (clothing → color + size)
-- **Dark mode** — persisted to DB, applied via CSS variables
-- **SetupWizard** — guided first-run onboarding
-- **Website tracking** — page_views table, usePageTracking hook
-- **Flashcard How It Works** — animated card stack on homepage with CSS keyframes
-- **Website Integration section** — 3 catalogue screenshots with infinite marquee loop on mobile
-- **Public pages** — Features, Use Cases, About pages with in-depth content
-- **ScrollToTop** — auto-scrolls to top on every route change
-- **SEO** — per-page title/description/OG tags via react-helmet-async, robots.txt + sitemap.xml
+- **Inventory** — CRUD, stock adjustments, barcode scanning, debounced search, variant badges from `product_attribute_values`
+- **Sales** — log sales with receipts, filter by method, search
+- **Marketing** — promotions, sale prices, badges, QR codes (website/product gated by websiteUrl), print catalog
+- **Finance** — today's revenue, payment pie chart, expense CRUD
+- **Reports** — profit margins per product, P&L bar chart (week/month toggle), CSV/PDF export
+- **Stock History** — paginated movement log, server-side search
+- **Bot management** — WhatsApp + Telegram bot cards per shop
+- **Website management** — catalogue listings, banners, business info, gallery, chat widget; all gated by websiteUrl
+- **Self-service storefront deployment** — deploy a hosted mini-catalogue site to Vercel from the dashboard (template pick, subdomain config, animated progress); gated by plan tier (Pro/Beta)
+- **Social media** — post scheduler
 - **Global announcements** — server-scheduled carousel banners (info/warning/alert/sale/maintenance) with per-shop dismissals
-- **Subscription lockout** — expired subscription blocks dashboard access with lockout screen
-- **Barcode scanning** — camera-based scanning for electronics/electricals categories
-- **Self-service storefront deployment** — deploy a hosted mini-catalogue site to Vercel from the dashboard (template pick, subdomain config, animated progress)
-- **Plan guard** — Pro/Beta plan storesfront via `chat_config.plan_tier`; non-Pro shops see an upsell card
+- **Subscription lockout** — expired `shops.subscription_expires_at` blocks dashboard with lockout screen
+- **Dark mode** — persisted to DB, applied via `dark:` Tailwind variants (no CSS variables)
+- **Plan guard** — Pro/Beta plan via `chat_config.plan_tier`; non-Pro shops see upsell cards
+- **Tabbed settings** — 7-tab layout (Store, Preferences, Notifications, Billing, Security, Data, Danger Zone)
+- **Profile** — 3-tab layout (About, Account, Quick Access)
+- **Search** — debounced client-side search on Marketing (name + category), Finance (description + category + method), Reports (product name); server-side search on StockHistory
+- **Public pages** — Features, Use Cases, About, Terms with SEO meta tags
+- **Landing page** — Homepage with 10 sections: Nav, Hero, Dashboard Preview, Features, How It Works (CSS flashcard stack), Website Integration (catalogue screenshots), Testimonials (snap-scroll carousel), FAQ (accordion), Contact, CTA + Trust Badges, Footer
+- **SEO** — per-page title/description/OG tags via react-helmet-async, robots.txt + sitemap.xml
+- **Web update checker** — polls `/version.json` every 5 min, Chrome-style refresh bar on new deployment
+- **Error boundary** — catches runtime errors per lazy route
+- **Barcode scanning** — camera-based (html5-qrcode), dynamic import, for electronics/electricals only
+- **Website analytics** — `page_views` table with usePageTracking hook
+- **One-tap publish** — publish inventory products to website catalogue (disabled when no websiteUrl)
+
+---
+
+## Auth
+
+- **No GoTrueClient** — Supabase client created with `accessToken` option, bypassing GoTrueClient entirely (fixes production hang on page reload)
+- All auth via direct `window.fetch` to Supabase Auth REST API:
+  - `POST /auth/v1/token?grant_type=password` (login)
+  - `POST /auth/v1/signup` (signup)
+  - `POST /auth/v1/logout` (logout)
+  - `POST /auth/v1/recover` (password reset)
+  - `PUT /auth/v1/user` (update password with recovery hash)
+  - `GET /auth/v1/authorize?provider=google&redirect_to=...` (Google OAuth)
+- Session stored in localStorage at `sb-{project-ref}-auth-token` (computed deterministically from `VITE_SUPABASE_URL`)
+- `AuthContext` wraps the app — provides `user`, `session`, `login()`, `logout()`
+- Signup saves `"light"` theme default
+- Duplicate shop prevention: falls back to email match if auth_user_id changes
+
+---
+
+## Supabase Database Schema
+
+All tables have RLS enabled with `auth.uid()` → `shop_id` tenant isolation.
+
+### `shops`
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `uuid PK` | Auto-generated |
+| `name` | `text` | Shop name |
+| `slug` | `text` | Unique slug |
+| `business_category` | `text` | general / clothing / electronics / electricals / wigs |
+| `subscription_expires_at` | `timestamptz` | Controls lockout; null = no lockout |
+| `scheduled_deletion_at` | `timestamptz` | Scheduled shop deletion |
+| `category_changed_at` | `timestamptz` | 30-day category change cooldown |
+| `created_at` | `timestamptz` | |
+
+### `store_settings`
+| Column | Type | Notes |
+|---|---|---|
+| `shop_id` | `uuid PK` | FK → shops |
+| `store_name` / `store_phone` / `store_address` | `text` | |
+| `currency_symbol` | `text` | Default KSh |
+| `low_stock_threshold` | `integer` | Default 6 |
+| `default_payment` | `text` | Default Cash |
+| `receipt_footer` | `text` | |
+| `theme` | `text` | light / dark |
+| `website_url` / `whatsapp` / `email` | `text` | Contact info |
+| `description` / `instagram` / `facebook` / `tiktok` | `text` | Social/branding |
+| `logo_url` | `text` | Shop logo |
+| `business_hours` | `jsonb` | `{Monday:{open,close,closed}, ...}` |
+| `notification_preferences` | `jsonb` | Email + in-app toggles |
+| `payment_methods` | `jsonb` | Dynamic payment methods |
+| `terms_of_service` | `text` | |
+
+### `chat_config`
+| Column | Type | Notes |
+|---|---|---|
+| `shop_id` | `uuid PK` | FK → shops |
+| `enabled` | `boolean` | Widget on/off |
+| `welcome_message` | `text` | |
+| `widget_color` | `text` | |
+| `position` | `text` | left / right |
+| `whatsapp_number` | `text` | |
+| `plan_tier` | `text` | free / starter / beta / pro (default free) |
+| `pro_until` | `timestamptz` | Pro expiry |
+| `groq_api_key` | `text` | AI assistant key |
+| `created_at` | `timestamptz` | |
+
+### `storefront_deployments`
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `uuid PK` | |
+| `shop_id` | `uuid FK` | Unique |
+| `template_id` | `text` | Default classic |
+| `subdomain` | `text` | Unique |
+| `vercel_project_id` | `text` | |
+| `url` | `text` | Vercel production alias |
+| `domain` | `text` | Custom domain |
+| `status` | `text` | deployed / provisioning |
+| `created_at` / `updated_at` | `timestamptz` | |
+
+### `products`
+`id`, `name`, `category`, `price`, `stock`, `cost_price`, `barcode`, `image`, `variants` (jsonb), `badge`, `badge_ends_at`, `sale_price`, `sale_ends_at`, `new_arrival`, `shop_id`, `created_at`
+
+### `catalogue`
+`id`, `name`, `type` (product/service), `category`, `price`, `image`, `available`, `featured`, `variants` (jsonb), `specs` (jsonb), `includes`, `badge`, `badge_ends_at`, `sale_price`, `sale_ends_at`, `new_arrival`, `product_id` (FK), `shop_id`, `created_at`
+
+### `banners`
+`id`, `type` (hero/sale/info/alert), `title`, `subtitle`, `message`, `image_url`, `link_url`, `active`, `sort_order`, `shop_id`
+
+### `sales` / `payments` / `posts` / `expenses` / `stock_movements` / `page_views`
+All with `shop_id`, created_at, and relevant data columns.
+
+### `users`
+`id`, `auth_user_id` (UUID, unique), `shop_id` (FK), `name`, `email`, `created_at`
+
+### `announcements` (global, no shop_id)
+`id`, `title`, `message`, `variant` (info/warning/alert/sale/maintenance), `priority`, `starts_at`, `expires_at`, `bg_image_url`, `link_url`, `link_text`, `active`, `created_at`
+
+### `announcement_dismissals`
+`id`, `announcement_id` (FK), `shop_id` (FK), `dismissed_at` — UNIQUE(announcement_id, shop_id)
+
+### Category & Attribute System
+`categories`, `category_attributes`, `product_attribute_values`, `catalogue_attribute_values` — data-driven variant fields per business category (23 attributes across 5 categories).
+
+### Other tables
+`keel_shops`, `keel_activity_log`, `keel_approvals`, `chat_faqs`, `chat_messages`, `chat_callbacks`, `chat_stock_alerts`, `catalogue_attribute_values`, `category_attributes` — various supporting functions.
+
+---
+
+## Storefront Provisioning
+
+Self-service deployment system. Shop owners deploy a live catalogue site to Vercel from the dashboard.
+
+```
+Keel Dashboard → direct fetch → storefront-provisioner (Railway) → Vercel API
+```
+
+**Provisioner endpoints:** `GET /templates`, `GET /check/:subdomain`, `GET /status?shop_id=`, `POST /provision`, `DELETE /delete/:shopId`
+
+**Delete flow:** Keel calls DELETE → provisioner deletes Vercel project (try/catch) → removes `storefront_deployments` DB row → Keel clears local state.
+
+**Plan guard:** Only `"pro"` or `"beta"` shops see the deploy UI. Plan set via framestudio-dashboard Keel Pulse dropdown, persisted to `chat_config.plan_tier`.
+
+See `AGENTS.md` → Storefront Provisioning for full details.
 
 ---
 
@@ -213,18 +324,19 @@ Global table (no `shop_id`). Dismissals tracked per shop in `announcement_dismis
 ## Setup
 
 ```bash
-git clone <repo-url> mitho-dash
-cd mitho-dash
+git clone <repo-url> keel
+cd keel
 npm install
 
 # Create .env:
 #   VITE_SUPABASE_URL=https://your-project.supabase.co
 #   VITE_SUPABASE_ANON_KEY=your-anon-key
+#   VITE_PROVISIONER_URL=https://storefront-provisioner.up.railway.app
 
 npm run dev
 ```
 
-Run the Supabase migrations to create tables. RLS is disabled — all tables accessible via anon key.
+Apply Supabase migrations to create tables. RLS policies require authentication — use anon key for public queries.
 
 ---
 
