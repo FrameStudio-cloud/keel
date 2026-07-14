@@ -41,6 +41,7 @@ const StockHistory = lazy(() => import("./pages/StockHistory"));
 const Finance = lazy(() => import("./pages/Finance"));
 const Reports = lazy(() => import("./pages/Reports"));
 const Marketing = lazy(() => import("./pages/Marketing"));
+const Storefront = lazy(() => import("./pages/Storefront"));
 const PublicProduct = lazy(() => import("./pages/PublicProduct"));
 const Terms = lazy(() => import("./pages/Terms"));
 const UseCases = lazy(() => import("./pages/UseCases"));
@@ -118,6 +119,7 @@ function AppRoutes() {
         <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
         <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
         <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
+        <Route path="/storefront" element={<ProtectedRoute><Storefront /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
