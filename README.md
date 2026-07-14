@@ -15,6 +15,7 @@ A **multi-tenant shop management dashboard** with website management features. B
 | **Charts** | Recharts 3 (bar chart) |
 | **Icons** | React Icons 5 |
 | **Backend / DB** | Supabase (PostgreSQL + REST API) |
+| **Storefront Backend** | storefront-provisioner (Node.js + Hono + EJS, deployed on Railway) |
 | **Linting** | ESLint 10 |
 | **Toasts** | cite-ui |
 | **SEO** | react-helmet-async |
@@ -27,6 +28,7 @@ Single-page application — all pages client-side rendered, data fetched directl
 
 ```
 Browser → React SPA → supabase-js → Supabase (PostgreSQL)
+                 └→ storefront-provisioner (Railway) → Vercel API
 ```
 
 ---
@@ -60,6 +62,7 @@ mitho-dash/
 │   │   ├── Inventory.jsx       # Product CRUD, stock adjust, publish to website
 │   │   ├── Sales.jsx           # Sales logging, receipts
 │   │   ├── Social.jsx          # Post scheduler
+│   │   ├── Storefront.jsx      # Self-service Vercel storefront deployment
 │   │   ├── Website.jsx         # Website management (listings, banners, biz info, gallery)
 │   │   ├── Settings.jsx        # Store, currency, theme, export, category
 │   │   ├── SetupWizard.jsx     # First-run onboarding
@@ -98,6 +101,7 @@ mitho-dash/
 | `/inventory` | Inventory | Product table, CRUD, stock adjust, search, publish |
 | `/sales` | Sales | Sales list, log sale, receipt |
 | `/social` | Social | Post scheduler, post feed |
+| `/storefront` | Storefront | Self-service Vercel storefront deployment — template pick, subdomain, deploy progress (Pro/Beta) |
 | `/bots` | Bots | WhatsApp + Telegram bot management |
 | `/website` | Website | Listings, Banners, Business Info, Gallery |
 | `/settings` | Settings | Store details, category, currency, theme, export |
@@ -190,6 +194,8 @@ Global table (no `shop_id`). Dismissals tracked per shop in `announcement_dismis
 - **Global announcements** — server-scheduled carousel banners (info/warning/alert/sale/maintenance) with per-shop dismissals
 - **Subscription lockout** — expired subscription blocks dashboard access with lockout screen
 - **Barcode scanning** — camera-based scanning for electronics/electricals categories
+- **Self-service storefront deployment** — deploy a hosted mini-catalogue site to Vercel from the dashboard (template pick, subdomain config, animated progress)
+- **Plan guard** — Pro/Beta plan storesfront via `chat_config.plan_tier`; non-Pro shops see an upsell card
 
 ---
 
@@ -228,3 +234,4 @@ Run the Supabase migrations to create tables. RLS is disabled — all tables acc
 |---|---|
 | `VITE_SUPABASE_URL` | Supabase project URL |
 | `VITE_SUPABASE_ANON_KEY` | Supabase anonymous API key |
+| `VITE_PROVISIONER_URL` | Storefront-provisioner backend URL (Railway) |

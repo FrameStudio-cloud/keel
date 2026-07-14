@@ -128,7 +128,9 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 
 ## Supabase Tables
 
-- `shops` — id, name, slug, business_category, subscription_expires_at, scheduled_deletion_at, created_at
+- `shops` — id, name, slug, business_category, subscription_expires_at, scheduled_deletion_at, category_changed_at, created_at
+- `chat_config` — shop_id (PK), enabled, welcome_message, widget_color, position, whatsapp_number, pro_until, groq_api_key, plan_tier (default "free"), created_at
+- `storefront_deployments` — id, shop_id (unique FK), template_id, subdomain, vercel_project_id, url, domain, status, created_at, updated_at
 - `products` — id, name, category, price, stock, variants (jsonb), barcode, cost_price, image, shop_id, created_at
 - `catalogue` — id, name, type, category, price, image, available, featured, variants (jsonb), specs, includes, shop_id, created_at
 - `banners` — id, type (hero/sale/info/alert), title, subtitle, message, image_url, link_url, active, sort_order, shop_id
@@ -220,6 +222,7 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 | `/reports` | Reports.jsx | Profit margins per product, P&L bar chart; client-side search by product name |
 | `/social` | Social.jsx | Post scheduler, Instagram "Connect" placeholder |
 | `/bots` | Bots.jsx | WhatsApp + Telegram bot management |
+| `/storefront` | Storefront.jsx | Self-service Vercel storefront deployment — template pick, subdomain config, deploy progress; guarded by planTier (Pro/Beta only) |
 | `/website` | Website.jsx | Banners, Business Info, Gallery, Chat Widget tabs; guarded with lock screen when no websiteUrl |
 | `/settings` | Settings.jsx | Tabbed (7 tabs): store details, preferences, notifications, billing, security, data, danger zone |
 | `/profile` | Profile.jsx | Tabbed (3 tabs): About (branding + contact), Account (email + subscription), Quick Access (nav + actions) |
@@ -344,7 +347,38 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 | `C:\Users\Administrator\Documents\Keel Client Proposal.docx` | Word doc | For potential clients: problem/solution, features, pricing |
 | `C:\Users\Administrator\Documents\Keel Deployment Checklist.docx` | Word doc | Deployment steps: prerequisites → Supabase → Vercel → testing → go-live |
 
-Mini-catalogue deployments: `mini-catalogue-phase2` (Zuri Fashion), `mini-catalogue-electricals`, `wix` (Lumière Hair). Each is a separate Vercel project with identical code — only `config/shop.js` and `config/catalogue.js` differ.
+## Storefront Provisioning
+
+Self-service deployment system. Shop owners deploy a live catalogue site to Vercel from the dashboard.
+
+### Architecture
+
+```
+Keel Dashboard → direct fetch → storefront-provisioner (Railway) → Vercel API
+```
+
+- **`src/pages/Storefront.jsx`** — page with 3 states: no deployment (hero + template preview + workflow steps), deploying (DeployProgressModal), deployed (green gradient hero + status card with URL/delete)
+- **TemplatePreview.jsx** — 3-slide phone mockup carousel (homepage, catalogue grid, product detail) with 4s auto-advance, crossfade, dot indicators
+- **TemplateModal.jsx** — template picker (currently only "classic")
+- **ConfigModal.jsx** — subdomain input with live debounced availability check against provisioner
+- **DeployProgressModal.jsx** — animated 4-stage timeline, 180s timeout (matches Vercel polling window), real retry, Escape/click-outside close
+- **Provisioner endpoints**: `GET /templates`, `GET /check/:subdomain`, `POST /provision`, `DELETE /delete/:shopId`
+- **Provisioner key files**: `src/vercel.js` (createProject, createDeployment with readiness polling + production alias URL return, assignDomain, deleteProject), `src/routes/provision.js`, `src/routes/delete.js`, `src/lib/shop-fetcher.js`, `src/templates/classic/` (11 EJS files)
+- **Delete flow**: Keel calls `DELETE /delete/:shopId` → provisioner tries Vercel API `DELETE /v9/projects/{id}` (wrapped in try/catch) → removes `storefront_deployments` row → Keel clears local state
+- **Provisioner fixes**: SUPABASE_ANON_KEY guard, cleanup on Vercel failure (deletes orphaned project), Vercel API retry/timeout (30s, 3 attempts GET/2 POST, 429 backoff), deleteProject wrapped in try/catch
+- **EJS template fixes**: added `tailwind.config.js.ejs` + `postcss.config.js.ejs`, fixed `site.js.ejs` (esc() in `<% %>`, JSON.stringify escaping, missing tagline/description/location), SEO meta tags in `index.html.ejs`, `.maybeSingle()` in `shop.js.ejs`, renderer prop mapping (name→title, image→{src}), Hero image string not object
+- **Tailwind fix**: cite-ui added to content scan + animation keyframes copied
+- **Deployment URL fix**: `createDeployment` returns `body.alias?.[0]` (production alias) instead of `body.url` (deployment hash), plus readiness polling (3s intervals, up to 2min)
+- **Vercel SSO**: `*.vercel.app` URLs redirect to login — need Vercel Team Settings → Security to disable authentication protection
+- **Custom DNS blocked**: `*.keel.framestudio.co.ke` CNAME target exists but host-ww.net provider access is suspended
+
+### Plan Guard
+
+- Storefront requires `planTier` to be `"pro"` or `"beta"` to render the deploy UI
+- `planTier` stored in `chat_config.plan_tier` (column added via migration, default `"free"`)
+- Set via framestudio-dashboard Keel Pulse dropdown → `setShopPlan()` writes to both `keel_shops.plan` and `chat_config.plan_tier` via upsert (fixed: was using nonexistent `id` column)
+- SettingsProvider fetches `chat_config.plan_tier` alongside shops + store_settings, exposes as `planTier`
+- Non-Pro shops see centered upsell card (award icon, heading, lock note) — no access to modals or deploy flow
 
 ## Conventions
 
