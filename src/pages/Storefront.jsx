@@ -42,15 +42,19 @@ const steps = [
 ];
 
 export default function Storefront() {
-  const { planTier } = useSettings();
+  const { planTier, businessCategory } = useSettings();
   const [step, setStep] = useState(null);
   const [deployment, setDeployment] = useState(null);
-  const [selectedTemplate, setSelectedTemplate] = useState("classic");
+  const [selectedTemplate, setSelectedTemplate] = useState(
+    ["clothing", "wigs"].includes(businessCategory) ? "clothing" : "classic"
+  );
   const [pendingSubdomain, setPendingSubdomain] = useState("");
   const [pendingShopId, setPendingShopId] = useState(null);
   const [loadingExisting, setLoadingExisting] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [redeploying, setRedeploying] = useState(false);
+  const [redeployMessage, setRedeployMessage] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -61,7 +65,7 @@ export default function Storefront() {
         if (res.ok) {
           const data = await res.json();
           if (data.deployed) {
-            setDeployment({ url: data.url, subdomain: data.subdomain });
+            setDeployment({ url: data.url, subdomain: data.subdomain, templateId: data.template_id });
           }
         }
       } catch {
@@ -101,6 +105,41 @@ export default function Storefront() {
     }
     setDeployment(null);
     setDeleteLoading(false);
+  }
+
+  async function handleRedeploy() {
+    const shopId = await getShopId();
+    if (!shopId || !deployment) return;
+    setRedeploying(true);
+    setRedeployMessage("Rebuilding catalogue...");
+    try {
+      const res = await fetch(`${PROVISIONER_URL}/provision`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          shop_id: shopId,
+          subdomain: deployment.subdomain,
+          template_id: deployment.templateId || "classic",
+        }),
+      });
+      if (res.ok) {
+        const result = await res.json();
+        setDeployment((prev) => ({
+          ...prev,
+          url: result.url.replace("https://", ""),
+        }));
+        setRedeployMessage("Catalogue updated!");
+      } else {
+        const err = await res.json();
+        setRedeployMessage(err.error || "Update failed");
+      }
+    } catch {
+      setRedeployMessage("Could not reach server");
+    }
+    setTimeout(() => {
+      setRedeploying(false);
+      setRedeployMessage("");
+    }, 2000);
   }
 
   const hasDeployment = !!deployment;
@@ -364,6 +403,14 @@ export default function Storefront() {
                     Open Site
                   </a>
                   <button
+                    onClick={handleRedeploy}
+                    disabled={redeploying}
+                    className="flex items-center gap-1.5 px-3 py-2 text-sm border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <FiRefreshCw size={14} className={redeploying ? "animate-spin" : ""} />
+                    {redeploying ? redeployMessage || "Updating..." : "Update"}
+                  </button>
+                  <button
                     onClick={() => setConfirmDelete(true)}
                     disabled={deleteLoading}
                     className="flex items-center gap-1.5 px-3 py-2 text-sm border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -403,6 +450,7 @@ export default function Storefront() {
       {/* ── Modals ── */}
       {step === "template" && (
         <TemplateModal
+          businessCategory={businessCategory}
           onClose={() => setStep(null)}
           onSelect={(id) => { setSelectedTemplate(id); setStep("config"); }}
         />

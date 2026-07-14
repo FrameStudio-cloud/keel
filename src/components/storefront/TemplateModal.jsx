@@ -9,17 +9,33 @@ const templates = [
     description:
       "Hero slideshow, product catalogue grid, announcement bar, and WhatsApp integration. Ideal for most retail shops.",
     colors: ["#7c3aed", "#f59e0b", "#6366f1"],
+    gradient: "from-violet-50 to-amber-50 dark:from-violet-500/10 dark:to-amber-500/5",
     screens: [
       { rows: 2, cols: 2, label: "Hero" },
       { rows: 2, cols: 1, label: "Cat" },
       { rows: 1, cols: 3, label: "Items" },
     ],
   },
+  {
+    id: "clothing",
+    name: "Fashion Storefront",
+    description:
+      "Lookbook hero, category strips, new arrivals carousel, and featured collection banner. Ideal for clothing and apparel shops.",
+    colors: ["#000000", "#f59e0b", "#ec4899"],
+    gradient: "from-stone-50 to-amber-50 dark:from-stone-500/10 dark:to-amber-500/5",
+    screens: [
+      { rows: 2, cols: 3, label: "Lookbook" },
+      { rows: 1, cols: 3, label: "Cat" },
+      { rows: 1, cols: 3, label: "Arrivals" },
+    ],
+  },
 ];
 
-export default function TemplateModal({ onClose, onSelect }) {
+export default function TemplateModal({ onClose, onSelect, businessCategory }) {
   const trapRef = useFocusTrap(true);
-  const [selected, setSelected] = useState("classic");
+  const [selected, setSelected] = useState(
+    ["clothing", "wigs"].includes(businessCategory) ? "clothing" : "classic"
+  );
 
   const handleEscape = useCallback((e) => {
     if (e.key === "Escape") onClose();
@@ -108,7 +124,7 @@ export default function TemplateModal({ onClose, onSelect }) {
             >
               <div className="flex flex-col sm:flex-row">
                 {/* Template preview */}
-                <div className="sm:w-48 h-32 bg-gradient-to-br from-violet-50 to-amber-50 dark:from-violet-500/10 dark:to-amber-500/5 p-3 flex-shrink-0 relative">
+                <div className={`sm:w-48 h-32 bg-gradient-to-br ${t.gradient} p-3 flex-shrink-0 relative`}>
                   <div className="grid grid-cols-3 gap-1 h-full">
                     {t.screens.map((sc, i) => (
                       <div
