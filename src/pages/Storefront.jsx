@@ -85,7 +85,7 @@ export default function Storefront() {
   }
 
   function handleComplete(result) {
-    setDeployment(result);
+    setDeployment({ ...result, templateId: selectedTemplate });
     setStep(null);
   }
 
