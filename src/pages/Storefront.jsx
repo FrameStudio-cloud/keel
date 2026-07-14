@@ -128,6 +128,8 @@ export default function Storefront() {
       setDeployment((prev) => ({ ...prev, templateId: templateOverride }));
     }
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
       const res = await fetch(`${PROVISIONER_URL}/provision`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -136,7 +138,9 @@ export default function Storefront() {
           subdomain: deployment.subdomain,
           template_id: newTemplateId,
         }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       if (res.ok) {
         const result = await res.json();
         setDeployment((prev) => ({
@@ -145,11 +149,15 @@ export default function Storefront() {
         }));
         setRedeployMessage("Catalogue updated!");
       } else {
-        const err = await res.json();
-        setRedeployMessage(err.error || "Update failed");
+        try {
+          const err = await res.json();
+          setRedeployMessage(err.error || `Update failed (${res.status})`);
+        } catch {
+          setRedeployMessage(`Update failed (${res.status})`);
+        }
       }
-    } catch {
-      setRedeployMessage("Could not reach server");
+    } catch (err) {
+      setRedeployMessage(err?.name === "AbortError" ? "Request timed out" : "Could not reach server");
     }
     setTimeout(() => {
       setRedeploying(false);
