@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { HelmetProvider } from 'react-helmet-async'
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import './index.css'
 import './lib/posthog'
 import App from './App.jsx'
@@ -11,6 +12,7 @@ createRoot(document.getElementById('root')).render(
     <HelmetProvider>
       <App />
       <Analytics />
+      <SpeedInsights />
     </HelmetProvider>
   </StrictMode>,
 )
