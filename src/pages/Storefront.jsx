@@ -7,9 +7,12 @@ import {
   FiRefreshCw,
   FiAlertTriangle,
   FiX,
+  FiLock,
+  FiCrown,
 } from "react-icons/fi";
 import { IoStorefrontOutline } from "react-icons/io5";
 import PageLayout from "../components/layout/PageLayout";
+import { useSettings } from "../hooks/useSettings";
 import TemplateModal from "../components/storefront/TemplateModal";
 import ConfigModal from "../components/storefront/ConfigModal";
 import DeployProgressModal from "../components/storefront/DeployProgressModal";
@@ -39,6 +42,7 @@ const steps = [
 ];
 
 export default function Storefront() {
+  const { planTier } = useSettings();
   const [step, setStep] = useState(null);
   const [deployment, setDeployment] = useState(null);
   const [selectedTemplate, setSelectedTemplate] = useState("classic");
@@ -100,6 +104,33 @@ export default function Storefront() {
   }
 
   const hasDeployment = !!deployment;
+
+  if (!["pro", "beta"].includes(planTier)) {
+    return (
+      <PageLayout title="Storefront">
+        <Helmet>
+          <title>Storefront - Keel</title>
+        </Helmet>
+        <div className="max-w-lg mx-auto pt-12 pb-8">
+          <div className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-200 dark:border-white/10 p-8 text-center">
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
+              <FiCrown size={28} className="text-white" />
+            </div>
+            <h2 className="mt-5 text-xl font-bold text-gray-800 dark:text-white">
+              Storefront is a Pro Feature
+            </h2>
+            <p className="mt-2 text-sm text-gray-500 dark:text-slate-400 leading-relaxed max-w-sm mx-auto">
+              Upgrade your plan to unlock a hosted mini-catalogue site with your own subdomain — no coding required.
+            </p>
+            <div className="mt-6 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-slate-500">
+              <FiLock size={12} />
+              <span>Your shop data stays intact. No data is lost.</span>
+            </div>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout title="Storefront">

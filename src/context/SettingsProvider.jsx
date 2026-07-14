@@ -48,6 +48,12 @@ export default function SettingsProvider({ children }) {
         .eq("id", shopId)
         .maybeSingle();
 
+      const { data: chatCfg } = await supabase
+        .from("chat_config")
+        .select("plan_tier")
+        .eq("shop_id", shopId)
+        .maybeSingle();
+
       const { data: store } = await supabase
         .from("store_settings")
         .select("*")
@@ -61,6 +67,8 @@ export default function SettingsProvider({ children }) {
 
         const theme = store.theme || "light";
         document.documentElement.classList.toggle("dark", theme === "dark");
+
+        const planTier = chatCfg?.plan_tier || "free";
 
         setSettings({
           storeName: store.store_name || "",
@@ -85,15 +93,18 @@ export default function SettingsProvider({ children }) {
           categoryChangedAt: shop?.category_changed_at || null,
           subscriptionExpiresAt: shop?.subscription_expires_at || null,
           scheduledDeletionAt: shop?.scheduled_deletion_at || null,
+          planTier,
           loading: false,
         });
       } else {
+        const planTier = chatCfg?.plan_tier || "free";
         setSettings((prev) => ({
           ...prev,
           businessCategory: shop?.business_category || "general",
           categoryChangedAt: shop?.category_changed_at || null,
           subscriptionExpiresAt: shop?.subscription_expires_at || null,
           scheduledDeletionAt: shop?.scheduled_deletion_at || null,
+          planTier,
           loading: false,
         }));
       }
