@@ -63,7 +63,7 @@ export default function DeployProgressModal({
         setStatus((prev) => ({ ...prev, shop: "done", provision: "current" }));
 
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 30000);
+        const timeout = setTimeout(() => controller.abort(), 180000);
 
         const res = await fetch(`${PROVISIONER_URL}/provision`, {
           method: "POST",
@@ -211,7 +211,7 @@ export default function DeployProgressModal({
           </h2>
           {!done && !error && (
             <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-              Setting up your site — this takes about 30 seconds
+              Building and deploying — this usually takes 1-2 minutes
             </p>
           )}
         </div>
