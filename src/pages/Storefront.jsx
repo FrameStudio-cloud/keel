@@ -18,6 +18,7 @@ import ConfigModal from "../components/storefront/ConfigModal";
 import DeployProgressModal from "../components/storefront/DeployProgressModal";
 import TemplatePreview from "../components/storefront/TemplatePreview";
 import { getShopId } from "../lib/shop";
+import { supabase } from "../lib/supabase";
 import { PROVISIONER_URL } from "../lib/constants";
 
 const steps = [
@@ -55,6 +56,7 @@ export default function Storefront() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [redeploying, setRedeploying] = useState(false);
   const [redeployMessage, setRedeployMessage] = useState("");
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -66,6 +68,15 @@ export default function Storefront() {
           const data = await res.json();
           if (data.deployed) {
             setDeployment({ url: data.url, subdomain: data.subdomain, templateId: data.template_id });
+            const { count: productCount } = await supabase
+              .from("catalogue")
+              .select("*", { count: "exact", head: true })
+              .eq("shop_id", shopId);
+            const { count: pageViewCount } = await supabase
+              .from("page_views")
+              .select("*", { count: "exact", head: true })
+              .eq("shop_id", shopId);
+            setStats({ products: productCount ?? 0, pageViews: pageViewCount ?? 0 });
           }
         }
       } catch {
@@ -107,11 +118,15 @@ export default function Storefront() {
     setDeleteLoading(false);
   }
 
-  async function handleRedeploy() {
+  async function handleRedeploy(templateOverride) {
     const shopId = await getShopId();
     if (!shopId || !deployment) return;
     setRedeploying(true);
     setRedeployMessage("Rebuilding catalogue...");
+    const newTemplateId = templateOverride || deployment.templateId || "classic";
+    if (templateOverride) {
+      setDeployment((prev) => ({ ...prev, templateId: templateOverride }));
+    }
     try {
       const res = await fetch(`${PROVISIONER_URL}/provision`, {
         method: "POST",
@@ -119,7 +134,7 @@ export default function Storefront() {
         body: JSON.stringify({
           shop_id: shopId,
           subdomain: deployment.subdomain,
-          template_id: deployment.templateId || "classic",
+          template_id: newTemplateId,
         }),
       });
       if (res.ok) {
@@ -323,7 +338,7 @@ export default function Storefront() {
         </div>
 
         {/* ── Template preview ── */}
-        {!hasDeployment && <TemplatePreview />}
+        {!hasDeployment && <TemplatePreview templateId={selectedTemplate} />}
 
         {/* ── Workflow steps (not deployed) ── */}
         {!hasDeployment && (
@@ -403,6 +418,14 @@ export default function Storefront() {
                     Open Site
                   </a>
                   <button
+                    onClick={() => setStep("change-template")}
+                    disabled={redeploying}
+                    className="flex items-center gap-1.5 px-3 py-2 text-sm border border-gray-200 dark:border-white/10 text-gray-600 dark:text-slate-400 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <FiRefreshCw size={14} />
+                    Change Template
+                  </button>
+                  <button
                     onClick={handleRedeploy}
                     disabled={redeploying}
                     className="flex items-center gap-1.5 px-3 py-2 text-sm border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -428,8 +451,8 @@ export default function Storefront() {
             {/* Stats row */}
             <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-100 dark:divide-white/5">
               {[
-                { label: "Products", value: "—" },
-                { label: "Page Views", value: "—" },
+                { label: "Products", value: stats ? String(stats.products) : "—" },
+                { label: "Page Views", value: stats ? String(stats.pageViews) : "—" },
                 { label: "Status", value: "Active" },
                 { label: "Domain", value: "Verified" },
               ].map((stat) => (
@@ -448,11 +471,19 @@ export default function Storefront() {
       </div>
 
       {/* ── Modals ── */}
-      {step === "template" && (
+      {(step === "template" || step === "change-template") && (
         <TemplateModal
           businessCategory={businessCategory}
           onClose={() => setStep(null)}
-          onSelect={(id) => { setSelectedTemplate(id); setStep("config"); }}
+          onSelect={(id) => {
+            setSelectedTemplate(id);
+            if (step === "change-template") {
+              setStep(null);
+              handleRedeploy(id);
+            } else {
+              setStep("config");
+            }
+          }}
         />
       )}
       {step === "config" && (
