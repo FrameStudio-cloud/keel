@@ -157,12 +157,12 @@ export default function Storefront() {
         }
       }
     } catch (err) {
-      setRedeployMessage(err?.name === "AbortError" ? "Request timed out" : "Could not reach server");
+      setRedeployMessage(err?.name === "AbortError" ? "Request timed out" : `Error: ${err?.message || "Unknown"}`);
     }
     setTimeout(() => {
       setRedeploying(false);
       setRedeployMessage("");
-    }, 2000);
+    }, 4000);
   }
 
   const hasDeployment = !!deployment;
