@@ -8,7 +8,7 @@ import {
   FiAlertTriangle,
   FiX,
   FiLock,
-  FiCrown,
+  FiAward,
 } from "react-icons/fi";
 import { IoStorefrontOutline } from "react-icons/io5";
 import PageLayout from "../components/layout/PageLayout";
@@ -114,7 +114,7 @@ export default function Storefront() {
         <div className="max-w-lg mx-auto pt-12 pb-8">
           <div className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-200 dark:border-white/10 p-8 text-center">
             <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
-              <FiCrown size={28} className="text-white" />
+              <FiAward size={28} className="text-white" />
             </div>
             <h2 className="mt-5 text-xl font-bold text-gray-800 dark:text-white">
               Storefront is a Pro Feature
