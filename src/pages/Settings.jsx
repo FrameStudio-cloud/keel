@@ -76,6 +76,13 @@ export default function Settings() {
     website_url: settings.websiteUrl, whatsapp: settings.whatsapp,
     business_category: settings.businessCategory,
     notification_preferences: settings.notificationPreferences,
+    primary_color: settings.primaryColor || "#000000",
+    secondary_color: settings.secondaryColor || "#4f46e5",
+    accent_color: settings.accentColor || "#f59e0b",
+    name_accent: settings.nameAccent || "",
+    instagram: settings.instagram || "",
+    facebook: settings.facebook || "",
+    tiktok: settings.tiktok || "",
   });
   const [hours, setHours] = useState(() => hoursFromSettings(settings.businessHours));
   const saveHandlerRef = useRef(null);
@@ -97,6 +104,13 @@ export default function Settings() {
       theme: settings.theme || "light", website_url: safe(settings.websiteUrl),
       whatsapp: safe(settings.whatsapp), business_category: settings.businessCategory || "general",
       notification_preferences: settings.notificationPreferences,
+      primary_color: settings.primaryColor || "#000000",
+      secondary_color: settings.secondaryColor || "#4f46e5",
+      accent_color: settings.accentColor || "#f59e0b",
+      name_accent: settings.nameAccent || "",
+      instagram: settings.instagram || "",
+      facebook: settings.facebook || "",
+      tiktok: settings.tiktok || "",
     };
     const newHours = hoursFromSettings(settings.businessHours);
     setForm(newForm);
@@ -140,6 +154,13 @@ export default function Settings() {
       theme: settings.theme || "light", website_url: safe(settings.websiteUrl),
       whatsapp: safe(settings.whatsapp), business_category: settings.businessCategory || "general",
       notification_preferences: settings.notificationPreferences,
+      primary_color: settings.primaryColor || "#000000",
+      secondary_color: settings.secondaryColor || "#4f46e5",
+      accent_color: settings.accentColor || "#f59e0b",
+      name_accent: settings.nameAccent || "",
+      instagram: settings.instagram || "",
+      facebook: settings.facebook || "",
+      tiktok: settings.tiktok || "",
     });
     setHours(hoursFromSettings(settings.businessHours));
     setValidationErrors({});
@@ -174,6 +195,13 @@ export default function Settings() {
       default_payment: form.default_payment, receipt_footer: form.receipt_footer, theme: form.theme,
       website_url: form.website_url, whatsapp: form.whatsapp, business_hours: businessHours, shop_id: shopId,
       notification_preferences: form.notification_preferences,
+      primary_color: form.primary_color,
+      secondary_color: form.secondary_color,
+      accent_color: form.accent_color,
+      name_accent: form.name_accent,
+      instagram: form.instagram,
+      facebook: form.facebook,
+      tiktok: form.tiktok,
     };
 
     const categoryChanged = form.business_category !== settings.businessCategory;

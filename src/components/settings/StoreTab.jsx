@@ -1,7 +1,7 @@
 import SectionCard from "./SectionCard";
 import { inputClass } from "./settingsStyles";
 import {
-  FiShoppingBag, FiGlobe, FiLock, FiClock, FiCheck
+  FiShoppingBag, FiGlobe, FiLock, FiClock, FiCheck, FiDroplet, FiAtSign
 } from "react-icons/fi";
 
 const CATEGORIES = ["general", "clothing", "electronics", "electricals"];
@@ -26,6 +26,10 @@ export default function StoreTab({ form, setForm, hours, updateHour, validationE
             <input type="text" value={form.store_name} onChange={(e) => setForm({ ...form, store_name: e.target.value })} className={`${inputClass} ${validationErrors.store_name ? "border-red-400 focus:border-red-400 focus:ring-red-400/20" : ""}`} />
             {validationErrors.store_name && <p className="text-xs text-red-500 mt-1">{validationErrors.store_name}</p>}
           </div>
+          <div>
+            <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Accent Word <span className="text-[10px] text-gray-400">(e.g. "Fashion" in "Campus Fashion")</span></label>
+            <input type="text" value={form.name_accent} onChange={(e) => setForm({ ...form, name_accent: e.target.value })} placeholder="Auto-detected from store name" className={inputClass} />
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Phone</label>
@@ -49,6 +53,53 @@ export default function StoreTab({ form, setForm, hours, updateHour, validationE
             </div>
             {validationErrors.website_url && <p className="text-xs text-red-500 mt-1">{validationErrors.website_url}</p>}
             <p className="text-[10px] text-gray-400 dark:text-slate-500 mt-1">Enables website analytics on Overview and Website management page</p>
+          </div>
+        </div>
+      </SectionCard>
+
+      <SectionCard icon={FiAtSign} title="Social Links">
+        <p className="text-xs text-gray-400 dark:text-slate-500 mb-3">Displayed on your storefront site's footer</p>
+        <div className="flex flex-col gap-3">
+          <div>
+            <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Instagram</label>
+            <input type="text" value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="username (without @)" className={inputClass} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Facebook</label>
+              <input type="text" value={form.facebook} onChange={(e) => setForm({ ...form, facebook: e.target.value })} placeholder="URL or username" className={inputClass} />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">TikTok</label>
+              <input type="text" value={form.tiktok} onChange={(e) => setForm({ ...form, tiktok: e.target.value })} placeholder="username (without @)" className={inputClass} />
+            </div>
+          </div>
+        </div>
+      </SectionCard>
+
+      <SectionCard icon={FiDroplet} title="Brand Colors">
+        <p className="text-xs text-gray-400 dark:text-slate-500 mb-3">Used by your generated storefront site</p>
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Primary</label>
+            <div className="flex items-center gap-2">
+              <input type="color" value={form.primary_color} onChange={(e) => setForm({ ...form, primary_color: e.target.value })} className="w-8 h-8 rounded border border-gray-200 dark:border-white/10 cursor-pointer bg-transparent" />
+              <input type="text" value={form.primary_color} onChange={(e) => setForm({ ...form, primary_color: e.target.value })} className={`${inputClass} flex-1 font-mono text-xs`} />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Secondary</label>
+            <div className="flex items-center gap-2">
+              <input type="color" value={form.secondary_color} onChange={(e) => setForm({ ...form, secondary_color: e.target.value })} className="w-8 h-8 rounded border border-gray-200 dark:border-white/10 cursor-pointer bg-transparent" />
+              <input type="text" value={form.secondary_color} onChange={(e) => setForm({ ...form, secondary_color: e.target.value })} className={`${inputClass} flex-1 font-mono text-xs`} />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Accent</label>
+            <div className="flex items-center gap-2">
+              <input type="color" value={form.accent_color} onChange={(e) => setForm({ ...form, accent_color: e.target.value })} className="w-8 h-8 rounded border border-gray-200 dark:border-white/10 cursor-pointer bg-transparent" />
+              <input type="text" value={form.accent_color} onChange={(e) => setForm({ ...form, accent_color: e.target.value })} className={`${inputClass} flex-1 font-mono text-xs`} />
+            </div>
           </div>
         </div>
       </SectionCard>

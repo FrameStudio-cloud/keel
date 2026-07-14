@@ -94,6 +94,10 @@ export default function SettingsProvider({ children }) {
           subscriptionExpiresAt: shop?.subscription_expires_at || null,
           scheduledDeletionAt: shop?.scheduled_deletion_at || null,
           planTier,
+          primaryColor: store.primary_color || "#000000",
+          secondaryColor: store.secondary_color || "#4f46e5",
+          accentColor: store.accent_color || "#f59e0b",
+          nameAccent: store.name_accent || "",
           loading: false,
         });
       } else {

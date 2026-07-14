@@ -26,6 +26,10 @@ export const SettingsContext = createContext({
   scheduledDeletionAt: null,
   planTier: "free",
   notificationPreferences: DEFAULT_NOTIF_PREFS,
+  primaryColor: "#000000",
+  secondaryColor: "#4f46e5",
+  accentColor: "#f59e0b",
+  nameAccent: "",
   loading: true,
   refreshSettings: async () => {},
 });
