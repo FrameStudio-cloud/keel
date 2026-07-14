@@ -13,7 +13,7 @@ Dark mode uses `@variant dark` in Tailwind v4, toggled via `.dark` class on `<ht
 **Default theme is `"light"`** — changed from `"dark"` to prevent flash on reload (previously, default was `"dark"` but `<html>` had no dark class, causing a light→dark flash after settings loaded).
 Settings are fetched once by `SettingsProvider` context and consumed via `useSettings()` hook.
 Theme class is applied via useEffect in SettingsProvider (no flash since default is "light").
-All Supabase tables have RLS disabled — no auth.
+All Supabase tables have RLS enabled (except `shops` — disabled due to signup chicken-and-egg problem) — tenant isolation via `auth.uid()` → `shop_id` policies.
 Tailwind v4 — no `tailwind.config.js`, dark mode via `@variant dark (&:where(.dark, .dark *));`.
 Multi-tenant via `shop_id` FK on every table — use `getShopId()` / `withShop()` helpers.
 Subscription lockout: `shops.subscription_expires_at` (timestamptz) controls access. `ProtectedRoute` in `App.jsx` checks `useSettings().subscriptionExpiresAt` — if in the past, renders `LockoutScreen.jsx` (lock icon, expiry date, Sign Out button). SettingsProvider fetches this column alongside `business_category`. If `null` (never set), no lockout applies. Migration: `20260624_add_subscription_expires_at.sql`. Managed via framestudio-dashboard's Keel Pulse page at `/keel`.
@@ -302,7 +302,8 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - `Features.jsx` — removed unused `FiMoon` import
 - `esbuild` removed from `devDependencies` — Vite 8 uses Rolldown native minifier (was `minify: "esbuild"` in vite.config.js, now uses default)
 - `robots.txt` + `sitemap.xml` added to `public/` — disallows dashboard routes, 6 marketing URLs point to `https://keel-nu.vercel.app`
-- `react-helmet-async` installed — `<HelmetProvider>` wraps `<App />` in `src/main.jsx`; `<Helmet>` with title + description + OG tags on all marketing pages (Homepage, Features, UseCases, AboutFramestudio, Terms, Login); basic `<Helmet>` titles on dashboard pages
+- `react-helmet-async` installed
+- Tauri signing key: `~/.tauri/keel` (private) / `~/.tauri/keel.pub` (public), password: `l3w151rungu`. Update endpoint: `https://framestudio.co.ke/releases/latest.json`. Release script: `framestudio-landing/release.ps1`. — `<HelmetProvider>` wraps `<App />` in `src/main.jsx`; `<Helmet>` with title + description + OG tags on all marketing pages (Homepage, Features, UseCases, AboutFramestudio, Terms, Login); basic `<Helmet>` titles on dashboard pages
 - LockoutScreen: added `refreshSettings()` to SettingsProvider + context; "Check Subscription Status" button calls `refreshSettings()`; `renewShop()` in framestudio-dashboard DataContext now also writes `subscription_expires_at` to `shops` table (Keel reads from `shops`, not `keel_shops`)
 - `useAnnouncements()` React Query hook — fetches active announcements within `starts_at`/`expires_at` schedule, filters out server-side dismissals per shop, 2min staleTime
 - `AnnouncementBanner.jsx` — carousel rendering up to 5 announcements (top 3 shown) with auto-advance (6s), arrow navigation, dot indicators; each announcement uses variant-based gradient + icon fallback (info/warning/alert/sale/maintenance), `bg_image_url` for custom backgrounds, `link_text` for CTA; dismiss calls server-side INSERT to `announcement_dismissals` + query invalidation
@@ -387,6 +388,6 @@ Keel Dashboard → direct fetch → storefront-provisioner (Railway) → Vercel 
 - Mobile first: sidebar drawer with hamburger toggle, collapsing grids, stacking cards
 - Dark mode: `dark:` variant on all elements, no CSS variables
 - Lazy imports for all pages except Overview (entry point)
-- No TypeScript, no auth/RLS
+- No TypeScript; RLS enabled on all tables (see Session Context)
 - Every Supabase query uses `getShopId()` + `.eq("shop_id", shopId)` for SELECT/UPDATE/DELETE and `withShop()` for INSERT
 - `supabase.auth` is **never used** — all auth via direct `window.fetch` to Supabase Auth REST API

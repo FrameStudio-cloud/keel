@@ -434,12 +434,12 @@ export default function Storefront() {
                     Change Template
                   </button>
                   <button
-                    onClick={handleRedeploy}
+                    onClick={() => handleRedeploy()}
                     disabled={redeploying}
                     className="flex items-center gap-1.5 px-3 py-2 text-sm border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <FiRefreshCw size={14} className={redeploying ? "animate-spin" : ""} />
-                    {redeploying ? redeployMessage || "Updating..." : "Update"}
+                    {redeploying ? "Updating…" : "Update"}
                   </button>
                   <button
                     onClick={() => setConfirmDelete(true)}
@@ -451,6 +451,17 @@ export default function Storefront() {
                   </button>
                 </div>
               </div>
+              {redeployMessage && (
+                <div className={`mt-4 px-3 py-2.5 rounded-lg text-sm leading-relaxed break-words ${
+                  redeployMessage.startsWith("Error") || redeployMessage.includes("failed") || redeployMessage.includes("circular")
+                    ? "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-500/20"
+                    : redeployMessage === "Catalogue updated!"
+                    ? "bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-500/20"
+                    : "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/20"
+                }`}>
+                  {redeployMessage}
+                </div>
+              )}
             </div>
 
             {/* Divider */}

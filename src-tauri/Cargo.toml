@@ -3,6 +3,10 @@ name = "keel"
 version = "1.1.0"
 edition = "2021"
 
+[profile.release]
+opt-level = 2
+strip = "debuginfo"
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 

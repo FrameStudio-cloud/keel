@@ -39,7 +39,8 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
         return token;
       }
       return session.access_token;
-    } catch {
+    } catch (err) {
+      console.error("[supabase] accessToken getter failed:", err);
       return null;
     }
   },
