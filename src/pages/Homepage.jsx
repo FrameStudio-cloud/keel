@@ -2,9 +2,18 @@ import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useFocusTrap } from "../hooks/useFocusTrap";
-import fashionCatalogue from "../assets/catalogue/zurifashion-catalogue-shot.png";
-import wixCatalogue from "../assets/catalogue/wix-collection-shot.png";
-import electricalsCatalogue from "../assets/catalogue/mini-electricals-shots.png";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
+import fashionCatalogueWebp from "../assets/catalogue/zurifashion-catalogue-shot.webp";
+import fashionCataloguePng from "../assets/catalogue/zurifashion-catalogue-shot.png";
+import wixCatalogueWebp from "../assets/catalogue/wix-collection-shot.webp";
+import wixCataloguePng from "../assets/catalogue/wix-collection-shot.png";
+import electricalsCatalogueWebp from "../assets/catalogue/mini-electricals-shots.webp";
+import electricalsCataloguePng from "../assets/catalogue/mini-electricals-shots.png";
+import PictureImg from "../components/PictureImg";
 import { FaTiktok } from "react-icons/fa6";
 import {
   FiPackage, FiTrendingUp,
@@ -21,17 +30,20 @@ const howItWorks = [
 
 const websiteShots = [
   {
-    image: fashionCatalogue,
+    image: fashionCatalogueWebp,
+    fallback: fashionCataloguePng,
     label: "Fashion Boutique",
     desc: "Showcase your clothing line with a clean, browsable product grid.",
   },
   {
-    image: wixCatalogue,
+    image: wixCatalogueWebp,
+    fallback: wixCataloguePng,
     label: "General Store",
     desc: "Display all your categories — groceries, household, and more.",
   },
   {
-    image: electricalsCatalogue,
+    image: electricalsCatalogueWebp,
+    fallback: electricalsCataloguePng,
     label: "Electronics Store",
     desc: "List phones, accessories, and gadgets with variant options.",
   },
@@ -81,6 +93,60 @@ export default function Homepage() {
   const navTrapRef = useFocusTrap(mobileNavOpen);
   const marqueeRef = useRef(null);
   const carouselRef = useRef(null);
+  const pageRef = useRef(null);
+
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+
+    mm.add("(prefers-reduced-motion: reduce)", () => {
+      gsap.set(".flashcard", { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" });
+    });
+
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      const heroTl = gsap.timeline({ defaults: { ease: "power2.out" } });
+      heroTl
+        .fromTo(".hero-icon", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4 })
+        .fromTo(".hero-headline", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.2")
+        .fromTo(".hero-subtitle", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.2")
+        .fromTo(".hero-cta", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.15 }, "-=0.2");
+
+      gsap.utils.toArray(".feature-row").forEach((row) => {
+        gsap.fromTo(row,
+          { opacity: 0, y: 60 },
+          {
+            opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
+            scrollTrigger: {
+              trigger: row,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            }
+          }
+        );
+      });
+
+      const cards = gsap.utils.toArray(".flashcard");
+      const peekY = [12, 20, 28];
+      const peekScale = [1, 0.975, 0.95];
+      const tl = gsap.timeline({ repeat: -1 });
+      const cycle = 8;
+
+      cards.forEach((card, i) => {
+        const start = i * cycle;
+        tl.set(card, { y: peekY[i], scale: peekScale[i], opacity: 0.6, filter: "blur(0.5px)", zIndex: 1 }, 0);
+        tl.to(card, {
+          y: 0, scale: 1, opacity: 1, filter: "blur(0px)", zIndex: 10,
+          duration: 1.5, ease: "power2.out"
+        }, start);
+        tl.to(card, {
+          y: 80, scale: 0.92, opacity: 0, filter: "blur(1px)", zIndex: 11,
+          duration: 1.5, ease: "power2.in"
+        }, start + 6.5);
+        tl.set(card, { y: peekY[i], scale: peekScale[i], opacity: 0.6, filter: "blur(0.5px)", zIndex: 1 }, start + 8 - 0.01);
+      });
+    });
+
+    return () => mm.revert();
+  }, { scope: pageRef });
 
   const scrollTestimonial = (index) => {
     const el = carouselRef.current;
@@ -138,18 +204,30 @@ export default function Homepage() {
         <meta name="description" content="Track inventory, manage sales, view reports, and grow your business — all from one clean dashboard. Built for Kenyan shop owners." />
         <meta property="og:title" content="Keel — Business Dashboard for African SMEs" />
         <meta property="og:description" content="Track inventory, manage sales, view reports, and grow your business — all from one clean dashboard." />
-        <meta property="og:url" content="https://keel-nu.vercel.app/" />
+        <meta property="og:url" content="https://keel.framestudio.co.ke/" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": faqs.map(({ q, a }) => ({
+              "@type": "Question",
+              "name": q,
+              "acceptedAnswer": { "@type": "Answer", "text": a }
+            }))
+          })}
+        </script>
       </Helmet>
       <style>{`
 @keyframes fade-slide-in { 0% { opacity: 0; transform: translateY(12px); } 100% { opacity: 1; transform: translateY(0); } }
 .nav-item { animation: fade-slide-in 0.3s ease-out both; }
+.flashcard { opacity: 0.6; filter: blur(0.5px); }
 `}</style>
-    <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] text-slate-900 dark:text-white">
+    <div ref={pageRef} className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] text-slate-900 dark:text-white">
       {/* NAV */}
       <nav className="sticky top-0 z-50 bg-white/80 dark:bg-[#16213e]/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 font-bold text-sm">
-            <img src="/keel icon.png" alt="Keel" className="w-7 h-7" />
+            <img src="/keel-icon.webp" alt="Keel" className="w-7 h-7" />
             Keel
           </Link>
 
@@ -203,7 +281,7 @@ export default function Homepage() {
           <button
             onClick={() => setMobileNavOpen(!mobileNavOpen)}
             className="sm:hidden p-1 text-slate-600 dark:text-slate-400"
-            aria-label="Toggle navigation"
+            aria-label={mobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
           >
             {mobileNavOpen ? <FiX size={20} /> : <FiMenu size={20} />}
           </button>
@@ -225,7 +303,7 @@ export default function Homepage() {
             </button>
             <div className="mb-10">
               <Link to="/" className="inline-flex items-center gap-2 font-bold text-sm">
-                <img src="/keel icon.png" alt="Keel" className="w-7 h-7" />
+            <img src="/keel-icon.webp" alt="Keel" className="w-7 h-7" />
                 Keel
               </Link>
             </div>
@@ -263,22 +341,22 @@ export default function Homepage() {
           {/* Left */}
           <div className="lg:col-span-5 text-center lg:text-left">
             <img
-              src="/keel icon.png"
+              src="/keel-icon.webp"
               alt="Keel"
-              className="w-16 h-16 mx-auto lg:mx-0 mb-6"
+              className="hero-icon w-16 h-16 mx-auto lg:mx-0 mb-6"
             />
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+            <h1 className="hero-headline text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
               Shop Management,{" "}
               <span className="text-blue-600 dark:text-blue-400">
                 Simplified
               </span>
             </h1>
-            <p className="mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed mx-auto lg:mx-0">
+            <p className="hero-subtitle mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed mx-auto lg:mx-0">
               Track inventory, manage sales, view reports, and grow your
               business — all from one clean dashboard. No complexity, no
               clutter.
             </p>
-            <div className="mt-10 flex flex-col sm:flex-row items-center lg:justify-start gap-4">
+            <div className="hero-cta mt-10 flex flex-col sm:flex-row items-center lg:justify-start gap-4">
               <Link
                 to="/login"
                 className="w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
@@ -297,22 +375,22 @@ export default function Homepage() {
           {/* Right */}
           <div className="lg:col-span-7 hidden md:block space-y-6">
             <div className="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden rotate-[2deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-500">
-              <img
-                src=" /Modern dashboard interface with metrics.png"
+              <PictureImg
+                src="/Modern dashboard interface with metrics.png"
                 alt="Overview"
                 className="w-full h-86 object-cover"
               />
             </div>
             <div className="grid grid-cols-2 gap-6">
               <div className="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden -rotate-[1deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-500">
-                <img
+                <PictureImg
                   src="/Modern tech product dashboard mockup.png"
                   alt="Inventory"
                   className="w-full h-60 object-cover"
                 />
               </div>
               <div className="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden rotate-[1deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-500">
-                <img
+                <PictureImg
                   src="/Payment summary dashboard widget.png"
                   alt="Finance"
                   className="w-full h-60 object-cover"
@@ -320,7 +398,7 @@ export default function Homepage() {
               </div>
             </div>
             <div className="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden -rotate-[1deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-500">
-              <img
+              <PictureImg
                 src="/Modern analytics dashboard with pastel accents.png"
                 alt="Reports"
                 className="w-full h-86 object-cover"
@@ -328,12 +406,30 @@ export default function Homepage() {
             </div>
           </div>
           {/* Mobile fallback */}
-          <div className="md:hidden">
-            <img
-              src="/Modern dashboard interface with metrics.png"
-              alt="Dashboard preview"
-              className="w-full rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl"
-            />
+          <div className="md:hidden space-y-3 mt-6">
+            <div className="rounded-2xl shadow-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden">
+              <PictureImg
+                src="/Modern dashboard interface with metrics.png"
+                alt="Dashboard overview"
+                className="w-full h-48 object-cover"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-2xl shadow-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden">
+                <PictureImg
+                  src="/Modern tech product dashboard mockup.png"
+                  alt="Inventory view"
+                  className="w-full h-32 object-cover"
+                />
+              </div>
+              <div className="rounded-2xl shadow-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden">
+                <PictureImg
+                  src="/Payment summary dashboard widget.png"
+                  alt="Finance view"
+                  className="w-full h-32 object-cover"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -352,81 +448,85 @@ export default function Homepage() {
           </p>
         </div>
 
-        <div className="space-y-20">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-            <div className="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden -rotate-[1deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-500">
-              <img
-                src="/Modern tech product dashboard mockup.png"
-                alt="Inventory"
-                className="w-full h-auto object-cover"
-              />
+          <div className="space-y-20">
+            <div className="feature-row grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+              <div className="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden -rotate-[1deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-500">
+                <PictureImg
+                  src="/Modern tech product dashboard mockup.png"
+                  alt="Inventory"
+                  className="w-full h-auto object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <div>
+                <h3 className="text-xl sm:text-2xl font-extrabold mb-3">
+                  Inventory Management
+                </h3>
+                <p className="text-base sm:text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                  Never lose track of stock again.
+                </p>
+                <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Track inventory in real time, monitor stock levels, and manage
+                  products from one dashboard.
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-xl sm:text-2xl font-extrabold mb-3">
-                Inventory Management
-              </h3>
-              <p className="text-base sm:text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                Never lose track of stock again.
-              </p>
-              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-                Track inventory in real time, monitor stock levels, and manage
-                products from one dashboard.
-              </p>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-            <div className="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden rotate-[1deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-500 lg:order-last">
-              <img
-                src="/Payment summary dashboard widget.png"
-                alt="Financial Tracking"
-                className="w-full h-auto object-cover"
-              />
+            <div className="feature-row grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+              <div className="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden rotate-[1deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-500 lg:order-last">
+                <PictureImg
+                  src="/Payment summary dashboard widget.png"
+                  alt="Financial Tracking"
+                  className="w-full h-auto object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <div className="lg:order-first">
+                <h3 className="text-xl sm:text-2xl font-extrabold mb-3">
+                  Financial Tracking
+                </h3>
+                <p className="text-base sm:text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                  Know exactly where every shilling goes.
+                </p>
+                <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Track revenue, expenses, cash, bank and M-Pesa payments from a
+                  single view.
+                </p>
+              </div>
             </div>
-            <div className="lg:order-first">
-              <h3 className="text-xl sm:text-2xl font-extrabold mb-3">
-                Financial Tracking
-              </h3>
-              <p className="text-base sm:text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                Know exactly where every shilling goes.
-              </p>
-              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-                Track revenue, expenses, cash, bank and M-Pesa payments from a
-                single view.
-              </p>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-            <div className="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden -rotate-[1deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-500">
-              <img
-                src="/Modern analytics dashboard with pastel accents.png"
-                alt="Reports"
-                className="w-full h-auto object-cover"
-              />
+            <div className="feature-row grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+              <div className="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden -rotate-[1deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-500">
+                <PictureImg
+                  src="/Modern analytics dashboard with pastel accents.png"
+                  alt="Reports"
+                  className="w-full h-auto object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <div>
+                <h3 className="text-xl sm:text-2xl font-extrabold mb-3">
+                  Reports &amp; Insights
+                </h3>
+                <p className="text-base sm:text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                  Make smarter business decisions.
+                </p>
+                <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+                  View profit trends, performance reports, and business growth in
+                  seconds.
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-xl sm:text-2xl font-extrabold mb-3">
-                Reports &amp; Insights
-              </h3>
-              <p className="text-base sm:text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                Make smarter business decisions.
-              </p>
-              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-                View profit trends, performance reports, and business growth in
-                seconds.
-              </p>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-            <div className="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden rotate-[1deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-500 lg:order-last">
-              <img
-                src="/Modern dashboard interface with metrics.png"
-                alt="Sales"
-                className="w-full h-auto object-cover"
-              />
-            </div>
+            <div className="feature-row grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+              <div className="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden rotate-[1deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-500 lg:order-last">
+                <PictureImg
+                  src="/Modern dashboard interface with metrics.png"
+                  alt="Sales"
+                  className="w-full h-auto object-cover"
+                  loading="lazy"
+                />
+              </div>
             <div className="lg:order-first">
               <h3 className="text-xl sm:text-2xl font-extrabold mb-3">
                 Sales Management
@@ -455,48 +555,12 @@ export default function Homepage() {
           </p>
         </div>
 
-        <style>{`
-          @keyframes cardCycle {
-            0%, 20% {
-              transform: translateY(var(--peek-y)) scale(var(--peek-scale));
-              opacity: 0.6;
-              z-index: 1;
-              filter: blur(0.5px);
-            }
-            20%, 25% {
-              transform: translateY(0) scale(1);
-              opacity: 1;
-              z-index: 9;
-              filter: blur(0);
-            }
-            25%, 55% {
-              transform: translateY(0) scale(1);
-              opacity: 1;
-              z-index: 10;
-              filter: blur(0);
-            }
-            55%, 60% {
-              transform: translateY(80px) scale(0.92);
-              opacity: 0;
-              z-index: 11;
-              filter: blur(1px);
-            }
-            60%, 100% {
-              transform: translateY(var(--peek-y)) scale(var(--peek-scale));
-              opacity: 0.6;
-              z-index: 1;
-              filter: blur(0.5px);
-            }
-          }
-        `}</style>
-
         <div className="relative h-[270px] sm:h-[240px]">
           {howItWorks.map(({ icon: Icon, title, desc }, i) => (
             <div
               key={title}
-              className="absolute inset-x-0"
+              className="flashcard absolute inset-x-0"
               style={{
-                animation: `cardCycle 15s ease-in-out ${["-5s", "0s", "-10s"][i]} infinite`,
                 "--peek-y": `${12 + i * 8}px`,
                 "--peek-scale": `${1 - i * 0.025}`,
               }}
@@ -558,14 +622,22 @@ export default function Homepage() {
               if (marqueeRef.current)
                 marqueeRef.current.dataset.paused = "false";
             }}
+            onTouchStart={() => {
+              if (marqueeRef.current)
+                marqueeRef.current.dataset.paused = "true";
+            }}
+            onTouchEnd={() => {
+              if (marqueeRef.current)
+                marqueeRef.current.dataset.paused = "false";
+            }}
           >
             {[...websiteShots, ...websiteShots].map(
-              ({ image, label, desc }, i) => (
+              ({ image, label, desc, fallback }, i) => (
                 <div
                   key={`${label}-${i}`}
                   className="w-[80vw] flex-shrink-0 bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden"
                 >
-                  <img src={image} alt={label} className="w-full" />
+                  <PictureImg src={image} fallback={fallback} alt={label} className="w-full" loading="lazy" />
                   <div className="p-4">
                     <h3 className="font-bold text-sm mb-0.5">{label}</h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -579,12 +651,12 @@ export default function Homepage() {
         </div>
 
         <div className="hidden sm:grid sm:grid-cols-3 gap-4">
-          {websiteShots.map(({ image, label, desc }) => (
+          {websiteShots.map(({ image, label, desc, fallback }) => (
             <div
               key={label}
               className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden"
             >
-              <img src={image} alt={label} className="w-full" />
+              <PictureImg src={image} fallback={fallback} alt={label} className="w-full" loading="lazy" />
               <div className="p-4">
                 <h3 className="font-bold text-sm mb-0.5">{label}</h3>
                 <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -657,18 +729,24 @@ export default function Homepage() {
             </div>
           </div>
 
-          <div className="flex justify-center gap-2 mt-2">
+          <div className="flex justify-center gap-1 mt-2">
             {testimonials.map((_, i) => (
               <button
                 key={i}
                 onClick={() => scrollTestimonial(i)}
-                className={`h-2 rounded-full transition-all ${
+                className={`flex items-center justify-center h-10 px-1 rounded-full transition-all ${
                   currentTestimonial === i
                     ? "w-6 bg-blue-600"
-                    : "w-2 bg-slate-300 dark:bg-slate-600"
+                    : "w-2 bg-transparent"
                 }`}
-                aria-label={`Testimonial ${i + 1}`}
-              />
+                aria-label={`Testimonial ${i + 1} of ${testimonials.length}`}
+              >
+                <span className={`block h-2 rounded-full transition-all ${
+                  currentTestimonial === i
+                    ? "w-full bg-blue-600"
+                    : "w-2 bg-slate-300 dark:bg-slate-600"
+                }`} />
+              </button>
             ))}
           </div>
         </div>
@@ -694,6 +772,7 @@ export default function Homepage() {
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 aria-expanded={openFaq === i}
                 aria-controls={`faq-panel-${i}`}
+                id={`faq-btn-${i}`}
                 className="w-full flex items-center justify-between px-5 py-4 text-left text-sm font-semibold hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors"
               >
                 {q}
@@ -705,6 +784,7 @@ export default function Homepage() {
                 <div
                   id={`faq-panel-${i}`}
                   role="region"
+                  aria-labelledby={`faq-btn-${i}`}
                   className="px-5 pb-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-200 dark:border-white/10 pt-3"
                 >
                   {a}
@@ -735,7 +815,7 @@ export default function Homepage() {
             hello@keel.app
           </a>
           <a
-            href="https://wa.me/254700000000"
+            href="https://wa.me/254799451882"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl px-6 py-3 text-sm font-medium hover:bg-slate-50 dark:hover:bg-white/[0.05] transition-all w-full sm:w-auto justify-center"
@@ -787,7 +867,7 @@ export default function Homepage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex flex-col items-center sm:items-start gap-2">
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-500">
-              <img src="/keel icon.png" alt="Keel" className="w-5 h-5" />
+              <img src="/keel-icon.webp" alt="Keel" className="w-5 h-5" />
               &copy; {new Date().getFullYear()} Keel. All rights reserved.
             </div>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-500">

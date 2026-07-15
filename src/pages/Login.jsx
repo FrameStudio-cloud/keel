@@ -371,7 +371,7 @@ export default function Login() {
 
             {/* Mobile brand */}
             <div className="flex flex-col items-center lg:hidden mb-8">
-              <img src="/keel icon.png" alt="Keel" className="w-10 h-10 mb-3" />
+              <img src="/keel-icon.webp" alt="Keel" className="w-10 h-10 mb-3" />
               <h2 className="text-slate-900 dark:text-white font-bold text-xl">Keel</h2>
               <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Manage your shop from one place</p>
             </div>

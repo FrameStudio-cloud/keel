@@ -3,8 +3,8 @@
 ## Session Context
 
 Root `/` route uses `HomeOrDashboard` wrapper — shows landing page (`Homepage.jsx`) if unauthenticated, redirects to Overview dashboard if logged in.
-Favicon + logo: `public/keel icon.png` (logo), `public/favicon-*.png` + `public/android-chrome-*.png` + `public/apple-touch-icon.png` (favicons). Referenced in `index.html` and used in place of inline "K" squares.
-Homepage (`src/pages/Homepage.jsx`) sections: Nav, Hero (left text + right floating cards using Modern screenshots from `public/`, no laptop image), Features (4 stacked rows — Inventory, Financial Tracking, Reports & Insights, Sales Management — alternating image/text layout with hover lift), How It Works (flashcard stack animation — 3 cards fall/reveal on loop, CSS keyframe + custom properties), Website Integration (3 catalogue screenshots from `src/assets/catalogue/`, horizontal scroll on mobile, 3-column grid on desktop), Testimonials (horizontal snap-scroll carousel with CSS mask fade edges and navigation dots), FAQ (10 questions, accordion), Contact, CTA + Trust Badges, Footer. Mobile-first: `pb-12` section spacing, nav with backdrop overlay. Trust badges use single accent color (`text-blue-600`).
+Favicon + logo: `public/keel-icon.png` (logo, renamed from `keel icon.png` to remove space), `public/favicon-*.png` + `public/android-chrome-*.png` + `public/apple-touch-icon.png` (favicons). Referenced in `index.html` and used in place of inline "K" squares.
+Homepage (`src/pages/Homepage.jsx`) sections: Nav, Hero (left text + right 3-card mobile hero using Modern screenshots from `public/`, no laptop image), Features (4 stacked rows — Inventory, Financial Tracking, Reports & Insights, Sales Management — alternating image/text layout with hover lift), How It Works (flashcard stack animation — 3 cards fall/reveal on loop, CSS keyframe at 24s cycle), Website Integration (3 catalogue screenshots from `src/assets/catalogue/`, infinite marquee scroll with pause on hover/touch, 3-column on desktop), Testimonials (horizontal snap-scroll carousel with CSS mask fade edges and 44px touch-target dots), FAQ (10 questions, accordion with aria-labelledby), Contact, CTA + Trust Badges, Footer. Mobile-first: `pb-12` section spacing, nav with backdrop overlay and dynamic aria-label. Trust badges use single accent color (`text-blue-600`).
 Low-stock threshold comes from `settings.lowStockThreshold` (database), not hardcoded.
 Critical stock threshold is `CRITICAL_STOCK_THRESHOLD = 2` in `src/lib/constants.js`.
 Payment methods are dynamic — configured via `paymentConfig` singleton, updated by SettingsProvider.
@@ -278,7 +278,15 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - IntaSend removed from AGENTS.md, docs/architecture.md, PITCH.md, README.md, seed files
 - `withShop()` no longer throws on null shop — returns payload unchanged instead (`shop.js:69`)
 - `AuthContext.jsx:147-155` — `ensuringRef` dedup guard prevents double `ensureUserRecordsInner`
-- `vercel.json` rewrite simplified to `"/(.*)"` covering all routes
+- `vercel.json` rewrite simplified to `"/(.*)"` covering all routes; added CSP + security headers (X-Frame-Options, Permissions-Policy, Content-Security-Policy) and edge caching (1h TTL) for `/`
+- Homepage prerendered to static HTML via `vite-prerender-plugin` (`src/prerender.jsx`) — 52 KB index.html with full content, `404.html` for post-cache fallback
+- `index.html` has preconnect hints for Vercel Analytics, Speed Insights, and PostHog; canonical URL + robots meta + full OG/Twitter tags
+- `@vercel/speed-insights` added to `main.jsx`
+- PostHog init deferred: `initPostHog()` called inside `<PostHogInit>` component `useEffect` instead of module-scope side effect import
+- All homepage images converted to WebP (11 public/ + 3 catalogue) via `sharp`; `<PictureImg>` component for WebP + PNG fallback; `loading="lazy"` on below-fold images
+- Mobile hero: 3-card stacked layout replacing flat screenshot; marquee pauses on touch as well as hover
+- Testimonial dots: 44px touch targets via `h-10` buttons with inner `<span>`; FAQ panels have `aria-labelledby`; nav `aria-label` reflects open/close state; FAQPage JSON-LD schema in homepage Helmet
+- OG/Twitter image: `public/keel-icon.webp` (renamed from `keel icon.png` to remove space); OG URL uses `keel.framestudio.co.ke`
 - `vite.config.js:7-9` — env validation throws at build time if `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` missing
 - Hardcoded `"KSh"` replaced with `formatPrice()` in Sales.jsx (2), AddProductModal.jsx (2), LogSaleModal.jsx (2)
 - OAuth exchange timeout — `AuthContext.jsx:57-60` `Promise.race` with 15s timeout on `fetchUserData`
@@ -292,7 +300,7 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - `Profile.jsx:102` — fallback theme changed from `"dark"` to `"light"`
 - `useLowStockProducts` — `retry: 2` with exponential backoff (`useQueries.js:74-75`)
 - `Marketing.jsx` — toasts use React state instead of DOM (`showToast` → `setToast`)
-- OG meta tags in `index.html:11-14` — `og:title`, `og:description`, `og:image`, `twitter:card`
+- OG meta tags in `index.html` — `og:title`, `og:description`, `og:image` (`keel-icon.webp`), `og:image:width`, `og:image:height`, `twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`, canonical, robots meta
 - Focus trap on all 8 modals via `src/hooks/useFocusTrap.js` — `Tab` key cycles within dialog
 - `Login.jsx:11` — `parseHashParams` call removed (reads hash directly via `URLSearchParams`)
 - Google OAuth `state` param removed — `AuthContext.jsx:168` reverts to bare authorize URL (state param interfered with Supabase OAuth)

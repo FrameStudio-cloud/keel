@@ -19,7 +19,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 10_000 } },
 });
-import Homepage from "./pages/Homepage";
+const Homepage = lazy(() => import("./pages/Homepage"));
 import TourGuide from "./components/TourGuide";
 import UpdateChecker from "./components/UpdateChecker";
 import WebUpdateChecker from "./components/WebUpdateChecker";
