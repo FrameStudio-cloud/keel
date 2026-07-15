@@ -21,7 +21,6 @@ const queryClient = new QueryClient({
 });
 const Homepage = lazy(() => import("./pages/Homepage"));
 import TourGuide from "./components/TourGuide";
-import UpdateChecker from "./components/UpdateChecker";
 import WebUpdateChecker from "./components/WebUpdateChecker";
 import SettingsProvider from "./context/SettingsProvider";
 import AuthProvider, { AuthContext } from "./context/AuthContext";
@@ -135,7 +134,6 @@ export default function App() {
           <BrowserRouter>
             <ScrollToTop />
             <PostHogPageView />
-            <UpdateChecker />
             <WebUpdateChecker />
             <AppRoutes />
           </BrowserRouter>

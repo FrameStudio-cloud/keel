@@ -7,6 +7,12 @@ import './index.css'
 import { initPostHog } from './lib/posthog'
 import App from './App.jsx'
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+  })
+}
+
 function PostHogInit() {
   useEffect(() => { initPostHog() }, [])
   return null

@@ -202,7 +202,7 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - `src/data/terms.json` — static Terms of Service content
 - `src/assets/catalogue/` — 3 catalogue screenshots (zurifashion-catalogue-shot.png, wix-collection-shot.png, mini-electricals-shots.png) used in Website Integration section
 - `src/pages/NotFound.jsx` — custom 404 page with `FiCompass` icon, "Page not found" message, Go Home link
-- `src/components/WebUpdateChecker.jsx` — polls `/version.json?t=...` every 5 min; shows Chrome-style bottom bar ("A new version is available [Refresh]") when a new deployment is detected. Works alongside Tauri UpdateChecker without conflict.
+- `src/components/WebUpdateChecker.jsx` — polls `/version.json?t=...` every 5 min; shows Chrome-style bottom bar ("A new version is available [Refresh]") when a new deployment is detected.
 - `src/components/settings/` — 12 component files: StoreTab, PreferencesTab, NotificationsTab, BillingTab, SecurityTab, DataTab, DangerZoneTab, DeleteShopModal, SectionCard, TabButton, SettingsSaveBar, settingsStyles
 - `src/components/profile/` — 4 component files: ProfileAboutTab, ProfileAccountTab, ProfileQuickAccessTab, SignOutModal
 
@@ -311,7 +311,7 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - `esbuild` removed from `devDependencies` — Vite 8 uses Rolldown native minifier (was `minify: "esbuild"` in vite.config.js, now uses default)
 - `robots.txt` + `sitemap.xml` added to `public/` — disallows dashboard routes, 6 marketing URLs point to `https://keel-nu.vercel.app`
 - `react-helmet-async` installed
-- Tauri signing key: `~/.tauri/keel` (private) / `~/.tauri/keel.pub` (public), password: `l3w151rungu`. Update endpoint: `https://framestudio.co.ke/releases/latest.json`. Release script: `framestudio-landing/release.ps1`. — `<HelmetProvider>` wraps `<App />` in `src/main.jsx`; `<Helmet>` with title + description + OG tags on all marketing pages (Homepage, Features, UseCases, AboutFramestudio, Terms, Login); basic `<Helmet>` titles on dashboard pages
+- `<HelmetProvider>` wraps `<App />` in `src/main.jsx`; `<Helmet>` with title + description + OG tags on all marketing pages (Homepage, Features, UseCases, AboutFramestudio, Terms, Login); basic `<Helmet>` titles on dashboard pages
 - LockoutScreen: added `refreshSettings()` to SettingsProvider + context; "Check Subscription Status" button calls `refreshSettings()`; `renewShop()` in framestudio-dashboard DataContext now also writes `subscription_expires_at` to `shops` table (Keel reads from `shops`, not `keel_shops`)
 - `useAnnouncements()` React Query hook — fetches active announcements within `starts_at`/`expires_at` schedule, filters out server-side dismissals per shop, 2min staleTime
 - `AnnouncementBanner.jsx` — carousel rendering up to 5 announcements (top 3 shown) with auto-advance (6s), arrow navigation, dot indicators; each announcement uses variant-based gradient + icon fallback (info/warning/alert/sale/maintenance), `bg_image_url` for custom backgrounds, `link_text` for CTA; dismiss calls server-side INSERT to `announcement_dismissals` + query invalidation
@@ -335,6 +335,7 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - `notification_preferences` JSONB column added to `store_settings` (migration 20260713)
 - Low-stock threshold input moved from Preferences tab to Notifications tab
 - WebUpdateChecker — `/version.json` generated on every build, polls every 5 min, Chrome-style "new version available" bar
+- Tauri removed — replaced with PWA. Manifest at `public/site.webmanifest`, service worker at `public/sw.js`, registered in `src/main.jsx`. App is installable from browser (Chrome/Edge/Safari) with no build step.
 - Custom 404 NotFound page with compass icon, replaces blank screen on unmatched routes
 - Action buttons on Inventory, Sales, and Finance changed from inline text links to pill buttons (`px-3 py-1.5`, rounded-lg, border) for larger tap targets
 - `Sales.jsx` — added `refreshKey` state so sales list refetches immediately after logging a sale (same pattern as Inventory)
