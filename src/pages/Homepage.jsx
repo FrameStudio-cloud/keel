@@ -826,6 +826,36 @@ export default function Homepage() {
         </div>
       </section>
 
+      {/* DESKTOP EXPERIENCE */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-12 sm:pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+          <div className="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden hover:-translate-y-2 transition-all duration-500">
+            <PictureImg
+              src="/dashboard-laptop-preview.webp"
+              fallback="/dashboard-laptop-preview.png"
+              alt="Keel desktop dashboard"
+              className="w-full h-auto"
+            />
+          </div>
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold mb-3">
+              Full desktop experience
+            </h2>
+            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+              Keel works beautifully on any screen — laptop, tablet, or phone.
+              Manage your shop from the comfort of a full desktop view with
+              keyboard shortcuts and multi-window workflows.
+            </p>
+            <a
+              href="https://github.com/FrameStudio-cloud/keel-desktop/releases/download/v1.2.1/Keel_1.2.0_x64_en-US.msi"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-blue-600/20"
+            >
+              Download for Windows <FiArrowRight />
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="max-w-3xl mx-auto px-4 sm:px-6 pb-12 sm:pb-24 text-center">
         <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-6 sm:p-10">

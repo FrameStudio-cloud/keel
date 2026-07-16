@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { getShopId } from "../../lib/shop";
 import { useSettings } from "../../hooks/useSettings";
-import { FiCheck, FiPlus, FiTrash2, FiChevronUp, FiChevronDown, FiCopy, FiMessageCircle, FiSend, FiCheckCircle, FiPhone, FiAlertCircle, FiLock } from "react-icons/fi";
+import { FiCheck, FiPlus, FiTrash2, FiChevronUp, FiChevronDown, FiMessageCircle, FiSend, FiCheckCircle, FiPhone, FiAlertCircle } from "react-icons/fi";
 import Pagination from "../Pagination";
 
 const MSG_PAGE_SIZE = 50;
@@ -24,9 +24,6 @@ export default function ChatWidgetTab() {
     widget_color: "#3B82F6",
     position: "right",
     whatsapp_number: "",
-    pro_until: null,
-    groq_api_key: null,
-    plan_tier: "free",
   });
   const [faqs, setFaqs] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -71,9 +68,6 @@ export default function ChatWidgetTab() {
           widget_color: cfg.widget_color || "#3B82F6",
           position: cfg.position || "right",
           whatsapp_number: cfg.whatsapp_number || "",
-          pro_until: cfg.pro_until || null,
-          groq_api_key: cfg.groq_api_key || null,
-          plan_tier: cfg.plan_tier || "free",
         });
       } else if (whatsapp) {
         setConfig((prev) => ({ ...prev, whatsapp_number: whatsapp }));
@@ -221,19 +215,6 @@ export default function ChatWidgetTab() {
     showToast("Reply sent!");
   }
 
-  async function copyEmbed() {
-    const snippet = `import ChatWidget from "./components/ChatWidget";
-
-// Add this inside your component tree (before closing </>):
-<ChatWidget />`;
-    try {
-      await navigator.clipboard.writeText(snippet);
-      showToast("Copied to clipboard!");
-    } catch {
-      showToast("Press Ctrl+C to copy", "error");
-    }
-  }
-
   async function markCallbackCalled(id) {
     const { error } = await supabase.from("chat_callbacks").update({ status: "called" }).eq("id", id).eq("shop_id", shopId);
     if (error) return showToast(error.message, "error");
@@ -270,29 +251,6 @@ export default function ChatWidgetTab() {
           {toast.msg}
         </div>
       )}
-
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-medium text-slate-800 dark:text-white flex items-center gap-2">
-            <FiLock size={14} className="text-slate-400" />
-            Subscription
-          </h3>
-          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize ${
-            config.plan_tier === "pro" && config.pro_until && new Date(config.pro_until) > new Date()
-              ? "bg-purple-100 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400"
-              : config.plan_tier === "beta"
-              ? "bg-cyan-100 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400"
-              : config.plan_tier === "starter"
-              ? "bg-blue-100 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400"
-              : "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400"
-          }`}>{config.plan_tier || "free"}</span>
-        </div>
-        <div className="space-y-2 text-xs">
-          <p className="text-slate-600 dark:text-slate-400">Tier: <span className="font-medium text-slate-800 dark:text-white capitalize">{config.plan_tier || "free"}</span></p>
-          <p className="text-slate-600 dark:text-slate-400">Expires: <span className={`font-medium ${config.pro_until && new Date(config.pro_until) > new Date() ? "text-slate-800 dark:text-white" : "text-slate-400"}`}>{config.pro_until ? new Date(config.pro_until).toLocaleDateString() : "—"}</span></p>
-          <p className="text-slate-600 dark:text-slate-400">Groq key: <span className={config.groq_api_key ? "text-green-600" : "text-slate-400"}>{config.groq_api_key ? "Configured" : "Using default"}</span></p>
-        </div>
-      </div>
 
       {callbacks.length > 0 && (
         <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
@@ -653,23 +611,6 @@ export default function ChatWidgetTab() {
         )}
       </div>
 
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
-        <h3 className="text-sm font-medium text-slate-800 dark:text-white mb-2">Integration</h3>
-        <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
-          Import the ChatWidget component into your React website:
-        </p>
-        <div className="bg-slate-900 dark:bg-black rounded-lg p-3 text-xs text-green-400 font-mono overflow-x-auto">
-          import ChatWidget from "./components/ChatWidget";{'\n'}{'\n'}
-          {`<ChatWidget />`}
-        </div>
-        <button
-          onClick={copyEmbed}
-          className="mt-3 w-full py-2 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-white/20 transition-all flex items-center justify-center gap-2"
-        >
-          <FiCopy size={14} />
-          Copy snippet
-        </button>
-      </div>
     </div>
   );
 }
