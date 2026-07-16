@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { FiChevronLeft, FiChevronRight, FiExternalLink, FiPackage } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiPackage } from "react-icons/fi";
 import { IoStorefrontOutline } from "react-icons/io5";
+import { TEMPLATES } from "../../data/storefrontBlueprints";
+
+const TEMPLATE_NAMES = Object.fromEntries(TEMPLATES.map(t => [t.id, t.name]));
 
 export default function StorefrontDetail({ item, onDeploy, onBack }) {
   const [current, setCurrent] = useState(0);
@@ -42,7 +45,7 @@ export default function StorefrontDetail({ item, onDeploy, onBack }) {
               </div>
               <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
                 Preview of a full storefront built with the{" "}
-                {item.templateId === "fashion" ? "Fashion" : "Classic"} template
+                {TEMPLATE_NAMES[item.templateId] || "Classic"} template
               </p>
             </div>
           </div>

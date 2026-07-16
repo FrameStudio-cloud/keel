@@ -842,9 +842,9 @@ export default function Homepage() {
               Full desktop experience
             </h2>
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
-              Keel works beautifully on any screen — laptop, tablet, or phone.
-              Manage your shop from the comfort of a full desktop view with
-              keyboard shortcuts and multi-window workflows.
+              A dedicated Windows app that stays open in the background
+              while you work. Faster load times, native feel, and zero
+              browser tabs to keep track of.
             </p>
             <a
               href="https://github.com/FrameStudio-cloud/keel-desktop/releases/download/v1.2.1/Keel_1.2.0_x64_en-US.msi"

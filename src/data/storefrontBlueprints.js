@@ -92,6 +92,20 @@ const FASHION_SCREENSHOTS = [
   { label: "Product Detail", desc: "Product page with size/color options and WhatsApp ordering" },
 ];
 
+const MINIMAL_SCREENSHOTS = [
+  { label: "Header Banner", desc: "Simple gradient banner with store name, tagline, and CTA" },
+  { label: "Catalogue Grid", desc: "Minimal product grid with clean borderless cards" },
+  { label: "Product Detail", desc: "Product page with specs, options, and WhatsApp ordering" },
+  { label: "Footer", desc: "Compact footer with contact, social links, and copyright" },
+];
+
+const BOLD_SCREENSHOTS = [
+  { label: "Gradient Hero", desc: "Full-width dark gradient hero with inline search bar" },
+  { label: "Dark Catalogue", desc: "Dark-themed product grid with spec previews on cards" },
+  { label: "Product Detail", desc: "Dark product detail with spec table and variant badges" },
+  { label: "Footer", desc: "Dark footer with contact details and social links" },
+];
+
 function addScreenshots(cards, screenshots, templateId) {
   return cards.map((c, i) => ({
     id: `${templateId}-${i}`,
@@ -103,6 +117,8 @@ function addScreenshots(cards, screenshots, templateId) {
 
 const GALLERY_TEMPLATE_ID = "classic";
 const FASHION_TEMPLATE_ID = "fashion";
+const MINIMAL_TEMPLATE_ID = "minimal";
+const BOLD_TEMPLATE_ID = "bold";
 
 const MOCK_CARDS = [
   { name: "Campus Glow", shopType: "General" },
@@ -130,14 +146,44 @@ const FASHION_CARDS = [
   { name: "Premium Threads", shopType: "Clothing" },
 ];
 
+const MINIMAL_CARDS = [
+  { name: "Simple Shop", shopType: "General" },
+  { name: "Essentials", shopType: "General" },
+  { name: "Daily Needs", shopType: "General" },
+  { name: "Corner Store", shopType: "General" },
+  { name: "Basics KE", shopType: "Electricals" },
+  { name: "Pure Goods", shopType: "General" },
+  { name: "Minimal Mart", shopType: "General" },
+  { name: "Clean Cuts", shopType: "Electronics" },
+  { name: "Plain & Simple", shopType: "General" },
+  { name: "Tiny Shop", shopType: "General" },
+];
+
+const BOLD_CARDS = [
+  { name: "Power Tech", shopType: "Electronics" },
+  { name: "Volt Store", shopType: "Electricals" },
+  { name: "Neon Gadgets", shopType: "Electronics" },
+  { name: "Dark Mode", shopType: "General" },
+  { name: "Circuit Hub", shopType: "Electricals" },
+  { name: "Matrix Shop", shopType: "Electronics" },
+  { name: "Bold Tech", shopType: "Electronics" },
+  { name: "Spark KE", shopType: "Electricals" },
+  { name: "Hyper Store", shopType: "General" },
+  { name: "Pulse Electronics", shopType: "Electronics" },
+];
+
 export const GALLERY_ITEMS = {
   classic: addScreenshots(MOCK_CARDS, COMMON_SCREENSHOTS, GALLERY_TEMPLATE_ID),
   fashion: addScreenshots(FASHION_CARDS, FASHION_SCREENSHOTS, FASHION_TEMPLATE_ID),
+  minimal: addScreenshots(MINIMAL_CARDS, MINIMAL_SCREENSHOTS, MINIMAL_TEMPLATE_ID),
+  bold: addScreenshots(BOLD_CARDS, BOLD_SCREENSHOTS, BOLD_TEMPLATE_ID),
 };
 
 export const TEMPLATES = [
   { id: "classic", name: "Classic", description: "Clean, professional layout for any shop type" },
   { id: "fashion", name: "Fashion", description: "Lookbook hero, category strips, featured carousel" },
+  { id: "minimal", name: "Minimal", description: "Clean, sparse layout with gradient header banner" },
+  { id: "bold", name: "Bold", description: "Dark theme with spec-heavy cards for electronics" },
   { id: "custom", name: "Custom", description: "Pick each section yourself — build from scratch" },
 ];
 
@@ -175,6 +221,42 @@ export const TEMPLATE_DETAILS = {
     screenshots: [
       { label: "Lookbook Hero", file: null },
       { label: "New Arrivals", file: null },
+      { label: "Product Detail", file: null },
+    ],
+  },
+  minimal: {
+    tagline: "No-fuss online presence — clean, fast, distraction-free",
+    description:
+      "The Minimal template strips away everything but the essentials: a gradient header banner with your store name and tagline, a searchable product grid with borderless cards, and a compact footer. No hero slideshow, no carousels — just products.",
+    highlights: [
+      "Gradient header banner with store name, tagline, and CTA",
+      "Searchable product grid with clean borderless cards",
+      "Category filter chips for easy browsing",
+      "Product detail page with specs, options, and WhatsApp ordering",
+      "Compact footer with contact info and social links",
+      "WhatsApp floating button and back-to-top",
+    ],
+    screenshots: [
+      { label: "Header Banner", file: null },
+      { label: "Catalogue Grid", file: null },
+      { label: "Product Detail", file: null },
+    ],
+  },
+  bold: {
+    tagline: "Dark, striking, spec-focused — built for tech shops",
+    description:
+      "The Bold template uses a dark color scheme with high-contrast typography and accent colors. The hero has a full-width gradient background with an inline search bar. Product cards show spec previews right on the grid, and the product detail page features a clean spec table layout.",
+    highlights: [
+      "Full-width dark gradient hero with inline product search",
+      "Dark-themed product grid with spec previews on cards",
+      "Spec table layout on product detail pages",
+      "Variant badges and WhatsApp ordering",
+      "Dark footer with contact details and social links",
+      "WhatsApp floating button and back-to-top",
+    ],
+    screenshots: [
+      { label: "Gradient Hero", file: null },
+      { label: "Dark Catalogue", file: null },
       { label: "Product Detail", file: null },
     ],
   },

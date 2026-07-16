@@ -29,6 +29,32 @@ const templates = [
       { rows: 1, cols: 3, label: "Arrivals" },
     ],
   },
+  {
+    id: "minimal",
+    name: "Minimal Storefront",
+    description:
+      "Gradient header banner, searchable product grid with clean borderless cards, and a compact footer. No hero slideshow, no clutter.",
+    colors: ["#1e293b", "#0ea5e9", "#94a3b8"],
+    gradient: "from-slate-50 to-sky-50 dark:from-slate-500/10 dark:to-sky-500/5",
+    screens: [
+      { rows: 1, cols: 3, label: "Banner" },
+      { rows: 2, cols: 2, label: "Grid" },
+      { rows: 1, cols: 1, label: "Ft" },
+    ],
+  },
+  {
+    id: "bold",
+    name: "Bold Storefront",
+    description:
+      "Dark theme with gradient hero featuring inline search, spec-heavy product cards, and dark footer. Built for electronics and tech.",
+    colors: ["#0f172a", "#f59e0b", "#1e293b"],
+    gradient: "from-slate-800 to-amber-900/30 dark:from-slate-900 dark:to-amber-900/10",
+    screens: [
+      { rows: 2, cols: 3, label: "Hero" },
+      { rows: 2, cols: 2, label: "Grid" },
+      { rows: 1, cols: 1, label: "PDP" },
+    ],
+  },
 ];
 
 export default function TemplateModal({ onClose, onSelect, businessCategory }) {

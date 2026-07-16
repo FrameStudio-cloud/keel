@@ -200,7 +200,7 @@ export default function StorefrontLanding({
             {/* Real storefronts grid */}
             <div className="px-6 pt-5 pb-6">
               <h3 className="text-base font-semibold text-gray-800 dark:text-white mb-1">
-                Real Storefronts Using {activeTab === "classic" ? "Classic" : "Fashion"}
+                Real Storefronts Using {TEMPLATES.find(t => t.id === activeTab)?.name || activeTab}
               </h3>
               <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">
                 Click any to deploy your own storefront with this template
