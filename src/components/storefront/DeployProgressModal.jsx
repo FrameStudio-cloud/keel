@@ -116,7 +116,7 @@ export default function DeployProgressModal({
     return () => { cancelled = true; };
   }, [subdomain, templateId, shopIdProp]);
 
-  const displayUrl = result?.url || `https://${subdomain}.keel.framestudio.co.ke`;
+  const displayUrl = `https://${result?.domain || `${subdomain}.keel.framestudio.co.ke`}`;
 
   async function handleCopy() {
     try {
@@ -332,7 +332,7 @@ export default function DeployProgressModal({
               </a>
               <button
                 onClick={() => {
-                  onComplete({ url: displayUrl, subdomain });
+                  onComplete({ url: displayUrl, domain: result?.domain || `${subdomain}.keel.framestudio.co.ke`, subdomain });
                   onClose();
                 }}
                 className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all active:scale-[0.97] shadow-sm"

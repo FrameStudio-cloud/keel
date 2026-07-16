@@ -42,6 +42,11 @@ export default function StockAdjustModal({ product, onClose, onAdjusted }) {
       console.error(updateError);
     } else {
       onAdjusted();
+      if (newStock < lowStockThreshold && newStock >= 0) {
+        supabase.functions.invoke("send-low-stock-alert", {
+          body: { shop_id: shopId, product_id: product.id, product_name: product.name, current_stock: newStock, threshold: lowStockThreshold },
+        }).catch((e) => console.error("low stock alert failed", e));
+      }
       onClose();
     }
     setLoading(false);

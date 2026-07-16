@@ -78,7 +78,7 @@ export default function SetupWizard() {
       }
     }
 
-    await supabase.from("shops").update({ business_category: form.category, category_changed_at: new Date().toISOString() }).eq("id", shopId);
+    await supabase.from("shops").update({ business_category: form.category, category_changed_at: new Date().toISOString(), setup_completed_at: new Date().toISOString() }).eq("id", shopId);
 
     const payload = {
       store_name: form.storeName,

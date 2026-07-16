@@ -20,6 +20,7 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 10_000 } },
 });
 const Homepage = lazy(() => import("./pages/Homepage"));
+import LoadingScreen from "./components/LoadingScreen";
 import TourGuide from "./components/TourGuide";
 import WebUpdateChecker from "./components/WebUpdateChecker";
 import SettingsProvider from "./context/SettingsProvider";
@@ -49,11 +50,7 @@ const Features = lazy(() => import("./pages/Features"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 function Loading() {
-  return (
-    <div className="flex items-center justify-center h-screen bg-slate-100 dark:bg-[#1a1a2e]">
-      <div className="text-sm text-slate-600 dark:text-slate-400 animate-pulse">Loading...</div>
-    </div>
-  );
+  return <LoadingScreen />;
 }
 
 function ProtectedRoute({ children }) {

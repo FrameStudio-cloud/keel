@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useContext } from "react";
 import { CiBellOn, CiSearch, CiMenuBurger } from "react-icons/ci";
-import { FiX } from "react-icons/fi";
+import { FiX, FiUser, FiSettings, FiGlobe, FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { CRITICAL_STOCK_THRESHOLD } from "../../lib/constants";
 import { AuthContext } from "../../context/AuthContext";
@@ -8,7 +8,7 @@ import { useSettings } from "../../hooks/useSettings";
 import { useLowStockProducts } from "../../hooks/useQueries";
 
 export default function Topbar({ title, searchQuery, setSearchQuery, onToggleSidebar }) {
-  const { storeName } = useSettings();
+  const { storeName, logoUrl, websiteUrl } = useSettings();
   const { data: lowStock = [] } = useLowStockProducts();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -163,27 +163,57 @@ export default function Topbar({ title, searchQuery, setSearchQuery, onToggleSid
         <div className="relative" ref={profileRef}>
           <button
             onClick={() => setProfileOpen((v) => !v)}
-            className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-medium cursor-pointer hover:bg-blue-500 transition-colors"
+            className="flex items-center gap-2 pl-2 pr-3 py-1 rounded-full border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
             aria-label={storeName || "Store"}
             aria-expanded={profileOpen}
           >
-            {storeName ? storeName[0].toUpperCase() : "S"}
+            {logoUrl ? (
+              <img src={logoUrl} alt="" className="w-7 h-7 rounded-full object-cover shrink-0" />
+            ) : (
+              <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-medium shrink-0">
+                {storeName ? storeName[0].toUpperCase() : "K"}
+              </div>
+            )}
+            <span className="text-sm font-medium text-gray-700 dark:text-slate-300 hidden sm:inline max-w-[100px] truncate">
+              {storeName || "Keel"}
+            </span>
           </button>
           {profileOpen && (
-            <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
+            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
               <div className="px-4 py-3 border-b border-slate-100 dark:border-white/10">
-                <p className="text-xs font-medium text-slate-900 dark:text-white truncate">{storeName}</p>
+                <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{storeName || "Keel"}</p>
               </div>
               <button
                 onClick={() => { navigate("/profile"); setProfileOpen(false); }}
-                className="w-full px-4 py-2.5 text-left text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors"
+                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors"
               >
+                <FiUser className="shrink-0" size={14} />
                 Profile
               </button>
               <button
-                onClick={() => { logout(); setProfileOpen(false); }}
-                className="w-full px-4 py-2.5 text-left text-xs text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors border-t border-slate-100 dark:border-white/10"
+                onClick={() => { navigate("/settings"); setProfileOpen(false); }}
+                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors"
               >
+                <FiSettings className="shrink-0" size={14} />
+                Settings
+              </button>
+              {websiteUrl && (
+                <a
+                  href={websiteUrl.startsWith("http") ? websiteUrl : `https://${websiteUrl}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setProfileOpen(false)}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors"
+                >
+                  <FiGlobe className="shrink-0" size={14} />
+                  Visit Website
+                </a>
+              )}
+              <button
+                onClick={() => { logout(); setProfileOpen(false); }}
+                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-xs text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors border-t border-slate-100 dark:border-white/10"
+              >
+                <FiLogOut className="shrink-0" size={14} />
                 Sign out
               </button>
             </div>

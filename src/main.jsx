@@ -18,7 +18,9 @@ function PostHogInit() {
   return null
 }
 
-createRoot(document.getElementById('root')).render(
+const container = document.getElementById('root')
+const root = createRoot(container)
+root.render(
   <StrictMode>
     <HelmetProvider>
       <App />
@@ -28,3 +30,9 @@ createRoot(document.getElementById('root')).render(
     </HelmetProvider>
   </StrictMode>,
 )
+
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    root.unmount()
+  })
+}

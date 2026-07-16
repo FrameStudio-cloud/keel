@@ -39,7 +39,7 @@ export default function Storefront() {
         if (res.ok) {
           const data = await res.json();
           if (data.deployed) {
-            setDeployment({ url: data.url, subdomain: data.subdomain, templateId: data.template_id });
+            setDeployment({ url: data.url, domain: data.domain, subdomain: data.subdomain, templateId: data.template_id });
             const { count: productCount } = await supabase
               .from("catalogue")
               .select("*", { count: "exact", head: true })
@@ -96,7 +96,7 @@ export default function Storefront() {
   }
 
   function handleComplete(result) {
-    setDeployment({ ...result, templateId: templateType });
+    setDeployment({ ...result, url: undefined, templateId: templateType });
     setView("landing");
   }
 
@@ -140,7 +140,7 @@ export default function Storefront() {
         const result = await res.json();
         setDeployment((prev) => ({
           ...prev,
-          url: result.url.replace("https://", ""),
+          domain: result.domain,
         }));
         setRedeployMessage("Catalogue updated!");
       } else {

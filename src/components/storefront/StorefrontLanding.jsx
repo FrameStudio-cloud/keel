@@ -56,13 +56,13 @@ export default function StorefrontLanding({
                     <span className="text-sm font-medium text-emerald-100">Live</span>
                   </div>
                   <a
-                    href={`https://${deployment.url}`}
+                    href={`https://${deployment.domain || deployment.subdomain}.keel.framestudio.co.ke`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-1 text-sm text-white/80 hover:text-white flex items-center gap-1.5 font-medium"
                   >
                     <FiExternalLink size={14} />
-                    {deployment.url}
+                    {deployment.domain || `${deployment.subdomain}.keel.framestudio.co.ke`}
                   </a>
                   {stats && (
                     <div className="flex items-center gap-4 mt-2">
@@ -167,17 +167,23 @@ export default function StorefrontLanding({
                 {detail.screenshots.map((ss) => (
                   <div
                     key={ss.label}
-                    className="aspect-[4/3] rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-white/5 dark:to-white/[0.02] border border-gray-200 dark:border-white/10 flex flex-col items-center justify-center"
+                    className={`aspect-[4/3] rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 flex flex-col items-center justify-center relative ${ss.file ? "" : "bg-gradient-to-br from-gray-100 to-gray-200 dark:from-white/5 dark:to-white/[0.02]"}`}
                   >
-                    <div className="w-10 h-10 rounded-lg bg-gray-200 dark:bg-white/10 flex items-center justify-center mb-2">
-                      <IoStorefrontOutline size={18} className="text-gray-400" />
-                    </div>
-                    <span className="text-xs font-medium text-gray-400 dark:text-slate-500">
+                    {ss.file ? (
+                      <img src={ss.file} alt={ss.label} className="absolute inset-0 w-full h-full object-cover object-top" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-gray-200 dark:bg-white/10 flex items-center justify-center mb-2">
+                        <IoStorefrontOutline size={18} className="text-gray-400" />
+                      </div>
+                    )}
+                    <span className={`text-xs font-medium relative z-10 ${ss.file ? "bg-black/50 text-white px-2 py-0.5 rounded-full backdrop-blur-sm" : "text-gray-400 dark:text-slate-500"}`}>
                       {ss.label}
                     </span>
-                    <span className="text-[10px] text-gray-300 dark:text-slate-600 mt-0.5">
-                      Screenshot
-                    </span>
+                    {!ss.file && (
+                      <span className="text-[10px] text-gray-300 dark:text-slate-600 mt-0.5">
+                        Screenshot
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>

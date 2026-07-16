@@ -98,6 +98,12 @@ export default function NotificationsTab({ form, setForm, whatsapp }) {
             label="Weekly report"
             desc="Full weekly breakdown of performance and trends"
           />
+          <Toggle
+            enabled={prefs.updates_email !== false}
+            onChange={(v) => setPref("updates_email", v)}
+            label="Product updates &amp; tips"
+            desc="New features, tips, and occasional product announcements"
+          />
         </div>
       </SectionCard>
 

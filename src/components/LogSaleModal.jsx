@@ -11,7 +11,7 @@ import BarcodeScanner from "./BarcodeScanner";
 
 export default function LogSaleModal({ onClose, onAdded }) {
   const trapRef = useFocusTrap(true);
-  const { businessCategory } = useSettings();
+  const { businessCategory, lowStockThreshold } = useSettings();
   const showBarcode = businessCategory === "electricals" || businessCategory === "electronics";
 
   const [products, setProducts] = useState([]);
@@ -78,7 +78,11 @@ export default function LogSaleModal({ onClose, onAdded }) {
       console.error(stockError);
       await supabase.from("sales").delete().eq("id", saleData.id);
     } else {
+      const newStock = selectedProduct.stock - parseInt(form.quantity);
       onAdded();
+      supabase.functions.invoke("send-low-stock-alert", {
+        body: { shop_id: shopId, product_id: selectedProduct.id, product_name: selectedProduct.name, current_stock: newStock, threshold: lowStockThreshold },
+      }).catch((e) => console.error("low stock alert failed", e));
       onClose();
     }
 

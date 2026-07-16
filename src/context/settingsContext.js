@@ -5,6 +5,7 @@ const DEFAULT_NOTIF_PREFS = {
   low_stock_email: true,
   daily_summary_email: true,
   weekly_report_email: false,
+  updates_email: true,
   callbacks_inapp: true,
   stock_alerts_inapp: true,
 };

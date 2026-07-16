@@ -113,7 +113,14 @@ export default function AuthProvider({ children }) {
       .eq("auth_user_id", user.id)
       .maybeSingle();
 
-    if (existingUser) return true;
+    if (existingUser) {
+      const { data: shop } = await supabase
+        .from("shops")
+        .select("setup_completed_at")
+        .eq("id", existingUser.shop_id)
+        .maybeSingle();
+      return !!shop?.setup_completed_at;
+    }
 
     const { data: existingByEmail } = await supabase
       .from("users")
@@ -126,7 +133,12 @@ export default function AuthProvider({ children }) {
         .from("users")
         .update({ auth_user_id: user.id })
         .eq("id", existingByEmail.id);
-      return true;
+      const { data: shop } = await supabase
+        .from("shops")
+        .select("setup_completed_at")
+        .eq("id", existingByEmail.shop_id)
+        .maybeSingle();
+      return !!shop?.setup_completed_at;
     }
 
     const displayName = user.user_metadata?.full_name || user.email?.split("@")[0] || "My Shop";
@@ -141,7 +153,7 @@ export default function AuthProvider({ children }) {
 
     const { data: shopData, error: shopError } = await supabase
       .from("shops")
-      .insert({ name: displayName, slug, business_category: "general" })
+      .insert({ name: displayName, slug, business_category: "general", setup_completed_at: null, subscription_expires_at: new Date(Date.now() + 30 * 86400000).toISOString() })
       .select("id")
       .single();
 
@@ -174,6 +186,14 @@ export default function AuthProvider({ children }) {
       await supabase.from("shops").delete().eq("id", shopData.id);
       return true;
     }
+
+    const payload = { email: user.email, store_name: displayName, shop_id: shopData.id };
+    supabase.functions.invoke("subscribe-contact", {
+      body: { ...payload, unsubscribed: false },
+    }).catch(() => {});
+    supabase.functions.invoke("send-welcome-email", {
+      body: payload,
+    }).catch(() => {});
 
     return false;
   }

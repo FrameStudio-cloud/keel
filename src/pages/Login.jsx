@@ -53,7 +53,7 @@ export default function Login() {
 
           const { data: shopData, error: shopError } = await supabase
             .from("shops")
-            .insert({ name: shopName, slug, business_category: "general" })
+            .insert({ name: shopName, slug, business_category: "general", subscription_expires_at: new Date(Date.now() + 30 * 86400000).toISOString() })
             .select("id")
             .single();
           if (shopError) throw shopError;
@@ -70,6 +70,14 @@ export default function Login() {
             name: shopName,
             email,
           });
+
+          const payload = { email, store_name: shopName, shop_id: shopData.id };
+          supabase.functions.invoke("subscribe-contact", {
+            body: { ...payload, unsubscribed: false },
+          }).catch(() => {});
+          supabase.functions.invoke("send-welcome-email", {
+            body: payload,
+          }).catch(() => {});
 
           await setupSignup(loginData);
         } else {

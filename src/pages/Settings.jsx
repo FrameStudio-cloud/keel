@@ -15,6 +15,7 @@ import {
 import TabButton from "../components/settings/TabButton";
 import SettingsSaveBar from "../components/settings/SettingsSaveBar";
 import DeleteShopModal from "../components/settings/DeleteShopModal";
+import DeleteDataModal from "../components/settings/DeleteDataModal";
 import StoreTab from "../components/settings/StoreTab";
 import PreferencesTab from "../components/settings/PreferencesTab";
 import NotificationsTab from "../components/settings/NotificationsTab";
@@ -60,12 +61,13 @@ function hoursFromSettings(businessHours) {
 
 export default function Settings() {
   const settings = useSettings();
-  const { logout } = useContext(AuthContext);
+  const { logout, user } = useContext(AuthContext);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
   const [activeTab, setActiveTab] = useState("store");
   const [validationErrors, setValidationErrors] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDeleteDataModal, setShowDeleteDataModal] = useState(false);
   const [pristineSnapshot, setPristineSnapshot] = useState(null);
 
   const [form, setForm] = useState({
@@ -235,6 +237,12 @@ export default function Settings() {
     hours.forEach((h) => { bh[h.key] = { open: h.open, close: h.close, active: h.active }; });
     setPristineSnapshot(JSON.stringify({ ...form, business_hours: bh }));
     showToast("Settings saved!");
+
+    const prefs = form.notification_preferences || {};
+    const unsubscribed = prefs.updates_email === false;
+    supabase.functions.invoke("subscribe-contact", {
+      body: { email: user?.email, store_name: form.store_name, shop_id: shopId, unsubscribed },
+    }).catch(() => {});
   }
 
   useEffect(() => { saveHandlerRef.current = handleSave; });
@@ -291,6 +299,36 @@ export default function Settings() {
     const { error } = await supabase.from("shops").update({ scheduled_deletion_at: null }).eq("id", shopId);
     if (error) { showToast(error.message || "Failed to cancel deletion", "error"); return; }
     showToast("Deletion cancelled. Your shop is safe.");
+  }
+
+  async function handleDeleteAllData() {
+    const shopId = await getShopId();
+    if (!shopId) { showToast("Shop not found.", "error"); return; }
+    setShowDeleteDataModal(false);
+
+    await supabase.from("product_attribute_values").delete().eq("shop_id", shopId);
+    await supabase.from("catalogue_attribute_values").delete().eq("shop_id", shopId);
+    await supabase.from("catalogue").delete().eq("shop_id", shopId);
+    await supabase.from("products").delete().eq("shop_id", shopId);
+
+    await Promise.allSettled([
+      supabase.from("stock_movements").delete().eq("shop_id", shopId),
+      supabase.from("sales").delete().eq("shop_id", shopId),
+      supabase.from("expenses").delete().eq("shop_id", shopId),
+      supabase.from("payments").delete().eq("shop_id", shopId),
+      supabase.from("posts").delete().eq("shop_id", shopId),
+      supabase.from("banners").delete().eq("shop_id", shopId),
+      supabase.from("page_views").delete().eq("shop_id", shopId),
+      supabase.from("chat_faqs").delete().eq("shop_id", shopId),
+      supabase.from("chat_messages").delete().eq("shop_id", shopId),
+      supabase.from("chat_callbacks").delete().eq("shop_id", shopId),
+      supabase.from("chat_stock_alerts").delete().eq("shop_id", shopId),
+      supabase.from("announcement_dismissals").delete().eq("shop_id", shopId),
+      supabase.from("storefront_deployments").delete().eq("shop_id", shopId),
+    ]);
+
+    settings.refreshSettings();
+    showToast("All business data has been deleted.");
   }
 
   const [now] = useState(() => Date.now());
@@ -370,7 +408,8 @@ export default function Settings() {
             {activeTab === "data" && <DataTab onExport={handleExport} />}
             {activeTab === "danger" && (
               <DangerZoneTab scheduledDeletionAt={settings.scheduledDeletionAt}
-                onDeleteClick={() => setShowDeleteModal(true)} onCancelDeletion={handleCancelDeletion} />
+                onDeleteClick={() => setShowDeleteModal(true)} onCancelDeletion={handleCancelDeletion}
+                onDeleteDataClick={() => setShowDeleteDataModal(true)} />
             )}
           </div>
 
@@ -381,6 +420,7 @@ export default function Settings() {
       </div>
 
       {showDeleteModal && <DeleteShopModal onClose={() => setShowDeleteModal(false)} onConfirm={handleRequestDeletion} />}
+      {showDeleteDataModal && <DeleteDataModal onClose={() => setShowDeleteDataModal(false)} onConfirm={handleDeleteAllData} />}
     </PageLayout>
   );
 }

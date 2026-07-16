@@ -79,31 +79,23 @@ export const DEFAULT_BLUEPRINTS = {
 };
 
 const COMMON_SCREENSHOTS = [
-  { label: "Hero", desc: "Full-screen hero section with slideshow or gradient background and CTA" },
-  { label: "Catalogue Grid", desc: "Searchable product grid with category filter chips and WhatsApp ordering" },
-  { label: "Product Detail", desc: "Product page with specs table, includes list, and WhatsApp order button" },
-  { label: "Footer", desc: "Footer with contact info, business hours, social links, and developer credit" },
+  { label: "Homepage", desc: "Full storefront homepage with hero, catalogue grid, and footer", file: "/templates/classic-homepage.png" },
+  { label: "Product Detail", desc: "Product page with specs, variants, and WhatsApp ordering", file: "/templates/classic-product-detail.png" },
 ];
 
 const FASHION_SCREENSHOTS = [
-  { label: "Lookbook Hero", desc: "Split-layout hero with bold imagery, tagline, and WhatsApp CTA" },
-  { label: "Category Strip", desc: "Horizontal scrollable category chips with item counts" },
-  { label: "New Arrivals", desc: "Horizontal product carousel for featured items with badge" },
+  { label: "Homepage", desc: "Full storefront homepage with lookbook hero, category strip, and carousel" },
   { label: "Product Detail", desc: "Product page with size/color options and WhatsApp ordering" },
 ];
 
 const MINIMAL_SCREENSHOTS = [
-  { label: "Header Banner", desc: "Simple gradient banner with store name, tagline, and CTA" },
-  { label: "Catalogue Grid", desc: "Minimal product grid with clean borderless cards" },
+  { label: "Homepage", desc: "Clean homepage with gradient banner, catalogue grid, and compact footer" },
   { label: "Product Detail", desc: "Product page with specs, options, and WhatsApp ordering" },
-  { label: "Footer", desc: "Compact footer with contact, social links, and copyright" },
 ];
 
 const BOLD_SCREENSHOTS = [
-  { label: "Gradient Hero", desc: "Full-width dark gradient hero with inline search bar" },
-  { label: "Dark Catalogue", desc: "Dark-themed product grid with spec previews on cards" },
-  { label: "Product Detail", desc: "Dark product detail with spec table and variant badges" },
-  { label: "Footer", desc: "Dark footer with contact details and social links" },
+  { label: "Homepage", desc: "Dark homepage with gradient hero, spec-heavy grid, and footer", file: "/templates/bold-homepage.png" },
+  { label: "Product Detail", desc: "Dark product detail with spec table and variant badges", file: "/templates/bold-product-detail.png" },
 ];
 
 function addScreenshots(cards, screenshots, templateId) {
@@ -111,7 +103,7 @@ function addScreenshots(cards, screenshots, templateId) {
     id: `${templateId}-${i}`,
     templateId,
     ...c,
-    screenshots: screenshots.map((s) => ({ ...s, file: null })),
+    screenshots: screenshots.map((s) => ({ ...s })),
   }));
 }
 
@@ -201,9 +193,8 @@ export const TEMPLATE_DETAILS = {
       "WhatsApp floating button and back-to-top",
     ],
     screenshots: [
-      { label: "Homepage", file: null },
-      { label: "Catalogue Grid", file: null },
-      { label: "Product Detail", file: null },
+      { label: "Homepage", file: "/templates/classic-homepage.png" },
+      { label: "Product Detail", file: "/templates/classic-product-detail.png" },
     ],
   },
   fashion: {
@@ -219,8 +210,7 @@ export const TEMPLATE_DETAILS = {
       "WhatsApp ordering and back-to-top",
     ],
     screenshots: [
-      { label: "Lookbook Hero", file: null },
-      { label: "New Arrivals", file: null },
+      { label: "Homepage", file: null },
       { label: "Product Detail", file: null },
     ],
   },
@@ -237,8 +227,7 @@ export const TEMPLATE_DETAILS = {
       "WhatsApp floating button and back-to-top",
     ],
     screenshots: [
-      { label: "Header Banner", file: null },
-      { label: "Catalogue Grid", file: null },
+      { label: "Homepage", file: null },
       { label: "Product Detail", file: null },
     ],
   },
@@ -255,9 +244,8 @@ export const TEMPLATE_DETAILS = {
       "WhatsApp floating button and back-to-top",
     ],
     screenshots: [
-      { label: "Gradient Hero", file: null },
-      { label: "Dark Catalogue", file: null },
-      { label: "Product Detail", file: null },
+      { label: "Homepage", file: "/templates/bold-homepage.png" },
+      { label: "Product Detail", file: "/templates/bold-product-detail.png" },
     ],
   },
 };
