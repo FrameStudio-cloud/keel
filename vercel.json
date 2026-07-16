@@ -22,13 +22,13 @@
     {
       "source": "/",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400" }
+        { "key": "Cache-Control", "value": "public, max-age=0, s-maxage=0, stale-while-revalidate=86400" }
       ]
     },
     {
       "source": "/(features|about|use-cases|terms)$",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400" }
+        { "key": "Cache-Control", "value": "public, max-age=0, s-maxage=0, stale-while-revalidate=86400" }
       ]
     }
   ]
