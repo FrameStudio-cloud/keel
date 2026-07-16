@@ -13,6 +13,7 @@ import { useSettings } from "../hooks/useSettings";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
+import { FiSun, FiMoon, FiCloud } from "react-icons/fi";
 
 const pageColors = { Instagram: "#E4405F", WhatsApp: "#25D366", TikTok: "#000000", Google: "#4285F4", Facebook: "#1877F2", Direct: "#6b7280" };
 
@@ -66,7 +67,7 @@ function buildChartData(raw, range) {
 }
 
 export default function Overview() {
-  const { lowStockThreshold, websiteUrl } = useSettings();
+  const { storeName, lowStockThreshold, websiteUrl } = useSettings();
   const hasWebsite = !!websiteUrl;
   const [timeRange, setTimeRange] = useState("week");
 
@@ -119,11 +120,32 @@ export default function Overview() {
     totalProducts: data?.totalProducts || 0,
   };
 
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 12 ? "Good morning" :
+    hour < 17 ? "Good afternoon" :
+    "Good evening";
+
+  const GreetingIcon = hour < 12 ? FiSun : hour < 17 ? FiCloud : FiMoon;
+
+  const todayStr = new Date().toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+
   return (
     <PageLayout title="Overview">
       <Helmet><title>Overview — Keel</title></Helmet>
       {isLoading ? (
         <div className="space-y-6">
+          <div className="flex gap-4 items-start">
+            <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
+            <div className="space-y-2 flex-1">
+              <Skeleton className="h-6 w-64 rounded-lg" />
+              <Skeleton className="h-4 w-48 rounded-lg" />
+            </div>
+          </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <Skeleton className="h-24 rounded-xl" />
             <Skeleton className="h-24 rounded-xl" />
@@ -137,6 +159,21 @@ export default function Overview() {
         </div>
       ) : (
         <>
+          <div className="mb-7 flex items-start justify-between">
+            <div className="flex items-start gap-4">
+              <div className="hidden sm:flex w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-500/20 dark:from-amber-400/10 dark:to-orange-500/10 items-center justify-center shrink-0 mt-0.5">
+                <GreetingIcon className="text-lg text-amber-500 dark:text-amber-400" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">
+                  {greeting}, {storeName || "there"}
+                </h1>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  {todayStr} &middot; Here's your daily snapshot
+                </p>
+              </div>
+            </div>
+          </div>
           <AnnouncementBanner />
           <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-3">Sales Overview</p>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
@@ -147,22 +184,24 @@ export default function Overview() {
           </div>
           <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-3">Performance</p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <WeeklySalesChart data={chartData} timeRange={timeRange} onTimeRangeChange={setTimeRange} />
-            <TopProducts products={topProducts} />
+            <div className="flex flex-col gap-4 h-full">
+              <div className="h-[248px] shrink-0">
+                <WeeklySalesChart data={chartData} timeRange={timeRange} onTimeRangeChange={setTimeRange} />
+              </div>
+              <div className="flex-1 min-h-0">
+                <TopProducts products={topProducts} />
+              </div>
+            </div>
+            <SlowMovingStock compact />
           </div>
           {hasWebsite && (
             <>
               <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mt-8 mb-3">Website Analytics</p>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div className="lg:col-span-2"><SlowMovingStock /></div>
-                <div className="lg:col-span-1">
-                  <div className="grid grid-cols-2 gap-3">
-                    <StatCard label="Total Views" value={(pageViews?.total || 0).toLocaleString()} change="All time" up />
-                    <StatCard label="Today" value={(pageViews?.today || 0).toLocaleString()} change="Visits today" up={pageViews?.today > 0} />
-                    <StatCard label="Most viewed" value={pageViews?.topPages?.[0]?.name || "—"} change={`${pageViews?.topPages?.[0]?.count || 0} visits`} up />
-                    <StatCard label="Pages" value={pageViews?.topPages?.length || 0} change="Tracked pages" up />
-                  </div>
-                </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <StatCard label="Total Views" value={(pageViews?.total || 0).toLocaleString()} change="All time" up />
+                <StatCard label="Today" value={(pageViews?.today || 0).toLocaleString()} change="Visits today" up={pageViews?.today > 0} />
+                <StatCard label="Most viewed" value={pageViews?.topPages?.[0]?.name || "—"} change={`${pageViews?.topPages?.[0]?.count || 0} visits`} up />
+                <StatCard label="Pages" value={pageViews?.topPages?.length || 0} change="Tracked pages" up />
               </div>
               <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {pageViews?.topPages?.length > 0 && (

@@ -470,7 +470,146 @@ export default function Marketing() {
             </div>
           )}
 
-          <div className="overflow-x-auto">
+          {/* Mobile cards */}
+          <div className="md:hidden mb-3 flex items-center gap-3 px-1">
+            <label className="flex items-center gap-2 text-xs text-gray-500 dark:text-slate-400 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={bulkSelection.size === filteredProducts.length && filteredProducts.length > 0}
+                onChange={toggleSelectAll}
+                className="rounded border-gray-300 dark:border-white/20 text-blue-600 focus:ring-blue-500"
+              />
+              Select all
+            </label>
+            <span className="text-xs text-gray-400 dark:text-slate-500">{filteredProducts.length} product(s)</span>
+          </div>
+          <div className="md:hidden space-y-3">
+            {filteredProducts.map((item) => {
+              const isSaving = savingId === item.id;
+              return (
+                <div key={item.id} className="bg-gray-50 dark:bg-[#1a1a2e] rounded-xl p-4 border border-gray-200 dark:border-white/10">
+                  <div className="flex items-start gap-3 mb-3">
+                    <input
+                      type="checkbox"
+                      checked={bulkSelection.has(item.id)}
+                      onChange={() => toggleBulk(item.id)}
+                      className="mt-1 rounded border-gray-300 dark:border-white/20 text-blue-600 focus:ring-blue-500 shrink-0"
+                    />
+                    <div className="w-10 h-10 rounded-lg bg-gray-200 dark:bg-white/5 flex items-center justify-center shrink-0 overflow-hidden">
+                      {item.image ? (
+                        <img src={item.image} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <FiImage size={16} className="text-gray-400" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{item.name}</p>
+                      <p className="text-xs text-gray-500 dark:text-slate-400 capitalize">{item.category}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      {item.sale_price != null ? (
+                        <div>
+                          <p className="text-xs text-gray-400 dark:text-slate-500 line-through">{formatPrice(item.price)}</p>
+                          <p className="text-sm font-semibold text-red-600 dark:text-red-400">{formatPrice(item.sale_price)}</p>
+                        </div>
+                      ) : (
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatPrice(item.price)}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-[10px] text-gray-500 dark:text-slate-500 mb-1 uppercase tracking-wide">Badge</label>
+                      {customBadgeProduct === item.id ? (
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="text"
+                            value={customBadgeInput}
+                            onChange={(e) => setCustomBadgeInput(e.target.value)}
+                            placeholder="Badge text"
+                            maxLength={20}
+                            className="flex-1 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                            autoFocus
+                            onKeyDown={(e) => { if (e.key === "Enter") saveCustomBadge(item.id); if (e.key === "Escape") setCustomBadgeProduct(null); }}
+                          />
+                          <button onClick={() => saveCustomBadge(item.id)} className="text-blue-600 dark:text-blue-400 p-1"><FiSave size={14} /></button>
+                          <button onClick={() => setCustomBadgeProduct(null)} className="text-gray-400 p-1"><FiX size={14} /></button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5">
+                          <select
+                            value={item.badge || ""}
+                            onChange={(e) => handleBadgeChange(item, e.target.value)}
+                            disabled={isSaving}
+                            className="flex-1 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 disabled:opacity-50"
+                          >
+                            {BADGE_OPTIONS.map((opt) => (
+                              <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                            <option value="__custom__">Custom...</option>
+                          </select>
+                          {item.badge && (
+                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${BADGE_COLORS[item.badge] || "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300"}`}>
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="shrink-0">
+                      <label className="block text-[10px] text-gray-500 dark:text-slate-500 mb-1 uppercase tracking-wide text-center">New</label>
+                      <Switch
+                        onChange={() => toggleNewArrival(item, !item.new_arrival)}
+                        checked={item.new_arrival}
+                        uncheckedIcon={false}
+                        checkedIcon={false}
+                        width={36}
+                        height={18}
+                        handleDiameter={14}
+                        offColor="#9ca3af"
+                        onColor="#2563eb"
+                        offHandleColor="#ffffff"
+                        onHandleColor="#ffffff"
+                        aria-label={`Toggle new arrival for ${item.name}`}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 mt-3 pt-3 border-t border-gray-200 dark:border-white/10">
+                    <div className="flex-1">
+                      <label className="block text-[10px] text-gray-500 dark:text-slate-500 mb-1 uppercase tracking-wide">Sale Price</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="—"
+                        value={item.sale_price ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value === "" ? null : parseFloat(e.target.value);
+                          updateProduct(item.id, { sale_price: val, badge: val != null ? "Sale" : item.badge });
+                        }}
+                        className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-[10px] text-gray-500 dark:text-slate-500 mb-1 uppercase tracking-wide">Ends</label>
+                      <input
+                        type="date"
+                        value={item.sale_ends_at ? item.sale_ends_at.split("T")[0] : ""}
+                        onChange={(e) => {
+                          const val = e.target.value ? new Date(e.target.value).toISOString() : null;
+                          updateProduct(item.id, { sale_ends_at: val });
+                        }}
+                        className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#1a1a2e]">

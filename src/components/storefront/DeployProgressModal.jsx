@@ -25,6 +25,7 @@ export default function DeployProgressModal({
   onComplete,
   onRetry,
   shopId: shopIdProp,
+  sections,
 }) {
   const trapRef = useFocusTrap(true);
   const [status, setStatus] = useState({});
@@ -65,14 +66,19 @@ export default function DeployProgressModal({
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 180000);
 
+        const payload = {
+          shop_id: shopId,
+          template_id: sections ? "custom" : templateId || "classic",
+          subdomain: finalSubdomain,
+        }
+        if (sections && sections.length > 0) {
+          payload.sections = sections
+        }
+
         const res = await fetch(`${PROVISIONER_URL}/provision`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            shop_id: shopId,
-            template_id: templateId || "classic",
-            subdomain: finalSubdomain,
-          }),
+          body: JSON.stringify(payload),
           signal: controller.signal,
         });
 
