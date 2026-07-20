@@ -37,6 +37,9 @@ export default function Finance() {
   const [saved, setSaved] = useState(false);
   const [manualForm, setManualForm] = useState({ receiptNo: "", amount: "", date: "", sender: "" });
   const [manualTxs, setManualTxs] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [historyData, setHistoryData] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   useEffect(() => {
     (async () => {
       const shopId = await getShopId();
@@ -232,6 +235,25 @@ export default function Finance() {
     setManualForm({ receiptNo: "", amount: "", date: "", sender: "" });
   }
 
+  async function fetchHistory() {
+    setHistoryLoading(true);
+    const shopId = await getShopId();
+    if (!shopId) { setHistoryLoading(false); return; }
+    const { data } = await supabase
+      .from("mpesa_transactions")
+      .select("id, receipt_no, amount, completion_time, sender, matched_sale_id, matched_at, created_at")
+      .eq("shop_id", shopId)
+      .order("created_at", { ascending: false })
+      .limit(500);
+    setHistoryData(data || []);
+    setHistoryLoading(false);
+  }
+
+  function closeHistory() {
+    setShowHistory(false);
+    setHistoryData([]);
+  }
+
   function startEdit(expense) {
     setEditingExpense(expense);
     setExpenseForm({
@@ -279,10 +301,16 @@ export default function Finance() {
           <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-medium text-gray-800 dark:text-white">Payment Breakdown</p>
-            <button onClick={() => { if (!showRecon) { setShowRecon(true); fetchMpesaSales(); } else setShowRecon(!showRecon); }} className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all">
-              {showRecon ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
-              Reconcile M-Pesa
-            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setShowHistory(!showHistory); if (!showHistory) fetchHistory(); }} className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-white/10 px-3 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all">
+                {showHistory ? <FiX size={14} /> : null}
+                Past Reconciliations
+              </button>
+              <button onClick={() => { if (!showRecon) { setShowRecon(true); fetchMpesaSales(); } else setShowRecon(!showRecon); }} className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all">
+                {showRecon ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
+                Reconcile M-Pesa
+              </button>
+            </div>
           </div>
           {paymentData.length === 0 ? (
             <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-8">No sales today</p>
@@ -408,6 +436,45 @@ export default function Finance() {
           )}
         </div>
       </div>
+
+      {showHistory && (
+        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 mb-6 transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-800 dark:text-white">Past Reconciliations</h3>
+            <button onClick={closeHistory} className="text-gray-400 dark:text-slate-500 hover:text-gray-600"><FiX size={16} /></button>
+          </div>
+          {historyLoading ? (
+            <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-10 bg-gray-100 dark:bg-white/5 rounded-lg animate-pulse" />)}</div>
+          ) : historyData.length === 0 ? (
+            <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-6">No past reconciliations yet. Upload a CSV or enter transactions manually to start.</p>
+          ) : (
+            <div className="border border-gray-200 dark:border-white/10 rounded-lg overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/[0.03]">
+                    <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Receipt No.</th>
+                    <th className="text-right px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Amount</th>
+                    <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Date</th>
+                    <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Sender</th>
+                    <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historyData.map((tx, i) => (
+                    <tr key={tx.id} className="border-b border-gray-50 dark:border-white/5">
+                      <td className="px-3 py-2 text-gray-800 dark:text-white font-mono">{tx.receipt_no}</td>
+                      <td className="px-3 py-2 text-right text-gray-800 dark:text-white font-medium">{formatPrice(tx.amount)}</td>
+                      <td className="px-3 py-2 text-gray-400 dark:text-slate-500">{tx.completion_time ? new Date(tx.completion_time).toLocaleDateString("en-KE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}</td>
+                      <td className="px-3 py-2 text-gray-400 dark:text-slate-500">{tx.sender || "—"}</td>
+                      <td className="px-3 py-2"><span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${tx.matched_sale_id ? "bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400" : "bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400"}`}>{tx.matched_sale_id ? <><FiCheck size={11} /> Matched</> : <><FiX size={11} /> Unmatched</>}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       {showRecon && (
         <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 mb-6 transition-all">
