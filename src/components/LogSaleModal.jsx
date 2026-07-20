@@ -20,6 +20,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
     product_id: "",
     quantity: 1,
     method: getDefaultPayment(),
+    mpesa_code: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -58,6 +59,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
       amount: total,
       quantity: parseInt(form.quantity),
       method: form.method,
+      mpesa_code: form.mpesa_code || null,
     })).select("id").single();
 
     if (saleError) {
@@ -218,6 +220,19 @@ export default function LogSaleModal({ onClose, onAdded }) {
               </select>
             </div>
           </div>
+
+          {form.method === "M-Pesa" && (
+            <div>
+              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">M-Pesa Receipt Code (optional)</label>
+              <input
+                name="mpesa_code"
+                value={form.mpesa_code}
+                onChange={handleChange}
+                placeholder="e.g. SDF34JKL"
+                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 font-mono"
+              />
+            </div>
+          )}
 
           {selectedProduct && (
             <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg px-4 py-3 flex justify-between items-center">

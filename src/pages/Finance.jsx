@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
 import StatCard from "../components/StatCard";
@@ -8,8 +8,9 @@ import { formatPrice } from "../lib/format";
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
 } from "recharts";
-import { FiEdit2, FiTrash2, FiPlus } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiPlus, FiChevronDown, FiChevronUp, FiUpload, FiCheck, FiX, FiSearch } from "react-icons/fi";
 import { useDebounce } from "../hooks/useDebounce";
+import { parseCSV, matchTransactions } from "../engine/mpesa-reconciliation";
 
 const PAYMENT_COLORS = { Cash: "#10b981", "M-Pesa": "#3b82f6", Bank: "#f59e0b" };
 const EXPENSE_CATEGORIES = ["Supplies", "Utilities", "Transport", "Marketing", "Maintenance", "Salary", "General"];
@@ -25,6 +26,14 @@ export default function Finance() {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [showRecon, setShowRecon] = useState(false);
+  const [reconStep, setReconStep] = useState("upload");
+  const [csvText, setCsvText] = useState("");
+  const [parsedTx, setParsedTx] = useState([]);
+  const [allSales, setAllSales] = useState([]);
+  const [matchResult, setMatchResult] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   useEffect(() => {
     (async () => {
       const shopId = await getShopId();
@@ -121,6 +130,84 @@ export default function Finance() {
     setRefreshKey((k) => k + 1);
   }
 
+  async function fetchMpesaSales() {
+    const shopId = await getShopId();
+    if (!shopId) return;
+    const { data } = await supabase.from("sales").select("id, amount, method, mpesa_code, created_at").eq("shop_id", shopId).eq("method", "M-Pesa").order("created_at", { ascending: false }).limit(2000);
+    setAllSales(data || []);
+    return data || [];
+  }
+
+  function handleCsvChange(text) {
+    setCsvText(text);
+    if (!text.trim()) { setParsedTx([]); setMatchResult(null); setReconStep("upload"); return; }
+    const result = parseCSV(text);
+    if (result.transactions.length === 0) return;
+    setParsedTx(result.transactions);
+    setReconStep("preview");
+  }
+
+  async function handleRunMatch() {
+    if (parsedTx.length === 0) return;
+    const sales = allSales.length > 0 ? allSales : await fetchMpesaSales();
+    const result = matchTransactions(sales, parsedTx);
+    setMatchResult(result);
+    setReconStep("results");
+  }
+
+  async function handleSaveMatches() {
+    if (!matchResult || matchResult.matched.length === 0) return;
+    setSaving(true);
+    const shopId = await getShopId();
+    if (!shopId) { setSaving(false); return; }
+
+    const inserts = matchResult.matched.map(m => ({
+      shop_id: shopId,
+      receipt_no: m.transaction.receiptNo,
+      completion_time: m.transaction.completionTime,
+      sender: m.transaction.sender,
+      amount: m.transaction.amount,
+      balance: m.transaction.balance,
+      transaction_type: m.transaction.transactionType,
+      matched_sale_id: m.sale.id,
+      matched_at: new Date().toISOString(),
+    }));
+
+    const unmatchedTxs = matchResult.unmatchedMpesa.map(tx => ({
+      shop_id: shopId,
+      receipt_no: tx.receiptNo,
+      completion_time: tx.completionTime,
+      sender: tx.sender,
+      amount: tx.amount,
+      balance: tx.balance,
+      transaction_type: tx.transactionType,
+    }));
+
+    const allInserts = [...inserts, ...unmatchedTxs];
+    if (allInserts.length === 0) { setSaving(false); return; }
+
+    const { error } = await supabase.from("mpesa_transactions").insert(allInserts);
+    if (error) { console.error("Save error:", error); setSaving(false); return; }
+
+    for (const m of matchResult.matched) {
+      if (m.sale.mpesa_code) continue;
+      await supabase.from("sales").update({ mpesa_code: m.transaction.receiptNo }).eq("id", m.sale.id);
+    }
+
+    setSaved(true);
+    setSaving(false);
+    setRefreshKey(k => k + 1);
+  }
+
+  function resetRecon() {
+    setShowRecon(false);
+    setCsvText("");
+    setParsedTx([]);
+    setMatchResult(null);
+    setReconStep("upload");
+    setSaved(false);
+  }
+
   function startEdit(expense) {
     setEditingExpense(expense);
     setExpenseForm({
@@ -165,8 +252,14 @@ export default function Finance() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
-          <p className="text-sm font-medium text-gray-800 dark:text-white mb-4">Payment Breakdown</p>
+          <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm font-medium text-gray-800 dark:text-white">Payment Breakdown</p>
+            <button onClick={() => { if (!showRecon) { setShowRecon(true); fetchMpesaSales(); } else setShowRecon(!showRecon); }} className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all">
+              {showRecon ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
+              Reconcile M-Pesa
+            </button>
+          </div>
           {paymentData.length === 0 ? (
             <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-8">No sales today</p>
           ) : (
@@ -291,6 +384,132 @@ export default function Finance() {
           )}
         </div>
       </div>
+
+      {showRecon && (
+        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 mb-6 transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-800 dark:text-white">M-Pesa Reconciliation</h3>
+            <button onClick={resetRecon} className="text-gray-400 dark:text-slate-500 hover:text-gray-600" aria-label="Close reconciliation"><FiX size={16} /></button>
+          </div>
+
+          {reconStep === "upload" && (
+            <div>
+              <p className="text-xs text-gray-400 dark:text-slate-500 mb-3">Download your M-Pesa statement from the Safaricom app (M-Pesa &gt; Statement &gt; Download as CSV), then paste it below or upload the file.</p>
+              <textarea value={csvText} onChange={(e) => handleCsvChange(e.target.value)} placeholder="Paste CSV content here..." rows={6} className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 font-mono" />
+              <label className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 cursor-pointer mt-2 hover:underline">
+                <FiUpload size={14} /> Upload CSV file
+                <input type="file" accept=".csv" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) { const r = new FileReader(); r.onload = () => handleCsvChange(r.result); r.readAsText(f); } }} />
+              </label>
+              {csvText.trim() && parsedTx.length === 0 && (
+                <p className="text-xs text-red-500 mt-2">Could not find any valid transactions. Check that your CSV has receipt numbers and amounts.</p>
+              )}
+            </div>
+          )}
+
+          {reconStep === "preview" && parsedTx.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs text-gray-400 dark:text-slate-500">{parsedTx.length} transactions found</p>
+                <div className="flex gap-2">
+                  <button onClick={() => setReconStep("upload")} className="text-xs text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-white/10 px-3 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05]">Back</button>
+                  <button onClick={handleRunMatch} className="text-xs text-white bg-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all">Match against sales</button>
+                </div>
+              </div>
+              <div className="border border-gray-200 dark:border-white/10 rounded-lg overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/[0.03]">
+                      <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Receipt</th>
+                      <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Date</th>
+                      <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Sender</th>
+                      <th className="text-right px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {parsedTx.slice(0, 50).map((tx, i) => (
+                      <tr key={i} className="border-b border-gray-50 dark:border-white/5">
+                        <td className="px-3 py-2 text-gray-800 dark:text-white font-mono">{tx.receiptNo}</td>
+                        <td className="px-3 py-2 text-gray-400 dark:text-slate-500">{tx.completionTime ? new Date(tx.completionTime).toLocaleDateString("en-KE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}</td>
+                        <td className="px-3 py-2 text-gray-600 dark:text-slate-400">{tx.sender || "—"}</td>
+                        <td className="px-3 py-2 text-right text-gray-800 dark:text-white font-medium">{formatPrice(tx.amount)}</td>
+                      </tr>
+                    ))}
+                    {parsedTx.length > 50 && <tr><td colSpan={4} className="px-3 py-2 text-center text-gray-400 text-xs">+{parsedTx.length - 50} more</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {reconStep === "results" && matchResult && (
+            <div>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-green-700 dark:text-green-400">{matchResult.matched.length}</p>
+                  <p className="text-xs text-green-600 dark:text-green-500">Matched</p>
+                  <p className="text-xs text-green-500 dark:text-green-400">{formatPrice(matchResult.matched.reduce((s, m) => s + Number(m.transaction.amount), 0))}</p>
+                </div>
+                <div className="bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">{matchResult.unmatchedMpesa.length}</p>
+                  <p className="text-xs text-yellow-600 dark:text-yellow-500">Unmatched M-Pesa</p>
+                  <p className="text-xs text-yellow-500 dark:text-yellow-400">{formatPrice(matchResult.unmatchedMpesa.reduce((s, t) => s + Number(t.amount), 0))}</p>
+                </div>
+                <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-red-700 dark:text-red-400">{matchResult.unmatchedSales.length}</p>
+                  <p className="text-xs text-red-600 dark:text-red-500">Unmatched Sales</p>
+                  <p className="text-xs text-red-500 dark:text-red-400">{formatPrice(matchResult.unmatchedSales.reduce((s, t) => s + Number(t.amount), 0))}</p>
+                </div>
+              </div>
+
+              <div className="border border-gray-200 dark:border-white/10 rounded-lg overflow-x-auto mb-4">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/[0.03]">
+                      <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Receipt</th>
+                      <th className="text-right px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Amount</th>
+                      <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Date</th>
+                      <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {matchResult.matched.map((m, i) => (
+                      <tr key={i} className="border-b border-gray-50 dark:border-white/5">
+                        <td className="px-3 py-2 text-gray-800 dark:text-white font-mono">{m.transaction.receiptNo}</td>
+                        <td className="px-3 py-2 text-right text-gray-800 dark:text-white font-medium">{formatPrice(m.transaction.amount)}</td>
+                        <td className="px-3 py-2 text-gray-400 dark:text-slate-500">{m.transaction.completionTime ? new Date(m.transaction.completionTime).toLocaleDateString("en-KE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}</td>
+                        <td className="px-3 py-2"><span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${m.confidence === "exact" ? "bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400" : "bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400"}`}>{m.confidence === "exact" ? <><FiCheck size={11} /> Exact</> : <><FiSearch size={11} /> Suggested</>}</span></td>
+                      </tr>
+                    ))}
+                    {matchResult.unmatchedMpesa.map((tx, i) => (
+                      <tr key={`u-${i}`} className="border-b border-gray-50 dark:border-white/5">
+                        <td className="px-3 py-2 text-gray-800 dark:text-white font-mono">{tx.receiptNo}</td>
+                        <td className="px-3 py-2 text-right text-gray-800 dark:text-white font-medium">{formatPrice(tx.amount)}</td>
+                        <td className="px-3 py-2 text-gray-400 dark:text-slate-500">{tx.completionTime ? new Date(tx.completionTime).toLocaleDateString("en-KE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}</td>
+                        <td className="px-3 py-2"><span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400"><FiX size={11} /> No match</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {saved ? (
+                <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 rounded-lg px-4 py-3 text-xs text-green-700 dark:text-green-400 flex items-center justify-between">
+                  <span><FiCheck size={14} className="inline mr-1" /> Saved successfully. {matchResult.matched.length} transactions matched.</span>
+                  <button onClick={resetRecon} className="text-green-600 dark:text-green-400 underline">Close</button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <button onClick={handleSaveMatches} disabled={saving || matchResult.matched.length === 0} className="flex-1 bg-blue-600 text-white text-xs py-2 rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50">
+                    {saving ? "Saving..." : `Save ${matchResult.matched.length} match(es)`}
+                  </button>
+                  <button onClick={resetRecon} className="flex-1 border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 text-xs py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05]">Cancel</button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
     </PageLayout>
   );
 }
