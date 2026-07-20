@@ -2,6 +2,8 @@
 
 ## Session Context
 
+- **Animated loading screen**: Replaced the plain `animate-pulse "Loading..."` text with a branded CSS animation (`src/components/LoadingScreen.jsx`). Features: pulsing "Keel" logo, two concentric spinning rings (blue + accent), orbiting dot, 5 bouncing dots. Pure CSS keyframes, zero JS animation deps. Used as Suspense fallback for all lazy pages and during auth/settings loading.
+
 Root `/` route uses `HomeOrDashboard` wrapper — shows landing page (`Homepage.jsx`) if unauthenticated, redirects to Overview dashboard if logged in.
 Favicon + logo: `public/keel-icon.png` (logo, renamed from `keel icon.png` to remove space), `public/favicon-*.png` + `public/android-chrome-*.png` + `public/apple-touch-icon.png` (favicons). Referenced in `index.html` and used in place of inline "K" squares.
 Homepage (`src/pages/Homepage.jsx`) sections: Nav, Hero (left text + right 3-card mobile hero using Modern screenshots from `public/`, no laptop image), Features (4 stacked rows — Inventory, Financial Tracking, Reports & Insights, Sales Management — alternating image/text layout with hover lift), How It Works (flashcard stack animation — 3 cards fall/reveal on loop, CSS keyframe at 24s cycle), Website Integration (3 catalogue screenshots from `src/assets/catalogue/`, infinite marquee scroll with pause on hover/touch, 3-column on desktop), Testimonials (horizontal snap-scroll carousel with CSS mask fade edges and 44px touch-target dots), FAQ (10 questions, accordion with aria-labelledby), Contact, CTA + Trust Badges, Footer. Mobile-first: `pb-12` section spacing, nav with backdrop overlay and dynamic aria-label. Trust badges use single accent color (`text-blue-600`).
@@ -202,6 +204,7 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - `src/data/terms.json` — static Terms of Service content
 - `src/assets/catalogue/` — 3 catalogue screenshots (zurifashion-catalogue-shot.png, wix-collection-shot.png, mini-electricals-shots.png) used in Website Integration section
 - `src/pages/NotFound.jsx` — custom 404 page with `FiCompass` icon, "Page not found" message, Go Home link
+- `src/components/LoadingScreen.jsx` — branded animated loading screen: pulsing "Keel" logo, two concentric spinning rings, orbiting dot, 5 bouncing dots. Pure CSS keyframes, zero JS deps. Used as Suspense fallback for all lazy pages and during auth/settings loading.
 - `src/components/WebUpdateChecker.jsx` — polls `/version.json?t=...` every 5 min; shows Chrome-style bottom bar ("A new version is available [Refresh]") when a new deployment is detected.
 - `src/components/settings/` — 12 component files: StoreTab, PreferencesTab, NotificationsTab, BillingTab, SecurityTab, DataTab, DangerZoneTab, DeleteShopModal, SectionCard, TabButton, SettingsSaveBar, settingsStyles
 - `src/components/profile/` — 4 component files: ProfileAboutTab, ProfileAccountTab, ProfileQuickAccessTab, SignOutModal
