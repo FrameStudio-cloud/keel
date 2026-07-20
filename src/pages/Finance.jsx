@@ -28,12 +28,15 @@ export default function Finance() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [showRecon, setShowRecon] = useState(false);
   const [reconStep, setReconStep] = useState("upload");
+  const [reconMode, setReconMode] = useState("csv");
   const [csvText, setCsvText] = useState("");
   const [parsedTx, setParsedTx] = useState([]);
   const [allSales, setAllSales] = useState([]);
   const [matchResult, setMatchResult] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [manualForm, setManualForm] = useState({ receiptNo: "", amount: "", date: "", sender: "" });
+  const [manualTxs, setManualTxs] = useState([]);
   useEffect(() => {
     (async () => {
       const shopId = await getShopId();
@@ -147,10 +150,29 @@ export default function Finance() {
     setReconStep("preview");
   }
 
+  function handleAddManual() {
+    if (!manualForm.receiptNo || !manualForm.amount) return;
+    const tx = {
+      receiptNo: manualForm.receiptNo.trim(),
+      amount: parseFloat(manualForm.amount),
+      completionTime: manualForm.date || null,
+      sender: manualForm.sender.trim(),
+      transactionType: "Manual",
+      balance: null,
+    };
+    setManualTxs(prev => [...prev, tx]);
+    setManualForm({ receiptNo: "", amount: "", date: "", sender: "" });
+  }
+
+  function handleRemoveManual(i) {
+    setManualTxs(prev => prev.filter((_, idx) => idx !== i));
+  }
+
   async function handleRunMatch() {
-    if (parsedTx.length === 0) return;
+    const txs = reconMode === "csv" ? parsedTx : manualTxs;
+    if (txs.length === 0) return;
     const sales = allSales.length > 0 ? allSales : await fetchMpesaSales();
-    const result = matchTransactions(sales, parsedTx);
+    const result = matchTransactions(sales, txs);
     setMatchResult(result);
     setReconStep("results");
   }
@@ -206,6 +228,8 @@ export default function Finance() {
     setMatchResult(null);
     setReconStep("upload");
     setSaved(false);
+    setManualTxs([]);
+    setManualForm({ receiptNo: "", amount: "", date: "", sender: "" });
   }
 
   function startEdit(expense) {
@@ -389,10 +413,18 @@ export default function Finance() {
         <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 mb-6 transition-all">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-medium text-gray-800 dark:text-white">M-Pesa Reconciliation</h3>
-            <button onClick={resetRecon} className="text-gray-400 dark:text-slate-500 hover:text-gray-600" aria-label="Close reconciliation"><FiX size={16} /></button>
+            <div className="flex items-center gap-2">
+              {reconStep === "upload" && (
+                <div className="flex bg-gray-100 dark:bg-white/[0.06] rounded-lg p-0.5 text-xs">
+                  <button onClick={() => { setReconMode("csv"); setCsvText(""); setParsedTx([]); setManualTxs([]); }} className={`px-3 py-1.5 rounded-md transition-all ${reconMode === "csv" ? "bg-white dark:bg-[#16213e] text-gray-800 dark:text-white shadow-sm" : "text-gray-500 dark:text-slate-400 hover:text-gray-700"}`}>Upload CSV</button>
+                  <button onClick={() => { setReconMode("manual"); setCsvText(""); setParsedTx([]); setManualTxs([]); }} className={`px-3 py-1.5 rounded-md transition-all ${reconMode === "manual" ? "bg-white dark:bg-[#16213e] text-gray-800 dark:text-white shadow-sm" : "text-gray-500 dark:text-slate-400 hover:text-gray-700"}`}>Manual Entry</button>
+                </div>
+              )}
+              <button onClick={resetRecon} className="text-gray-400 dark:text-slate-500 hover:text-gray-600" aria-label="Close reconciliation"><FiX size={16} /></button>
+            </div>
           </div>
 
-          {reconStep === "upload" && (
+          {reconStep === "upload" && reconMode === "csv" && (
             <div>
               <p className="text-xs text-gray-400 dark:text-slate-500 mb-3">Download your M-Pesa statement from the Safaricom app (M-Pesa &gt; Statement &gt; Download as CSV), then paste it below or upload the file.</p>
               <textarea value={csvText} onChange={(e) => handleCsvChange(e.target.value)} placeholder="Paste CSV content here..." rows={6} className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 font-mono" />
@@ -402,6 +434,52 @@ export default function Finance() {
               </label>
               {csvText.trim() && parsedTx.length === 0 && (
                 <p className="text-xs text-red-500 mt-2">Could not find any valid transactions. Check that your CSV has receipt numbers and amounts.</p>
+              )}
+            </div>
+          )}
+
+          {reconStep === "upload" && reconMode === "manual" && (
+            <div>
+              <p className="text-xs text-gray-400 dark:text-slate-500 mb-3">Enter one or more M-Pesa transactions manually to match against your sales.</p>
+              <div className="grid grid-cols-4 gap-2 mb-3">
+                <input value={manualForm.receiptNo} onChange={(e) => setManualForm(f => ({ ...f, receiptNo: e.target.value }))} placeholder="Receipt No *" className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 font-mono" />
+                <input value={manualForm.amount} onChange={(e) => setManualForm(f => ({ ...f, amount: e.target.value }))} placeholder="Amount *" type="number" step="0.01" className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400" />
+                <input value={manualForm.date} onChange={(e) => setManualForm(f => ({ ...f, date: e.target.value }))} placeholder="Date (optional)" type="datetime-local" className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400" />
+                <input value={manualForm.sender} onChange={(e) => setManualForm(f => ({ ...f, sender: e.target.value }))} placeholder="Sender (optional)" className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400" />
+              </div>
+              <button onClick={handleAddManual} disabled={!manualForm.receiptNo || !manualForm.amount} className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all disabled:opacity-50">
+                <FiPlus size={13} /> Add transaction
+              </button>
+
+              {manualTxs.length > 0 && (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs text-gray-400 dark:text-slate-500">{manualTxs.length} transaction(s) added</p>
+                    <button onClick={handleRunMatch} className="text-xs text-white bg-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all">Match against sales</button>
+                  </div>
+                  <div className="border border-gray-200 dark:border-white/10 rounded-lg overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/[0.03]">
+                          <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Receipt</th>
+                          <th className="text-right px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Amount</th>
+                          <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Sender</th>
+                          <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {manualTxs.map((tx, i) => (
+                          <tr key={i} className="border-b border-gray-50 dark:border-white/5">
+                            <td className="px-3 py-2 text-gray-800 dark:text-white font-mono">{tx.receiptNo}</td>
+                            <td className="px-3 py-2 text-right text-gray-800 dark:text-white font-medium">{formatPrice(tx.amount)}</td>
+                            <td className="px-3 py-2 text-gray-400 dark:text-slate-500">{tx.sender || "—"}</td>
+                            <td className="px-3 py-2"><button onClick={() => handleRemoveManual(i)} className="text-red-500 hover:text-red-600 text-xs"><FiX size={13} /></button></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               )}
             </div>
           )}
