@@ -3,6 +3,7 @@ import { supabase } from "../../lib/supabase";
 import { getShopId } from "../../lib/shop";
 import { useSettings } from "../../hooks/useSettings";
 import { FiCheck, FiPlus, FiTrash2, FiChevronUp, FiChevronDown, FiMessageCircle, FiSend, FiCheckCircle, FiPhone, FiAlertCircle } from "react-icons/fi";
+import { useToast } from "../../context/ToastProvider";
 import Pagination from "../Pagination";
 
 const MSG_PAGE_SIZE = 50;
@@ -16,8 +17,8 @@ export default function ChatWidgetTab() {
   const { whatsapp } = useSettings();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [toast, setToast] = useState(null);
-  const [shopId, setShopId] = useState(null);
+  const { showToast } = useToast();
+
   const [config, setConfig] = useState({
     enabled: true,
     welcome_message: "Hi! How can we help you today?",
@@ -39,11 +40,6 @@ export default function ChatWidgetTab() {
   const [sendingReply, setSendingReply] = useState(null);
   const [callbacks, setCallbacks] = useState([]);
   const [stockAlerts, setStockAlerts] = useState([]);
-
-  function showToast(msg, type = "success") {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3000);
-  }
 
   useEffect(() => {
     let cancelled = false;
@@ -244,14 +240,6 @@ export default function ChatWidgetTab() {
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
-      {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold shadow-xl ${
-          toast.type === "error" ? "bg-red-500 text-white" : "bg-blue-600 text-white"
-        }`}>
-          {toast.msg}
-        </div>
-      )}
-
       {callbacks.length > 0 && (
         <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-4">

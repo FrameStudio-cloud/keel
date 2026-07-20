@@ -10,6 +10,7 @@ import EmptyState from "../components/EmptyState";
 import AddProductModal from "../components/AddProductModal";
 import EditProductModal from "../components/EditProductModal";
 import StockAdjustModal from "../components/StockAdjustModal";
+import QueueStatus from "../components/QueueStatus";
 import Pagination from "../components/Pagination";
 import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
@@ -182,12 +183,15 @@ export default function Inventory() {
         <p className="text-sm text-gray-400 dark:text-slate-500">
           {total} products
         </p>
-        <button
-          onClick={() => setShowModal(true)}
-          className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all"
-        >
-          + Add product
-        </button>
+        <div className="flex items-center gap-2">
+          <QueueStatus />
+          <button
+            onClick={() => setShowModal(true)}
+            className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all"
+          >
+            + Add product
+          </button>
+        </div>
       </div>
 
       {!hasWebsite && (

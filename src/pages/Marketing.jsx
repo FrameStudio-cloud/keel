@@ -8,6 +8,7 @@ import { supabase } from "../lib/supabase";
 import { formatPrice } from "../lib/format";
 import { useSettings } from "../hooks/useSettings";
 import { useDebounce } from "../hooks/useDebounce";
+import { useToast } from "../context/ToastProvider";
 import QRCode from "qrcode";
 import {
   FiLink, FiCopy, FiShare2, FiSmartphone, FiFileText, FiGrid, FiStar, FiDownload, FiCheck,
@@ -42,7 +43,6 @@ export default function Marketing() {
   const [copied, setCopied] = useState(false);
   const [qrType, setQrType] = useState("website");
   const [qrUrl, setQrUrl] = useState("");
-  const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
   const [bulkSelection, setBulkSelection] = useState(new Set());
   const [savingId, setSavingId] = useState(null);
@@ -51,17 +51,7 @@ export default function Marketing() {
   const [showCalendar, setShowCalendar] = useState(false);
   const [catalogueMap, setCatalogueMap] = useState({});
   const qrCanvasRef = useRef(null);
-  const toastTimer = useRef(null);
-
-  useEffect(() => {
-    return () => { if (toastTimer.current) clearTimeout(toastTimer.current); };
-  }, []);
-
-  function showToast(msg, type) {
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    setToast({ msg, type });
-    toastTimer.current = setTimeout(() => setToast(null), 2500);
-  }
+  const { showToast } = useToast();
 
   const publishedIds = useMemo(() => new Set(Object.keys(catalogueMap)), [catalogueMap]);
   const selectedProduct = products.find((c) => c.id === selectedId);
@@ -890,11 +880,6 @@ export default function Marketing() {
       </>
       )}
     </PageLayout>
-      {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold shadow-xl transition-all ${toast.type === "error" ? "bg-red-500 text-white" : "bg-blue-600 text-white"}`}>
-          {toast.msg}
-        </div>
-      )}
     </>
   );
 }

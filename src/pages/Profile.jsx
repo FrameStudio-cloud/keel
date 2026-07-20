@@ -5,6 +5,7 @@ import PageLayout from "../components/layout/PageLayout";
 import Skeleton from "../components/Skeleton";
 import { useSettings } from "../hooks/useSettings";
 import { AuthContext } from "../context/AuthContext";
+import { useToast } from "../context/ToastProvider";
 import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
 import {
@@ -29,12 +30,7 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState("about");
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [memberSince, setMemberSince] = useState(null);
-  const [toast, setToast] = useState(null);
-
-  function showToast(msg, type = "success") {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3000);
-  }
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (settings.loading) return;
@@ -78,14 +74,6 @@ export default function Profile() {
       <Helmet><title>Store Profile — Keel</title></Helmet>
       <style>{`@keyframes fadeSlideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
-      {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold shadow-xl ${
-          toast.type === "error" ? "bg-red-500 text-white" : "bg-blue-600 text-white"
-        }`}>
-          {toast.msg}
-        </div>
-      )}
-
       <div className="lg:hidden overflow-x-auto pb-3 -mx-4 px-4 mb-4">
         <div className="flex gap-1.5 min-w-max">
           {TABS.map((t) => <TabButton key={t.id} tab={t} isActive={activeTab === t.id} onSelect={setActiveTab} isMobile />)}
@@ -105,7 +93,7 @@ export default function Profile() {
               <ProfileAboutTab
                 storeName={storeName} businessCategory={businessCategory}
                 logoUrl={logoUrl} memberSince={memberSince}
-                showToast={showToast} refreshSettings={settings.refreshSettings}
+                refreshSettings={settings.refreshSettings}
                 storePhone={storePhone} storeAddress={storeAddress}
                 whatsapp={whatsapp} websiteUrl={websiteUrl}
               />

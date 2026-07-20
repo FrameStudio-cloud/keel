@@ -1,12 +1,13 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from "react";
 import { FiX, FiCamera, FiSearch, FiCheck } from "react-icons/fi";
-import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
+import { getShopId } from "../lib/shop";
 import { getPaymentMethods, getDefaultPayment } from "../lib/paymentConfig";
 import { formatPrice } from "../lib/format";
 import { useSettings } from "../hooks/useSettings";
 import { useFocusTrap } from "../hooks/useFocusTrap";
+import { enqueueWrite } from "../lib/writeQueue";
 import BarcodeScanner from "./BarcodeScanner";
 
 export default function LogSaleModal({ onClose, onAdded }) {
@@ -22,7 +23,6 @@ export default function LogSaleModal({ onClose, onAdded }) {
     method: getDefaultPayment(),
     mpesa_code: "",
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showScanner, setShowScanner] = useState(false);
 
@@ -50,45 +50,31 @@ export default function LogSaleModal({ onClose, onAdded }) {
       return;
     }
 
-    setLoading(true);
-
-    // 1 — insert the sale
-    const { data: saleData, error: saleError } = await supabase.from("sales").insert(withShop({
-      product_id: selectedProduct.id,
-      product_name: selectedProduct.name,
-      amount: total,
-      quantity: parseInt(form.quantity),
-      method: form.method,
-      mpesa_code: form.mpesa_code || null,
-    })).select("id").single();
-
-    if (saleError) {
-      console.error(saleError);
-      setLoading(false);
-      return;
-    }
-
-    // 2 — reduce the stock
     const shopId = await getShopId();
-    const { error: stockError } = await supabase
-      .from("products")
-      .update({ stock: selectedProduct.stock - parseInt(form.quantity) })
-      .eq("id", selectedProduct.id)
-      .eq("shop_id", shopId);
+    const newStock = selectedProduct.stock - parseInt(form.quantity);
+    const lowStockAlert =
+      newStock < lowStockThreshold && newStock >= 0
+        ? { shop_id: shopId, product_id: selectedProduct.id, product_name: selectedProduct.name, current_stock: newStock, threshold: lowStockThreshold }
+        : null;
 
-    if (stockError) {
-      console.error(stockError);
-      await supabase.from("sales").delete().eq("id", saleData.id);
-    } else {
-      const newStock = selectedProduct.stock - parseInt(form.quantity);
-      onAdded();
-      supabase.functions.invoke("send-low-stock-alert", {
-        body: { shop_id: shopId, product_id: selectedProduct.id, product_name: selectedProduct.name, current_stock: newStock, threshold: lowStockThreshold },
-      }).catch((e) => console.error("low stock alert failed", e));
-      onClose();
-    }
+    onAdded();
+    onClose();
 
-    setLoading(false);
+    enqueueWrite({
+      type: "logSale",
+      shopId,
+      payload: {
+        sale: {
+          product_id: selectedProduct.id,
+          product_name: selectedProduct.name,
+          amount: total,
+          quantity: parseInt(form.quantity),
+          method: form.method,
+          mpesa_code: form.mpesa_code || null,
+        },
+        stockUpdate: { productId: selectedProduct.id, newStock, lowStockAlert },
+      },
+    });
   }
 
   return (
@@ -259,10 +245,9 @@ export default function LogSaleModal({ onClose, onAdded }) {
           </button>
           <button
             onClick={handleSubmit}
-            disabled={loading}
-            className="flex-1 bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50"
+            className="flex-1 bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700 transition-all"
           >
-            {loading ? "Saving..." : "Log sale"}
+            Log sale
           </button>
         </div>
       </div>

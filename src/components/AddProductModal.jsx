@@ -1,13 +1,14 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from "react";
 import { FiX, FiCamera } from "react-icons/fi";
-import { getShopId, withShop } from "../lib/shop";
+import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { uploadImage } from "../lib/storage";
 import { useSettings } from "../hooks/useSettings";
 import { formatPrice } from "../lib/format";
 import ImageUploader from "./ImageUploader";
 import { useFocusTrap } from "../hooks/useFocusTrap";
+import { enqueueWrite } from "../lib/writeQueue";
 import BarcodeScanner from "./BarcodeScanner";
 
 export default function AddProductModal({ onClose, onAdded }) {
@@ -103,36 +104,28 @@ export default function AddProductModal({ onClose, onAdded }) {
     };
     if (showBarcode && form.barcode) payload.barcode = form.barcode;
 
-    const { data: newProduct, error } = await supabase
-      .from("products")
-      .insert(withShop(payload))
-      .select()
-      .single();
+    const attrEntries = Object.entries(attributeValues).filter(
+      (entry) => entry[1].trim()
+    ).map(([attrId, val]) => ({
+      attribute_id: attrId,
+      value: val === "__other__" ? (customAttrValues[attrId] || "") : val,
+    }));
 
-    if (error) {
-      console.error(error);
-    } else if (newProduct) {
-      const attrEntries = Object.entries(attributeValues).filter(
-        (entry) => entry[1].trim()
-      ).map(([attrId, val]) => ({
-          product_id: newProduct.id,
-          attribute_id: attrId,
-          value: val === "__other__" ? (customAttrValues[attrId] || "") : val,
-          shop_id: shopId,
-        }));
-      if (attrEntries.length > 0) {
-        await supabase.from("product_attribute_values").insert(attrEntries);
-      }
-      onAdded();
-      onClose();
-    }
-
+    onAdded();
+    onClose();
     setLoading(false);
+
+    enqueueWrite({
+      type: "addProduct",
+      shopId,
+      payload: { product: payload, attributes: attrEntries },
+    });
   }
 
   async function handleUpdate() {
-    const shopId = await getShopId();
     setLoading(true);
+
+    const shopId = await getShopId();
 
     let image = existingProduct.image;
     if (imageFile) {
@@ -143,25 +136,24 @@ export default function AddProductModal({ onClose, onAdded }) {
       }
     }
 
-    const { error } = await supabase
-      .from("products")
-      .update({
-        stock: parseInt(form.stock),
-        price: parseInt(form.price),
-        cost_price: parseInt(form.cost_price) || 0,
-        image,
-      })
-      .eq("id", existingProduct.id)
-      .eq("shop_id", shopId);
-
-    if (error) {
-      console.error(error);
-    } else {
-      onAdded();
-      onClose();
-    }
-
+    onAdded();
+    onClose();
     setLoading(false);
+
+    enqueueWrite({
+      type: "updateProduct",
+      shopId,
+      payload: {
+        productId: existingProduct.id,
+        product: {
+          stock: parseInt(form.stock),
+          price: parseInt(form.price),
+          cost_price: parseInt(form.cost_price) || 0,
+          image,
+        },
+        attributes: [],
+      },
+    });
   }
 
   return (

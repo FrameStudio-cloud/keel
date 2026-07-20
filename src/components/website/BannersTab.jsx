@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { FiX, FiArrowUp } from "react-icons/fi";
 import { supabase } from "../../lib/supabase";
 import { getShopId, withShop } from "../../lib/shop";
+import { useToast } from "../../context/ToastProvider";
 
 const BANNER_TYPES = [
   { value: "hero", label: "Hero", color: "bg-purple-500/20 text-purple-300" },
@@ -28,7 +29,7 @@ export default function BannersTab() {
   const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
-  const [toast, setToast] = useState(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     fetchBanners();
@@ -43,11 +44,6 @@ export default function BannersTab() {
       .order("sort_order");
     if (!error) setBanners(data || []);
     setLoading(false);
-  }
-
-  function showToast(msg, type = "success") {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3000);
   }
 
   function openAdd() {
@@ -142,18 +138,6 @@ export default function BannersTab() {
 
   return (
     <div>
-      {toast && (
-        <div
-          className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold shadow-xl ${
-            toast.type === "error"
-              ? "bg-red-500 text-white"
-              : "bg-blue-600 text-white"
-          }`}
-        >
-          {toast.msg}
-        </div>
-      )}
-
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm text-slate-600 dark:text-slate-400">{banners.length} banners</p>
         <button

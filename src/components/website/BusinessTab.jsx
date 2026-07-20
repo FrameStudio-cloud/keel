@@ -3,6 +3,7 @@ import { FiCheck } from "react-icons/fi";
 import { supabase } from "../../lib/supabase";
 import { getShopId } from "../../lib/shop";
 import { useSettings } from "../../hooks/useSettings";
+import { useToast } from "../../context/ToastProvider";
 import ImageUploader from "../ImageUploader";
 import { uploadImage } from "../../lib/storage";
 
@@ -39,7 +40,7 @@ export default function BusinessTab() {
   const [logoFile, setLogoFile] = useState(null);
   const [hours, setHours] = useState(() => hoursFromSettings(settings.businessHours));
   const [saving, setSaving] = useState(false);
-  const [toast, setToast] = useState(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (settings.loading) return;
@@ -54,11 +55,6 @@ export default function BusinessTab() {
     setLogoFile(null);
     setHours(hoursFromSettings(settings.businessHours));
   }, [settings]);
-
-  function showToast(msg, type = "success") {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3000);
-  }
 
   function updateHour(key, field, value) {
     setHours((prev) => prev.map((h) => (h.key === key ? { ...h, [field]: value } : h)));
@@ -110,14 +106,6 @@ export default function BusinessTab() {
 
   return (
     <div className="max-w-xl mx-auto">
-      {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold shadow-xl ${
-          toast.type === "error" ? "bg-red-500 text-white" : "bg-blue-600 text-white"
-        }`}>
-          {toast.msg}
-        </div>
-      )}
-
       <div className="space-y-6">
 
         <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5 shadow-sm">

@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import './index.css'
 import { initPostHog } from './lib/posthog'
+import { processQueue } from './lib/writeQueue'
 import App from './App.jsx'
 
 if ('serviceWorker' in navigator) {
@@ -18,6 +19,11 @@ function PostHogInit() {
   return null
 }
 
+function QueueInit() {
+  useEffect(() => { processQueue() }, [])
+  return null
+}
+
 const container = document.getElementById('root')
 const root = createRoot(container)
 root.render(
@@ -27,6 +33,7 @@ root.render(
       <Analytics />
       <SpeedInsights />
       <PostHogInit />
+      <QueueInit />
     </HelmetProvider>
   </StrictMode>,
 )

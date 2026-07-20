@@ -25,6 +25,7 @@ import TourGuide from "./components/TourGuide";
 import WebUpdateChecker from "./components/WebUpdateChecker";
 import SettingsProvider from "./context/SettingsProvider";
 import AuthProvider, { AuthContext } from "./context/AuthContext";
+import { ToastProvider } from "./context/ToastProvider";
 import { useSettings } from "./hooks/useSettings";
 import LockoutScreen from "./pages/LockoutScreen";
 
@@ -132,7 +133,9 @@ export default function App() {
             <ScrollToTop />
             <PostHogPageView />
             <WebUpdateChecker />
-            <AppRoutes />
+            <ToastProvider>
+              <AppRoutes />
+            </ToastProvider>
           </BrowserRouter>
         </SettingsProvider>
       </AuthProvider>

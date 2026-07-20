@@ -1,55 +1,39 @@
 import { useState } from "react";
-import { getShopId, withShop } from "../lib/shop";
-import { supabase } from "../lib/supabase";
+import { getShopId } from "../lib/shop";
 import { useSettings } from "../hooks/useSettings";
 import { useFocusTrap } from "../hooks/useFocusTrap";
+import { enqueueWrite } from "../lib/writeQueue";
 import { FiX } from "react-icons/fi";
 
 export default function StockAdjustModal({ product, onClose, onAdjusted }) {
   const trapRef = useFocusTrap(true);
   const [change, setChange] = useState(0);
   const [reason, setReason] = useState("");
-  const [loading, setLoading] = useState(false);
   const { lowStockThreshold } = useSettings();
 
   const newStock = product.stock + change;
 
   async function handleSubmit() {
     if (change === 0 || !reason) return;
+    if (newStock < 0) return;
+
     const shopId = await getShopId();
-    setLoading(true);
+    const lowStockAlert =
+      newStock < lowStockThreshold && newStock >= 0
+        ? { shop_id: shopId, product_id: product.id, product_name: product.name, current_stock: newStock, threshold: lowStockThreshold }
+        : null;
 
-    const { error } = await supabase.from("stock_movements").insert(withShop({
-      product_id: product.id,
-      product_name: product.name,
-      change,
-      reason,
-    }));
+    onAdjusted();
+    onClose();
 
-    if (error) {
-      console.error(error);
-      setLoading(false);
-      return;
-    }
-
-    const { error: updateError } = await supabase
-      .from("products")
-      .update({ stock: newStock })
-      .eq("id", product.id)
-      .eq("shop_id", shopId);
-
-    if (updateError) {
-      console.error(updateError);
-    } else {
-      onAdjusted();
-      if (newStock < lowStockThreshold && newStock >= 0) {
-        supabase.functions.invoke("send-low-stock-alert", {
-          body: { shop_id: shopId, product_id: product.id, product_name: product.name, current_stock: newStock, threshold: lowStockThreshold },
-        }).catch((e) => console.error("low stock alert failed", e));
-      }
-      onClose();
-    }
-    setLoading(false);
+    enqueueWrite({
+      type: "adjustStock",
+      shopId,
+      payload: {
+        movement: { product_id: product.id, product_name: product.name, change, reason },
+        stockUpdate: { productId: product.id, newStock, lowStockAlert },
+      },
+    });
   }
 
   return (
@@ -131,10 +115,10 @@ export default function StockAdjustModal({ product, onClose, onAdjusted }) {
           </button>
           <button
             onClick={handleSubmit}
-            disabled={loading || change === 0 || !reason || newStock < 0}
+            disabled={change === 0 || !reason || newStock < 0}
             className="flex-1 bg-blue-600 text-white font-bold text-sm py-2.5 rounded-xl hover:bg-blue-500 transition-all disabled:opacity-50"
           >
-            {loading ? "Saving..." : "Save"}
+            Save
           </button>
         </div>
       </div>

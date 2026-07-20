@@ -8,6 +8,7 @@ import Skeleton from "../components/Skeleton";
 import EmptyState from "../components/EmptyState";
 import LogSaleModal from "../components/LogSaleModal";
 import ReceiptModal from "../components/ReceiptModal";
+import QueueStatus from "../components/QueueStatus";
 import Pagination from "../components/Pagination";
 import { getShopId } from "../lib/shop";
 import { paginateQuery } from "../lib/paginate";
@@ -71,12 +72,15 @@ export default function Sales() {
       <Helmet><title>Sales — Keel</title></Helmet>
       <div className="flex justify-between items-center mb-4">
         <p className="text-sm text-gray-400 dark:text-slate-500">{total} transactions</p>
-        <button
-          onClick={() => setShowModal(true)}
-          className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all"
-        >
-          + Log sale
-        </button>
+        <div className="flex items-center gap-2">
+          <QueueStatus />
+          <button
+            onClick={() => setShowModal(true)}
+            className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all"
+          >
+            + Log sale
+          </button>
+        </div>
       </div>
 
       <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden">

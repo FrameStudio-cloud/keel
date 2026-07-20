@@ -6,6 +6,7 @@ import { supabase } from "../lib/supabase";
 import { uploadImage, deleteImage } from "../lib/storage";
 import { useSettings } from "../hooks/useSettings";
 import { useFocusTrap } from "../hooks/useFocusTrap";
+import { enqueueWrite } from "../lib/writeQueue";
 import ImageUploader from "./ImageUploader";
 import BarcodeScanner from "./BarcodeScanner";
 
@@ -80,8 +81,9 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
   }
 
   async function handleUpdate() {
-    const shopId = await getShopId();
     setLoading(true);
+
+    const shopId = await getShopId();
 
     let image = product.image;
     if (imageFile === null) {
@@ -108,59 +110,42 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
     };
     if (showBarcode) payload.barcode = form.barcode || null;
 
-    const { error } = await supabase
-      .from("products")
-      .update(payload)
-      .eq("id", product.id)
-      .eq("shop_id", shopId);
-
-    if (error) {
-      console.error(error);
-      setLoading(false);
-      return;
-    }
-
     const attrEntries = Object.entries(attributeValues).filter(
       (entry) => entry[1].trim()
     ).map(([attrId, val]) => ({
-        product_id: product.id,
-        attribute_id: attrId,
-        value: val === "__other__" ? (customAttrValues[attrId] || "") : val,
-        shop_id: shopId,
-      }));
-
-    if (attrEntries.length > 0) {
-      await supabase.from("product_attribute_values").upsert(attrEntries, {
-        onConflict: "product_id, attribute_id",
-      });
-    }
+      attribute_id: attrId,
+      value: val === "__other__" ? (customAttrValues[attrId] || "") : val,
+    }));
 
     onUpdated();
     onClose();
     setLoading(false);
+
+    enqueueWrite({
+      type: "updateProduct",
+      shopId,
+      payload: { productId: product.id, product: payload, attributes: attrEntries },
+    });
   }
 
   async function handleDelete() {
-    const shopId = await getShopId();
     setLoading(true);
+
+    const shopId = await getShopId();
 
     if (product.image) {
       await deleteImage(product.image).catch(() => {});
     }
 
-    const { error } = await supabase
-      .from("products")
-      .delete()
-      .eq("id", product.id)
-      .eq("shop_id", shopId);
-
-    if (error) {
-      console.error(error);
-    } else {
-      onUpdated();
-      onClose();
-    }
+    onUpdated();
+    onClose();
     setLoading(false);
+
+    enqueueWrite({
+      type: "deleteProduct",
+      shopId,
+      payload: { id: product.id, name: product.name },
+    });
   }
 
   return (

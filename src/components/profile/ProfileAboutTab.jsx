@@ -3,6 +3,7 @@ import SectionCard from "../settings/SectionCard";
 import { uploadImage } from "../../lib/storage";
 import { supabase } from "../../lib/supabase";
 import { getShopId } from "../../lib/shop";
+import { useToast } from "../../context/ToastProvider";
 import { FiPhone, FiMapPin, FiGlobe, FiMessageCircle, FiCamera } from "react-icons/fi";
 
 const GRADIENTS = [
@@ -17,7 +18,8 @@ function hashName(name) {
   return Math.abs(h);
 }
 
-export default function ProfileAboutTab({ storeName, businessCategory, logoUrl, memberSince, showToast, refreshSettings, storePhone, storeAddress, whatsapp, websiteUrl }) {
+export default function ProfileAboutTab({ storeName, businessCategory, logoUrl, memberSince, refreshSettings, storePhone, storeAddress, whatsapp, websiteUrl }) {
+  const { showToast } = useToast();
   const fileInputRef = useRef(null);
   const gradient = GRADIENTS[hashName(storeName || "K") % GRADIENTS.length];
 

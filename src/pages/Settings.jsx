@@ -8,6 +8,7 @@ import { setCurrency } from "../lib/format";
 import { setPaymentConfig } from "../lib/paymentConfig";
 import { useSettings } from "../hooks/useSettings";
 import { AuthContext } from "../context/AuthContext";
+import { useToast } from "../context/ToastProvider";
 import {
   FiShoppingBag, FiSettings, FiBell, FiCreditCard,
   FiLock, FiDownload, FiAlertTriangle
@@ -63,7 +64,7 @@ export default function Settings() {
   const settings = useSettings();
   const { logout, user } = useContext(AuthContext);
   const [saving, setSaving] = useState(false);
-  const [toast, setToast] = useState(null);
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState("store");
   const [validationErrors, setValidationErrors] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -131,11 +132,6 @@ export default function Settings() {
   }, [form, hours]);
 
   const isDirty = pristineSnapshot !== null && currentSnapshot !== pristineSnapshot;
-
-  function showToast(msg, type = "success") {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3000);
-  }
 
   function handleThemeChange(theme) {
     setForm((prev) => ({ ...prev, theme }));
@@ -366,14 +362,6 @@ export default function Settings() {
       <Helmet><title>Settings — Keel</title></Helmet>
       <style>{`@keyframes fadeSlideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
-      {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold shadow-xl ${
-          toast.type === "error" ? "bg-red-500 text-white" : "bg-blue-600 text-white"
-        }`}>
-          {toast.msg}
-        </div>
-      )}
-
       <div className="lg:hidden overflow-x-auto pb-3 -mx-4 px-4 mb-4">
         <div className="flex gap-1.5 min-w-max">
           {TABS.map((t) => <TabButton key={t.id} tab={t} isActive={activeTab === t.id} onSelect={setActiveTab} isMobile />)}
@@ -404,7 +392,7 @@ export default function Settings() {
               <BillingTab subscriptionExpiresAt={settings.subscriptionExpiresAt}
                 refreshSettings={settings.refreshSettings} />
             )}
-            {activeTab === "security" && <SecurityTab sessionEmail={sessionEmail} showToast={showToast} />}
+            {activeTab === "security" && <SecurityTab sessionEmail={sessionEmail} />}
             {activeTab === "data" && <DataTab onExport={handleExport} />}
             {activeTab === "danger" && (
               <DangerZoneTab scheduledDeletionAt={settings.scheduledDeletionAt}

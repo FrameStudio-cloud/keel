@@ -2,6 +2,7 @@ import { useState } from "react";
 import SectionCard from "./SectionCard";
 import { inputClass } from "./settingsStyles";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiRefreshCw } from "react-icons/fi";
+import { useToast } from "../../context/ToastProvider";
 import { authLogin, authUpdatePassword } from "../../lib/supabase";
 
 function validatePasswordForm(pf) {
@@ -13,7 +14,8 @@ function validatePasswordForm(pf) {
   return errors;
 }
 
-export default function SecurityTab({ sessionEmail, showToast }) {
+export default function SecurityTab({ sessionEmail }) {
+  const { showToast } = useToast();
   const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
   const [passwordSaving, setPasswordSaving] = useState(false);
   const [passwordError, setPasswordError] = useState("");
