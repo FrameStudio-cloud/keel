@@ -5,11 +5,13 @@ import { useNavigate } from "react-router-dom";
 import { CRITICAL_STOCK_THRESHOLD } from "../../lib/constants";
 import { AuthContext } from "../../context/AuthContext";
 import { useSettings } from "../../hooks/useSettings";
-import { useLowStockProducts } from "../../hooks/useQueries";
+import { useLowStockProducts, useUpcomingScheduledPosts } from "../../hooks/useQueries";
 
 export default function Topbar({ title, searchQuery, setSearchQuery, onToggleSidebar }) {
   const { storeName, logoUrl, websiteUrl } = useSettings();
   const { data: lowStock = [] } = useLowStockProducts();
+  const { data: upcomingPosts = [] } = useUpcomingScheduledPosts();
+  const notificationCount = lowStock.length + upcomingPosts.length;
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef(null);
@@ -92,28 +94,64 @@ export default function Topbar({ title, searchQuery, setSearchQuery, onToggleSid
         <div className="relative" ref={notifRef}>
           <button
             onClick={handleNotifToggle}
-            aria-label={notifOpen ? "Close notifications" : `${lowStock.length} low stock alerts`}
+            aria-label={notifOpen ? "Close notifications" : `${notificationCount} notification${notificationCount !== 1 ? "s" : ""}`}
             aria-expanded={notifOpen}
             data-tour="notifications"
             className="w-8 h-8 rounded-lg border border-gray-200 dark:border-white/10 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-400 transition-all relative"
           >
             <CiBellOn />
-            {lowStock.length > 0 && (
+            {notificationCount > 0 && (
               <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full px-1 leading-none shadow-md">
-                {lowStock.length > 9 ? "9+" : lowStock.length}
+                {notificationCount > 9 ? "9+" : notificationCount}
               </span>
             )}
           </button>
 
           {notifOpen && (
-            <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto">
-              <div className="px-4 py-3 border-b border-slate-100 dark:border-white/10">
-                <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                  Low Stock Alerts
-                </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {lowStock.length} product{lowStock.length !== 1 ? "s" : ""} below threshold
-                </p>
+            <div className="absolute right-0 mt-2 w-72 sm:w-80 max-w-[calc(100vw-16px)] bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl z-50 max-h-[32rem] overflow-y-auto">
+              {/* Upcoming scheduled posts */}
+              {upcomingPosts.length > 0 && (
+                <>
+                  <div className="px-4 py-3 border-b border-slate-100 dark:border-white/10">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                        Upcoming Posts
+                      </p>
+                      <span className="text-[10px] font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-1.5 py-0.5 rounded-full">
+                        {upcomingPosts.length} this week
+                      </span>
+                    </div>
+                  </div>
+                  {upcomingPosts.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => { navigate("/social"); setNotifOpen(false); }}
+                      className="w-full flex items-start gap-3 px-4 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors border-b border-slate-50 dark:border-white/5 last:border-0"
+                    >
+                      <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          {new Date(p.scheduled_at).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })} · {p.platform}
+                        </p>
+                        <p className="text-sm text-slate-900 dark:text-white truncate mt-0.5">
+                          {p.caption || "No caption"}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </>
+              )}
+
+              {/* Low stock alerts */}
+              <div className={`px-4 py-3 border-b border-slate-100 dark:border-white/10 ${upcomingPosts.length > 0 ? "" : ""}`}>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                    Low Stock Alerts
+                  </p>
+                  <span className="text-[10px] font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 px-1.5 py-0.5 rounded-full">
+                    {lowStock.length}
+                  </span>
+                </div>
               </div>
               {lowStock.length === 0 ? (
                 <div className="px-4 py-6 text-center text-sm text-slate-400 dark:text-slate-500">
@@ -125,7 +163,7 @@ export default function Topbar({ title, searchQuery, setSearchQuery, onToggleSid
                   return (
                     <button
                       key={p.id}
-                      onClick={() => { navigate(`/inventory`); setNotifOpen(false); }}
+                      onClick={() => { navigate("/inventory"); setNotifOpen(false); }}
                       className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors border-b border-slate-50 dark:border-white/5 last:border-0"
                     >
                       <div className={`w-2 h-2 rounded-full flex-shrink-0 ${critical ? "bg-red-500" : "bg-amber-400"}`} />
@@ -150,7 +188,7 @@ export default function Topbar({ title, searchQuery, setSearchQuery, onToggleSid
               )}
               {lowStock.length > 0 && (
                 <button
-                  onClick={() => { navigate(`/inventory`); setNotifOpen(false); }}
+                  onClick={() => { navigate("/inventory"); setNotifOpen(false); }}
                   className="w-full py-2.5 text-center text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-slate-50 dark:hover:bg-white/[0.03] rounded-b-xl transition-colors"
                 >
                   View all in Inventory

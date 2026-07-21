@@ -108,3 +108,29 @@ export function useAnnouncements() {
     staleTime: 120_000,
   });
 }
+
+export function useUpcomingScheduledPosts() {
+  return useQuery({
+    queryKey: ["upcomingScheduledPosts"],
+    queryFn: async () => {
+      const shopId = await getShopId();
+      if (!shopId) return [];
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const endOfWeek = new Date(startOfToday);
+      endOfWeek.setDate(endOfWeek.getDate() + 7);
+
+      const { data } = await supabase
+        .from("posts")
+        .select("id, caption, platform, scheduled_at, post_type")
+        .eq("shop_id", shopId)
+        .eq("status", "scheduled")
+        .gte("scheduled_at", startOfToday.toISOString())
+        .lte("scheduled_at", endOfWeek.toISOString())
+        .order("scheduled_at", { ascending: true })
+        .limit(20);
+      return data || [];
+    },
+    staleTime: 30_000,
+  });
+}

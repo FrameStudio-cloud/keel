@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { GoGraph } from "react-icons/go";
 import { FaBoxOpen } from "react-icons/fa";
 import { FcSalesPerformance } from "react-icons/fc";
-import { MdOutlinePhoneIphone } from "react-icons/md";
+import { MdOutlineQueue } from "react-icons/md";
 import { IoGlobeOutline, IoSettingsOutline, IoPersonOutline, IoTimeOutline, IoWalletOutline, IoStatsChartOutline, IoMegaphoneOutline, IoStorefrontOutline } from "react-icons/io5";
 import { BsBuildingsFill } from "react-icons/bs";
 import { useSettings } from "../../hooks/useSettings";
@@ -22,7 +22,7 @@ const groups = [
   {
     label: "Marketing",
     items: [
-      { label: "Social Media", icon: <MdOutlinePhoneIphone />, path: "/social" },
+      { label: "Queue", icon: <MdOutlineQueue />, path: "/social" },
 
       { label: "Website", icon: <IoGlobeOutline />, path: "/website" },
       { label: "Storefront", icon: <IoStorefrontOutline />, path: "/storefront" },
@@ -39,7 +39,7 @@ const groups = [
 ];
 
 export default function Sidebar({ open, onClose }) {
-  const { storeName } = useSettings();
+  const { storeName, logoUrl } = useSettings();
   const { data: lowStockCount = 0 } = useLowStockCount();
   const navRef = useRef(null);
 
@@ -168,8 +168,12 @@ export default function Sidebar({ open, onClose }) {
       {/* User */}
       <div className="p-3 border-t border-gray-100 dark:border-white/10">
         <div className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] cursor-pointer">
-          <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-medium">
-            {storeName ? storeName[0].toUpperCase() : "S"}
+          <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-medium shrink-0 overflow-hidden">
+            {logoUrl ? (
+              <img src={logoUrl} alt="" className="w-full h-full object-cover" />
+            ) : (
+              storeName ? storeName[0].toUpperCase() : "S"
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-800 dark:text-white truncate">
