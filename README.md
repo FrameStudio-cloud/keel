@@ -140,24 +140,35 @@ keel/
 
 Every table has a `shop_id` column referencing `shops(id)`. The `getShopId()` singleton resolves the current shop ID on first call (reads `STORAGE_KEY` from localStorage, queries `users` by `auth_user_id`). Use `withShop(payload)` to auto-inject `shop_id` into INSERTs.
 
-## Business Categories
+## Business Categories (16 total)
 
-| Category | Variant Fields |
-|---|---|
-| general | None |
-| clothing | Color, Size |
-| electronics | Color, Storage |
-| electricals | None |
-| wigs | Hair Type, Texture, Length, Color, Weight |
+| Category | Slug | Variant Fields |
+|---|---|---|
+| Clothing | clothing | Gender (select), Size (select) |
+| Electronics | electronics | Storage (select), Color (select) |
+| Electricals | electricals | Voltage (select), Color (select) |
+| General / Home & Living | general | Variant (text, multi-value) |
+| Wigs | wigs | Hair Type (text), Texture (text), Length (text), Color (text), Density (select), Weight (text) |
+| Shoes | shoes | Variant (text, multi-value) |
+| Bags | bags | Variant (text, multi-value) |
+| Beauty | beauty | Variant (text, multi-value) |
+| Health | health | Variant (text, multi-value) |
+| Groceries | groceries | Variant (text, multi-value) |
+| Furniture | furniture | Variant (text, multi-value) |
+| Stationery | stationery | Variant (text, multi-value) |
+| Books | books | Variant (text, multi-value) |
+| Toys | toys | Variant (text, multi-value) |
+| Sports | sports | Variant (text, multi-value) |
+| Automotive | automotive | Variant (text, multi-value) |
 
-Category is set during SetupWizard and can be changed in Settings (30-day cooldown via `category_changed_at`).
+Category set during SetupWizard (grouped industry layout with 6 groups), changeable in Settings (30-day cooldown via `category_changed_at`).
 
 ---
 
 ## Key Features
 
 - **Multi-tenant** — single Supabase project for 10+ shops
-- **Inventory** — CRUD, stock adjustments, barcode scanning, debounced search, variant badges from `product_attribute_values`
+- **Inventory** — CRUD, stock adjustments, barcode scanning, debounced search, variant badges from `product_attribute_values` (multi-value split into individual badges)
 - **Sales** — log sales with receipts, filter by method, search
 - **Marketing** — promotions, sale prices, badges, QR codes (website/product gated by websiteUrl), print catalog
 - **Finance** — today's revenue, payment pie chart, expense CRUD
@@ -212,7 +223,7 @@ All tables have RLS enabled with `auth.uid()` → `shop_id` tenant isolation.
 | `id` | `uuid PK` | Auto-generated |
 | `name` | `text` | Shop name |
 | `slug` | `text` | Unique slug |
-| `business_category` | `text` | general / clothing / electronics / electricals / wigs |
+| `business_category` | `text` | 16 categories: clothing / electronics / electricals / general / wigs / shoes / bags / beauty / health / groceries / furniture / stationery / books / toys / sports / automotive |
 | `subscription_expires_at` | `timestamptz` | Controls lockout; null = no lockout |
 | `scheduled_deletion_at` | `timestamptz` | Scheduled shop deletion |
 | `category_changed_at` | `timestamptz` | 30-day category change cooldown |
@@ -285,7 +296,7 @@ All with `shop_id`, created_at, and relevant data columns.
 `id`, `announcement_id` (FK), `shop_id` (FK), `dismissed_at` — UNIQUE(announcement_id, shop_id)
 
 ### Category & Attribute System
-`categories`, `category_attributes`, `product_attribute_values`, `catalogue_attribute_values` — data-driven variant fields per business category (23 attributes across 5 categories).
+`categories`, `category_attributes`, `product_attribute_values`, `catalogue_attribute_values` — data-driven variant fields per business category (16 categories, 34 attributes). Wigs category has 6 structured attributes; new categories each have a single "Variant" text attribute. `select`-type rendered as pills, `text`-type as multi-value tag input (pipe-delimited storage).
 
 ### Other tables
 `keel_shops`, `keel_activity_log`, `keel_approvals`, `chat_faqs`, `chat_messages`, `chat_callbacks`, `chat_stock_alerts`, `catalogue_attribute_values`, `category_attributes` — various supporting functions.

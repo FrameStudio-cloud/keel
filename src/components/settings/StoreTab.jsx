@@ -4,16 +4,49 @@ import {
   FiShoppingBag, FiGlobe, FiLock, FiClock, FiCheck, FiDroplet, FiAtSign
 } from "react-icons/fi";
 
-const CATEGORIES = ["general", "clothing", "electronics", "electricals"];
+const CATEGORY_GROUPS = [
+  {
+    name: "Fashion & Beauty",
+    items: ["clothing", "footwear", "wigs", "cosmetics-beauty", "nails-salon", "jewelry-accessories"],
+  },
+  {
+    name: "Electronics & Electrical",
+    items: ["electronics", "electricals"],
+  },
+  {
+    name: "Home & Living",
+    items: ["furniture-home-decor", "groceries-foodstuffs", "hardware-building"],
+  },
+  {
+    name: "Sports & Kids",
+    items: ["sports-fitness", "baby-kids"],
+  },
+  {
+    name: "Media & Office",
+    items: ["books-stationery"],
+  },
+  {
+    name: "Automotive",
+    items: ["automotive-car"],
+  },
+  {
+    name: "Other",
+    items: ["general"],
+  },
+];
 
 function catClass(cat, selected, locked) {
-  return `flex-1 py-2 rounded-lg text-xs font-semibold border transition-all ${
+  return `py-1.5 px-3 rounded-lg text-xs font-semibold border transition-all whitespace-nowrap ${
     locked && selected !== cat
       ? "opacity-40 cursor-not-allowed bg-white dark:bg-[#1a1a2e] text-gray-500 dark:text-slate-400 border-gray-200 dark:border-white/10"
       : selected === cat
       ? "bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/25"
       : "bg-white dark:bg-[#1a1a2e] text-gray-500 dark:text-slate-400 border-gray-200 dark:border-white/10 hover:text-gray-800 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/20"
   }`;
+}
+
+function categoryLabel(slug) {
+  return slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 }
 
 export default function StoreTab({ form, setForm, hours, updateHour, validationErrors, categoryLocked, categoryRemainingDays }) {
@@ -106,18 +139,27 @@ export default function StoreTab({ form, setForm, hours, updateHour, validationE
 
       <SectionCard icon={FiShoppingBag} title="Business Category">
         <p className="text-xs text-gray-400 dark:text-slate-500 mb-3">Controls variant fields shown in Inventory (color, size, storage)</p>
-        <div className="flex gap-2">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => {
-                if (categoryLocked && form.business_category !== cat) return;
-                setForm({ ...form, business_category: cat });
-              }}
-              className={catClass(cat, form.business_category, categoryLocked)}
-            >
-              {cat.charAt(0).toUpperCase() + cat.slice(1)}
-            </button>
+        <div className="space-y-3 max-h-[320px] overflow-y-auto">
+          {CATEGORY_GROUPS.map((group) => (
+            <div key={group.name}>
+              <p className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-slate-500 font-semibold mb-1.5">
+                {group.name}
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {group.items.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      if (categoryLocked && form.business_category !== cat) return;
+                      setForm({ ...form, business_category: cat });
+                    }}
+                    className={catClass(cat, form.business_category, categoryLocked)}
+                  >
+                    {categoryLabel(cat)}
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
         {categoryLocked && (

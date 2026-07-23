@@ -281,11 +281,13 @@ export default function Inventory() {
                         </div>
                         {attributeMap[p.id]?.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1.5">
-                            {attributeMap[p.id].map((av, i) => (
-                              <span key={i} className="text-[10px] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded whitespace-nowrap">
-                                {av.attribute?.name}: {av.value}
-                              </span>
-                            ))}
+                            {attributeMap[p.id].flatMap((av) =>
+                              av.value.split("|||").map((v, j) => (
+                                <span key={`${av.attribute_id}-${j}`} className="text-[10px] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded whitespace-nowrap">
+                                  {av.attribute?.name}: {v}
+                                </span>
+                              ))
+                            )}
                           </div>
                         )}
                       </div>
@@ -386,11 +388,13 @@ export default function Inventory() {
                         {p.new_arrival && <span className="ml-2 text-[10px] font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-500/20 px-1.5 py-0.5 rounded align-middle">New</span>}
                         {attributeMap[p.id]?.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1">
-                            {attributeMap[p.id].map((av, i) => (
-                              <span key={i} className="text-[10px] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded whitespace-nowrap">
-                                {av.value}
-                              </span>
-                            ))}
+                            {attributeMap[p.id].flatMap((av) =>
+                              av.value.split("|||").map((v, j) => (
+                                <span key={`${av.attribute_id}-${j}`} className="text-[10px] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded whitespace-nowrap">
+                                  {v}
+                                </span>
+                              ))
+                            )}
                           </div>
                         )}
                       </td>

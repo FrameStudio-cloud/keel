@@ -1,18 +1,65 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { FiArrowLeft, FiArrowRight, FiMonitor, FiLayers, FiTool, FiGrid } from "react-icons/fi";
+import { FiArrowLeft, FiArrowRight, FiMonitor, FiLayers, FiTool, FiGrid, FiUser, FiDroplet, FiHeart, FiHome, FiPackage, FiBook, FiActivity, FiSmile, FiCompass, FiStar, FiTruck } from "react-icons/fi";
 import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
 import { AuthContext } from "../context/AuthContext";
 import ImageUploader from "../components/ImageUploader";
 import { uploadImage } from "../lib/storage";
 
-const CATEGORIES = [
-  { id: "clothing", label: "Clothing", desc: "Sizes, colors, and styles", icon: FiLayers },
-  { id: "electronics", label: "Electronics", desc: "Storage, colors, and specs", icon: FiMonitor },
-  { id: "electricals", label: "Electricals", desc: "Wiring, parts, and tools", icon: FiTool },
-  { id: "general", label: "General", desc: "Mixed retail items", icon: FiGrid },
+const CATEGORY_GROUPS = [
+  {
+    name: "Fashion & Beauty",
+    items: [
+      { id: "clothing", label: "Clothing", icon: FiLayers },
+      { id: "footwear", label: "Footwear", icon: FiCompass },
+      { id: "wigs", label: "Wigs", icon: FiUser },
+      { id: "cosmetics-beauty", label: "Cosmetics & Beauty", icon: FiDroplet },
+      { id: "nails-salon", label: "Nails & Salon", icon: FiHeart },
+      { id: "jewelry-accessories", label: "Jewelry & Accessories", icon: FiStar },
+    ],
+  },
+  {
+    name: "Electronics & Electrical",
+    items: [
+      { id: "electronics", label: "Electronics", icon: FiMonitor },
+      { id: "electricals", label: "Electricals", icon: FiTool },
+    ],
+  },
+  {
+    name: "Home & Living",
+    items: [
+      { id: "furniture-home-decor", label: "Furniture & Decor", icon: FiHome },
+      { id: "groceries-foodstuffs", label: "Groceries & Food", icon: FiPackage },
+      { id: "hardware-building", label: "Hardware & Building", icon: FiTool },
+    ],
+  },
+  {
+    name: "Sports & Kids",
+    items: [
+      { id: "sports-fitness", label: "Sports & Fitness", icon: FiActivity },
+      { id: "baby-kids", label: "Baby & Kids", icon: FiSmile },
+    ],
+  },
+  {
+    name: "Media & Office",
+    items: [
+      { id: "books-stationery", label: "Books & Stationery", icon: FiBook },
+    ],
+  },
+  {
+    name: "Automotive",
+    items: [
+      { id: "automotive-car", label: "Automotive & Car", icon: FiTruck },
+    ],
+  },
+  {
+    name: "Other",
+    items: [
+      { id: "general", label: "General", icon: FiGrid },
+    ],
+  },
 ];
 
 const STEPS = ["category", "store", "details", "currency", "payment", "done"];
@@ -199,21 +246,29 @@ export default function SetupWizard() {
 
           <div className="space-y-3">
             {STEPS[step] === "category" && (
-              <div className="grid grid-cols-2 gap-3">
-                {CATEGORIES.map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => setForm({ ...form, category: cat.id })}
-                    className={`flex flex-col items-center text-center p-4 rounded-xl border text-sm transition-all ${
-                      form.category === cat.id
-                        ? "border-blue-500 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300"
-                        : "border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-slate-300"
-                    }`}
-                  >
-                    <cat.icon className="text-xl mb-2" />
-                    <div className="font-medium">{cat.label}</div>
-                    <div className="text-xs mt-0.5 opacity-70">{cat.desc}</div>
-                  </button>
+              <div className="space-y-4 max-h-[340px] overflow-y-auto pr-1">
+                {CATEGORY_GROUPS.map((group) => (
+                  <div key={group.name}>
+                    <p className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-semibold mb-2">
+                      {group.name}
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {group.items.map((cat) => (
+                        <button
+                          key={cat.id}
+                          onClick={() => setForm({ ...form, category: cat.id })}
+                          className={`flex flex-col items-center text-center p-3 rounded-xl border text-sm transition-all ${
+                            form.category === cat.id
+                              ? "border-blue-500 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300"
+                              : "border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-slate-300"
+                          }`}
+                        >
+                          <cat.icon className="text-lg mb-1.5" />
+                          <div className="font-medium text-xs leading-tight">{cat.label}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             )}

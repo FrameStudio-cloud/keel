@@ -32,6 +32,8 @@ export default function AddProductModal({ onClose, onAdded }) {
   const [attributes, setAttributes] = useState([]);
   const [attributeValues, setAttributeValues] = useState({});
   const [customAttrValues, setCustomAttrValues] = useState({});
+  const [showVariants, setShowVariants] = useState(false);
+  const [showAllAttrs, setShowAllAttrs] = useState({});
 
   function validate() {
     const next = {};
@@ -39,9 +41,11 @@ export default function AddProductModal({ onClose, onAdded }) {
     if (!form.category.trim()) next.category = "Category is required";
     if (!form.price || Number(form.price) <= 0) next.price = "Enter a valid price";
     if (!form.stock || Number(form.stock) < 0) next.stock = "Enter a valid stock quantity";
-    const missingRequired = attributes.some(
-      (a) => a.required && !attributeValues[a.id]?.trim()
-    );
+    const missingRequired = attributes.some((a) => {
+      if (!a.required) return false;
+      if (a.type === "text") return (attributeValues[a.id] || "").split("|||").filter(Boolean).length === 0;
+      return !attributeValues[a.id]?.trim();
+    });
     if (missingRequired) next.attributes = "Fill in all required variant attributes";
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -66,6 +70,8 @@ export default function AddProductModal({ onClose, onAdded }) {
     fetchAttributes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businessCategory]);
+
+
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -259,52 +265,160 @@ export default function AddProductModal({ onClose, onAdded }) {
 
           {attributes.length > 0 && (
             <div className="border-t border-gray-100 dark:border-white/10 pt-3">
-              <p className="text-xs text-gray-400 dark:text-slate-500 mb-3 font-medium">
-                Variant attributes
-              </p>
-              {errors.attributes && <p className="text-red-400 text-xs mb-2">{errors.attributes}</p>}
-              <div className="flex flex-col gap-3">
-                {attributes.map((attr) => (
-                  <div key={attr.id}>
-                    <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
-                      {attr.name}
-                      {attr.required && <span className="text-red-400 ml-0.5">*</span>}
-                    </label>
-                    {attr.type === "select" && attr.options ? (
-                      <div>
-                        <select
+              <button
+                type="button"
+                onClick={() => setShowVariants((v) => !v)}
+                className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-slate-500 font-medium mb-1 hover:text-gray-600 dark:hover:text-slate-300 transition-colors w-full text-left"
+              >
+                <span className={`transition-transform ${showVariants ? "rotate-90" : ""}`}>▸</span>
+                Product Attributes
+                {!attributes.some((a) => a.required) && (
+                  <span className="text-gray-300 dark:text-slate-600 font-normal">(Optional)</span>
+                )}
+              </button>
+              {showVariants && (
+                <div className="flex flex-col gap-3 mt-3">
+                  {errors.attributes && <p className="text-red-400 text-xs">{errors.attributes}</p>}
+                  {attributes.map((attr) => (
+                    <div key={attr.id}>
+                      <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+                        {attr.name}
+                        {attr.required && <span className="text-red-400 ml-0.5">*</span>}
+                      </label>
+                      {attr.type === "select" && attr.options ? (
+                        <div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {(() => {
+                              const showAll = showAllAttrs[attr.id];
+                              const pills = showAll ? attr.options : attr.options.slice(0, 3);
+                              return pills.map((opt) => {
+                                const selected = attributeValues[attr.id] === opt;
+                                return (
+                                  <button
+                                    key={opt}
+                                    type="button"
+                                    onClick={() => {
+                                      if (selected) {
+                                        handleAttrChange(attr.id, "");
+                                      } else {
+                                        handleAttrChange(attr.id, opt);
+                                        setCustomAttrValues((prev) => ({ ...prev, [attr.id]: "" }));
+                                      }
+                                    }}
+                                    className={`px-2.5 py-1 text-xs rounded-lg border transition-all ${
+                                      selected
+                                        ? "bg-blue-50 border-blue-300 text-blue-700 dark:bg-blue-500/15 dark:border-blue-500/30 dark:text-blue-300"
+                                        : "border-gray-200 text-gray-600 hover:border-gray-300 dark:border-white/10 dark:text-slate-400 dark:hover:border-white/20"
+                                    }`}
+                                  >
+                                    {selected && <span className="mr-1">✓</span>}
+                                    {opt}
+                                  </button>
+                                );
+                              });
+                            })()}
+                            {!showAllAttrs[attr.id] && attr.options.length > 3 && (
+                              <button
+                                type="button"
+                                onClick={() => setShowAllAttrs((prev) => ({ ...prev, [attr.id]: true }))}
+                                className="px-2.5 py-1 text-xs rounded-lg border border-dashed border-gray-200 text-gray-400 hover:text-gray-600 hover:border-gray-300 dark:border-white/10 dark:text-slate-500 dark:hover:text-slate-300 transition-all"
+                              >
+                                + {attr.options.length - 3} more
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (attributeValues[attr.id] === "__other__") {
+                                  handleAttrChange(attr.id, "");
+                                  setCustomAttrValues((prev) => ({ ...prev, [attr.id]: "" }));
+                                } else {
+                                  handleAttrChange(attr.id, "__other__");
+                                }
+                              }}
+                              className={`px-2.5 py-1 text-xs rounded-lg border border-dashed transition-all ${
+                                attributeValues[attr.id] === "__other__"
+                                  ? "bg-blue-50 border-blue-300 text-blue-700 dark:bg-blue-500/15 dark:border-blue-500/30 dark:text-blue-300"
+                                  : "border-gray-200 text-gray-400 hover:text-gray-600 hover:border-gray-300 dark:border-white/10 dark:text-slate-500 dark:hover:text-slate-300"
+                              }`}
+                            >
+                              {attributeValues[attr.id] === "__other__" ? "✓ Custom" : "+ Add"}
+                            </button>
+                          </div>
+                          {attributeValues[attr.id] === "__other__" && (
+                            <input
+                              value={customAttrValues[attr.id] || ""}
+                              onChange={(e) => setCustomAttrValues((prev) => ({ ...prev, [attr.id]: e.target.value }))}
+                              placeholder={`Type custom ${attr.name.toLowerCase()}`}
+                              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 mt-2"
+                              autoFocus
+                            />
+                          )}
+                        </div>
+                      ) : attr.type === "text" ? (
+                        <div>
+                          <div className="flex flex-wrap gap-1.5 mb-1.5">
+                            {(attributeValues[attr.id] || "").split("|||").filter(Boolean).map((val, i) => (
+                              <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-lg bg-blue-50 border border-blue-200 text-blue-700 dark:bg-blue-500/15 dark:border-blue-500/30 dark:text-blue-300">
+                                {val}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const vals = (attributeValues[attr.id] || "").split("|||").filter(Boolean);
+                                    vals.splice(i, 1);
+                                    handleAttrChange(attr.id, vals.join("|||"));
+                                  }}
+                                  className="hover:text-blue-900 dark:hover:text-blue-100 leading-none"
+                                >
+                                  ×
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                          <div className="flex gap-1.5">
+                            <input
+                              value={customAttrValues[attr.id] || ""}
+                              onChange={(e) => setCustomAttrValues((prev) => ({ ...prev, [attr.id]: e.target.value }))}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" && customAttrValues[attr.id]?.trim()) {
+                                  const vals = (attributeValues[attr.id] || "").split("|||").filter(Boolean);
+                                  vals.push(customAttrValues[attr.id].trim());
+                                  handleAttrChange(attr.id, vals.join("|||"));
+                                  setCustomAttrValues((prev) => ({ ...prev, [attr.id]: "" }));
+                                }
+                              }}
+                              placeholder={`Type ${attr.name.toLowerCase()} and press Enter`}
+                              className="flex-1 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (customAttrValues[attr.id]?.trim()) {
+                                  const vals = (attributeValues[attr.id] || "").split("|||").filter(Boolean);
+                                  vals.push(customAttrValues[attr.id].trim());
+                                  handleAttrChange(attr.id, vals.join("|||"));
+                                  setCustomAttrValues((prev) => ({ ...prev, [attr.id]: "" }));
+                                }
+                              }}
+                              className="px-3 py-2 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all"
+                            >
+                              Add
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <input
                           value={attributeValues[attr.id] || ""}
-                          onChange={(e) => { handleAttrChange(attr.id, e.target.value); if (e.target.value !== "__other__") setCustomAttrValues((prev) => ({ ...prev, [attr.id]: "" })); }}
+                          onChange={(e) => handleAttrChange(attr.id, e.target.value)}
+                          type="number"
+                          placeholder={`Enter ${attr.name.toLowerCase()}`}
                           className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
-                        >
-                          <option value="">{attr.required ? `Select ${attr.name.toLowerCase()}` : "Optional"}</option>
-                          {attr.options.map((opt) => (
-                            <option key={opt} value={opt}>{opt}</option>
-                          ))}
-                          <option value="__other__">Other</option>
-                        </select>
-                        {attributeValues[attr.id] === "__other__" && (
-                          <input
-                            value={customAttrValues[attr.id] || ""}
-                            onChange={(e) => setCustomAttrValues((prev) => ({ ...prev, [attr.id]: e.target.value }))}
-                            placeholder={`Type custom ${attr.name.toLowerCase()}`}
-                            className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 mt-2"
-                            autoFocus
-                          />
-                        )}
-                      </div>
-                    ) : (
-                      <input
-                        value={attributeValues[attr.id] || ""}
-                        onChange={(e) => handleAttrChange(attr.id, e.target.value)}
-                        type={attr.type === "number" ? "number" : "text"}
-                        placeholder={`Enter ${attr.name.toLowerCase()}`}
-                        className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

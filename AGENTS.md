@@ -19,7 +19,7 @@ All Supabase tables have RLS enabled (except `shops` — disabled due to signup 
 Tailwind v4 — no `tailwind.config.js`, dark mode via `@variant dark (&:where(.dark, .dark *));`.
 Multi-tenant via `shop_id` FK on every table — use `getShopId()` / `withShop()` helpers.
 Subscription lockout: `shops.subscription_expires_at` (timestamptz) controls access. `ProtectedRoute` in `App.jsx` checks `useSettings().subscriptionExpiresAt` — if in the past, renders `LockoutScreen.jsx` (lock icon, expiry date, Sign Out button). SettingsProvider fetches this column alongside `business_category`. If `null` (never set), no lockout applies. Migration: `20260624_add_subscription_expires_at.sql`. Managed via framestudio-dashboard's Keel Pulse page at `/keel`.
-Business category (`clothing`/`electronics`/`electricals`/`general`) controls variant fields (color/size/storage) in Inventory modals.
+Business category (16 categories from DB `categories` table, slug-based) controls variant fields in Inventory modals. `select`-type attributes render as pill buttons (first 3 + "More"), `text`-type as multi-value tag input (pipe-delimited `|||` storage). Section collapsible as "Product Attributes (Optional)", closed by default.
 Terms of Service are stored in `src/data/terms.json` (static JSON), not in the database. The Settings page shows a simple card link to `/terms` instead of an editor.
 
 ## Onboarding System (3-layer)
@@ -202,18 +202,22 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 
 Business category controls variant fields via data-driven tables (not hardcoded `if/else`):
 
-- `categories` table — defines shop types (Clothing, Electronics, Electricals, General, Wigs)
-- `category_attributes` table — per-category variant dimensions (e.g. Wigs → Hair Type, Texture, Length, Color, Weight)
+- `categories` table — defines shop types (16 categories: Clothing, Electronics, Electricals, General, Wigs, Shoes, Bags, Beauty, Health, Groceries, Furniture, Stationery, Books, Toys, Sports, Automotive)
+- `category_attributes` table — per-category variant dimensions (34 total). Wigs has 6 structured attributes; all other categories have 1-2 attributes.
 - `product_attribute_values` / `catalogue_attribute_values` — structured values per product/catalogue item
-- **23 attribute definitions** across 5 categories, all database-driven
+- **34 attribute definitions** across 16 categories, all database-driven
 - AddProductModal / EditProductModal render dynamic fields by querying `category_attributes` for the shop's category
-- Inventory displays attribute badges from `product_attribute_values`
+- `select`-type attributes: **pill buttons** (first 3 options inline, "+ N more" to expand remaining), no `<select>` dropdowns
+- `text`-type attributes: **multi-value tag input** with "Add" button + Enter key. Values stored pipe-delimited (`|||`) in a single `product_attribute_values` row. Pills with `×` remove button.
+- Variants section is **collapsible** ("▸ Product Attributes (Optional)", `showVariants: false` by default, never auto-expands)
+- Category picker (StoreTab + SetupWizard) uses **grouped industry layout** (6 groups: Fashion & Apparel, Electronics & Electricals, Home & Living, Health & Wellness, Books & Stationery, Sports & Automotive)
+- Inventory displays attribute badges from `product_attribute_values`, splitting `|||` into individual badges
 - Adding a new category = DB insert only, zero code changes
 - **`catalogue_attribute_values` — deferred.** Table exists in schema + seed data, but no frontend reads/writes it yet. The mini-catalogue reads from the legacy `variants` JSONB column instead. To complete: (1) copy `product_attribute_values` → `catalogue_attribute_values` on Inventory publish, (2) add dynamic attribute fields + badges to ListingsTab, (3) update mini-catalogue to read from `catalogue_attribute_values` instead of JSONB. Not critical — products sell fine without variant toggles on the public site.
 - `src/pages/Inventory.jsx` — product CRUD, stock adjust, debounced search, variant badges from `product_attribute_values`, one-tap publish to catalogue (includes shop_id filter); publish buttons disabled with banner notice when no `websiteUrl` set
 - `src/pages/Social.jsx` — replaced fake Instagram stats with "Connect" placeholder
-- `src/components/AddProductModal.jsx` — dynamic attribute fields from `category_attributes` query (not hardcoded), saves to `product_attribute_values`
-- `src/components/EditProductModal.jsx` — same dynamic fields, pre-filled from `product_attribute_values`, upserts on save
+- `src/components/AddProductModal.jsx` — dynamic attribute fields; pill buttons for select types, multi-value tag input for text types (pipe-delimited), collapsible "Product Attributes" section (closed by default), required attribute validation
+- `src/components/EditProductModal.jsx` — same pill + multi-value text + collapsible section as Add, pre-filled from `product_attribute_values`, upserts on save
 - `src/components/Bots.jsx` — WhatsApp + Telegram bot cards per shop
 - `src/lib/format.js` — formatPrice, setCurrency, getCurrency
 - `src/payment/paymentConfig.js` — getPaymentMethods, setPaymentConfig, getDefaultPayment
