@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from "react";
-import { FiChevronLeft, FiChevronRight, FiPlus, FiCalendar, FiCpu, FiInstagram, FiMessageCircle } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiPlus, FiCalendar, FiCpu, FiLock, FiInstagram, FiMessageCircle } from "react-icons/fi";
 import { SiTiktok } from "react-icons/si";
+import { isFeatureAccessible } from "../../lib/tiers";
 import CalendarHoverPopover from "./CalendarHoverPopover";
 import CalendarWeekView from "./CalendarWeekView";
 
@@ -60,7 +61,7 @@ function computeStats(postsByDay) {
 }
 
 export default function CalendarView({
-  posts, loading, onDayClick, onAddPost, onWriteWeek, aiLoading,
+  posts, loading, onDayClick, onAddPost, onWriteWeek, aiLoading, planTier,
   onEditPost, onDeletePost, onMarkPublished,
 }) {
   const today = useMemo(() => new Date(), []);
@@ -218,13 +219,23 @@ export default function CalendarView({
             <FiCalendar size={14} /> Today
           </button>
           <div className="hidden lg:flex items-center gap-2">
-            <button
-              onClick={() => onWriteWeek?.()}
-              disabled={aiLoading}
-              className="flex items-center gap-1.5 text-xs font-medium bg-purple-600 text-white px-3 py-1.5 rounded-lg hover:bg-purple-700 transition-all disabled:opacity-50"
-            >
-              <FiCpu size={14} /> {aiLoading ? "Writing..." : "Write My Week"}
-            </button>
+            {isFeatureAccessible("social_ai", planTier) ? (
+              <button
+                onClick={() => onWriteWeek?.()}
+                disabled={aiLoading}
+                className="flex items-center gap-1.5 text-xs font-medium bg-purple-600 text-white px-3 py-1.5 rounded-lg hover:bg-purple-700 transition-all disabled:opacity-50"
+              >
+                <FiCpu size={14} /> {aiLoading ? "Writing..." : "Write My Week"}
+              </button>
+            ) : (
+              <span
+                className="flex items-center gap-1.5 text-xs font-medium border border-gray-200 dark:border-white/10 text-gray-300 dark:text-slate-600 px-3 py-1.5 rounded-lg cursor-not-allowed select-none"
+                title="AI Caption Generator — Pro feature"
+              >
+                <FiLock size={11} />
+                Write My Week
+              </span>
+            )}
             <button
               onClick={() => onAddPost()}
               className="flex items-center gap-1.5 text-xs font-medium bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all"
@@ -235,13 +246,23 @@ export default function CalendarView({
         </div>
       </div>
       <div className="flex lg:hidden items-center gap-2 mb-3">
-        <button
-          onClick={() => onWriteWeek?.()}
-          disabled={aiLoading}
-          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium bg-purple-600 text-white px-3 py-2 rounded-lg hover:bg-purple-700 transition-all disabled:opacity-50"
-        >
-          <FiCpu size={14} /> {aiLoading ? "Writing..." : "Write My Week"}
-        </button>
+        {isFeatureAccessible("social_ai", planTier) ? (
+          <button
+            onClick={() => onWriteWeek?.()}
+            disabled={aiLoading}
+            className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium bg-purple-600 text-white px-3 py-2 rounded-lg hover:bg-purple-700 transition-all disabled:opacity-50"
+          >
+            <FiCpu size={14} /> {aiLoading ? "Writing..." : "Write My Week"}
+          </button>
+        ) : (
+          <span
+            className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium border border-gray-200 dark:border-white/10 text-gray-300 dark:text-slate-600 px-3 py-2 rounded-lg cursor-not-allowed select-none"
+            title="AI Caption Generator — Pro feature"
+          >
+            <FiLock size={12} />
+            Write My Week
+          </span>
+        )}
         <button
           onClick={() => onAddPost()}
           className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-all"

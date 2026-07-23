@@ -1,4 +1,5 @@
 import { createContext } from "react";
+import { DEFAULT_PROGRESS } from "../lib/onboarding";
 
 const DEFAULT_NOTIF_PREFS = {
   email: "",
@@ -27,6 +28,7 @@ export const SettingsContext = createContext({
   scheduledDeletionAt: null,
   planTier: "free",
   notificationPreferences: DEFAULT_NOTIF_PREFS,
+  onboardingProgress: DEFAULT_PROGRESS,
   primaryColor: "#000000",
   secondaryColor: "#4f46e5",
   accentColor: "#f59e0b",

@@ -24,6 +24,7 @@ export default function AddProductModal({ onClose, onAdded }) {
     stock: "",
     barcode: "",
   });
+  const [errors, setErrors] = useState({});
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [existingProduct, setExistingProduct] = useState(null);
@@ -31,6 +32,20 @@ export default function AddProductModal({ onClose, onAdded }) {
   const [attributes, setAttributes] = useState([]);
   const [attributeValues, setAttributeValues] = useState({});
   const [customAttrValues, setCustomAttrValues] = useState({});
+
+  function validate() {
+    const next = {};
+    if (!form.name.trim()) next.name = "Product name is required";
+    if (!form.category.trim()) next.category = "Category is required";
+    if (!form.price || Number(form.price) <= 0) next.price = "Enter a valid price";
+    if (!form.stock || Number(form.stock) < 0) next.stock = "Enter a valid stock quantity";
+    const missingRequired = attributes.some(
+      (a) => a.required && !attributeValues[a.id]?.trim()
+    );
+    if (missingRequired) next.attributes = "Fill in all required variant attributes";
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  }
 
   async function fetchAttributes() {
     const { data: cat } = await supabase
@@ -55,19 +70,16 @@ export default function AddProductModal({ onClose, onAdded }) {
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
     if (existingProduct) setExistingProduct(null);
+    if (errors[e.target.name]) setErrors((prev) => ({ ...prev, [e.target.name]: undefined }));
   }
 
   function handleAttrChange(attrId, value) {
     setAttributeValues((prev) => ({ ...prev, [attrId]: value }));
+    if (errors.attributes) setErrors((prev) => ({ ...prev, attributes: undefined }));
   }
 
   async function handleSubmit() {
-    if (!form.name || !form.category || !form.price || !form.stock) return;
-
-    const missingRequired = attributes.some(
-      (a) => a.required && !attributeValues[a.id]?.trim()
-    );
-    if (missingRequired) return;
+    if (!validate()) return;
 
     setLoading(true);
 
@@ -186,8 +198,9 @@ export default function AddProductModal({ onClose, onAdded }) {
               value={form.name}
               onChange={handleChange}
               placeholder="e.g. iPhone 15 case"
-              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+              className={`w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 ${errors.name ? "border-red-400" : "border-gray-200 dark:border-white/10"}`}
             />
+            {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
           </div>
           <div>
             <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Category</label>
@@ -196,8 +209,9 @@ export default function AddProductModal({ onClose, onAdded }) {
               value={form.category}
               onChange={handleChange}
               placeholder="e.g. Cases"
-              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+              className={`w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 ${errors.category ? "border-red-400" : "border-gray-200 dark:border-white/10"}`}
             />
+            {errors.category && <p className="text-red-400 text-xs mt-1">{errors.category}</p>}
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
@@ -210,8 +224,9 @@ export default function AddProductModal({ onClose, onAdded }) {
                 onChange={handleChange}
                 placeholder="350"
                 type="number"
-                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                className={`w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 ${errors.price ? "border-red-400" : "border-gray-200 dark:border-white/10"}`}
               />
+              {errors.price && <p className="text-red-400 text-xs mt-1">{errors.price}</p>}
             </div>
             <div>
               <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
@@ -236,8 +251,9 @@ export default function AddProductModal({ onClose, onAdded }) {
                 onChange={handleChange}
                 placeholder="10"
                 type="number"
-                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                className={`w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 ${errors.stock ? "border-red-400" : "border-gray-200 dark:border-white/10"}`}
               />
+              {errors.stock && <p className="text-red-400 text-xs mt-1">{errors.stock}</p>}
             </div>
           </div>
 
@@ -246,6 +262,7 @@ export default function AddProductModal({ onClose, onAdded }) {
               <p className="text-xs text-gray-400 dark:text-slate-500 mb-3 font-medium">
                 Variant attributes
               </p>
+              {errors.attributes && <p className="text-red-400 text-xs mb-2">{errors.attributes}</p>}
               <div className="flex flex-col gap-3">
                 {attributes.map((attr) => (
                   <div key={attr.id}>

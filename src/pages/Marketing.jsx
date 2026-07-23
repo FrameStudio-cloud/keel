@@ -2,10 +2,12 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import PageLayout from "../components/layout/PageLayout";
+import ContextTip from "../components/ContextTip";
 import EmptyState from "../components/EmptyState";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { formatPrice } from "../lib/format";
+import ProGate from "../components/ProGate";
 import { useSettings } from "../hooks/useSettings";
 import { useDebounce } from "../hooks/useDebounce";
 import { useToast } from "../context/ToastProvider";
@@ -347,6 +349,9 @@ export default function Marketing() {
         <meta property="og:url" content="https://keel-nu.vercel.app/marketing" />
       </Helmet>
     <PageLayout title="Marketing" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
+      <ContextTip tipKey="marketing" title="Tip">
+        <p>Use marketing tools to generate QR codes, add sale prices, and share product links.</p>
+      </ContextTip>
       <p className="text-xs text-gray-400 dark:text-slate-500 mb-5">Manage promotions, badges, sale prices, share links, QR codes, and more.</p>
       {products.length === 0 ? (
         <EmptyState
@@ -747,6 +752,7 @@ export default function Marketing() {
 
         {/* Share & QR */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <ProGate feature="marketing_links">
           <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5">
             <div className="flex items-center gap-2 mb-4">
               <FiLink size={14} className="text-gray-400" />
@@ -790,7 +796,9 @@ export default function Marketing() {
               </div>
             )}
           </div>
+          </ProGate>
 
+          <ProGate feature="marketing_qr">
           <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5">
             <div className="flex items-center gap-2 mb-4">
               <FiGrid size={14} className="text-gray-400" />
@@ -826,6 +834,7 @@ export default function Marketing() {
               </button>
             </div>
           </div>
+          </ProGate>
         </div>
 
         {/* WhatsApp + Print Catalog row */}
@@ -859,6 +868,7 @@ export default function Marketing() {
             </button>
           </div>
 
+          <ProGate feature="marketing_print">
           <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5">
             <div className="flex items-center gap-2 mb-4">
               <FiFileText size={14} className="text-gray-400" />
@@ -875,6 +885,7 @@ export default function Marketing() {
               <FiFileText size={16} /> Generate & Print
             </button>
           </div>
+          </ProGate>
         </div>
 
       </>

@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
+import ContextTip from "../components/ContextTip";
 import Skeleton from "../components/Skeleton";
+import ProGate from "../components/ProGate";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { formatPrice } from "../lib/format";
@@ -163,24 +165,31 @@ export default function Reports() {
   return (
     <PageLayout title="Reports" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <Helmet><title>Reports — Keel</title></Helmet>
+      <ContextTip tipKey="reports" title="Tip">
+        <p>View profit margins per product and export P&amp;L reports as CSV or PDF.</p>
+      </ContextTip>
       <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <p className="text-sm font-medium text-gray-800 dark:text-white">Profit Margin per Product</p>
           <div className="flex gap-2">
-            <button
-              onClick={() => exportCSV(profitData, "profit-margins.csv", [
-                { label: "Product", value: (r) => `"${r.name}"` },
-                { label: "Units Sold", value: (r) => r.qty },
-                { label: "Revenue", value: (r) => r.revenue },
-                { label: "Cost", value: (r) => r.totalCost },
-                { label: "Profit", value: (r) => r.profit },
-                { label: "Margin %", value: (r) => r.margin },
-              ])}
-              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              CSV
-            </button>
-            <button onClick={exportPDF} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">PDF</button>
+            <ProGate feature="reports_pnl">
+              <button
+                onClick={() => exportCSV(profitData, "profit-margins.csv", [
+                  { label: "Product", value: (r) => `"${r.name}"` },
+                  { label: "Units Sold", value: (r) => r.qty },
+                  { label: "Revenue", value: (r) => r.revenue },
+                  { label: "Cost", value: (r) => r.totalCost },
+                  { label: "Profit", value: (r) => r.profit },
+                  { label: "Margin %", value: (r) => r.margin },
+                ])}
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                CSV
+              </button>
+            </ProGate>
+            <ProGate feature="reports_pnl">
+              <button onClick={exportPDF} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">PDF</button>
+            </ProGate>
           </div>
         </div>
         {profitData.length === 0 ? (
@@ -260,79 +269,81 @@ export default function Reports() {
         )}
       </div>
 
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-          <p className="text-sm font-medium text-gray-800 dark:text-white">Profit & Loss</p>
-          <div className="flex items-center gap-3">
-            <div className="flex gap-1 bg-gray-100 dark:bg-[#1a1a2e] rounded-lg p-0.5">
-              {["week", "month"].map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setTimeRange(r)}
-                  className={`px-2.5 py-1 text-xs rounded-md font-medium capitalize ${
-                    timeRange === r
-                      ? "bg-white dark:bg-[#16213e] text-blue-600 dark:text-blue-400 shadow-sm"
-                      : "text-gray-500 dark:text-slate-400"
-                  }`}
-                >
-                  {r}
-                </button>
-              ))}
+      <ProGate feature="reports_pnl">
+        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <p className="text-sm font-medium text-gray-800 dark:text-white">Profit & Loss</p>
+            <div className="flex items-center gap-3">
+              <div className="flex gap-1 bg-gray-100 dark:bg-[#1a1a2e] rounded-lg p-0.5">
+                {["week", "month"].map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setTimeRange(r)}
+                    className={`px-2.5 py-1 text-xs rounded-md font-medium capitalize ${
+                      timeRange === r
+                        ? "bg-white dark:bg-[#16213e] text-blue-600 dark:text-blue-400 shadow-sm"
+                        : "text-gray-500 dark:text-slate-400"
+                    }`}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => exportCSV(pnlData, `pnl-${timeRange}.csv`, [
+                  { label: "Period", value: (r) => `"${r.day}"` },
+                  { label: "Revenue", value: (r) => r.revenue },
+                  { label: "Expenses", value: (r) => r.expenses },
+                  { label: "Profit", value: (r) => r.profit },
+                ])}
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                CSV
+              </button>
+              <button onClick={exportPDF} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">PDF</button>
             </div>
-            <button
-              onClick={() => exportCSV(pnlData, `pnl-${timeRange}.csv`, [
-                { label: "Period", value: (r) => `"${r.day}"` },
-                { label: "Revenue", value: (r) => r.revenue },
-                { label: "Expenses", value: (r) => r.expenses },
-                { label: "Profit", value: (r) => r.profit },
-              ])}
-              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              CSV
-            </button>
-            <button onClick={exportPDF} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">PDF</button>
           </div>
+          {pnlData.length === 0 ? (
+            <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-8">No data for this period</p>
+          ) : (
+            <>
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={pnlData} barSize={timeRange === "week" ? 20 : 6} barCategoryGap={timeRange === "week" ? "20%" : "10%"}>
+                  <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#9ca3af" }} axisLine={false} tickLine={false} interval={timeRange === "month" ? 5 : 0} />
+                  <YAxis hide />
+                  <Tooltip
+                    formatter={(value) => formatPrice(value)}
+                    contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #f3f4f6" }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                  <Bar dataKey="revenue" fill="#2563eb" radius={[4, 4, 0, 0]} name="Revenue" />
+                  <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expenses" />
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="grid grid-cols-3 gap-3 mt-3 sm:flex sm:justify-center sm:gap-6 text-sm">
+                <div className="text-center">
+                  <p className="text-xs text-gray-400 dark:text-slate-500">Total Revenue</p>
+                  <p className="font-semibold text-gray-800 dark:text-white">
+                    {formatPrice(pnlData.reduce((s, r) => s + r.revenue, 0))}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-gray-400 dark:text-slate-500">Total Expenses</p>
+                  <p className="font-semibold text-red-500">
+                    {formatPrice(pnlData.reduce((s, r) => s + r.expenses, 0))}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-gray-400 dark:text-slate-500">Net Profit</p>
+                  <p className={`font-semibold ${pnlData.reduce((s, r) => s + r.profit, 0) >= 0 ? "text-green-500" : "text-red-500"}`}>
+                    {formatPrice(pnlData.reduce((s, r) => s + r.profit, 0))}
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
         </div>
-        {pnlData.length === 0 ? (
-          <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-8">No data for this period</p>
-        ) : (
-          <>
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={pnlData} barSize={timeRange === "week" ? 20 : 6} barCategoryGap={timeRange === "week" ? "20%" : "10%"}>
-                <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#9ca3af" }} axisLine={false} tickLine={false} interval={timeRange === "month" ? 5 : 0} />
-                <YAxis hide />
-                <Tooltip
-                  formatter={(value) => formatPrice(value)}
-                  contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #f3f4f6" }}
-                />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Bar dataKey="revenue" fill="#2563eb" radius={[4, 4, 0, 0]} name="Revenue" />
-                <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expenses" />
-              </BarChart>
-            </ResponsiveContainer>
-            <div className="grid grid-cols-3 gap-3 mt-3 sm:flex sm:justify-center sm:gap-6 text-sm">
-              <div className="text-center">
-                <p className="text-xs text-gray-400 dark:text-slate-500">Total Revenue</p>
-                <p className="font-semibold text-gray-800 dark:text-white">
-                  {formatPrice(pnlData.reduce((s, r) => s + r.revenue, 0))}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs text-gray-400 dark:text-slate-500">Total Expenses</p>
-                <p className="font-semibold text-red-500">
-                  {formatPrice(pnlData.reduce((s, r) => s + r.expenses, 0))}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs text-gray-400 dark:text-slate-500">Net Profit</p>
-                <p className={`font-semibold ${pnlData.reduce((s, r) => s + r.profit, 0) >= 0 ? "text-green-500" : "text-red-500"}`}>
-                  {formatPrice(pnlData.reduce((s, r) => s + r.profit, 0))}
-                </p>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
+      </ProGate>
     </PageLayout>
   );
 }

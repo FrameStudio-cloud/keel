@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext, useMemo, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
+import ContextTip from "../components/ContextTip";
 import Skeleton from "../components/Skeleton";
 import { supabase, getPersistedSession } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
@@ -360,6 +361,9 @@ export default function Settings() {
   return (
     <PageLayout title="Settings">
       <Helmet><title>Settings — Keel</title></Helmet>
+      <ContextTip tipKey="settings" title="Tip">
+        <p>Customise your store name, currency, payment methods, theme, and more.</p>
+      </ContextTip>
       <style>{`@keyframes fadeSlideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
       <div className="lg:hidden overflow-x-auto pb-3 -mx-4 px-4 mb-4">

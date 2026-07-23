@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
 import StatCard from "../components/StatCard";
+import ContextTip from "../components/ContextTip";
+import ProGate from "../components/ProGate";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { formatPrice } from "../lib/format";
@@ -290,6 +292,9 @@ export default function Finance() {
   return (
     <PageLayout title="Finance" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <Helmet><title>Finance — Keel</title></Helmet>
+      <ContextTip tipKey="finance" targetSelector="[data-onboarding='log-expense']" title="Tip">
+        <p>Track your spending. Tap <strong>Log Expense</strong> to record an expense by category.</p>
+      </ContextTip>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <StatCard label="Revenue today" value={formatPrice(summary.revenue)} change={`${summary.transactions} transaction(s)`} up={summary.revenue > 0} />
         <StatCard label="Expenses today" value={formatPrice(summary.expenses)} change={summary.expenses > 0 ? "Logged today" : "None"} up={summary.expenses === 0} />
@@ -306,10 +311,12 @@ export default function Finance() {
                 {showHistory ? <FiX size={14} /> : null}
                 Past Reconciliations
               </button>
-              <button onClick={() => { if (!showRecon) { setShowRecon(true); fetchMpesaSales(); } else setShowRecon(!showRecon); }} className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all">
-                {showRecon ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
-                Reconcile M-Pesa
-              </button>
+              <ProGate feature="finance_mpesa">
+                <button onClick={() => { if (!showRecon) { setShowRecon(true); fetchMpesaSales(); } else setShowRecon(!showRecon); }} className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all">
+                  {showRecon ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
+                  Reconcile M-Pesa
+                </button>
+              </ProGate>
             </div>
           </div>
           {paymentData.length === 0 ? (
@@ -351,6 +358,7 @@ export default function Finance() {
           <p className="text-sm font-medium text-gray-800 dark:text-white mb-4">Today's Expenses</p>
           {!showForm ? (
             <button
+              data-onboarding="log-expense"
               onClick={() => { setEditingExpense(null); setExpenseForm({ description: "", amount: "", category: "General", payment_method: "Cash", expense_date: new Date().toISOString().slice(0, 10) }); setShowForm(true); }}
               className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 hover:underline"
             >
@@ -476,6 +484,7 @@ export default function Finance() {
         </div>
       )}
 
+      <ProGate feature="finance_mpesa">
       {showRecon && (
         <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 mb-6 transition-all">
           <div className="flex items-center justify-between mb-4">
@@ -654,6 +663,7 @@ export default function Finance() {
           )}
         </div>
       )}
+      </ProGate>
 
     </PageLayout>
   );

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import { FiLock, FiAward } from "react-icons/fi";
 import PageLayout from "../components/layout/PageLayout";
+import ProPanel from "../components/ProPanel";
 import { useSettings } from "../hooks/useSettings";
 import StorefrontLanding from "../components/storefront/StorefrontLanding";
 import StorefrontDetail from "../components/storefront/StorefrontDetail";
@@ -157,21 +157,7 @@ export default function Storefront() {
     return (
       <PageLayout title="Storefront">
         <Helmet><title>Storefront - Keel</title></Helmet>
-        <div className="max-w-lg mx-auto pt-12 pb-8">
-          <div className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-200 dark:border-white/10 p-8 text-center">
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
-              <FiAward size={28} className="text-white" />
-            </div>
-            <h2 className="mt-5 text-xl font-bold text-gray-800 dark:text-white">Storefront is a Pro Feature</h2>
-            <p className="mt-2 text-sm text-gray-500 dark:text-slate-400 leading-relaxed max-w-sm mx-auto">
-              Upgrade your plan to unlock a hosted mini-catalogue site with your own subdomain — no coding required.
-            </p>
-            <div className="mt-6 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-slate-500">
-              <FiLock size={12} />
-              <span>Your shop data stays intact. No data is lost.</span>
-            </div>
-          </div>
-        </div>
+        <ProPanel feature="storefront" />
       </PageLayout>
     );
   }

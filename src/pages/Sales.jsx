@@ -9,6 +9,7 @@ import EmptyState from "../components/EmptyState";
 import LogSaleModal from "../components/LogSaleModal";
 import ReceiptModal from "../components/ReceiptModal";
 import QueueStatus from "../components/QueueStatus";
+import ContextTip from "../components/ContextTip";
 import Pagination from "../components/Pagination";
 import { getShopId } from "../lib/shop";
 import { paginateQuery } from "../lib/paginate";
@@ -70,11 +71,15 @@ export default function Sales() {
   return (
     <PageLayout title="Sales" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <Helmet><title>Sales — Keel</title></Helmet>
+      <ContextTip tipKey="sales" targetSelector="[data-onboarding='log-sale']" title="Tip">
+        <p>When a customer buys, tap <strong>Log Sale</strong> — receipt and revenue tracked automatically.</p>
+      </ContextTip>
       <div className="flex justify-between items-center mb-4">
         <p className="text-sm text-gray-400 dark:text-slate-500">{total} transactions</p>
         <div className="flex items-center gap-2">
           <QueueStatus />
           <button
+            data-onboarding="log-sale"
             onClick={() => setShowModal(true)}
             className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all"
           >

@@ -2,6 +2,10 @@ import { useEffect, useState, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import { FiCalendar, FiList, FiBookmark, FiBarChart2, FiSend } from "react-icons/fi";
 import PageLayout from "../components/layout/PageLayout";
+import ContextTip from "../components/ContextTip";
+import ProPanel from "../components/ProPanel";
+import { useSettings } from "../hooks/useSettings";
+import { isFeatureAccessible } from "../lib/tiers";
 import CalendarView from "../components/social/CalendarView";
 import PostCard from "../components/social/PostCard";
 import PostComposer from "../components/social/PostComposer";
@@ -28,6 +32,7 @@ const TABS = [
 ];
 
 export default function Social() {
+  const { planTier } = useSettings();
   const [activeTab, setActiveTab] = useState("calendar");
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -153,9 +158,21 @@ export default function Social() {
     setActiveTab("templates");
   }
 
+  if (!isFeatureAccessible("social", planTier)) {
+    return (
+      <PageLayout title="Social (Queue)">
+        <Helmet><title>Social — Keel</title></Helmet>
+        <ProPanel feature="social" />
+      </PageLayout>
+    );
+  }
+
   return (
     <PageLayout title="Queue">
       <Helmet><title>Queue — Keel</title></Helmet>
+      <ContextTip tipKey="social" title="Tip">
+        <p>Schedule and manage your social media posts across platforms.</p>
+      </ContextTip>
 
       <div className="flex gap-1 mb-4 border-b border-gray-100 dark:border-white/5 pb-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {TABS.map((tab) => {
@@ -187,6 +204,7 @@ export default function Social() {
               onAddPost={() => setShowComposer(true)}
               onWriteWeek={handleWriteWeek}
               aiLoading={aiLoading}
+              planTier={planTier}
               onEditPost={handleEditPost}
               onDeletePost={handleDeletePost}
               onMarkPublished={handleMarkPublished}

@@ -2,6 +2,7 @@ import { Helmet } from "react-helmet-async";
 import { useState, useEffect } from "react";
 
 import PageLayout from "../components/layout/PageLayout";
+import QuickStartCard from "../components/QuickStartCard";
 import AnnouncementBanner from "../components/AnnouncementBanner";
 import StatCard from "../components/StatCard";
 import WeeklySalesChart from "../components/WeeklySalesChart";
@@ -10,6 +11,7 @@ import SlowMovingStock from "../components/SlowMovingStock";
 import Skeleton from "../components/Skeleton";
 import { formatPrice } from "../lib/format";
 import { useSettings } from "../hooks/useSettings";
+import { isFeatureAccessible } from "../lib/tiers";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
@@ -67,7 +69,7 @@ function buildChartData(raw, range) {
 }
 
 export default function Overview() {
-  const { storeName, lowStockThreshold, websiteUrl } = useSettings();
+  const { storeName, lowStockThreshold, websiteUrl, planTier } = useSettings();
   const hasWebsite = !!websiteUrl;
   const [timeRange, setTimeRange] = useState("week");
 
@@ -137,6 +139,7 @@ export default function Overview() {
   return (
     <PageLayout title="Overview">
       <Helmet><title>Overview — Keel</title></Helmet>
+      <QuickStartCard />
       {isLoading ? (
         <div className="space-y-6">
           <div className="flex gap-4 items-start">
@@ -194,7 +197,7 @@ export default function Overview() {
             </div>
             <SlowMovingStock compact />
           </div>
-          {hasWebsite && (
+          {hasWebsite && isFeatureAccessible("overview_analytics", planTier) && (
             <>
               <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mt-8 mb-3">Website Analytics</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

@@ -22,6 +22,36 @@ Subscription lockout: `shops.subscription_expires_at` (timestamptz) controls acc
 Business category (`clothing`/`electronics`/`electricals`/`general`) controls variant fields (color/size/storage) in Inventory modals.
 Terms of Service are stored in `src/data/terms.json` (static JSON), not in the database. The Settings page shows a simple card link to `/terms` instead of an editor.
 
+## Onboarding System (3-layer)
+
+### Layer 1: QuickStart (TourGuide.jsx)
+- Rewritten from 10-step (6 setup forms + 4 labels) to **3-step navigation tour** (no data collection)
+- Shows once after SetupWizard: Welcome → Inventory → Sales
+- State stored in `shops.onboarding_progress.quickstart_dismissed` (JSONB, DB-backed)
+- Reads from `useSettings().onboardingProgress`, sets via `setOnboardingProgress()`
+- Dead code removed: `returnSteps`, localStorage-only tracking, form fields
+
+### Layer 2: Per-page Contextual Tips (ContextTip.jsx)
+- New component: fixed-position tooltip pointing at primary action button
+- Shown once per page on first visit (tracked in `onboarding_progress.tips_seen`)
+- Disappears after 8s auto-dismiss or "Got it" click
+- Non-blocking (z-40, no backdrop), styled as blue tooltip
+- Added to 8 pages via `<ContextTip tipKey="page" targetSelector="[data-onboarding='...']">`
+- Primary buttons annotated with `data-onboarding` attributes
+- DB-backed state via `markTipSeen()` → `settings.onboardingProgress` refresh
+
+### Layer 3: Progress Card (QuickStartCard.jsx)
+- Blue gradient card on Overview showing 4 milestones: Add product, Log sale, Record expense, Publish
+- Auto-catches up via DB queries for users with pre-existing data
+- Each row links to the relevant page
+- Hidden when all 4 complete or dismissed
+- Progress bar + percentage indicator
+
+### Data layer
+- Migration: `20260723_add_onboarding_progress.sql` → `onboarding_progress jsonb` column on `shops` (default all-false)
+- Helpers in `src/lib/onboarding.js`: `getOnboardingProgress()`, `setOnboardingProgress()`, `markTipSeen()`, `markMilestone()`
+- Fetched by `SettingsProvider` alongside other shop columns, exposed via `useSettings().onboardingProgress`
+
 ## Build & Lint
 
 ```bash
@@ -392,6 +422,13 @@ Keel Dashboard → direct fetch → storefront-provisioner (Railway) → Vercel 
 - Set via framestudio-dashboard Keel Pulse dropdown → `setShopPlan()` writes to both `keel_shops.plan` and `chat_config.plan_tier` via upsert (fixed: was using nonexistent `id` column)
 - SettingsProvider fetches `chat_config.plan_tier` alongside shops + store_settings, exposes as `planTier`
 - Non-Pro shops see centered upsell card (award icon, heading, lock note) — no access to modals or deploy flow
+
+## Feature Tiers (Pro Gating)
+
+- `src/lib/tiers.js` — `FEATURE_TIERS` map (feature key → required plan), `isFeatureAccessible()`, `FEATURE_PREVIEW` (for ProPanel upsell), `FEATURE_META` (descriptions/benefits for locked prompts)
+- Currently gated: `storefront` (pro), `social_ai` (pro)
+- AI features in Social (`CalendarView` "Write My Week", `PostComposer` "AI Generate" + "AI Variants") show a locked `FiLock` badge for free users instead of the active button
+- `planTier` comes from `useSettings().planTier` (stored in `chat_config.plan_tier`, default `"free"`)
 
 ## Conventions
 

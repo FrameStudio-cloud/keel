@@ -3,7 +3,10 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { FiGlobe, FiArrowRight } from "react-icons/fi";
 import PageLayout from "../components/layout/PageLayout";
+import ContextTip from "../components/ContextTip";
+import ProPanel from "../components/ProPanel";
 import { useSettings } from "../hooks/useSettings";
+import { isFeatureAccessible } from "../lib/tiers";
 import BannersTab from "../components/website/BannersTab";
 import BusinessTab from "../components/website/BusinessTab";
 import GalleryTab from "../components/website/GalleryTab";
@@ -23,9 +26,18 @@ const MESH = `
 `;
 
 export default function Website() {
-  const { websiteUrl } = useSettings();
+  const { planTier, websiteUrl } = useSettings();
   const hasWebsite = !!websiteUrl;
   const [activeTab, setActiveTab] = useState("banners");
+
+  if (!isFeatureAccessible("website", planTier)) {
+    return (
+      <PageLayout title="Website">
+        <Helmet><title>Website — Keel</title></Helmet>
+        <ProPanel feature="website" />
+      </PageLayout>
+    );
+  }
 
   if (!hasWebsite) {
     return (
@@ -121,6 +133,9 @@ export default function Website() {
   return (
     <PageLayout title="Website">
       <Helmet><title>Website — Keel</title></Helmet>
+      <ContextTip tipKey="website" title="Tip">
+        <p>Configure your public website — banners, gallery, chat widget, and business info.</p>
+      </ContextTip>
       <div className="flex gap-1 mb-6 border-b border-slate-200 dark:border-white/10 overflow-x-auto overflow-hidden">
         {TABS.map((tab) => (
           <button

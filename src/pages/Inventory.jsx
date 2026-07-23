@@ -11,6 +11,7 @@ import AddProductModal from "../components/AddProductModal";
 import EditProductModal from "../components/EditProductModal";
 import StockAdjustModal from "../components/StockAdjustModal";
 import QueueStatus from "../components/QueueStatus";
+import ContextTip from "../components/ContextTip";
 import Pagination from "../components/Pagination";
 import { getShopId, withShop } from "../lib/shop";
 import { supabase } from "../lib/supabase";
@@ -179,6 +180,9 @@ export default function Inventory() {
       setSearchQuery={setSearchQuery}
     >
       <Helmet><title>Inventory — Keel</title></Helmet>
+      <ContextTip tipKey="inventory" targetSelector="[data-onboarding='add-product']" title="Tip">
+        <p>Tap <strong>Add Product</strong> to create your first item with stock, price, and category.</p>
+      </ContextTip>
       <div className="flex justify-between items-center mb-4">
         <p className="text-sm text-gray-400 dark:text-slate-500">
           {total} products
@@ -186,6 +190,7 @@ export default function Inventory() {
         <div className="flex items-center gap-2">
           <QueueStatus />
           <button
+            data-onboarding="add-product"
             onClick={() => setShowModal(true)}
             className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all"
           >

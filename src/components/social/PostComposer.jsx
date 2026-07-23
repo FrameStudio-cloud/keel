@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { FiX, FiZap, FiCpu } from "react-icons/fi";
+import { FiX, FiZap, FiCpu, FiLock } from "react-icons/fi";
 import { getShopId, withShop } from "../../lib/shop";
 import { supabase } from "../../lib/supabase";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import { useSettings } from "../../hooks/useSettings";
+import { isFeatureAccessible } from "../../lib/tiers";
 import { aiGenerateVariants } from "../../lib/ai";
 
 const PLATFORMS = ["Instagram", "TikTok", "WhatsApp"];
@@ -19,7 +20,7 @@ const POST_TYPES = [
 
 export default function PostComposer({ onClose, onAdded, editPost, initialCaption, initialDate }) {
   const trapRef = useFocusTrap(true);
-  const { businessCategory } = useSettings();
+  const { businessCategory, planTier } = useSettings();
   const [products, setProducts] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [aiLoading, setAiLoading] = useState(false);
@@ -248,14 +249,24 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
                 >
                   <FiZap size={12} /> Suggest
                 </button>
-                <button
-                  type="button"
-                  onClick={handleAiGenerate}
-                  disabled={!form.product_id || aiLoading}
-                  className="text-xs text-purple-600 dark:text-purple-400 hover:underline disabled:opacity-40 disabled:no-underline flex items-center gap-1"
-                >
-                  <FiCpu size={12} /> {aiLoading ? "Generating..." : "AI Generate"}
-                </button>
+                {isFeatureAccessible("social_ai", planTier) ? (
+                  <button
+                    type="button"
+                    onClick={handleAiGenerate}
+                    disabled={!form.product_id || aiLoading}
+                    className="text-xs text-purple-600 dark:text-purple-400 hover:underline disabled:opacity-40 disabled:no-underline flex items-center gap-1"
+                  >
+                    <FiCpu size={12} /> {aiLoading ? "Generating..." : "AI Generate"}
+                  </button>
+                ) : (
+                  <span
+                    className="text-xs text-gray-300 dark:text-slate-600 flex items-center gap-1 cursor-not-allowed select-none"
+                    title="AI Caption Generator — Pro feature"
+                  >
+                    <FiLock size={10} />
+                    AI Generate
+                  </span>
+                )}
                 <button
                   type="button"
                   onClick={insertHashtags}
@@ -305,7 +316,7 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
           )}
         </div>
 
-        {aiVariants.length > 0 && (
+        {isFeatureAccessible("social_ai", planTier) && aiVariants.length > 0 && (
           <div className="mt-3 space-y-2">
             <p className="text-xs font-semibold text-purple-600 dark:text-purple-400">AI Variants</p>
             {aiVariants.map((v, i) => (

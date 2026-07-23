@@ -4,6 +4,7 @@ import { getShopId } from "../lib/shop";
 import { setCurrency } from "../lib/format";
 import { setPaymentConfig } from "../lib/paymentConfig";
 import { SettingsContext, DEFAULT_NOTIF_PREFS } from "./settingsContext";
+import { DEFAULT_PROGRESS } from "../lib/onboarding";
 import { AuthContext } from "./AuthContext";
 
 export default function SettingsProvider({ children }) {
@@ -31,6 +32,7 @@ export default function SettingsProvider({ children }) {
     subscriptionExpiresAt: null,
     scheduledDeletionAt: null,
     notificationPreferences: DEFAULT_NOTIF_PREFS,
+    onboardingProgress: DEFAULT_PROGRESS,
     loading: true,
   });
 
@@ -44,7 +46,7 @@ export default function SettingsProvider({ children }) {
 
       const { data: shop } = await supabase
         .from("shops")
-        .select("business_category, subscription_expires_at, scheduled_deletion_at, category_changed_at")
+        .select("business_category, subscription_expires_at, scheduled_deletion_at, category_changed_at, onboarding_progress")
         .eq("id", shopId)
         .maybeSingle();
 
@@ -94,6 +96,7 @@ export default function SettingsProvider({ children }) {
           subscriptionExpiresAt: shop?.subscription_expires_at || null,
           scheduledDeletionAt: shop?.scheduled_deletion_at || null,
           planTier,
+          onboardingProgress: shop?.onboarding_progress || DEFAULT_PROGRESS,
           primaryColor: store.primary_color || "#000000",
           secondaryColor: store.secondary_color || "#4f46e5",
           accentColor: store.accent_color || "#f59e0b",
