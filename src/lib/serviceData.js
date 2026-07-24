@@ -16,7 +16,7 @@ export async function fetchOrders({ status, page = 0, pageSize = 50, search = ""
 
   if (search) {
     const escaped = search.replace(/[%_]/g, "\\$&");
-    query = query.or(`id.ilike.%${escaped}%,customer_id.in:select id from customers where name.ilike.%${escaped}%`);
+    query = query.or(`id.ilike.%${escaped}%,customer_id.in.(select id from customers where name.ilike.%${escaped}%)`);
   }
 
   const from = page * pageSize;
@@ -138,7 +138,10 @@ export async function createOrder({ customerName, customerPhone, items, notes, t
   }));
 
   const { error: itemsError } = await supabase.from("service_order_items").insert(orderItems);
-  if (itemsError) throw itemsError;
+  if (itemsError) {
+    await supabase.from("service_orders").delete().eq("id", order.id);
+    throw itemsError;
+  }
 
   return { id: order.id };
 }
@@ -320,7 +323,8 @@ export async function fetchOrderCounts() {
   const { data, error } = await supabase
     .from("service_orders")
     .select("status")
-    .eq("shop_id", shopId);
+    .eq("shop_id", shopId)
+    .limit(5000);
 
   if (error) throw error;
 
@@ -385,7 +389,9 @@ export async function seedDefaultServices(category) {
   }));
 
   const { error: insError } = await supabase.from("services").insert(inserts);
-  if (insError) throw insError;
+  if (insError) {
+    return await fetchServices(category);
+  }
 
   return await fetchServices(category);
 }

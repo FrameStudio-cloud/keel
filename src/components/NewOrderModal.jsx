@@ -3,7 +3,7 @@ import { FiX, FiPlus, FiTrash2, FiUser } from "react-icons/fi";
 import { formatPrice } from "../lib/format";
 import { useFocusTrap } from "../hooks/useFocusTrap";
 import { useSettings } from "../hooks/useSettings";
-import { pricingModeLabels } from "../lib/defaultServices";
+
 import { fetchServices, fetchCustomers } from "../lib/serviceData";
 
 function emptyRow() {
