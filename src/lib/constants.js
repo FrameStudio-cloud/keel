@@ -8,4 +8,9 @@ export const SERVICE_CATEGORIES = [
   "cosmetics-beauty",
   "nails-salon",
   "automotive-car",
+  "barber-grooming",
+  "auto-repair-garage",
+  "photography",
+  "cleaning-services",
+  "electronics-repair",
 ];
