@@ -32,7 +32,7 @@ import LockoutScreen from "./pages/LockoutScreen";
 const Overview = lazy(() => import("./pages/Overview"));
 const Inventory = lazy(() => import("./pages/Inventory"));
 const Sales = lazy(() => import("./pages/Sales"));
-const Social = lazy(() => import("./pages/Social"));
+const Queue = lazy(() => import("./pages/Queue"));
 const Website = lazy(() => import("./pages/Website"));
 const Settings = lazy(() => import("./pages/Settings"));
 const SetupWizard = lazy(() => import("./pages/SetupWizard"));
@@ -48,6 +48,9 @@ const Terms = lazy(() => import("./pages/Terms"));
 const UseCases = lazy(() => import("./pages/UseCases"));
 const AboutFramestudio = lazy(() => import("./pages/AboutFramestudio"));
 const Features = lazy(() => import("./pages/Features"));
+const Orders = lazy(() => import("./pages/Orders"));
+const Customers = lazy(() => import("./pages/Customers"));
+const Services = lazy(() => import("./pages/Services"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 function Loading() {
@@ -108,7 +111,7 @@ function AppRoutes() {
         <Route path="/" element={<HomeOrDashboard />} />
         <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
         <Route path="/sales" element={<ProtectedRoute><Sales /></ProtectedRoute>} />
-        <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} />
+        <Route path="/queue" element={<ProtectedRoute><Queue /></ProtectedRoute>} />
         <Route path="/website" element={<ProtectedRoute><Website /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
@@ -117,6 +120,9 @@ function AppRoutes() {
         <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
         <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
         <Route path="/storefront" element={<ProtectedRoute><Storefront /></ProtectedRoute>} />
+        <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+        <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
+        <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>

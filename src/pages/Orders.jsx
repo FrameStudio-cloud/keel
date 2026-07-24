@@ -5,6 +5,7 @@ import { useDebounce } from "../hooks/useDebounce";
 import { MdOutlineReceiptLong } from "react-icons/md";
 import PageLayout from "../components/layout/PageLayout";
 import Badge from "../components/Badge";
+import ContextTip from "../components/ContextTip";
 import EmptyState from "../components/EmptyState";
 import NewOrderModal from "../components/NewOrderModal";
 import EditOrderModal from "../components/EditOrderModal";
@@ -87,12 +88,16 @@ export default function Orders() {
 
       <div className="flex justify-center mb-5">
         <button
+          data-onboarding="new-order"
           onClick={() => setShowNewOrder(true)}
           className="flex items-center justify-center gap-3 bg-blue-600 text-white font-medium text-base px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-[0.97] w-full sm:w-auto"
         >
           <FiPlus size={22} />
           <span>New order</span>
         </button>
+        <ContextTip tipKey="new-order" targetSelector="[data-onboarding='new-order']" title="Orders">
+          Create a service order for a customer, track its status from pending → in progress → ready → completed.
+        </ContextTip>
       </div>
 
       <div className="flex gap-1 mb-4 overflow-x-auto pb-1">

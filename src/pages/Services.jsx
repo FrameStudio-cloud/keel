@@ -4,6 +4,7 @@ import { FiGrid, FiPlus, FiEdit2, FiTrash2 } from "react-icons/fi";
 import PageLayout from "../components/layout/PageLayout";
 import EmptyState from "../components/EmptyState";
 import ServiceFormModal from "../components/ServiceFormModal";
+import ContextTip from "../components/ContextTip";
 import { useToast } from "../context/ToastProvider";
 import { useSettings } from "../hooks/useSettings";
 import { formatPrice } from "../lib/format";
@@ -76,12 +77,16 @@ export default function Services() {
 
       <div className="flex justify-center mb-4">
         <button
+          data-onboarding="add-service"
           onClick={() => { setEditing(null); setShowModal(true); }}
           className="flex items-center justify-center gap-3 bg-blue-600 text-white font-medium text-base px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-[0.97] w-full sm:w-auto"
         >
           <FiPlus size={22} />
           <span>Add service</span>
         </button>
+        <ContextTip tipKey="add-service" targetSelector="[data-onboarding='add-service']" title="Services">
+          Define the services you offer — set a name, category, pricing mode (fixed/weight-based/service-based), and price. These appear in the order form.
+        </ContextTip>
       </div>
       <p className="text-sm text-gray-400 dark:text-slate-500 mb-4 -mt-2">{filtered.length} service{filtered.length !== 1 ? "s" : ""}</p>
 

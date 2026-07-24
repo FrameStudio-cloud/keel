@@ -31,7 +31,7 @@ const TABS = [
   { key: "performance", label: "Performance", icon: FiBarChart2 },
 ];
 
-export default function Social() {
+export default function Queue() {
   const { planTier } = useSettings();
   const [activeTab, setActiveTab] = useState("calendar");
   const [posts, setPosts] = useState([]);
@@ -160,7 +160,7 @@ export default function Social() {
 
   if (!isFeatureAccessible("social", planTier)) {
     return (
-      <PageLayout title="Social (Queue)">
+      <PageLayout title="Queue">
         <Helmet><title>Social — Keel</title></Helmet>
         <ProPanel feature="social" />
       </PageLayout>

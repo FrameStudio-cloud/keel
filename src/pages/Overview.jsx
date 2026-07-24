@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import PageLayout from "../components/layout/PageLayout";
 import QuickStartCard from "../components/QuickStartCard";
 import AnnouncementBanner from "../components/AnnouncementBanner";
+import ServiceOverview from "../components/ServiceOverview";
 import StatCard from "../components/StatCard";
 import WeeklySalesChart from "../components/WeeklySalesChart";
 import TopProducts from "../components/TopProducts";
@@ -12,6 +13,7 @@ import Skeleton from "../components/Skeleton";
 import { formatPrice } from "../lib/format";
 import { useSettings } from "../hooks/useSettings";
 import { isFeatureAccessible } from "../lib/tiers";
+import { SERVICE_CATEGORIES } from "../lib/constants";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
@@ -69,7 +71,8 @@ function buildChartData(raw, range) {
 }
 
 export default function Overview() {
-  const { storeName, lowStockThreshold, websiteUrl, planTier } = useSettings();
+  const { storeName, lowStockThreshold, websiteUrl, planTier, businessCategory } = useSettings();
+  const isService = SERVICE_CATEGORIES.includes(businessCategory);
   const hasWebsite = !!websiteUrl;
   const [timeRange, setTimeRange] = useState("week");
 
@@ -178,26 +181,32 @@ export default function Overview() {
             </div>
           </div>
           <AnnouncementBanner />
-          <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-3">Sales Overview</p>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-            <StatCard label="Sales today" value={formatPrice(stats.salesToday)} change={stats.salesToday > 0 ? "From today's transactions" : "No sales yet today"} up={stats.salesToday > 0} />
-            <StatCard label="Items sold" value={stats.itemsSold} change={stats.itemsSold > 0 ? "Units today" : "None yet"} up={stats.itemsSold > 0} />
-            <StatCard label="Low stock alerts" value={stats.lowStock} change={stats.lowStock > 0 ? "Products need restocking" : "All stock healthy"} up={stats.lowStock === 0} />
-            <StatCard label="Total products" value={stats.totalProducts} change="In your inventory" up />
-          </div>
-          <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-3">Performance</p>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-4 h-full">
-              <div className="h-[248px] shrink-0">
-                <WeeklySalesChart data={chartData} timeRange={timeRange} onTimeRangeChange={setTimeRange} />
-              </div>
-              <div className="flex-1 min-h-0">
-                <TopProducts products={topProducts} />
-              </div>
+          {isService ? (
+            <ServiceOverview />
+          ) : (
+            <>
+            <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-3">Sales Overview</p>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+              <StatCard label="Sales today" value={formatPrice(stats.salesToday)} change={stats.salesToday > 0 ? "From today's transactions" : "No sales yet today"} up={stats.salesToday > 0} />
+              <StatCard label="Items sold" value={stats.itemsSold} change={stats.itemsSold > 0 ? "Units today" : "None yet"} up={stats.itemsSold > 0} />
+              <StatCard label="Low stock alerts" value={stats.lowStock} change={stats.lowStock > 0 ? "Products need restocking" : "All stock healthy"} up={stats.lowStock === 0} />
+              <StatCard label="Total products" value={stats.totalProducts} change="In your inventory" up />
             </div>
-            <SlowMovingStock compact />
-          </div>
-          {hasWebsite && isFeatureAccessible("overview_analytics", planTier) && (
+            <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-3">Performance</p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-4 h-full">
+                <div className="h-[248px] shrink-0">
+                  <WeeklySalesChart data={chartData} timeRange={timeRange} onTimeRangeChange={setTimeRange} />
+                </div>
+                <div className="flex-1 min-h-0">
+                  <TopProducts products={topProducts} />
+                </div>
+              </div>
+              <SlowMovingStock compact />
+            </div>
+            </>
+          )}
+          {!isService && hasWebsite && isFeatureAccessible("overview_analytics", planTier) && (
             <>
               <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mt-8 mb-3">Website Analytics</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

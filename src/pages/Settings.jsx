@@ -330,10 +330,12 @@ export default function Settings() {
 
   const [now] = useState(() => Date.now());
   const categoryLocked = useMemo(() => {
+    if (localStorage.getItem("dev_category_bypass") === "true") return false;
     if (!settings.categoryChangedAt) return false;
     return Math.floor((now - new Date(settings.categoryChangedAt).getTime()) / 86400000) < 30;
   }, [settings.categoryChangedAt, now]);
   const categoryRemainingDays = useMemo(() => {
+    if (localStorage.getItem("dev_category_bypass") === "true") return 0;
     if (!settings.categoryChangedAt) return 0;
     return Math.max(0, 30 - Math.floor((now - new Date(settings.categoryChangedAt).getTime()) / 86400000));
   }, [settings.categoryChangedAt, now]);

@@ -3,45 +3,56 @@ import { NavLink } from "react-router-dom";
 import { GoGraph } from "react-icons/go";
 import { FaBoxOpen } from "react-icons/fa";
 import { FcSalesPerformance } from "react-icons/fc";
-import { MdOutlineQueue } from "react-icons/md";
-import { IoGlobeOutline, IoSettingsOutline, IoPersonOutline, IoTimeOutline, IoWalletOutline, IoStatsChartOutline, IoMegaphoneOutline, IoStorefrontOutline } from "react-icons/io5";
+import { MdOutlineQueue, MdOutlineReceiptLong } from "react-icons/md";
+import { IoGlobeOutline, IoSettingsOutline, IoPersonOutline, IoTimeOutline, IoWalletOutline, IoStatsChartOutline, IoMegaphoneOutline, IoStorefrontOutline, IoPeopleOutline, IoGridOutline } from "react-icons/io5";
 import { BsBuildingsFill } from "react-icons/bs";
 import { useSettings } from "../../hooks/useSettings";
 import { useLowStockCount } from "../../hooks/useQueries";
-
-const groups = [
-  {
-    label: "Operations",
-    items: [
-      { label: "Overview", icon: <GoGraph />, path: "/" },
-      { label: "Inventory", icon: <FaBoxOpen />, path: "/inventory" },
-      { label: "Sales", icon: <FcSalesPerformance />, path: "/sales" },
-      { label: "Finance", icon: <IoWalletOutline />, path: "/finance" },
-    ],
-  },
-  {
-    label: "Marketing",
-    items: [
-      { label: "Queue", icon: <MdOutlineQueue />, path: "/social" },
-
-      { label: "Website", icon: <IoGlobeOutline />, path: "/website" },
-      { label: "Storefront", icon: <IoStorefrontOutline />, path: "/storefront" },
-      { label: "Marketing", icon: <IoMegaphoneOutline />, path: "/marketing" },
-    ],
-  },
-  {
-    label: "Analytics",
-    items: [
-      { label: "Stock History", icon: <IoTimeOutline />, path: "/stock-history" },
-      { label: "Reports", icon: <IoStatsChartOutline />, path: "/reports" },
-    ],
-  },
-];
+import { SERVICE_CATEGORIES } from "../../lib/constants";
 
 export default function Sidebar({ open, onClose }) {
-  const { storeName, logoUrl } = useSettings();
+  const { storeName, logoUrl, businessCategory } = useSettings();
   const { data: lowStockCount = 0 } = useLowStockCount();
   const navRef = useRef(null);
+
+  const isService = SERVICE_CATEGORIES.includes(businessCategory);
+
+  const groups = [
+    {
+      label: "Services",
+      show: isService,
+      items: [
+        { label: "Orders", icon: <MdOutlineReceiptLong />, path: "/orders" },
+        { label: "Customers", icon: <IoPeopleOutline />, path: "/customers" },
+        { label: "Services", icon: <IoGridOutline />, path: "/services" },
+      ],
+    },
+    {
+      label: "Operations",
+      items: [
+        { label: "Overview", icon: <GoGraph />, path: "/" },
+        ...(isService ? [] : [{ label: "Inventory", icon: <FaBoxOpen />, path: "/inventory" }]),
+        ...(isService ? [] : [{ label: "Sales", icon: <FcSalesPerformance />, path: "/sales" }]),
+        { label: "Finance", icon: <IoWalletOutline />, path: "/finance" },
+      ],
+    },
+    {
+      label: "Marketing",
+      items: [
+        ...(isService ? [] : [{ label: "Queue", icon: <MdOutlineQueue />, path: "/queue" }]),
+        { label: "Website", icon: <IoGlobeOutline />, path: "/website" },
+        ...(isService ? [] : [{ label: "Storefront", icon: <IoStorefrontOutline />, path: "/storefront" }]),
+        ...(isService ? [] : [{ label: "Marketing", icon: <IoMegaphoneOutline />, path: "/marketing" }]),
+      ],
+    },
+    {
+      label: "Analytics",
+      items: [
+        ...(isService ? [] : [{ label: "Stock History", icon: <IoTimeOutline />, path: "/stock-history" }]),
+        { label: "Reports", icon: <IoStatsChartOutline />, path: "/reports" },
+      ],
+    },
+  ];
 
   useEffect(() => {
     const saved = sessionStorage.getItem("sidebarScroll");
@@ -90,7 +101,7 @@ export default function Sidebar({ open, onClose }) {
 
       {/* Nav */}
       <nav ref={navRef} className="flex-1 p-3 flex flex-col gap-1 overflow-y-auto">
-        {groups.map((group, gi) => (
+        {groups.filter(g => g.show !== false && g.items.length > 0).map((group, gi) => (
           <div key={group.label}>
             <p
               data-tour={`group-${group.label}`}
