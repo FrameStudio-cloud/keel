@@ -7,11 +7,11 @@ import {
 const CATEGORY_GROUPS = [
   {
     name: "Fashion & Beauty",
-    items: ["clothing", "footwear", "wigs", "cosmetics-beauty", "nails-salon", "jewelry-accessories"],
+    items: ["clothing", "footwear", "wigs",       "cosmetics-beauty", "nails-salon", "barber-grooming", "jewelry-accessories"],
   },
   {
     name: "Electronics & Electrical",
-    items: ["electronics", "electricals"],
+    items: ["electronics", "electricals", "electronics-repair"],
   },
   {
     name: "Home & Living",
@@ -27,7 +27,11 @@ const CATEGORY_GROUPS = [
   },
   {
     name: "Automotive",
-    items: ["automotive-car"],
+    items: ["automotive-car", "auto-repair-garage"],
+  },
+  {
+    name: "Services & Repairs",
+    items: ["laundry", "photography", "cleaning-services"],
   },
   {
     name: "Other",

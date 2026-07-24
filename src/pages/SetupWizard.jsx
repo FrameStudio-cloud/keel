@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { FiArrowLeft, FiArrowRight, FiMonitor, FiLayers, FiTool, FiGrid, FiUser, FiDroplet, FiHeart, FiHome, FiPackage, FiBook, FiActivity, FiSmile, FiCompass, FiStar, FiTruck } from "react-icons/fi";
+import { FiArrowLeft, FiArrowRight, FiMonitor, FiLayers, FiTool, FiGrid, FiUser, FiDroplet, FiHeart, FiHome, FiPackage, FiBook, FiActivity, FiSmile, FiCompass, FiStar, FiTruck, FiCamera, FiWind } from "react-icons/fi";
 import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
 import { AuthContext } from "../context/AuthContext";
@@ -17,6 +17,7 @@ const CATEGORY_GROUPS = [
       { id: "wigs", label: "Wigs", icon: FiUser },
       { id: "cosmetics-beauty", label: "Cosmetics & Beauty", icon: FiDroplet },
       { id: "nails-salon", label: "Nails & Salon", icon: FiHeart },
+      { id: "barber-grooming", label: "Barber & Grooming", icon: FiUser },
       { id: "jewelry-accessories", label: "Jewelry & Accessories", icon: FiStar },
     ],
   },
@@ -25,6 +26,7 @@ const CATEGORY_GROUPS = [
     items: [
       { id: "electronics", label: "Electronics", icon: FiMonitor },
       { id: "electricals", label: "Electricals", icon: FiTool },
+      { id: "electronics-repair", label: "Electronics Repair", icon: FiTool },
     ],
   },
   {
@@ -52,6 +54,15 @@ const CATEGORY_GROUPS = [
     name: "Automotive",
     items: [
       { id: "automotive-car", label: "Automotive & Car", icon: FiTruck },
+      { id: "auto-repair-garage", label: "Auto Repair & Garage", icon: FiTruck },
+    ],
+  },
+  {
+    name: "Services & Repairs",
+    items: [
+      { id: "laundry", label: "Laundry", icon: FiGrid },
+      { id: "photography", label: "Photography", icon: FiCamera },
+      { id: "cleaning-services", label: "Cleaning Services", icon: FiWind },
     ],
   },
   {
