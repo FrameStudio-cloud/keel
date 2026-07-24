@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { FiArrowLeft, FiSearch, FiFileText, FiTrendingDown, FiAlertCircle, FiWifiOff, FiCopy, FiMessageCircle, FiCoffee } from "react-icons/fi";
+import { FiArrowLeft, FiSearch, FiFileText, FiTrendingDown, FiAlertCircle, FiWifiOff, FiCopy, FiMessageCircle, FiCoffee, FiShoppingBag } from "react-icons/fi";
 
 const cases = [
   {
@@ -58,6 +58,14 @@ const cases = [
     cost: "Hours per week lost to repetitive messaging. Delayed responses mean lost sales — customers who message you and don't hear back quickly will move on to someone else.",
     solution: "Keel's WhatsApp and Telegram bots handle the most common questions automatically. Customers ask about stock, prices, and business hours, and the bot gives them instant answers using your live data. You only step in for the conversations that actually need your personal attention.",
     who: "Any shop that receives frequent customer inquiries via messaging apps.",
+  },
+  {
+    icon: FiShoppingBag,
+    title: "You run a service business and tracking orders is chaos",
+    problem: "A customer drops off laundry in the morning. Another comes in for a haircut. A third wants their phone repaired. You have names, phone numbers, and instructions written on random pieces of paper. By midday, you can't remember whose order is whose, which ones are ready, and how much each customer owes.",
+    cost: "Lost orders mean lost revenue. Angry customers. And every time someone calls to ask if their item is ready, you have to search through piles of paper — or call them back because you can't find the information in time.",
+    solution: "Keel's service order system lets you create digital orders for every customer. Each order has a status: pending, in progress, ready, completed. You see everything in one list, searchable by name. Customer profiles store their order history so returning customers can be served faster. Pricing supports fixed rates, per-item, and even weight-based billing for laundries.",
+    who: "Laundries, salons, barbershops, auto garages, photographers, cleaning services, electronics repair shops — any service business taking customer orders.",
   },
   {
     icon: FiCoffee,

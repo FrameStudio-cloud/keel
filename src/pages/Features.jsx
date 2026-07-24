@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { FiArrowLeft, FiPackage, FiCamera, FiAlertTriangle, FiShoppingCart, FiBarChart2, FiDollarSign, FiGlobe, FiMessageSquare, FiCalendar, FiMessageCircle, FiLayers, FiSmartphone } from "react-icons/fi";
+import { FiArrowLeft, FiPackage, FiCamera, FiAlertTriangle, FiShoppingCart, FiBarChart2, FiDollarSign, FiGlobe, FiMessageSquare, FiCalendar, FiMessageCircle, FiLayers, FiSmartphone, FiClipboard } from "react-icons/fi";
 
 const features = [
   {
@@ -92,6 +92,14 @@ const features = [
     shops: ["Shop owners with multiple locations"],
   },
   {
+    icon: FiClipboard,
+    title: "Service Order Management",
+    intro: "If you run a service business — laundry, salon, barber, repair shop — tracking customer orders on paper is chaos. Who dropped off what? Which orders are ready? What does the customer owe?",
+    body: "Keel lets you create service orders with customer details, service items, quantities, and notes. Each order moves through a status pipeline: pending, in progress, ready, completed, or cancelled. You can view a live queue, search orders by customer name, and see a customer's full order history. Pricing supports fixed rates, per-unit pricing, and weight-based billing for laundries and similar businesses.",
+    outcome: "No more lost orders or forgotten customers. Every order is tracked from drop-off to pickup.",
+    shops: ["Laundry", "Salon & Barber", "Auto Garage", "Photography", "Cleaning Services", "Electronics Repair"],
+  },
+  {
     icon: FiSmartphone,
     title: "Mobile-First Design",
     intro: "Most business software is built for desktop first and phone second. But a shop owner is rarely sitting at a desk — they're on the sales floor, in the stockroom, or on the move.",
@@ -147,7 +155,7 @@ export default function Features() {
         <div className="text-center mb-10">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">Everything your shop needs to run smarter</h1>
           <p className="text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto leading-relaxed">
-            Keel brings together the tools every small shop actually needs — inventory, sales, reports, a website, and customer communication — in one place that works on your phone. No complexity, no hardware, no monthly fees.
+            Keel brings together the tools every small business actually needs — inventory, sales, service orders, reports, a website, and customer communication — in one place that works on your phone. No complexity, no hardware. Pricing from KSh 400/month.
           </p>
         </div>
 

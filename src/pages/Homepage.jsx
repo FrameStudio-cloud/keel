@@ -24,8 +24,8 @@ import {
 
 const howItWorks = [
   { icon: FiUserPlus, title: "Create Account", desc: "Sign up with your email and shop name. No credit card needed — start for free in under a minute." },
-  { icon: FiPackage, title: "Add Products", desc: "Enter products manually, import in bulk, or scan barcodes with your phone camera. Variants, prices, and stock all in one place." },
-  { icon: FiTrendingUp, title: "Start Selling", desc: "Log sales, print receipts, and track revenue in real time. Built-in reports show you exactly where your business stands." },
+  { icon: FiPackage, title: "Set Up Your Business", desc: "Choose your category — product or service — and add your products or services with prices and variants. Works for shops, salons, laundries, garages, and more." },
+  { icon: FiTrendingUp, title: "Start Selling", desc: "Log sales, create service orders, print receipts, and track revenue in real time. Built-in reports show you exactly where your business stands." },
 ];
 
 const websiteShots = [
@@ -60,8 +60,9 @@ const testimonials = [
 
 const faqs = [
   { q: "What is Keel?", a: "Keel is a shop management dashboard for small businesses. It helps you track inventory, log sales, view reports, manage a website, and handle social media — all from one place." },
-  { q: "How much does it cost?", a: "Keel is free to use during our beta period. We'll announce pricing when we launch, but early users will get grandfathered into special rates." },
+  { q: "How much does it cost?", a: "Keel has two plans. Basic is KSh 400 per month and includes sales, inventory, service orders, expenses, customer management, stock alerts, and basic reports. Pro is KSh 1,200 per month and adds a live website, storefront, P&L charts, social media scheduler, WhatsApp bots, M-Pesa reconciliation, and more. No long-term contracts — cancel anytime." },
   { q: "Can I manage multiple shops?", a: "Yes. Each shop gets its own dashboard, inventory, and settings. Sign in once and switch between your shops easily." },
+  { q: "Does Keel work for service businesses like salons, laundries, or repair shops?", a: "Yes. Keel has a dedicated service mode for 9 categories: laundry, salon & barber, automotive, photography, cleaning, and more. You get order management with status tracking (pending → in progress → ready → completed), a customer queue, weight-based billing, customer profiles with order history, and service-specific pricing (fixed, per-unit, or weight-based). Everything a product shop gets — expenses, reports, receipts — is also available for service businesses." },
   { q: "Do I get a real website with Keel?", a: "Yes. Keel generates a live website for your shop with a product catalogue, promotional banners, business info page, image gallery, and a WhatsApp chat widget. Add or update products in your dashboard and they appear on your site instantly — no coding needed." },
   { q: "Can customers buy directly from my website?", a: "Your Keel website currently works as a product showcase and catalogue. Customers browse your listings, see prices and variants, and contact you via WhatsApp or the contact info you provide. Direct checkout is coming soon." },
   { q: "Can I use my own domain name?", a: "Yes. You can link a custom domain to your Keel website. Ask us for the DNS details after you've set up your shop." },
@@ -352,9 +353,9 @@ export default function Homepage() {
               </span>
             </h1>
             <p className="hero-subtitle mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed mx-auto lg:mx-0">
-              Track inventory, manage sales, view reports, and grow your
-              business — all from one clean dashboard. No complexity, no
-              clutter.
+              Track inventory, manage services, log sales, view reports —
+              whether you run a shop, salon, laundry, or garage, Keel keeps
+              everything in one clean dashboard. No complexity, no clutter.
             </p>
             <div className="hero-cta mt-10 flex flex-col sm:flex-row items-center lg:justify-start gap-4">
               <Link
@@ -522,6 +523,28 @@ export default function Homepage() {
               <div className="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden rotate-[1deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-500 lg:order-last">
                 <PictureImg
                   src="/Modern dashboard interface with metrics.png"
+                  alt="Orders"
+                  className="w-full h-auto object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <div className="lg:order-first">
+                <h3 className="text-xl sm:text-2xl font-extrabold mb-3">
+                  Service Order Management
+                </h3>
+                <p className="text-base sm:text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                  Perfect for service-based businesses.
+                </p>
+                <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Create customer orders, track status from pending to completed, manage a queue, and store customer profiles. Supports per-item pricing, weight-based billing, and notes.
+                </p>
+              </div>
+            </div>
+
+            <div className="feature-row grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+              <div className="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#16213e] overflow-hidden -rotate-[1deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-500 lg:order-last">
+                <PictureImg
+                  src="/Modern dashboard interface with metrics.png"
                   alt="Sales"
                   className="w-full h-auto object-cover"
                   loading="lazy"
@@ -605,6 +628,9 @@ export default function Homepage() {
             </span>
             <span className="text-xs text-slate-500 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-full">
               Business info page
+            </span>
+            <span className="text-xs text-slate-500 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-full">
+              Service catalogue
             </span>
           </div>
         </div>
@@ -888,6 +914,99 @@ export default function Homepage() {
               <FiMapPin className="text-blue-600 dark:text-blue-400" /> Built
               for Kenya
             </span>
+          </div>
+        </div>
+      </section>
+
+      {/* PRICING */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 pb-12 sm:pb-24">
+        <div className="text-center mb-10">
+          <h2 className="text-2xl sm:text-3xl font-extrabold">
+            Simple, transparent pricing
+          </h2>
+          <p className="mt-2 text-base text-slate-600 dark:text-slate-400">
+            Pick the plan that fits your business. No hidden fees, no surprises.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-500 mb-1">Basic</p>
+            <p className="text-3xl font-extrabold mb-1">KSh 400</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">per month</p>
+            <ul className="space-y-3 text-sm flex-1">
+              <li className="flex items-start gap-2 text-slate-700 dark:text-slate-300">
+                <span className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0">✓</span>
+                Sales &amp; inventory management
+              </li>
+              <li className="flex items-start gap-2 text-slate-700 dark:text-slate-300">
+                <span className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0">✓</span>
+                Service order management
+              </li>
+              <li className="flex items-start gap-2 text-slate-700 dark:text-slate-300">
+                <span className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0">✓</span>
+                Expense tracking
+              </li>
+              <li className="flex items-start gap-2 text-slate-700 dark:text-slate-300">
+                <span className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0">✓</span>
+                Customer management
+              </li>
+              <li className="flex items-start gap-2 text-slate-700 dark:text-slate-300">
+                <span className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0">✓</span>
+                Stock alerts &amp; barcode scanning
+              </li>
+              <li className="flex items-start gap-2 text-slate-700 dark:text-slate-300">
+                <span className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0">✓</span>
+                Basic reports
+              </li>
+              <li className="flex items-start gap-2 text-slate-700 dark:text-slate-300">
+                <span className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0">✓</span>
+                Mobile-first dashboard
+              </li>
+            </ul>
+          </div>
+          <div className="bg-blue-600 dark:bg-blue-700 border border-blue-500 rounded-2xl p-6 sm:p-8 flex flex-col relative">
+            <span className="absolute top-0 right-6 -translate-y-1/2 bg-white text-blue-600 text-xs font-bold px-3 py-1 rounded-full shadow-md">Popular</span>
+            <p className="text-xs font-semibold uppercase tracking-wider text-blue-200 mb-1">Pro</p>
+            <p className="text-3xl font-extrabold text-white mb-1">KSh 1,200</p>
+            <p className="text-sm text-blue-200 mb-6">per month</p>
+            <ul className="space-y-3 text-sm flex-1">
+              <li className="flex items-start gap-2 text-white">
+                <span className="text-blue-200 mt-0.5 flex-shrink-0">✓</span>
+                Everything in Basic
+              </li>
+              <li className="flex items-start gap-2 text-white">
+                <span className="text-blue-200 mt-0.5 flex-shrink-0">✓</span>
+                Live website &amp; storefront
+              </li>
+              <li className="flex items-start gap-2 text-white">
+                <span className="text-blue-200 mt-0.5 flex-shrink-0">✓</span>
+                P&amp;L charts &amp; CSV/PDF export
+              </li>
+              <li className="flex items-start gap-2 text-white">
+                <span className="text-blue-200 mt-0.5 flex-shrink-0">✓</span>
+                Social media scheduler
+              </li>
+              <li className="flex items-start gap-2 text-white">
+                <span className="text-blue-200 mt-0.5 flex-shrink-0">✓</span>
+                WhatsApp &amp; Telegram bots
+              </li>
+              <li className="flex items-start gap-2 text-white">
+                <span className="text-blue-200 mt-0.5 flex-shrink-0">✓</span>
+                M-Pesa reconciliation
+              </li>
+              <li className="flex items-start gap-2 text-white">
+                <span className="text-blue-200 mt-0.5 flex-shrink-0">✓</span>
+                QR codes &amp; print catalogue
+              </li>
+              <li className="flex items-start gap-2 text-white">
+                <span className="text-blue-200 mt-0.5 flex-shrink-0">✓</span>
+                Website analytics
+              </li>
+              <li className="flex items-start gap-2 text-white">
+                <span className="text-blue-200 mt-0.5 flex-shrink-0">✓</span>
+                Data export
+              </li>
+            </ul>
           </div>
         </div>
       </section>
