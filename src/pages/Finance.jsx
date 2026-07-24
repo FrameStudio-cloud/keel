@@ -368,6 +368,9 @@ export default function Finance() {
           )}
         </div>
 
+        <ContextTip tipKey="finance-overview" title="Finance">
+          Track today&apos;s revenue, see payment breakdowns, and log expenses. Use M-Pesa reconciliation to match payments to sales automatically.
+        </ContextTip>
         <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
           <p className="text-sm font-medium text-gray-800 dark:text-white mb-4">Today's Expenses</p>
           {!showForm ? (

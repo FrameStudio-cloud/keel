@@ -4,6 +4,7 @@ import { FiUsers, FiEdit2, FiTrash2, FiPhone, FiChevronDown, FiChevronUp } from 
 import PageLayout from "../components/layout/PageLayout";
 import EmptyState from "../components/EmptyState";
 import CustomerFormModal from "../components/CustomerFormModal";
+import ContextTip from "../components/ContextTip";
 import { useToast } from "../context/ToastProvider";
 import { formatPrice } from "../lib/format";
 import { fetchCustomers, updateCustomer, deleteCustomer } from "../lib/serviceData";
@@ -56,6 +57,10 @@ export default function Customers() {
       <Helmet><title>Customers — Keel</title></Helmet>
 
       <p className="text-sm text-gray-400 dark:text-slate-500 mb-4">{customers.length} customers — auto-saved from orders</p>
+
+      <ContextTip tipKey="customers" title="Customers">
+        Customers are automatically saved when you create an order. Come here to view order history, edit details, or delete customer records.
+      </ContextTip>
 
       <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden">
         {loading ? (

@@ -210,8 +210,8 @@ export default function Reports() {
   return (
     <PageLayout title="Reports" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <Helmet><title>Reports — Keel</title></Helmet>
-      <ContextTip tipKey="reports" title="Tip">
-        <p>View profit margins per product and export P&amp;L reports as CSV or PDF.</p>
+      <ContextTip tipKey="reports" title="Reports & Insights">
+        See how each product or service performs — profit margins, revenue, costs. The P&amp;L chart shows your daily profit and loss over a week or month.
       </ContextTip>
       <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
