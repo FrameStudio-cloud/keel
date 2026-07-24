@@ -11,8 +11,13 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 import { useDebounce } from "../hooks/useDebounce";
+import { useSettings } from "../hooks/useSettings";
+import { SERVICE_CATEGORIES } from "../lib/constants";
+import { fetchOrders, fetchRevenuePerService } from "../lib/serviceData";
 
 export default function Reports() {
+  const { businessCategory } = useSettings();
+  const isService = SERVICE_CATEGORIES.includes(businessCategory);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearch = useDebounce(searchQuery, 300);
   const [timeRange, setTimeRange] = useState("week");
@@ -23,6 +28,9 @@ export default function Reports() {
   async function fetchProfitMargins() {
     const shopId = await getShopId();
     if (!shopId) return [];
+    if (isService) {
+      return await fetchRevenuePerService();
+    }
     const { data } = await supabase.rpc("get_profit_margins", { p_shop_id: shopId });
     return data || [];
   }
@@ -43,13 +51,7 @@ export default function Reports() {
     }
     start.setHours(0, 0, 0, 0);
 
-    const [salesRes, expensesRes] = await Promise.all([
-      supabase
-        .from("sales")
-        .select("amount, created_at")
-        .eq("shop_id", shopId)
-        .gte("created_at", start.toISOString())
-        .limit(2000),
+    const [expensesRes] = await Promise.all([
       supabase
         .from("expenses")
         .select("amount, expense_date")
@@ -58,48 +60,91 @@ export default function Reports() {
         .limit(2000),
     ]);
 
-    const sales = salesRes.data || [];
     const expenses = expensesRes.data || [];
-
     const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     const dayTotals = {};
     const expenseTotals = {};
 
-    if (range === "week") {
-      for (let i = 0; i < 7; i++) {
-        const d = new Date(now);
-        d.setDate(d.getDate() - (6 - i));
-        const name = dayNames[d.getDay() === 0 ? 6 : d.getDay() - 1];
-        dayTotals[name] = 0;
-        expenseTotals[name] = 0;
+    if (isService) {
+      const result = await fetchOrders({ status: "completed", pageSize: 2000 });
+      const completed = result.data;
+
+      if (range === "week") {
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(now);
+          d.setDate(d.getDate() - (6 - i));
+          const name = dayNames[d.getDay() === 0 ? 6 : d.getDay() - 1];
+          dayTotals[name] = 0;
+          expenseTotals[name] = 0;
+        }
+        completed.forEach((o) => {
+          const d = new Date(o.created_at);
+          const name = dayNames[d.getDay() === 0 ? 6 : d.getDay() - 1];
+          if (dayTotals[name] !== undefined) dayTotals[name] += o.total;
+        });
+      } else {
+        const fmt = (d) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        for (let i = 29; i >= 0; i--) {
+          const d = new Date(now);
+          d.setDate(d.getDate() - i);
+          dayTotals[fmt(d)] = 0;
+          expenseTotals[fmt(d)] = 0;
+        }
+        completed.forEach((o) => {
+          const key = fmt(new Date(o.created_at));
+          if (dayTotals[key] !== undefined) dayTotals[key] += o.total;
+        });
       }
-      sales.forEach((s) => {
-        const d = new Date(s.created_at);
-        const name = dayNames[d.getDay() === 0 ? 6 : d.getDay() - 1];
-        if (dayTotals[name] !== undefined) dayTotals[name] += s.amount;
-      });
-      expenses.forEach((e) => {
+    } else {
+      const [salesRes] = await Promise.all([
+        supabase
+          .from("sales")
+          .select("amount, created_at")
+          .eq("shop_id", shopId)
+          .gte("created_at", start.toISOString())
+          .limit(2000),
+      ]);
+
+      const sales = salesRes.data || [];
+
+      if (range === "week") {
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(now);
+          d.setDate(d.getDate() - (6 - i));
+          const name = dayNames[d.getDay() === 0 ? 6 : d.getDay() - 1];
+          dayTotals[name] = 0;
+          expenseTotals[name] = 0;
+        }
+        sales.forEach((s) => {
+          const d = new Date(s.created_at);
+          const name = dayNames[d.getDay() === 0 ? 6 : d.getDay() - 1];
+          if (dayTotals[name] !== undefined) dayTotals[name] += s.amount;
+        });
+      } else {
+        const fmt = (d) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        for (let i = 29; i >= 0; i--) {
+          const d = new Date(now);
+          d.setDate(d.getDate() - i);
+          dayTotals[fmt(d)] = 0;
+          expenseTotals[fmt(d)] = 0;
+        }
+        sales.forEach((s) => {
+          const key = fmt(new Date(s.created_at));
+          if (dayTotals[key] !== undefined) dayTotals[key] += s.amount;
+        });
+      }
+    }
+
+    expenses.forEach((e) => {
+      if (range === "week") {
         const d = new Date(e.expense_date);
         const name = dayNames[d.getDay() === 0 ? 6 : d.getDay() - 1];
         if (expenseTotals[name] !== undefined) expenseTotals[name] += e.amount;
-      });
-    } else {
-      const fmt = (d) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-      for (let i = 29; i >= 0; i--) {
-        const d = new Date(now);
-        d.setDate(d.getDate() - i);
-        dayTotals[fmt(d)] = 0;
-        expenseTotals[fmt(d)] = 0;
-      }
-      sales.forEach((s) => {
-        const key = fmt(new Date(s.created_at));
-        if (dayTotals[key] !== undefined) dayTotals[key] += s.amount;
-      });
-      expenses.forEach((e) => {
-        const key = fmt(new Date(e.expense_date));
+      } else {
+        const key = new Date(e.expense_date).toLocaleDateString("en-US", { month: "short", day: "numeric" });
         if (expenseTotals[key] !== undefined) expenseTotals[key] += e.amount;
-      });
-    }
+      }
+    });
 
     const labels = Object.keys(dayTotals);
     setPnlData(
@@ -170,11 +215,15 @@ export default function Reports() {
       </ContextTip>
       <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-          <p className="text-sm font-medium text-gray-800 dark:text-white">Profit Margin per Product</p>
+          <p className="text-sm font-medium text-gray-800 dark:text-white">{isService ? "Revenue per Service" : "Profit Margin per Product"}</p>
           <div className="flex gap-2">
             <ProGate feature="reports_pnl">
               <button
-                onClick={() => exportCSV(profitData, "profit-margins.csv", [
+                onClick={() => exportCSV(profitData, isService ? "service-revenue.csv" : "profit-margins.csv", isService ? [
+                  { label: "Service", value: (r) => `"${r.name}"` },
+                  { label: "Orders", value: (r) => r.qty },
+                  { label: "Revenue", value: (r) => r.revenue },
+                ] : [
                   { label: "Product", value: (r) => `"${r.name}"` },
                   { label: "Units Sold", value: (r) => r.qty },
                   { label: "Revenue", value: (r) => r.revenue },
@@ -194,7 +243,7 @@ export default function Reports() {
         </div>
         {profitData.length === 0 ? (
           <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-6">
-            No sales data yet. Start logging sales to see profit margins.
+            {isService ? "No completed orders yet." : "No sales data yet. Start logging sales to see profit margins."}
           </p>
         ) : filteredProfitData.length === 0 ? (
           <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-6">
@@ -211,11 +260,12 @@ export default function Reports() {
                     <span className="text-right text-gray-700 dark:text-slate-300">{p.qty}</span>
                     <span className="text-gray-400 dark:text-slate-500">Revenue</span>
                     <span className="text-right font-medium text-gray-800 dark:text-white">{formatPrice(p.revenue)}</span>
-                    <span className="text-gray-400 dark:text-slate-500">Cost</span>
+                    {!isService && <><span className="text-gray-400 dark:text-slate-500">Cost</span>
                     <span className="text-right text-gray-600 dark:text-slate-400">{formatPrice(p.totalCost)}</span>
                     <span className="text-gray-400 dark:text-slate-500">Profit</span>
-                    <span className={`text-right font-medium ${p.profit >= 0 ? "text-green-500" : "text-red-500"}`}>{formatPrice(p.profit)}</span>
+                    <span className={`text-right font-medium ${p.profit >= 0 ? "text-green-500" : "text-red-500"}`}>{formatPrice(p.profit)}</span></>}
                   </div>
+                  {!isService && (
                   <div className="mt-2 pt-2 border-t border-gray-200 dark:border-white/10 flex justify-between items-center">
                     <span className="text-xs text-gray-400 dark:text-slate-500">Margin</span>
                     <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
@@ -226,6 +276,7 @@ export default function Reports() {
                       {p.margin}%
                     </span>
                   </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -233,12 +284,12 @@ export default function Reports() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#1a1a2e]">
-                    <th className="px-3 py-2.5 text-xs font-semibold text-left text-gray-500 dark:text-slate-400 uppercase">Product</th>
+                    <th className="px-3 py-2.5 text-xs font-semibold text-left text-gray-500 dark:text-slate-400 uppercase">{isService ? "Service" : "Product"}</th>
                     <th className="px-3 py-2.5 text-xs font-semibold text-right text-gray-500 dark:text-slate-400 uppercase">Sold</th>
                     <th className="px-3 py-2.5 text-xs font-semibold text-right text-gray-500 dark:text-slate-400 uppercase">Revenue</th>
-                    <th className="px-3 py-2.5 text-xs font-semibold text-right text-gray-500 dark:text-slate-400 uppercase">Cost</th>
+                    {!isService && <><th className="px-3 py-2.5 text-xs font-semibold text-right text-gray-500 dark:text-slate-400 uppercase">Cost</th>
                     <th className="px-3 py-2.5 text-xs font-semibold text-right text-gray-500 dark:text-slate-400 uppercase">Profit</th>
-                    <th className="px-3 py-2.5 text-xs font-semibold text-right text-gray-500 dark:text-slate-400 uppercase">Margin</th>
+                    <th className="px-3 py-2.5 text-xs font-semibold text-right text-gray-500 dark:text-slate-400 uppercase">Margin</th></>}
                   </tr>
                 </thead>
                 <tbody>
@@ -247,7 +298,7 @@ export default function Reports() {
                       <td className="px-3 py-2.5 font-medium text-gray-800 dark:text-white">{p.name}</td>
                       <td className="px-3 py-2.5 text-right text-gray-600 dark:text-slate-400">{p.qty}</td>
                       <td className="px-3 py-2.5 text-right font-medium text-gray-800 dark:text-white">{formatPrice(p.revenue)}</td>
-                      <td className="px-3 py-2.5 text-right text-gray-600 dark:text-slate-400">{formatPrice(p.totalCost)}</td>
+                      {!isService && <><td className="px-3 py-2.5 text-right text-gray-600 dark:text-slate-400">{formatPrice(p.totalCost)}</td>
                       <td className={`px-3 py-2.5 text-right font-medium ${p.profit >= 0 ? "text-green-500" : "text-red-500"}`}>
                         {formatPrice(p.profit)}
                       </td>
@@ -259,7 +310,7 @@ export default function Reports() {
                         }`}>
                           {p.margin}%
                         </span>
-                      </td>
+                      </td></>}
                     </tr>
                   ))}
                 </tbody>

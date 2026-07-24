@@ -12,12 +12,17 @@ import {
 } from "recharts";
 import { FiEdit2, FiTrash2, FiPlus, FiChevronDown, FiChevronUp, FiUpload, FiCheck, FiX, FiSearch } from "react-icons/fi";
 import { useDebounce } from "../hooks/useDebounce";
+import { useSettings } from "../hooks/useSettings";
+import { SERVICE_CATEGORIES } from "../lib/constants";
 import { parseCSV, matchTransactions } from "../engine/mpesa-reconciliation";
+import { fetchServiceRevenue } from "../lib/serviceData";
 
 const PAYMENT_COLORS = { Cash: "#10b981", "M-Pesa": "#3b82f6", Bank: "#f59e0b" };
 const EXPENSE_CATEGORIES = ["Supplies", "Utilities", "Transport", "Marketing", "Maintenance", "Salary", "General"];
 
 export default function Finance() {
+  const { businessCategory } = useSettings();
+  const isService = SERVICE_CATEGORIES.includes(businessCategory);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearch = useDebounce(searchQuery, 300);
   const [summary, setSummary] = useState({ revenue: 0, transactions: 0, expenses: 0 });
@@ -52,41 +57,48 @@ export default function Finance() {
       const todayEnd = new Date();
       todayEnd.setHours(23, 59, 59, 999);
 
-      const [salesRes, expensesRes] = await Promise.all([
-        supabase
+      const expensesRes = await supabase
+        .from("expenses")
+        .select("*")
+        .eq("shop_id", shopId)
+        .eq("expense_date", today.toISOString().slice(0, 10))
+        .order("created_at", { ascending: false })
+        .limit(500);
+
+      const expenseTotal = expensesRes.data?.reduce((sum, e) => sum + e.amount, 0) || 0;
+
+      if (isService) {
+        const result = await fetchServiceRevenue();
+        setSummary({ revenue: result.revenue, transactions: result.transactions, expenses: expenseTotal });
+        setPaymentData(result.paymentData);
+        setExpenses(expensesRes.data || []);
+      } else {
+        const salesRes = await supabase
           .from("sales")
           .select("amount, method")
           .eq("shop_id", shopId)
           .gte("created_at", today.toISOString())
           .lte("created_at", todayEnd.toISOString())
-          .limit(500),
-        supabase
-          .from("expenses")
-          .select("*")
-          .eq("shop_id", shopId)
-          .eq("expense_date", today.toISOString().slice(0, 10))
-          .order("created_at", { ascending: false })
-          .limit(500),
-      ]);
+          .limit(500);
 
-      const sales = salesRes.data || [];
-      const revenue = sales.reduce((sum, s) => sum + s.amount, 0);
-      const expenseTotal = expensesRes.data?.reduce((sum, e) => sum + e.amount, 0) || 0;
-      setSummary({ revenue, transactions: sales.length, expenses: expenseTotal });
+        const sales = salesRes.data || [];
+        const revenue = sales.reduce((sum, s) => sum + s.amount, 0);
+        setSummary({ revenue, transactions: sales.length, expenses: expenseTotal });
 
-      const methodMap = {};
-      sales.forEach((s) => {
-        methodMap[s.method] = (methodMap[s.method] || 0) + s.amount;
-      });
-      setPaymentData(
-        Object.entries(methodMap).map(([method, amount]) => ({
-          name: method,
-          value: amount,
-          color: PAYMENT_COLORS[method] || "#6b7280",
-        }))
-      );
+        const methodMap = {};
+        sales.forEach((s) => {
+          methodMap[s.method] = (methodMap[s.method] || 0) + s.amount;
+        });
+        setPaymentData(
+          Object.entries(methodMap).map(([method, amount]) => ({
+            name: method,
+            value: amount,
+            color: PAYMENT_COLORS[method] || "#6b7280",
+          }))
+        );
 
-      setExpenses(expensesRes.data || []);
+        setExpenses(expensesRes.data || []);
+      }
       setLoading(false);
     })();
   }, [refreshKey]);
@@ -312,10 +324,12 @@ export default function Finance() {
                 Past Reconciliations
               </button>
               <ProGate feature="finance_mpesa">
-                <button onClick={() => { if (!showRecon) { setShowRecon(true); fetchMpesaSales(); } else setShowRecon(!showRecon); }} className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all">
-                  {showRecon ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
-                  Reconcile M-Pesa
-                </button>
+                {!isService && (
+                  <button onClick={() => { if (!showRecon) { setShowRecon(true); fetchMpesaSales(); } else setShowRecon(!showRecon); }} className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all">
+                    {showRecon ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
+                    Reconcile M-Pesa
+                  </button>
+                )}
               </ProGate>
             </div>
           </div>
@@ -485,7 +499,7 @@ export default function Finance() {
       )}
 
       <ProGate feature="finance_mpesa">
-      {showRecon && (
+      {!isService && showRecon && (
         <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 mb-6 transition-all">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-medium text-gray-800 dark:text-white">M-Pesa Reconciliation</h3>

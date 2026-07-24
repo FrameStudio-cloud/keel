@@ -1,0 +1,30 @@
+export const DEFAULT_SERVICES = [
+  { id: "s1", name: "Wash & Fold", category: "Laundry", price: 200, pricing_mode: "per_weight", unit_label: "kg", description: "Machine wash, dry and fold per kilogram" },
+  { id: "s2", name: "Wash & Iron", category: "Laundry", price: 300, pricing_mode: "per_weight", unit_label: "kg", description: "Machine wash, dry and press per kilogram" },
+  { id: "s3", name: "Pressing Only", category: "Laundry", price: 150, pricing_mode: "per_unit", unit_label: "item", description: "Iron and press per garment" },
+  { id: "s4", name: "Dry Clean — Shirt", category: "Laundry", price: 350, pricing_mode: "per_unit", unit_label: "item", description: "Professional dry cleaning per shirt" },
+  { id: "s5", name: "Dry Clean — Suit", category: "Laundry", price: 800, pricing_mode: "per_unit", unit_label: "item", description: "Full suit dry cleaning" },
+  { id: "s6", name: "Dry Clean — Dress", category: "Laundry", price: 600, pricing_mode: "per_unit", unit_label: "item", description: "Dry cleaning for dresses and gowns" },
+  { id: "s7", name: "Dry Clean — Jacket", category: "Laundry", price: 500, pricing_mode: "per_unit", unit_label: "item", description: "Jacket and blazer dry cleaning" },
+  { id: "s8", name: "Blanket Wash", category: "Laundry", price: 400, pricing_mode: "per_unit", unit_label: "item", description: "Machine wash and dry for blankets" },
+  { id: "s9", name: "Duvet Cleaning", category: "Laundry", price: 600, pricing_mode: "per_unit", unit_label: "item", description: "Full duvet wash and fluff" },
+  { id: "s10", name: "Curtain Cleaning", category: "Laundry", price: 500, pricing_mode: "per_weight", unit_label: "kg", description: "Curtain wash and press per kilogram" },
+  { id: "s11", name: "Rug Cleaning", category: "Laundry", price: 800, pricing_mode: "per_unit", unit_label: "item", description: "Small to medium rug wash" },
+  { id: "s12", name: "Delicates Hand Wash", category: "Laundry", price: 350, pricing_mode: "per_unit", unit_label: "item", description: "Hand wash for silk, lace, and delicate fabrics" },
+  { id: "s13", name: "Stain Removal", category: "Laundry", price: 200, pricing_mode: "per_unit", unit_label: "item", description: "Pre-treatment and stain removal per garment" },
+  { id: "s14", name: "Shoe Cleaning", category: "Laundry", price: 250, pricing_mode: "per_unit", unit_label: "pair", description: "Shoe wash and polish per pair" },
+  { id: "s15", name: "Wedding Dress Cleaning", category: "Laundry", price: 3500, pricing_mode: "flat", unit_label: "", description: "Full wedding dress preservation cleaning" },
+  { id: "s16", name: "Leather Care", category: "Laundry", price: 1200, pricing_mode: "per_unit", unit_label: "item", description: "Leather jacket cleaning and conditioning" },
+  { id: "s17", name: "Express Service", category: "Laundry", price: 500, pricing_mode: "flat", unit_label: "", description: "Express surcharge — same day collection" },
+  { id: "s18", name: "Haircut", category: "Salon", price: 500, pricing_mode: "flat", unit_label: "", description: "Standard haircut — wash included" },
+  { id: "s19", name: "Manicure", category: "Salon", price: 800, pricing_mode: "flat", unit_label: "", description: "Full manicure with polish" },
+  { id: "s20", name: "Oil Change", category: "Automotive", price: 2500, pricing_mode: "flat", unit_label: "", description: "Engine oil change — labour included" },
+  { id: "s21", name: "Car Wash", category: "Automotive", price: 600, pricing_mode: "flat", unit_label: "", description: "Exterior + interior vacuum" },
+];
+
+export const pricingModeLabels = {
+  flat: "Flat rate",
+  per_unit: "Per item",
+  per_weight: "Per kg",
+  per_hour: "Per hour",
+};

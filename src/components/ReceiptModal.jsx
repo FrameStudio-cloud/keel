@@ -1,182 +1,115 @@
 import { useRef } from "react";
-import { toPng } from "html-to-image";
-import { useSettings } from "../hooks/useSettings";
+import { FiX, FiPrinter } from "react-icons/fi";
 import { formatPrice } from "../lib/format";
 import { useFocusTrap } from "../hooks/useFocusTrap";
-import { FiDownload } from "react-icons/fi";
+import { useSettings } from "../hooks/useSettings";
 
-export default function ReceiptModal({ sale, onClose }) {
+export default function ReceiptModal({ order, onClose }) {
   const trapRef = useFocusTrap(true);
-  const printRef = useRef(null);
-  const { storeName, storePhone, storeAddress, receiptFooter } = useSettings();
+  const receiptRef = useRef(null);
+  const { storeName } = useSettings();
 
-  if (!sale) return null;
-
-  const dateStr = sale.created_at
-    ? new Date(sale.created_at).toLocaleString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "";
-
-  async function handleDownload() {
-    if (!printRef.current) return;
-    try {
-      const dataUrl = await toPng(printRef.current, {
-        backgroundColor: "#ffffff",
-        pixelRatio: 2,
-      });
-      const link = document.createElement("a");
-      const date = new Date(sale.created_at).toLocaleDateString("en-GB").replace(/\//g, "-");
-      link.download = `${(storeName || "Keel-Shop").replace(/\s+/g, "-")}-receipt-${date}.png`;
-      link.href = dataUrl;
-      link.click();
-    } catch (err) {
-      console.error("Failed to download receipt:", err);
-    }
+  function handlePrint() {
+    const win = window.open("", "_blank");
+    if (!win) return;
+    win.document.write(`
+      <html><head><title>Receipt ${order.id}</title>
+      <style>
+        body { font-family: 'Courier New', monospace; font-size: 12px; color: #000; margin: 0; padding: 20px; }
+        .receipt { max-width: 320px; margin: 0 auto; }
+        h2 { text-align: center; font-size: 16px; margin-bottom: 4px; }
+        .center { text-align: center; color: #666; margin: 0 0 4px; }
+        hr { border: none; border-top: 1px dashed #666; margin: 12px 0; }
+        .meta { display: flex; justify-content: space-between; font-size: 11px; color: #666; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 4px 0; text-align: left; font-size: 11px; }
+        th { border-bottom: 1px solid #ccc; }
+        .total { text-align: right; font-weight: bold; font-size: 14px; margin-top: 8px; }
+        .footer { text-align: center; margin-top: 16px; font-size: 10px; color: #888; }
+      </style></head><body>
+      <div class="receipt">
+        <h2>${storeName || "Store"}</h2>
+        <p class="center">${new Date(order.created_at).toLocaleDateString()} ${new Date(order.created_at).toLocaleTimeString()}</p>
+        <p class="center">${order.id}</p>
+        <hr>
+        <div style="margin-bottom:8px"><strong>${order.customer.name}</strong><br/>${order.customer.phone}</div>
+        <table>
+          <tr><th>Item</th><th style="text-align:right">Qty</th><th style="text-align:right">Price</th></tr>
+          ${order.items.map((item) => `
+            <tr>
+              <td>${item.service_name}</td>
+              <td style="text-align:right">${item.quantity || 1}</td>
+              <td style="text-align:right">${formatPrice(item.line_total || item.service_price * (item.quantity || 1))}</td>
+            </tr>
+          `).join("")}
+        </table>
+        <hr>
+        <div class="total">Total: ${formatPrice(order.total)}</div>
+        <div style="text-align:right;font-size:11px;color:#666;margin-top:4px">Paid: ${order.payment_method || "Cash"}</div>
+        ${order.notes ? `<p style="font-size:11px;color:#666;margin-top:8px">${order.notes}</p>` : ""}
+        <hr>
+        <div class="footer">Thank you for your business!</div>
+      </div>
+      </body></html>
+    `);
+    win.document.close();
+    setTimeout(() => win.print(), 200);
   }
 
-  const line = "─".repeat(32);
-  const dash = "·".repeat(32);
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div
         ref={trapRef}
-        className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-6 w-full max-w-sm mx-4"
+        className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-100 dark:border-white/10 p-6 w-full max-w-sm mx-4"
         role="dialog"
         aria-modal="true"
-        aria-label="Sale receipt"
+        aria-label="Receipt"
       >
-        {/* Visible receipt — modern modal look */}
-        <div className="bg-white p-4 rounded-xl">
-          <div className="text-center mb-5">
-            <h2 className="text-slate-900 font-bold text-lg">
-              {storeName || "Keel Shop"}
-            </h2>
-            {storePhone && (
-              <p className="text-slate-600 text-xs">{storePhone}</p>
-            )}
-            {storeAddress && (
-              <p className="text-slate-600 text-xs">{storeAddress}</p>
-            )}
-            <div className="w-12 h-0.5 bg-blue-500/30 mx-auto mt-3" />
-          </div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-medium text-gray-800 dark:text-white">Receipt</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg" aria-label="Close"><FiX /></button>
+        </div>
 
-          <div className="text-sm space-y-2 mb-5">
-            <div className="flex justify-between">
-              <span className="text-slate-600">Item</span>
-              <span className="text-slate-900 font-semibold">{sale.product_name}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-600">Quantity</span>
-              <span className="text-slate-900">{sale.quantity}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-600">Method</span>
-              <span className="text-slate-900">{sale.method}</span>
-            </div>
-            <div className="border-t border-slate-200 pt-2 mt-2">
-              <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">Total</span>
-                <span className="text-blue-500 font-bold text-lg">
-                  {formatPrice(sale.amount)}
-                </span>
-              </div>
-            </div>
+        <div ref={receiptRef} className="bg-slate-50 dark:bg-[#1a1a2e] rounded-xl p-4 font-mono text-sm">
+          <h3 className="text-center text-base font-semibold text-gray-800 dark:text-white mb-1">{storeName || "Store"}</h3>
+          <p className="text-center text-[10px] text-gray-400 dark:text-slate-500">
+            {new Date(order.created_at).toLocaleDateString()} {new Date(order.created_at).toLocaleTimeString()}
+          </p>
+          <p className="text-center text-[10px] text-gray-400 dark:text-slate-500 mb-3">{order.id}</p>
+          <hr className="border-t border-dashed border-gray-300 dark:border-white/10 mb-3" />
+          <p className="text-gray-800 dark:text-white mb-2"><strong>{order.customer.name}</strong><br /><span className="text-[11px] text-gray-400">{order.customer.phone}</span></p>
+          <table className="w-full text-[11px]">
+            <thead>
+              <tr className="text-gray-400 dark:text-slate-500 border-b border-dashed border-gray-300 dark:border-white/10">
+                <th className="text-left pb-1">Item</th>
+                <th className="text-right pb-1">Qty</th>
+                <th className="text-right pb-1">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {order.items.map((item, i) => (
+                <tr key={i} className="text-gray-800 dark:text-white">
+                  <td className="py-1">{item.service_name}</td>
+                  <td className="text-right py-1">{item.quantity || 1}</td>
+                  <td className="text-right py-1">{formatPrice(item.line_total || item.service_price * (item.quantity || 1))}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <hr className="border-t border-dashed border-gray-300 dark:border-white/10 my-2" />
+          <div className="flex justify-between text-sm font-semibold text-gray-800 dark:text-white">
+            <span>Total</span>
+            <span>{formatPrice(order.total)}</span>
           </div>
-
-          {receiptFooter && (
-            <p className="text-center text-xs text-slate-400 mb-4">
-              {receiptFooter}
-            </p>
-          )}
+          <p className="text-[10px] text-gray-400 dark:text-slate-500 text-right mt-1">{order.payment_method || "Cash"}</p>
+          {order.notes && <p className="text-[10px] text-gray-400 dark:text-slate-500 mt-2">{order.notes}</p>}
+          <hr className="border-t border-dashed border-gray-300 dark:border-white/10 my-3" />
+          <p className="text-center text-[10px] text-gray-400 dark:text-slate-500">Thank you for your business!</p>
         </div>
 
         <div className="flex gap-2 mt-4">
-          <button
-            onClick={handleDownload}
-            className="flex-1 flex items-center justify-center gap-1.5 bg-blue-600 text-white text-sm py-2.5 rounded-xl hover:bg-blue-700 transition-colors"
-          >
-            <FiDownload size={14} />
-            Download
-          </button>
-          <button
-            onClick={onClose}
-            className="flex-1 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 text-sm py-2.5 rounded-xl hover:text-slate-900 dark:text-white transition-colors"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-
-      {/* Hidden thermal-receipt version for PNG download */}
-      <div className="fixed left-[-9999px] top-0">
-        <div
-          ref={printRef}
-          style={{
-            width: 320,
-            padding: "20px 16px",
-            backgroundColor: "#fff",
-            color: "#111",
-            fontFamily: "'Courier New', Courier, monospace",
-            fontSize: 13,
-            lineHeight: 1.6,
-          }}
-        >
-          <div style={{ textAlign: "center", marginBottom: 12 }}>
-            <div style={{ fontWeight: "bold", fontSize: 16, letterSpacing: 1 }}>
-              {storeName || "Keel Shop"}
-            </div>
-            {storePhone && (
-              <div style={{ fontSize: 11, color: "#555" }}>{storePhone}</div>
-            )}
-            {storeAddress && (
-              <div style={{ fontSize: 11, color: "#555" }}>{storeAddress}</div>
-            )}
-          </div>
-
-          <div style={{ textAlign: "center", fontSize: 10, color: "#888", marginBottom: 8 }}>
-            #{sale.id?.toString().slice(-6).toUpperCase() || "------"}
-          </div>
-
-          <div style={{ textAlign: "center", fontSize: 10, color: "#888", marginBottom: 12 }}>
-            {dateStr}
-          </div>
-
-          <div style={{ letterSpacing: 1, color: "#999", marginBottom: 8 }}>{dash}</div>
-
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
-            <span style={{ color: "#666", fontWeight: "bold" }}>ITEM</span>
-            <span style={{ color: "#666", fontWeight: "bold" }}>QTY</span>
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-            <span>{sale.product_name}</span>
-            <span>{sale.quantity}</span>
-          </div>
-
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
-            <span style={{ color: "#666" }}>Payment</span>
-            <span>{sale.method}</span>
-          </div>
-
-          <div style={{ letterSpacing: 1, color: "#999", margin: "10px 0" }}>{line}</div>
-
-          <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "bold", fontSize: 16, marginBottom: 12 }}>
-            <span>TOTAL</span>
-            <span>{formatPrice(sale.amount)}</span>
-          </div>
-
-          <div style={{ textAlign: "center", fontSize: 10, color: "#888", marginTop: 8 }}>
-            {receiptFooter || "Thank you for your purchase!"}
-          </div>
-
-          <div style={{ textAlign: "center", fontSize: 10, color: "#999", marginTop: 4 }}>
-            Powered by Keel
-          </div>
+          <button onClick={onClose} className="flex-1 border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 text-sm py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all">Close</button>
+          <button onClick={handlePrint} className="flex-1 bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2"><FiPrinter size={14} /> Print</button>
         </div>
       </div>
     </div>
