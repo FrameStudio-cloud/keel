@@ -155,7 +155,7 @@ export default function Features() {
         <div className="text-center mb-10">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">Everything your shop needs to run smarter</h1>
           <p className="text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto leading-relaxed">
-            Keel brings together the tools every small business actually needs — inventory, sales, service orders, reports, a website, and customer communication — in one place that works on your phone. No complexity, no hardware. Pricing from KSh 400/month.
+            Keel brings together the tools every small business actually needs — inventory, sales, service orders, reports, a website, and customer communication — in one place that works on your phone. No complexity, no hardware. Pricing from KSh 500/month.
           </p>
         </div>
 

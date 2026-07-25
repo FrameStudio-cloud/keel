@@ -19,11 +19,12 @@ import {
   FiPackage, FiTrendingUp,
   FiChevronDown, FiMail, FiPhone, FiInstagram, FiGithub,
   FiArrowRight, FiMenu, FiX, FiUserPlus, FiShield, FiCreditCard, FiMapPin,
-  FiMonitor, FiMessageSquare, FiHelpCircle, FiLayers, FiBriefcase, FiInfo, FiExternalLink
+  FiMonitor, FiMessageSquare, FiHelpCircle, FiLayers, FiBriefcase, FiInfo, FiExternalLink,
+  FiCheckCircle
 } from "react-icons/fi";
 
 const howItWorks = [
-  { icon: FiUserPlus, title: "Create Account", desc: "Sign up with your email and shop name. No credit card needed — start for free in under a minute." },
+  { icon: FiUserPlus, title: "Create Account", desc: "Sign up with your email and shop name. No credit card needed — start with a 7-day free trial in under a minute." },
   { icon: FiPackage, title: "Set Up Your Business", desc: "Choose your category — product or service — and add your products or services with prices and variants. Works for shops, salons, laundries, garages, and more." },
   { icon: FiTrendingUp, title: "Start Selling", desc: "Log sales, create service orders, print receipts, and track revenue in real time. Built-in reports show you exactly where your business stands." },
 ];
@@ -60,7 +61,7 @@ const testimonials = [
 
 const faqs = [
   { q: "What is Keel?", a: "Keel is a shop management dashboard for small businesses. It helps you track inventory, log sales, view reports, manage a website, and handle social media — all from one place." },
-  { q: "How much does it cost?", a: "Keel has two plans. Basic is KSh 400 per month and includes sales, inventory, service orders, expenses, customer management, stock alerts, and basic reports. Pro is KSh 1,200 per month and adds a live website, storefront, P&L charts, social media scheduler, WhatsApp bots, M-Pesa reconciliation, and more. No long-term contracts — cancel anytime." },
+  { q: "How much does it cost?", a: "Keel has two plans. Basic is KSh 500 per month and includes sales, inventory, service orders, expenses, customer management, stock alerts, and basic reports. Pro is KSh 1,000 per month and adds a live website, storefront, P&L charts, social media scheduler, WhatsApp bots, M-Pesa reconciliation, and more. No long-term contracts — cancel anytime." },
   { q: "Can I manage multiple shops?", a: "Yes. Each shop gets its own dashboard, inventory, and settings. Sign in once and switch between your shops easily." },
   { q: "Does Keel work for service businesses like salons, laundries, or repair shops?", a: "Yes. Keel has a dedicated service mode for 9 categories: laundry, salon & barber, automotive, photography, cleaning, and more. You get order management with status tracking (pending → in progress → ready → completed), a customer queue, weight-based billing, customer profiles with order history, and service-specific pricing (fixed, per-unit, or weight-based). Everything a product shop gets — expenses, reports, receipts — is also available for service businesses." },
   { q: "Do I get a real website with Keel?", a: "Yes. Keel generates a live website for your shop with a product catalogue, promotional banners, business info page, image gallery, and a WhatsApp chat widget. Add or update products in your dashboard and they appear on your site instantly — no coding needed." },
@@ -357,7 +358,10 @@ export default function Homepage() {
               whether you run a shop, salon, laundry, or garage, Keel keeps
               everything in one clean dashboard. No complexity, no clutter.
             </p>
-            <div className="hero-cta mt-10 flex flex-col sm:flex-row items-center lg:justify-start gap-4">
+            <div className="mt-6 inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-full px-4 py-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+              <FiCheckCircle size={12} /> 7 days free trial. No credit card.
+            </div>
+            <div className="hero-cta mt-6 flex flex-col sm:flex-row items-center lg:justify-start gap-4">
               <Link
                 to="/login"
                 className="w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
@@ -929,9 +933,10 @@ export default function Homepage() {
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col">
+          <div className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col relative">
+            <span className="absolute top-3 right-3 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full">7-day trial</span>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-500 mb-1">Basic</p>
-            <p className="text-3xl font-extrabold mb-1">KSh 400</p>
+            <p className="text-3xl font-extrabold mb-1">KSh 500</p>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">per month</p>
             <ul className="space-y-3 text-sm flex-1">
               <li className="flex items-start gap-2 text-slate-700 dark:text-slate-300">
@@ -966,8 +971,9 @@ export default function Homepage() {
           </div>
           <div className="bg-blue-600 dark:bg-blue-700 border border-blue-500 rounded-2xl p-6 sm:p-8 flex flex-col relative">
             <span className="absolute top-0 right-6 -translate-y-1/2 bg-white text-blue-600 text-xs font-bold px-3 py-1 rounded-full shadow-md">Popular</span>
+            <span className="absolute top-10 right-6 bg-emerald-300/20 text-emerald-100 text-[10px] font-bold px-2 py-0.5 rounded-full">7-day trial</span>
             <p className="text-xs font-semibold uppercase tracking-wider text-blue-200 mb-1">Pro</p>
-            <p className="text-3xl font-extrabold text-white mb-1">KSh 1,200</p>
+            <p className="text-3xl font-extrabold text-white mb-1">KSh 1,000</p>
             <p className="text-sm text-blue-200 mb-6">per month</p>
             <ul className="space-y-3 text-sm flex-1">
               <li className="flex items-start gap-2 text-white">
