@@ -30,6 +30,7 @@ export default function SettingsProvider({ children }) {
     businessCategory: "general",
     categoryChangedAt: null,
     subscriptionExpiresAt: null,
+    lockedAt: null,
     scheduledDeletionAt: null,
     notificationPreferences: DEFAULT_NOTIF_PREFS,
     onboardingProgress: DEFAULT_PROGRESS,
@@ -46,7 +47,7 @@ export default function SettingsProvider({ children }) {
 
       const { data: shop } = await supabase
         .from("shops")
-        .select("business_category, subscription_expires_at, scheduled_deletion_at, category_changed_at, onboarding_progress")
+        .select("business_category, subscription_expires_at, scheduled_deletion_at, locked_at, category_changed_at, onboarding_progress")
         .eq("id", shopId)
         .maybeSingle();
 
@@ -94,6 +95,7 @@ export default function SettingsProvider({ children }) {
           businessCategory: shop?.business_category || "general",
           categoryChangedAt: shop?.category_changed_at || null,
           subscriptionExpiresAt: shop?.subscription_expires_at || null,
+          lockedAt: shop?.locked_at || null,
           scheduledDeletionAt: shop?.scheduled_deletion_at || null,
           planTier,
           onboardingProgress: shop?.onboarding_progress || DEFAULT_PROGRESS,
@@ -110,6 +112,7 @@ export default function SettingsProvider({ children }) {
           businessCategory: shop?.business_category || "general",
           categoryChangedAt: shop?.category_changed_at || null,
           subscriptionExpiresAt: shop?.subscription_expires_at || null,
+          lockedAt: shop?.locked_at || null,
           scheduledDeletionAt: shop?.scheduled_deletion_at || null,
           planTier,
           loading: false,

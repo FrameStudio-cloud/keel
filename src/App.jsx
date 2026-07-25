@@ -59,12 +59,12 @@ function Loading() {
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useContext(AuthContext);
-  const { subscriptionExpiresAt, loading: settingsLoading } = useSettings();
+  const { subscriptionExpiresAt, lockedAt, loading: settingsLoading } = useSettings();
 
   if (loading || settingsLoading) return <Loading />;
   if (!user) return <Navigate to="/login" replace />;
 
-  if (subscriptionExpiresAt && new Date(subscriptionExpiresAt) < new Date()) {
+  if (lockedAt || (subscriptionExpiresAt && new Date(subscriptionExpiresAt) < new Date())) {
     return <LockoutScreen />;
   }
 

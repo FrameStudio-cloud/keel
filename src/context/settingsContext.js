@@ -25,6 +25,7 @@ export const SettingsContext = createContext({
   businessHours: null,
   businessCategory: "general",
   subscriptionExpiresAt: null,
+  lockedAt: null,
   scheduledDeletionAt: null,
   planTier: "free",
   notificationPreferences: DEFAULT_NOTIF_PREFS,
