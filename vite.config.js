@@ -20,6 +20,7 @@ export default defineConfig(({ mode }) => {
       },
     ],
     build: {
+      minify: "esbuild",
       rollupOptions: {
         output: {
           manualChunks(id) {
