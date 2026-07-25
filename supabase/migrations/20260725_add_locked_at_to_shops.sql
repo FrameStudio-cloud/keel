@@ -1,1 +1,0 @@
-ALTER TABLE public.shops ADD COLUMN IF NOT EXISTS locked_at timestamptz;
