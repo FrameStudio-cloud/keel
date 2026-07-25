@@ -17,6 +17,7 @@ export default function ChatWidgetTab() {
   const { whatsapp } = useSettings();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [shopId, setShopId] = useState(null);
   const { showToast } = useToast();
 
   const [config, setConfig] = useState({
@@ -93,7 +94,7 @@ export default function ChatWidgetTab() {
       setLoading(false);
     })();
     return () => { cancelled = true; };
-  }, [whatsapp]);
+  }, [whatsapp, showToast]);
 
   useEffect(() => {
     let cancelled = false;
@@ -120,7 +121,7 @@ export default function ChatWidgetTab() {
       }
     })();
     return () => { cancelled = true; };
-  }, [shopId, msgPage, answeredPage, msgTab]);
+  }, [shopId, msgPage, answeredPage, msgTab, showToast]);
 
   async function saveConfig() {
     if (!shopId) return;

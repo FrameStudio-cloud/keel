@@ -24,8 +24,8 @@ export default function Storefront() {
   const [pendingSubdomain, setPendingSubdomain] = useState("");
   const [pendingSections, setPendingSections] = useState(null);
   const [pendingShopId, setPendingShopId] = useState(null);
-  const [loadingExisting, setLoadingExisting] = useState(true);
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [, setLoadingExisting] = useState(true);
+  const [, setDeleteLoading] = useState(false);
   const [redeploying, setRedeploying] = useState(false);
   const [redeployMessage, setRedeployMessage] = useState("");
   const [stats, setStats] = useState(null);
@@ -54,7 +54,7 @@ export default function Storefront() {
       } catch {
         // provisioner not reachable
       } finally {
-        setLoadingExisting(false);
+        setLoadingExisting(false)
       }
     })();
   }, []);
@@ -107,14 +107,14 @@ export default function Storefront() {
   async function handleDelete() {
     const shopId = await getShopId();
     if (!shopId) return;
-    setDeleteLoading(true);
+    setDeleteLoading(true)
     try {
       await fetch(`${PROVISIONER_URL}/delete/${shopId}`, { method: "DELETE" });
     } catch {
       // best-effort
     }
     setDeployment(null);
-    setDeleteLoading(false);
+    setDeleteLoading(false)
   }
 
   async function handleRedeploy() {

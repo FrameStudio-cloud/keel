@@ -1,5 +1,4 @@
 import { supabase } from "./supabase";
-import { withShop } from "./shop";
 
 const QUEUE_KEY = "keel_write_queue";
 const MAX_RETRIES = 5;
@@ -28,7 +27,7 @@ export function getPendingWrites() {
 function emitEvent(name, detail) {
   try {
     window.dispatchEvent(new CustomEvent(`writeQueue:${name}`, { detail }));
-  } catch {}
+  } catch { /* empty */ }
 }
 
 export function enqueueWrite(item) {

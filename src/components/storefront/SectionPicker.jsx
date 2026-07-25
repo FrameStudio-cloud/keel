@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FiCheck, FiChevronLeft, FiChevronRight, FiExternalLink, FiPackage, FiLayout, FiGrid, FiImage, FiMail, FiSliders } from "react-icons/fi";
+import { FiCheck, FiChevronLeft, FiChevronRight, FiExternalLink, FiPackage } from "react-icons/fi";
 import StepNavbar from "./sections/StepNavbar";
 import StepHero from "./sections/StepHero";
 import StepCatalogue from "./sections/StepCatalogue";
@@ -7,15 +7,12 @@ import StepFooter from "./sections/StepFooter";
 import StepExtras from "./sections/StepExtras";
 import { STEPS_CONFIG, SECTION_OPTIONS, getDefaultBlueprint } from "../../data/storefrontBlueprints";
 
-const STEP_ICONS = [FiLayout, FiImage, FiGrid, FiMail, FiSliders];
-
 function StepIndicator({ steps, current }) {
   return (
     <div className="flex items-center gap-0 sm:gap-1">
       {steps.map((step, i) => {
         const isDone = i < current;
         const isActive = i === current;
-        const Icon = STEP_ICONS[i] || FiPackage;
         return (
           <div key={step.key} className="flex items-center gap-0 sm:gap-1 flex-1 sm:flex-none">
             <div className={`flex items-center gap-1.5 sm:gap-2 px-1 sm:px-2 py-1 rounded-lg transition-colors ${
@@ -79,7 +76,6 @@ export default function SectionPicker({ templateType, onDeploy, onBack }) {
   }
 
   const currentStep = STEPS_CONFIG[step];
-  const canProceed = step >= STEPS_CONFIG.length;
 
   // Check if current step has a selection (skip for extras step which uses toggles)
   const hasSelection = step >= STEPS_CONFIG.length - 1 || !!blueprint[currentStep?.key];
@@ -166,7 +162,7 @@ export default function SectionPicker({ templateType, onDeploy, onBack }) {
 
 function DeployReview({ blueprint }) {
   const OPTION_LABELS = {};
-  for (const [group, options] of Object.entries(SECTION_OPTIONS)) {
+  for (const [, options] of Object.entries(SECTION_OPTIONS)) {
     for (const opt of options) {
       OPTION_LABELS[opt.id] = opt.name;
     }

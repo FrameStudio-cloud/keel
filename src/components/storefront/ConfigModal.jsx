@@ -20,22 +20,24 @@ export default function ConfigModal({ onClose, onDeploy, templateId }) {
 
   useEffect(() => {
     if (checkId.current) clearTimeout(checkId.current);
-    if (sanitized.length < 3) {
+    checkId.current = setTimeout(() => {
+      if (sanitized.length < 3) {
+        setAvailability(null);
+        setChecking(false);
+        return;
+      }
+      setChecking(true);
       setAvailability(null);
-      setChecking(false);
-      return;
-    }
-    setChecking(true);
-    setAvailability(null);
-    checkId.current = setTimeout(async () => {
-      const { data } = await supabase
-        .from("storefront_deployments")
-        .select("id")
-        .eq("subdomain", sanitized)
-        .maybeSingle();
-      setAvailability(!data);
-      setChecking(false);
-    }, 500);
+      (async () => {
+        const { data } = await supabase
+          .from("storefront_deployments")
+          .select("id")
+          .eq("subdomain", sanitized)
+          .maybeSingle();
+        setAvailability(!data);
+        setChecking(false);
+      })();
+    }, sanitized.length < 3 ? 0 : 500);
     return () => {
       if (checkId.current) clearTimeout(checkId.current);
     };

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
 import ContextTip from "../components/ContextTip";
@@ -25,7 +25,7 @@ export default function Reports() {
   const [pnlData, setPnlData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  async function fetchProfitMargins() {
+  const fetchProfitMargins = useCallback(async () => {
     const shopId = await getShopId();
     if (!shopId) return [];
     if (isService) {
@@ -33,9 +33,9 @@ export default function Reports() {
     }
     const { data } = await supabase.rpc("get_profit_margins", { p_shop_id: shopId });
     return data || [];
-  }
+  }, [isService]);
 
-  async function fetchPnl(range) {
+  const fetchPnl = useCallback(async (range) => {
     const shopId = await getShopId();
     if (!shopId) return;
 
@@ -155,7 +155,7 @@ export default function Reports() {
         profit: dayTotals[label] - expenseTotals[label],
       }))
     );
-  }
+  }, [isService]);
 
   useEffect(() => {
     let cancelled = false;
@@ -167,7 +167,7 @@ export default function Reports() {
       if (!cancelled) setLoading(false);
     })();
     return () => { cancelled = true; };
-  }, [timeRange]);
+  }, [timeRange, fetchProfitMargins, fetchPnl]);
 
   function exportCSV(data, filename, columns) {
     const header = columns.map((c) => c.label).join(",");

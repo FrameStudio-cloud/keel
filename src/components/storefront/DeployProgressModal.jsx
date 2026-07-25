@@ -114,7 +114,7 @@ export default function DeployProgressModal({
     })();
 
     return () => { cancelled = true; };
-  }, [subdomain, templateId, shopIdProp]);
+  }, [subdomain, templateId, shopIdProp, sections]);
 
   const displayUrl = `https://${result?.domain || `${subdomain}.keel.framestudio.co.ke`}`;
 

@@ -24,6 +24,7 @@ export function parseCSV(csvText) {
       current = [];
       field = "";
     } else if (ch === "\r") {
+      continue;
     } else {
       field += ch;
     }
@@ -168,6 +169,7 @@ export function matchTransactions(sales, transactions) {
 
   for (const tx of transactions) {
     if (!tx._matched) {
+      // eslint-disable-next-line no-unused-vars
       const { _matched, ...rest } = tx;
       unmatchedMpesa.push(rest);
     }

@@ -44,16 +44,19 @@ export default function BusinessTab() {
 
   useEffect(() => {
     if (settings.loading) return;
-    setForm({
-      email: settings.email || "",
-      description: settings.description || "",
-      instagram: settings.instagram || "",
-      facebook: settings.facebook || "",
-      tiktok: settings.tiktok || "",
-      logo_url: settings.logoUrl || null,
-    });
-    setLogoFile(null);
-    setHours(hoursFromSettings(settings.businessHours));
+    const timer = setTimeout(() => {
+      setForm({
+        email: settings.email || "",
+        description: settings.description || "",
+        instagram: settings.instagram || "",
+        facebook: settings.facebook || "",
+        tiktok: settings.tiktok || "",
+        logo_url: settings.logoUrl || null,
+      });
+      setLogoFile(null);
+      setHours(hoursFromSettings(settings.businessHours));
+    }, 0);
+    return () => clearTimeout(timer);
   }, [settings]);
 
   function updateHour(key, field, value) {

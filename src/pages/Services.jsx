@@ -9,7 +9,7 @@ import { useToast } from "../context/ToastProvider";
 import { useSettings } from "../hooks/useSettings";
 import { formatPrice } from "../lib/format";
 import { pricingModeLabels } from "../lib/defaultServices";
-import { fetchServices, seedDefaultServices, createService, updateService, deleteService } from "../lib/serviceData";
+import { seedDefaultServices, createService, updateService, deleteService } from "../lib/serviceData";
 import { useDebounce } from "../hooks/useDebounce";
 
 export default function Services() {

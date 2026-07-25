@@ -3,7 +3,7 @@ import { FiClock, FiShare2, FiExternalLink, FiSave, FiEdit3, FiCheckCircle } fro
 import Badge from "../Badge";
 import { useSettings } from "../../hooks/useSettings";
 import { supabase } from "../../lib/supabase";
-import { getShopId, withShop } from "../../lib/shop";
+import { withShop } from "../../lib/shop";
 
 const PLATFORM_STYLES = {
   Instagram: "border-l-pink-500",
@@ -48,7 +48,6 @@ export default function PostCard({ post, onEdit, onSaveAsTemplate, onMarkPublish
   const typeLabel = POST_TYPE_LABELS[post.post_type];
 
   async function saveEngagement() {
-    const shopId = await getShopId();
     await supabase.from("posts").update(withShop({
       likes: engagement.likes,
       comments: engagement.comments,

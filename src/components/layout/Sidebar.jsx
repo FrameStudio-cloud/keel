@@ -62,9 +62,10 @@ export default function Sidebar({ open, onClose }) {
   }, []);
 
   useEffect(() => {
+    const nav = navRef.current;
     return () => {
-      if (navRef.current) {
-        sessionStorage.setItem("sidebarScroll", navRef.current.scrollTop);
+      if (nav) {
+        sessionStorage.setItem("sidebarScroll", nav.scrollTop);
       }
     };
   }, []);

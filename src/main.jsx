@@ -14,11 +14,13 @@ if ('serviceWorker' in navigator) {
   })
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 function PostHogInit() {
   useEffect(() => { initPostHog() }, [])
   return null
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 function QueueInit() {
   useEffect(() => { processQueue() }, [])
   return null

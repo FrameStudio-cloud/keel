@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { FiCheck, FiX, FiSend, FiClock } from "react-icons/fi";
+import { FiCheck, FiSend, FiClock } from "react-icons/fi";
 import { getShopId } from "../../lib/shop";
 import { supabase } from "../../lib/supabase";
 import Skeleton from "../Skeleton";
 
-export default function BroadcastList({ onRefresh }) {
+export default function BroadcastList() {
   const [broadcasts, setBroadcasts] = useState([]);
   const [loading, setLoading] = useState(true);
 

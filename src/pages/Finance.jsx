@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "../components/layout/PageLayout";
 import StatCard from "../components/StatCard";
@@ -101,7 +101,7 @@ export default function Finance() {
       }
       setLoading(false);
     })();
-  }, [refreshKey]);
+  }, [refreshKey, isService]);
 
   async function handleAddExpense() {
     if (!expenseForm.description || !expenseForm.amount) return;
@@ -485,7 +485,7 @@ export default function Finance() {
                   </tr>
                 </thead>
                 <tbody>
-                  {historyData.map((tx, i) => (
+                  {historyData.map((tx) => (
                     <tr key={tx.id} className="border-b border-gray-50 dark:border-white/5">
                       <td className="px-3 py-2 text-gray-800 dark:text-white font-mono">{tx.receipt_no}</td>
                       <td className="px-3 py-2 text-right text-gray-800 dark:text-white font-medium">{formatPrice(tx.amount)}</td>

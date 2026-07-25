@@ -3,6 +3,7 @@ import { supabase, getPersistedSession, saveSession, authLogin, authLogout, pars
 import { clearShopId } from "../lib/shop";
 import posthog from "../lib/posthog";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext({
   user: null,
   session: null,

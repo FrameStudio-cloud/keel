@@ -30,7 +30,7 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState("about");
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [memberSince, setMemberSince] = useState(null);
-  const { showToast } = useToast();
+  useToast();
 
   useEffect(() => {
     if (settings.loading) return;

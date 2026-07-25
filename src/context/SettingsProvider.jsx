@@ -125,7 +125,10 @@ export default function SettingsProvider({ children }) {
   };
 
   useEffect(() => {
-    fetchSettings();
+    const timer = setTimeout(() => {
+      fetchSettings();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [user]);
 
   useEffect(() => {

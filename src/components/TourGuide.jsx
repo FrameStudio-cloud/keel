@@ -66,16 +66,9 @@ export default function TourGuide() {
       window.removeEventListener("resize", reposition);
       window.removeEventListener("scroll", reposition, { capture: true, passive: true });
     };
-  }, [step, visible, loading]);
+  }, [step, visible, loading, reposition]);
 
-  const dismiss = useCallback(async () => {
-    await setOnboardingProgress({ quickstart_dismissed: true });
-    setVisible(false);
-  }, []);
-
-  if (loading) return null;
-
-  function reposition(retriesLeft = MAX_RETRIES) {
+  const reposition = useCallback(function reposition(retriesLeft = MAX_RETRIES) {
     const current = steps[step];
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
@@ -117,7 +110,14 @@ export default function TourGuide() {
       const arrowLeft = Math.max(8, Math.min(targetCenter - left - 8, tw - 16));
       setPos({ top: `${top}px`, left: `${left}px`, side, arrowLeft });
     });
-  }
+  }, [step]);
+
+  const dismiss = useCallback(async () => {
+    await setOnboardingProgress({ quickstart_dismissed: true });
+    setVisible(false);
+  }, []);
+
+  if (loading) return null;
 
   async function next() {
     if (step < steps.length - 1) {

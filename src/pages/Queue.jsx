@@ -42,7 +42,6 @@ export default function Queue() {
   const [presetCaption, setPresetCaption] = useState("");
   const [presetDate, setPresetDate] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
-  const [saveTemplatePost, setSaveTemplatePost] = useState(null);
 
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
@@ -153,11 +152,6 @@ export default function Queue() {
     setShowComposer(true);
   }
 
-  function handleSaveAsTemplate(post) {
-    setSaveTemplatePost(post);
-    setActiveTab("templates");
-  }
-
   if (!isFeatureAccessible("social", planTier)) {
     return (
       <PageLayout title="Queue">
@@ -265,7 +259,6 @@ export default function Queue() {
                     setEditPost(post);
                     setShowComposer(true);
                   }}
-                  onSaveAsTemplate={handleSaveAsTemplate}
                   onMarkPublished={handleMarkPublished}
                 />
               ))}
