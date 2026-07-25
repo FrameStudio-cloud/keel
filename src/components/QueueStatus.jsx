@@ -34,9 +34,9 @@ export default function QueueStatus() {
   }
 
   useEffect(() => {
-    refresh();
+    const timer = setTimeout(() => refresh(), 0);
     const interval = setInterval(refresh, 3000);
-    return () => clearInterval(interval);
+    return () => { clearTimeout(timer); clearInterval(interval); };
   }, []);
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export default function QueueStatus() {
       window.removeEventListener("writeQueue:failed", onFailed);
       window.removeEventListener("writeQueue:retrying", onRetrying);
     };
-  }, []);
+  }, [showToast]);
 
   useEffect(() => {
     function onClick(e) {

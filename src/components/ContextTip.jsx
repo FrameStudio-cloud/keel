@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { FiX, FiArrowRight } from "react-icons/fi";
 import { markTipSeen } from "../lib/onboarding";
 import { supabase } from "../lib/supabase";
@@ -34,11 +34,22 @@ export default function ContextTip({ tipKey, targetSelector, title, children }) 
     return () => { mounted = false; };
   }, [tipKey]);
 
+  const handleDismiss = useCallback(async (e) => {
+    if (e) e.preventDefault();
+    if (dismissedRef.current) return;
+    dismissedRef.current = true;
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setDismissed(true);
+    await markTipSeen(tipKey);
+  }, [tipKey]);
+
   useEffect(() => {
     if (dismissed || loading) return;
     const targetEl = targetSelector ? document.querySelector(targetSelector) : null;
     if (!targetEl) {
-      setPos({ top: 16, left: 16, side: "bottom" });
+      requestAnimationFrame(() => {
+        setPos({ top: 16, left: 16, side: "bottom" });
+      });
       return;
     }
 
@@ -92,16 +103,7 @@ export default function ContextTip({ tipKey, targetSelector, title, children }) 
     if (dismissed || loading) return;
     timerRef.current = setTimeout(() => handleDismiss(), 8000);
     return () => clearTimeout(timerRef.current);
-  }, [dismissed, loading]);
-
-  async function handleDismiss(e) {
-    if (e) e.preventDefault();
-    if (dismissedRef.current) return;
-    dismissedRef.current = true;
-    if (timerRef.current) clearTimeout(timerRef.current);
-    setDismissed(true);
-    await markTipSeen(tipKey);
-  }
+  }, [dismissed, loading, handleDismiss]);
 
   if (loading) return null;
   if (dismissed) return null;

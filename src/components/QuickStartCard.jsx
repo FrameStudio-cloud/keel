@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FiCheckCircle, FiCircle, FiArrowRight, FiX } from "react-icons/fi";
 import { markMilestone, markTipSeen } from "../lib/onboarding";
@@ -31,10 +31,9 @@ export default function QuickStartCard() {
   const [milestones, setMilestones] = useState({});
   const [syncing, setSyncing] = useState(true);
   const [tourDone, setTourDone] = useState(false);
-  const readyAt = useRef(null);
+  const [allDoneAutoDismissed, setAllDoneAutoDismissed] = useState(false);
 
   useEffect(() => {
-    readyAt.current = Date.now();
     let mounted = true;
     (async () => {
       const shopId = await getShopId();
@@ -71,15 +70,22 @@ export default function QuickStartCard() {
     return () => { mounted = false; };
   }, []);
 
+  const allDone = MILESTONES.every((m) => milestones[m.key]);
+
+  useEffect(() => {
+    if (allDone && !syncing) {
+      const timer = setTimeout(() => setAllDoneAutoDismissed(true), MIN_VISIBLE_MS);
+      return () => clearTimeout(timer);
+    }
+    const timer = setTimeout(() => setAllDoneAutoDismissed(false), 0);
+    return () => clearTimeout(timer);
+  }, [allDone, syncing]);
+
   if (loading) return null;
   if (dismissed) return null;
   if (!tourDone) return null;
+  if (allDone && allDoneAutoDismissed) return null;
 
-  const allDone = MILESTONES.every((m) => milestones[m.key]);
-  if (allDone && !syncing) {
-    const elapsed = Date.now() - (readyAt.current || 0);
-    if (elapsed > MIN_VISIBLE_MS) return null;
-  }
 
   const doneCount = MILESTONES.filter((m) => milestones[m.key]).length;
 
