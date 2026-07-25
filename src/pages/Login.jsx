@@ -53,7 +53,7 @@ export default function Login() {
 
           const { data: shopData, error: shopError } = await supabase
             .from("shops")
-            .insert({ name: shopName, slug, business_category: "general", subscription_expires_at: new Date(Date.now() + 30 * 86400000).toISOString() })
+            .insert({ name: shopName, slug, business_category: "general", subscription_expires_at: new Date(Date.now() + 7 * 86400000).toISOString() })
             .select("id")
             .single();
           if (shopError) throw shopError;

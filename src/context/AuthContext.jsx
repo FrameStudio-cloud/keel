@@ -153,7 +153,7 @@ export default function AuthProvider({ children }) {
 
     const { data: shopData, error: shopError } = await supabase
       .from("shops")
-      .insert({ name: displayName, slug, business_category: "general", setup_completed_at: null, subscription_expires_at: new Date(Date.now() + 30 * 86400000).toISOString() })
+      .insert({ name: displayName, slug, business_category: "general", setup_completed_at: null, subscription_expires_at: new Date(Date.now() + 7 * 86400000).toISOString() })
       .select("id")
       .single();
 

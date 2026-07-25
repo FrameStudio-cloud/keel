@@ -9,6 +9,10 @@ export default function ReceiptModal({ order, onClose }) {
   const receiptRef = useRef(null);
   const { storeName } = useSettings();
 
+  const customer = order.customer || { name: "", phone: "" };
+  const items = order.items || [{ service_name: order.product_name, quantity: order.quantity || 1, line_total: order.amount || order.total || 0 }];
+  const total = order.total || order.amount || 0;
+
   function handlePrint() {
     const win = window.open("", "_blank");
     if (!win) return;
@@ -32,10 +36,10 @@ export default function ReceiptModal({ order, onClose }) {
         <p class="center">${new Date(order.created_at).toLocaleDateString()} ${new Date(order.created_at).toLocaleTimeString()}</p>
         <p class="center">${order.id}</p>
         <hr>
-        <div style="margin-bottom:8px"><strong>${order.customer.name}</strong><br/>${order.customer.phone}</div>
+        <div style="margin-bottom:8px"><strong>${customer.name}</strong><br/>${customer.phone}</div>
         <table>
           <tr><th>Item</th><th style="text-align:right">Qty</th><th style="text-align:right">Price</th></tr>
-          ${order.items.map((item) => `
+          ${items.map((item) => `
             <tr>
               <td>${item.service_name}</td>
               <td style="text-align:right">${item.quantity || 1}</td>
@@ -44,8 +48,8 @@ export default function ReceiptModal({ order, onClose }) {
           `).join("")}
         </table>
         <hr>
-        <div class="total">Total: ${formatPrice(order.total)}</div>
-        <div style="text-align:right;font-size:11px;color:#666;margin-top:4px">Paid: ${order.payment_method || "Cash"}</div>
+        <div class="total">Total: ${formatPrice(total)}</div>
+        <div style="text-align:right;font-size:11px;color:#666;margin-top:4px">Paid: ${order.payment_method || order.method || "Cash"}</div>
         ${order.notes ? `<p style="font-size:11px;color:#666;margin-top:8px">${order.notes}</p>` : ""}
         <hr>
         <div class="footer">Thank you for your business!</div>
@@ -77,7 +81,7 @@ export default function ReceiptModal({ order, onClose }) {
           </p>
           <p className="text-center text-[10px] text-gray-400 dark:text-slate-500 mb-3">{order.id}</p>
           <hr className="border-t border-dashed border-gray-300 dark:border-white/10 mb-3" />
-          <p className="text-gray-800 dark:text-white mb-2"><strong>{order.customer.name}</strong><br /><span className="text-[11px] text-gray-400">{order.customer.phone}</span></p>
+          {customer.name && <p className="text-gray-800 dark:text-white mb-2"><strong>{customer.name}</strong><br /><span className="text-[11px] text-gray-400">{customer.phone}</span></p>}
           <table className="w-full text-[11px]">
             <thead>
               <tr className="text-gray-400 dark:text-slate-500 border-b border-dashed border-gray-300 dark:border-white/10">
@@ -87,7 +91,7 @@ export default function ReceiptModal({ order, onClose }) {
               </tr>
             </thead>
             <tbody>
-              {order.items.map((item, i) => (
+              {items.map((item, i) => (
                 <tr key={i} className="text-gray-800 dark:text-white">
                   <td className="py-1">{item.service_name}</td>
                   <td className="text-right py-1">{item.quantity || 1}</td>
@@ -99,9 +103,9 @@ export default function ReceiptModal({ order, onClose }) {
           <hr className="border-t border-dashed border-gray-300 dark:border-white/10 my-2" />
           <div className="flex justify-between text-sm font-semibold text-gray-800 dark:text-white">
             <span>Total</span>
-            <span>{formatPrice(order.total)}</span>
+            <span>{formatPrice(total)}</span>
           </div>
-          <p className="text-[10px] text-gray-400 dark:text-slate-500 text-right mt-1">{order.payment_method || "Cash"}</p>
+          <p className="text-[10px] text-gray-400 dark:text-slate-500 text-right mt-1">{order.payment_method || order.method || "Cash"}</p>
           {order.notes && <p className="text-[10px] text-gray-400 dark:text-slate-500 mt-2">{order.notes}</p>}
           <hr className="border-t border-dashed border-gray-300 dark:border-white/10 my-3" />
           <p className="text-center text-[10px] text-gray-400 dark:text-slate-500">Thank you for your business!</p>

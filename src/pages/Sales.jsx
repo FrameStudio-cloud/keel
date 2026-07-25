@@ -222,7 +222,7 @@ export default function Sales() {
 
       {receiptSale && (
         <ReceiptModal
-          sale={receiptSale}
+          order={receiptSale}
           onClose={() => setReceiptSale(null)}
         />
       )}
