@@ -56,18 +56,6 @@ export default function TourGuide() {
     return () => { mounted = false; };
   }, []);
 
-  useEffect(() => {
-    if (!visible || loading) return;
-    reposition();
-    window.addEventListener("resize", reposition);
-    window.addEventListener("scroll", reposition, { capture: true, passive: true });
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      window.removeEventListener("resize", reposition);
-      window.removeEventListener("scroll", reposition, { capture: true, passive: true });
-    };
-  }, [step, visible, loading, reposition]);
-
   const reposition = useCallback(function reposition(retriesLeft = MAX_RETRIES) {
     const current = steps[step];
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -111,6 +99,18 @@ export default function TourGuide() {
       setPos({ top: `${top}px`, left: `${left}px`, side, arrowLeft });
     });
   }, [step]);
+
+  useEffect(() => {
+    if (!visible || loading) return;
+    reposition();
+    window.addEventListener("resize", reposition);
+    window.addEventListener("scroll", reposition, { capture: true, passive: true });
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      window.removeEventListener("resize", reposition);
+      window.removeEventListener("scroll", reposition, { capture: true, passive: true });
+    };
+  }, [step, visible, loading, reposition]);
 
   const dismiss = useCallback(async () => {
     await setOnboardingProgress({ quickstart_dismissed: true });
