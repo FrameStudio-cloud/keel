@@ -1096,6 +1096,13 @@ export default function Homepage() {
                 Help
               </Link>
               <Link
+                to="/privacy"
+                className="inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >
+                <FiShield size={12} />
+                Privacy
+              </Link>
+              <Link
                 to="/blog"
                 className="inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >

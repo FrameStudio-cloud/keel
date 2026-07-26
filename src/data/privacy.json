@@ -1,0 +1,67 @@
+[
+  [
+    "## Information We Collect",
+    "",
+    "We collect information you provide when using Keel: store settings, product inventory, sales records, expenses, customer names and phone numbers, service order details, and communication preferences.",
+    "",
+    "When you connect Google Calendar, we access your calendar events solely to create, update, and delete service appointment events as you direct through the app.",
+    "",
+    "We also collect basic usage data such as page views and browser information to improve the service."
+  ],
+  [
+    "## How We Use Your Information",
+    "",
+    "Your data is used to:",
+    "",
+    "- Operate and maintain the Keel dashboard (inventory, sales, expenses, reports)",
+    "- Sync service appointments to your Google Calendar when you choose to",
+    "- Improve and troubleshoot the application",
+    "- Communicate with you about your account and subscription"
+  ],
+  [
+    "## Google Calendar Data",
+    "",
+    "Keel integrates with Google Calendar only on Pro plans and only with your explicit consent via OAuth. We:",
+    "",
+    "- Create calendar events for scheduled service orders when you toggle calendar sync",
+    "- Update or delete events when you modify or cancel orders",
+    "- Store your access and refresh tokens securely to maintain the connection",
+    "- Never share your calendar data with third parties",
+    "- Never use your calendar data for advertising or training AI models",
+    "",
+    "You can disconnect Google Calendar at any time from Settings → Integrations. Disconnecting revokes our access tokens."
+  ],
+  [
+    "## Data Sharing",
+    "",
+    "We do not sell your personal data. We may share data with service providers (Supabase for database hosting, Vercel for hosting, Paystack for payment processing) who are contractually bound to protect it. We may disclose data if required by law."
+  ],
+  [
+    "## Data Retention",
+    "",
+    "We retain your data for as long as your account is active. When you delete your account, we delete your data within 30 days. Google Calendar events you created through Keel remain in your Google Calendar after disconnection and must be removed manually."
+  ],
+  [
+    "## Security",
+    "",
+    "We use encryption in transit (TLS) and at rest. Access tokens are stored in your Supabase project database with row-level security. We follow industry practices to protect your information."
+  ],
+  [
+    "## Your Rights",
+    "",
+    "You can access, update, export, or delete your data at any time through the Keel dashboard (Settings → Data tab). You can disconnect third-party integrations (Google Calendar) from Settings → Integrations."
+  ],
+  [
+    "## Contact",
+    "",
+    "For questions about this policy: support@framestudio.co.ke",
+    "",
+    "Framestudio",
+    "Nairobi, Kenya"
+  ],
+  [
+    "## Changes",
+    "",
+    "We may update this policy. Changes will be posted to this URL."
+  ]
+]

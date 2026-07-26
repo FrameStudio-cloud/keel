@@ -45,6 +45,7 @@ const Marketing = lazy(() => import("./pages/Marketing"));
 const Storefront = lazy(() => import("./pages/Storefront"));
 const PublicProduct = lazy(() => import("./pages/PublicProduct"));
 const Terms = lazy(() => import("./pages/Terms"));
+const Privacy = lazy(() => import("./pages/Privacy"));
 const UseCases = lazy(() => import("./pages/UseCases"));
 const AboutFramestudio = lazy(() => import("./pages/AboutFramestudio"));
 const Features = lazy(() => import("./pages/Features"));
@@ -105,6 +106,7 @@ function AppRoutes() {
       <TourGuide />
       <Routes>
         <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/use-cases" element={<UseCases />} />
         <Route path="/about" element={<AboutFramestudio />} />
         <Route path="/features" element={<Features />} />

@@ -144,7 +144,7 @@ export default function Features() {
         <meta name="description" content="Explore all 12 features of Keel — inventory management, barcode scanning, sales logging, profit reports, expense tracking, website builder, WhatsApp bots, and more." />
         <meta property="og:title" content="Features — Keel" />
         <meta property="og:description" content="Explore all 12 features of Keel — inventory, sales, reports, website, and customer communication in one dashboard." />
-        <meta property="og:url" content="https://keel-nu.vercel.app/features" />
+        <meta property="og:url" content="https://keel.framestudio.co.ke/features" />
       </Helmet>
     <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] text-slate-900 dark:text-white">
       <div className="max-w-3xl mx-auto px-4 py-8">

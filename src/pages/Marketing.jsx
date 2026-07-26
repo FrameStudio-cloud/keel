@@ -346,7 +346,7 @@ export default function Marketing() {
         <meta name="description" content="Promotions, product links, QR codes, and marketing tools for your shop." />
         <meta property="og:title" content="Marketing — Keel" />
         <meta property="og:description" content="Promotions, product links, QR codes, and marketing tools." />
-        <meta property="og:url" content="https://keel-nu.vercel.app/marketing" />
+        <meta property="og:url" content="https://keel.framestudio.co.ke/marketing" />
       </Helmet>
     <PageLayout title="Marketing" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <ContextTip tipKey="marketing" title="Tip">

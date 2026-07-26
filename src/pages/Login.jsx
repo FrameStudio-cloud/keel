@@ -368,7 +368,7 @@ export default function Login() {
         <meta name="description" content="Sign in to Keel or create a free account. Manage your inventory, sales, and reports from one dashboard." />
         <meta property="og:title" content="Sign In — Keel" />
         <meta property="og:description" content="Sign in to Keel or create a free account. Manage your inventory, sales, and reports from one dashboard." />
-        <meta property="og:url" content="https://keel-nu.vercel.app/login" />
+        <meta property="og:url" content="https://keel.framestudio.co.ke/login" />
       </Helmet>
 
       <div className="min-h-screen flex bg-slate-100 dark:bg-[#1a1a2e]">

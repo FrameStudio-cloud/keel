@@ -21,7 +21,7 @@ export default function Terms() {
         <meta name="description" content="Terms of Service for Keel — the shop management dashboard for Kenyan small businesses." />
         <meta property="og:title" content="Terms of Service — Keel" />
         <meta property="og:description" content="Terms of Service for Keel — the shop management dashboard for Kenyan small businesses." />
-        <meta property="og:url" content="https://keel-nu.vercel.app/terms" />
+        <meta property="og:url" content="https://keel.framestudio.co.ke/terms" />
       </Helmet>
     <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e]">
       <div

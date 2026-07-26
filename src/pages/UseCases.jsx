@@ -119,7 +119,7 @@ export default function UseCases() {
         <meta name="description" content="Real situations Kenyan shop owners face every day — stock tracking, profit visibility, online presence, expense leaks. See how Keel solves them." />
         <meta property="og:title" content="Use Cases — Keel" />
         <meta property="og:description" content="Real situations Kenyan shop owners face — stock tracking, profit visibility, online presence, and expense leaks. See how Keel helps." />
-        <meta property="og:url" content="https://keel-nu.vercel.app/use-cases" />
+        <meta property="og:url" content="https://keel.framestudio.co.ke/use-cases" />
       </Helmet>
     <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] text-slate-900 dark:text-white">
       <div className="max-w-3xl mx-auto px-4 py-8">
