@@ -19,7 +19,7 @@ import {
   FiPackage, FiTrendingUp,
   FiChevronDown, FiMail, FiPhone, FiInstagram, FiGithub,
   FiArrowRight, FiMenu, FiX, FiUserPlus, FiShield, FiCreditCard, FiMapPin,
-  FiMonitor, FiMessageSquare, FiHelpCircle, FiLayers, FiBriefcase, FiInfo, FiExternalLink,
+  FiHelpCircle, FiLayers, FiBriefcase, FiInfo, FiExternalLink,
   FiCheckCircle
 } from "react-icons/fi";
 
@@ -79,18 +79,37 @@ const socialLinks = [
   { icon: FiGithub, href: "https://github.com/FrameStudio-cloud", label: "GitHub" },
 ];
 
-const navLinks = [
-  { href: "#features", label: "Features", icon: FiLayers },
-  { href: "#how-it-works", label: "How It Works", icon: FiTrendingUp },
-  { href: "#website-integration", label: "Website", icon: FiMonitor },
-  { href: "#testimonials", label: "Testimonials", icon: FiMessageSquare },
-  { href: "#faq", label: "FAQ", icon: FiHelpCircle },
-  { href: "#contact", label: "Contact", icon: FiMail },
+const navGroups = [
+  {
+    label: "Product",
+    items: [
+      { to: "/features", label: "Features", desc: "Everything Keel can do" },
+      { href: "#how-it-works", label: "How It Works", desc: "See how it works in 3 steps" },
+      { to: "/use-cases", label: "Use Cases", desc: "Real-world business situations" },
+      { href: "#website-integration", label: "Website", desc: "Your shop's online presence" },
+    ],
+  },
+  {
+    label: "Resources",
+    items: [
+      { to: "/help", label: "Help Center", desc: "Guides, docs & troubleshooting" },
+      { to: "/blog", label: "Blog", desc: "Tips, updates & business advice" },
+      { href: "#faq", label: "FAQ", desc: "Frequently asked questions" },
+    ],
+  },
+  {
+    label: "Company",
+    items: [
+      { to: "/about", label: "About", desc: "Who we are & why we built Keel" },
+      { href: "#contact", label: "Contact", desc: "Get in touch with us" },
+    ],
+  },
 ];
 
 export default function Homepage() {
   const [openFaq, setOpenFaq] = useState(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [mobileNavGroup, setMobileNavGroup] = useState(null);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const navTrapRef = useFocusTrap(mobileNavOpen);
   const marqueeRef = useRef(null);
@@ -234,46 +253,38 @@ export default function Homepage() {
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden sm:flex items-center gap-6 text-xs text-slate-600 dark:text-slate-400">
-            <a
-              href="#features"
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Features
-            </a>
-            <a
-              href="#how-it-works"
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              How It Works
-            </a>
-            <a
-              href="#website-integration"
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Website
-            </a>
-            <a
-              href="#testimonials"
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Testimonials
-            </a>
-            <a
-              href="#faq"
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              FAQ
-            </a>
-            <a
-              href="#contact"
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Contact
-            </a>
+          <div className="hidden sm:flex items-center gap-1 text-xs text-slate-600 dark:text-slate-400">
+            {navGroups.map((group) => (
+              <div key={group.label} className="relative group">
+                <button className="flex items-center gap-1 px-3 py-2 rounded-lg hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-all cursor-pointer">
+                  {group.label}
+                  <FiChevronDown size={10} className="transition-transform group-hover:rotate-180" />
+                </button>
+                <div className="absolute left-0 top-full pt-1.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 translate-y-1 group-hover:translate-y-0 z-50">
+                  <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-xl shadow-lg shadow-slate-200/50 dark:shadow-black/20 p-2 min-w-[200px]">
+                    {group.items.map((item) => {
+                      const content = (
+                        <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-all">
+                          <div>
+                            <div className="text-xs font-medium text-slate-900 dark:text-white">{item.label}</div>
+                            <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{item.desc}</div>
+                          </div>
+                        </div>
+                      );
+                      if (item.to) {
+                        return <Link key={item.label} to={item.to} className="block">{content}</Link>;
+                      }
+                      return (
+                        <a key={item.label} href={item.href} className="block">{content}</a>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            ))}
             <Link
               to="/login"
-              className="ml-2 px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-xs transition-all"
+              className="ml-3 px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-xs transition-all"
             >
               Sign In
             </Link>
@@ -304,29 +315,59 @@ export default function Homepage() {
               <FiX size={22} />
             </button>
             <div className="mb-10">
-              <Link to="/" className="inline-flex items-center gap-2 font-bold text-sm">
-            <img src="/keel-icon.webp" alt="Keel" className="w-7 h-7" />
+              <Link to="/" className="inline-flex items-center gap-2 font-bold text-sm" onClick={() => setMobileNavOpen(false)}>
+                <img src="/keel-icon.webp" alt="Keel" className="w-7 h-7" />
                 Keel
               </Link>
             </div>
-            <div className="flex-1 space-y-1">
-              {navLinks.map((link, i) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileNavOpen(false)}
-                  className="nav-item flex items-center gap-3.5 px-4 py-3.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-sm font-medium text-slate-700 dark:text-slate-300"
-                  style={{ animationDelay: `${i * 0.07}s` }}
-                >
-                  <link.icon className="text-blue-600 shrink-0" size={18} />
-                  {link.label}
-                </a>
+            <div className="flex-1 space-y-2">
+              {navGroups.map((group) => (
+                <div key={group.label} className="rounded-xl border border-slate-100 dark:border-white/10 overflow-hidden">
+                  <button
+                    onClick={() => setMobileNavGroup(mobileNavGroup === group.label ? null : group.label)}
+                    className="w-full flex items-center justify-between px-4 py-3.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
+                    aria-expanded={mobileNavGroup === group.label}
+                  >
+                    {group.label}
+                    <FiChevronDown
+                      size={14}
+                      className={`text-slate-400 transition-transform ${mobileNavGroup === group.label ? "rotate-180" : ""}`}
+                    />
+                  </button>
+                  {mobileNavGroup === group.label && (
+                    <div className="border-t border-slate-100 dark:border-white/5">
+                      {group.items.map((item) => {
+                        const content = (
+                          <div className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                            <div>
+                              <div className="text-sm font-medium text-slate-900 dark:text-white">{item.label}</div>
+                              <div className="text-xs text-slate-400 dark:text-slate-500">{item.desc}</div>
+                            </div>
+                            <FiArrowRight size={14} className="text-slate-300 dark:text-slate-600 shrink-0" />
+                          </div>
+                        );
+                        if (item.to) {
+                          return (
+                            <Link key={item.label} to={item.to} onClick={() => setMobileNavOpen(false)} className="block">
+                              {content}
+                            </Link>
+                          );
+                        }
+                        return (
+                          <a key={item.label} href={item.href} onClick={() => setMobileNavOpen(false)} className="block">
+                            {content}
+                          </a>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
             <Link
               to="/login"
               onClick={() => setMobileNavOpen(false)}
-              className="block w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-xl text-center transition-all"
+              className="block w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-xl text-center transition-all mt-4"
             >
               Sign In
             </Link>
