@@ -12,7 +12,7 @@ import { AuthContext } from "../context/AuthContext";
 import { useToast } from "../context/ToastProvider";
 import {
   FiShoppingBag, FiSettings, FiBell, FiCreditCard,
-  FiLock, FiDownload, FiAlertTriangle
+  FiLock, FiDownload, FiAlertTriangle, FiCpu
 } from "react-icons/fi";
 import TabButton from "../components/settings/TabButton";
 import SettingsSaveBar from "../components/settings/SettingsSaveBar";
@@ -22,6 +22,7 @@ import StoreTab from "../components/settings/StoreTab";
 import PreferencesTab from "../components/settings/PreferencesTab";
 import NotificationsTab from "../components/settings/NotificationsTab";
 import BillingTab from "../components/settings/BillingTab";
+import IntegrationsTab from "../components/settings/IntegrationsTab";
 import SecurityTab from "../components/settings/SecurityTab";
 import DataTab from "../components/settings/DataTab";
 import DangerZoneTab from "../components/settings/DangerZoneTab";
@@ -31,6 +32,7 @@ const TABS = [
   { id: "preferences", label: "Preferences", subtitle: "Theme, currency & defaults", icon: FiSettings },
   { id: "notifications", label: "Notifications", subtitle: "Alerts & reminders", icon: FiBell },
   { id: "billing", label: "Billing", subtitle: "Subscription & plan", icon: FiCreditCard },
+  { id: "integrations", label: "Integrations", subtitle: "Google Calendar & connectors", icon: FiCpu },
   { id: "security", label: "Security", subtitle: "Password & account", icon: FiLock },
   { id: "data", label: "Data", subtitle: "Export & backups", icon: FiDownload },
   { id: "danger", label: "Danger Zone", subtitle: "Irreversible actions", icon: FiAlertTriangle },
@@ -347,7 +349,7 @@ export default function Settings() {
       <PageLayout title="Settings">
         <div className="flex gap-6">
           <div className="hidden lg:flex flex-col w-[220px] space-y-2">
-            {[...Array(7)].map((_, i) => <Skeleton key={i} className="h-11 rounded-xl" />)}
+            {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-11 rounded-xl" />)}
           </div>
           <div className="flex-1 space-y-6">
             <Skeleton className="h-32 rounded-xl" /><Skeleton className="h-20 rounded-xl" />
@@ -398,6 +400,7 @@ export default function Settings() {
               <BillingTab subscriptionExpiresAt={settings.subscriptionExpiresAt}
                 refreshSettings={settings.refreshSettings} />
             )}
+            {activeTab === "integrations" && <IntegrationsTab />}
             {activeTab === "security" && <SecurityTab sessionEmail={sessionEmail} />}
             {activeTab === "data" && <DataTab onExport={handleExport} />}
             {activeTab === "danger" && (

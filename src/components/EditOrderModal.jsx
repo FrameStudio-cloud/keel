@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { FiX, FiPlus, FiTrash2 } from "react-icons/fi";
+import { FiX, FiPlus, FiTrash2, FiCalendar } from "react-icons/fi";
 import { formatPrice } from "../lib/format";
 import { useFocusTrap } from "../hooks/useFocusTrap";
 import { useSettings } from "../hooks/useSettings";
+import { isFeatureAccessible } from "../lib/tiers";
 import { fetchServices } from "../lib/serviceData";
 
 function emptyRow() {
@@ -18,9 +19,21 @@ function computeLineTotal(svc, qty, weight) {
 
 export default function EditOrderModal({ order, onSave, onClose }) {
   const trapRef = useFocusTrap(true);
-  const { businessCategory } = useSettings();
+  const { businessCategory, planTier } = useSettings();
   const [services, setServices] = useState([]);
   const [loadingServices, setLoadingServices] = useState(true);
+
+  const [calConnected, setCalConnected] = useState(false);
+  const calEnabled = isFeatureAccessible("settings_export", planTier);
+
+  useEffect(() => {
+    if (!calEnabled) return;
+    (async () => {
+      const { getCalendarStatus } = await import("../lib/googleCalendar");
+      const status = await getCalendarStatus();
+      setCalConnected(!!status);
+    })();
+  }, [calEnabled]);
 
   useEffect(() => {
     (async () => {
@@ -50,6 +63,8 @@ export default function EditOrderModal({ order, onSave, onClose }) {
   const [orderNotes, setOrderNotes] = useState(order.notes || "");
   const [paymentMethod, setPaymentMethod] = useState(order.payment_method || "Cash");
   const [loading, setLoading] = useState(false);
+  const [scheduledAt, setScheduledAt] = useState(order.scheduled_at ? order.scheduled_at.slice(0, 16) : "");
+  const [syncCalendar, setSyncCalendar] = useState(false);
 
   const total = rows.reduce((sum, r) => {
     const svc = services.find((s) => s.id === r.service_id);
@@ -94,7 +109,14 @@ export default function EditOrderModal({ order, onSave, onClose }) {
       });
     if (items.length === 0) { setLoading(false); return; }
 
-    await onSave(order.id, { items, notes: orderNotes, payment_method: paymentMethod, total, subtotal: total });
+    const updatePayload = { items, notes: orderNotes, payment_method: paymentMethod, total, subtotal: total };
+    if (scheduledAt) {
+      updatePayload.scheduled_at = scheduledAt;
+      if (order.calendar_event_id && syncCalendar) {
+        updatePayload.calendar_event_id = order.calendar_event_id;
+      }
+    }
+    await onSave(order.id, updatePayload, { syncCalendar, scheduledAt });
     setLoading(false);
     onClose();
   }
@@ -206,6 +228,29 @@ export default function EditOrderModal({ order, onSave, onClose }) {
               placeholder="e.g. Collect by 5pm..."
               className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
             />
+          </div>
+
+          <div>
+            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Schedule (optional)</label>
+            <input
+              type="datetime-local"
+              value={scheduledAt}
+              onChange={(e) => setScheduledAt(e.target.value)}
+              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+            />
+            {calEnabled && calConnected && (
+              <label className="flex items-center gap-2 mt-2 text-xs text-gray-500 dark:text-slate-400 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={syncCalendar}
+                  onChange={(e) => setSyncCalendar(e.target.checked)}
+                  disabled={!scheduledAt}
+                  className="rounded border-gray-300 dark:border-white/20 text-blue-600 focus:ring-blue-500"
+                />
+                <FiCalendar size={12} />
+                {order.calendar_event_id ? "Update calendar event" : "Sync to Google Calendar"}
+              </label>
+            )}
           </div>
 
           <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg px-4 py-3 flex justify-between items-center">

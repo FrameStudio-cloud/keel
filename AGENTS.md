@@ -452,3 +452,19 @@ Keel Dashboard → direct fetch → storefront-provisioner (Railway) → Vercel 
 - No TypeScript; RLS enabled on all tables (see Session Context)
 - Every Supabase query uses `getShopId()` + `.eq("shop_id", shopId)` for SELECT/UPDATE/DELETE and `withShop()` for INSERT
 - `supabase.auth` is **never used** — all auth via direct `window.fetch` to Supabase Auth REST API
+
+## Google Calendar Integration (Session — Jul 2026)
+
+### Edge function
+- `supabase/functions/google-calendar/index.ts` deployed (GET = OAuth callback, POST = create/update/delete events, auto-refresh tokens)
+- Google Cloud OAuth credentials (`VITE_GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`) still need to be set as env vars for the integration to work end-to-end
+
+### Frontend
+- `src/lib/googleCalendar.js` — helper lib: `getCalendarStatus()`, `getConnectUrl()`, `createCalendarEvent()`, `updateCalendarEvent()`, `deleteCalendarEvent()`, `disconnectCalendar()`
+- `src/components/settings/BillingTab.jsx` — Google Calendar section under billing: shows connect/disconnect UI, reads cal status on mount, handles OAuth redirect detection (URL param `?calendar=connected`)
+- `src/components/NewOrderModal.jsx` — added datetime-local input for scheduling, checkbox toggle "Sync to Google Calendar" (gated to Pro, only visible when connected)
+- `src/components/EditOrderModal.jsx` — same schedule field + calendar sync checkbox (shows "Update calendar event" when event already exists)
+- `src/pages/Orders.jsx` — triggers `createCalendarEvent` / `updateCalendarEvent` after save when sync is enabled; shows scheduled date on order card
+- `src/lib/serviceData.js` — `createOrder`/`updateOrder` now accept and persist `scheduled_at` and `calendar_event_id`
+- Feature gate: calendar sync is shown when `isFeatureAccessible("settings_export", planTier)` (Pro plan)
+- Migration (previous session): `google_integrations` table, `service_orders.scheduled_at`, `service_orders.calendar_event_id` columns

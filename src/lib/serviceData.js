@@ -45,6 +45,8 @@ export async function fetchOrders({ status, page = 0, pageSize = 50, search = ""
     subtotal: o.subtotal,
     total: o.total,
     status_history: o.status_history,
+    scheduled_at: o.scheduled_at,
+    calendar_event_id: o.calendar_event_id,
     created_at: o.created_at,
   }));
 
@@ -80,11 +82,13 @@ export async function fetchOrderById(orderId) {
     subtotal: data.subtotal,
     total: data.total,
     status_history: data.status_history,
+    scheduled_at: data.scheduled_at,
+    calendar_event_id: data.calendar_event_id,
     created_at: data.created_at,
   };
 }
 
-export async function createOrder({ customerName, customerPhone, items, notes, total, payment_method }) {
+export async function createOrder({ customerName, customerPhone, items, notes, total, payment_method, scheduled_at }) {
   const shopId = await getShopId();
   if (!shopId) throw new Error("No shop ID");
 
@@ -114,7 +118,7 @@ export async function createOrder({ customerName, customerPhone, items, notes, t
     customerId = newCust.id;
   }
 
-  const { data: order, error: orderError } = await supabase.from("service_orders").insert({
+  const orderPayload = {
     shop_id: shopId,
     customer_id: customerId,
     status: "pending",
@@ -123,7 +127,12 @@ export async function createOrder({ customerName, customerPhone, items, notes, t
     subtotal: total,
     total,
     status_history: [{ status: "pending", at: new Date().toISOString() }],
-  }).select("id").single();
+  };
+  if (scheduled_at) {
+    orderPayload.scheduled_at = scheduled_at;
+  }
+
+  const { data: order, error: orderError } = await supabase.from("service_orders").insert(orderPayload).select("id").single();
 
   if (orderError) throw orderError;
 
@@ -155,6 +164,8 @@ export async function updateOrder(orderId, data) {
   if (data.payment_method !== undefined) updates.payment_method = data.payment_method;
   if (data.subtotal !== undefined) updates.subtotal = data.subtotal;
   if (data.total !== undefined) updates.total = data.total;
+  if (data.scheduled_at !== undefined) updates.scheduled_at = data.scheduled_at;
+  if (data.calendar_event_id !== undefined) updates.calendar_event_id = data.calendar_event_id;
   updates.updated_at = new Date().toISOString();
 
   const { error: orderError } = await supabase

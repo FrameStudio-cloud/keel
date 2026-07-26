@@ -150,6 +150,11 @@ export default function Orders() {
                     <div className="text-right text-xs shrink-0">
                       <p className="text-blue-600 dark:text-blue-400 text-sm font-semibold">{formatPrice(order.total)}</p>
                       <p className="text-gray-400">{order.items.length} item{order.items.length > 1 ? "s" : ""}</p>
+                      {order.scheduled_at && (
+                        <p className="text-gray-400 mt-0.5">
+                          {new Date(order.scheduled_at).toLocaleDateString("en-KE", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        </p>
+                      )}
                     </div>
                     <Badge label={statusLabels[order.status]} color={statusBadgeColors[order.status]} />
                     <span className="text-gray-300 dark:text-slate-600">
@@ -208,7 +213,26 @@ export default function Orders() {
 
       {showNewOrder && (
         <NewOrderModal
-          onSave={async (data) => { await createOrder(data); setShowNewOrder(false); showToast("Order created", "success"); setRefreshKey(k => k + 1); }}
+          onSave={async (data) => {
+            const { id } = await createOrder(data);
+            if (data.syncCalendar && data.scheduled_at && id) {
+              try {
+                const { createCalendarEvent } = await import("../lib/googleCalendar");
+                await createCalendarEvent({
+                  title: `Service order — ${data.customerName}`,
+                  description: data.notes || "",
+                  startTime: data.scheduled_at,
+                  endTime: data.scheduled_at,
+                  orderId: id,
+                });
+              } catch (e) {
+                console.error("Calendar sync failed:", e);
+              }
+            }
+            setShowNewOrder(false);
+            showToast("Order created", "success");
+            setRefreshKey(k => k + 1);
+          }}
           onClose={() => setShowNewOrder(false)}
         />
       )}
@@ -216,7 +240,26 @@ export default function Orders() {
       {editingOrder && (
         <EditOrderModal
           order={editingOrder}
-          onSave={async (id, data) => { await updateOrder(id, data); showToast("Order updated", "success"); setRefreshKey(k => k + 1); }}
+          onSave={async (id, data, extras) => {
+            await updateOrder(id, data);
+            if (extras?.syncCalendar && extras?.scheduledAt) {
+              try {
+                const { updateCalendarEvent } = await import("../lib/googleCalendar");
+                await updateCalendarEvent({
+                  eventId: editingOrder.calendar_event_id,
+                  title: `Service order — ${editingOrder.customer.name}`,
+                  description: data.notes || "",
+                  startTime: extras.scheduledAt,
+                  endTime: extras.scheduledAt,
+                  orderId: id,
+                });
+              } catch (e) {
+                console.error("Calendar sync failed:", e);
+              }
+            }
+            showToast("Order updated", "success");
+            setRefreshKey(k => k + 1);
+          }}
           onClose={() => setEditingOrder(null)}
         />
       )}

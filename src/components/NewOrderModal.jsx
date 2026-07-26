@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { FiX, FiPlus, FiTrash2, FiUser } from "react-icons/fi";
+import { FiX, FiPlus, FiTrash2, FiUser, FiCalendar } from "react-icons/fi";
 import { formatPrice } from "../lib/format";
 import { useFocusTrap } from "../hooks/useFocusTrap";
 import { useSettings } from "../hooks/useSettings";
+import { isFeatureAccessible } from "../lib/tiers";
 
 import { fetchServices, fetchCustomers } from "../lib/serviceData";
 
@@ -12,7 +13,7 @@ function emptyRow() {
 
 export default function NewOrderModal({ onSave, onClose }) {
   const trapRef = useFocusTrap(true);
-  const { businessCategory } = useSettings();
+  const { businessCategory, planTier } = useSettings();
   const [services, setServices] = useState([]);
   const [loadingServices, setLoadingServices] = useState(true);
   const [rows, setRows] = useState([emptyRow()]);
@@ -22,6 +23,10 @@ export default function NewOrderModal({ onSave, onClose }) {
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [suggestions, setSuggestions] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [scheduledAt, setScheduledAt] = useState("");
+  const [syncCalendar, setSyncCalendar] = useState(false);
+  const [calConnected, setCalConnected] = useState(false);
+  const calEnabled = isFeatureAccessible("settings_export", planTier);
   const debounceRef = useRef(null);
 
   useEffect(() => {
@@ -35,6 +40,15 @@ export default function NewOrderModal({ onSave, onClose }) {
       setLoadingServices(false);
     })();
   }, [businessCategory]);
+
+  useEffect(() => {
+    if (!calEnabled) return;
+    (async () => {
+      const { getCalendarStatus } = await import("../lib/googleCalendar");
+      const status = await getCalendarStatus();
+      setCalConnected(!!status);
+    })();
+  }, [calEnabled]);
 
   function handlePhoneChange(val) {
     setCustomerPhone(val);
@@ -103,7 +117,7 @@ export default function NewOrderModal({ onSave, onClose }) {
       });
     if (items.length === 0) { setSubmitting(false); return; }
 
-    await onSave({ customerName, customerPhone, items, notes: orderNotes, total, payment_method: paymentMethod });
+    await onSave({ customerName, customerPhone, items, notes: orderNotes, total, payment_method: paymentMethod, scheduled_at: syncCalendar && scheduledAt ? scheduledAt : undefined, syncCalendar });
     setSubmitting(false);
     onClose();
   }
@@ -244,6 +258,29 @@ export default function NewOrderModal({ onSave, onClose }) {
               placeholder="e.g. Collect by 5pm..."
               className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
             />
+          </div>
+
+          <div>
+            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Schedule (optional)</label>
+            <input
+              type="datetime-local"
+              value={scheduledAt}
+              onChange={(e) => setScheduledAt(e.target.value)}
+              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+            />
+            {calEnabled && calConnected && (
+              <label className="flex items-center gap-2 mt-2 text-xs text-gray-500 dark:text-slate-400 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={syncCalendar}
+                  onChange={(e) => setSyncCalendar(e.target.checked)}
+                  disabled={!scheduledAt}
+                  className="rounded border-gray-300 dark:border-white/20 text-blue-600 focus:ring-blue-500"
+                />
+                <FiCalendar size={12} />
+                Sync to Google Calendar
+              </label>
+            )}
           </div>
 
           <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg px-4 py-3 flex justify-between items-center">
