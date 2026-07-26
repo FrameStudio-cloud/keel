@@ -48,6 +48,9 @@ const Terms = lazy(() => import("./pages/Terms"));
 const UseCases = lazy(() => import("./pages/UseCases"));
 const AboutFramestudio = lazy(() => import("./pages/AboutFramestudio"));
 const Features = lazy(() => import("./pages/Features"));
+const Help = lazy(() => import("./pages/Help"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
 const Orders = lazy(() => import("./pages/Orders"));
 const Customers = lazy(() => import("./pages/Customers"));
 const Services = lazy(() => import("./pages/Services"));
@@ -105,6 +108,9 @@ function AppRoutes() {
         <Route path="/use-cases" element={<UseCases />} />
         <Route path="/about" element={<AboutFramestudio />} />
         <Route path="/features" element={<Features />} />
+        <Route path="/help" element={<Help />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/p/:id" element={<PublicProduct />} />
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/setup" element={<ProtectedRoute><SetupWizard /></ProtectedRoute>} />

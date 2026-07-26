@@ -1047,6 +1047,20 @@ export default function Homepage() {
                 <FiInfo size={12} />
                 About
               </Link>
+              <Link
+                to="/help"
+                className="inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >
+                <FiHelpCircle size={12} />
+                Help
+              </Link>
+              <Link
+                to="/blog"
+                className="inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >
+                <FiExternalLink size={12} />
+                Blog
+              </Link>
               <a
                 href="https://framestudio.co.ke"
                 target="_blank"

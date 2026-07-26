@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
+Allow: /help
+Allow: /blog
 Disallow: /inventory
 Disallow: /sales
 Disallow: /settings

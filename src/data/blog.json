@@ -1,0 +1,174 @@
+[
+  {
+    "slug": "getting-started-with-keel",
+    "title": "Getting Started with Keel: Your First Week",
+    "date": "2026-07-20",
+    "author": "Keel Team",
+    "excerpt": "A step-by-step guide to setting up your shop, adding products, logging sales, and exploring the dashboard in your first week using Keel.",
+    "tags": ["getting-started", "beginner"],
+    "image": null,
+    "content": [
+      { "type": "paragraph", "text": "So you've signed up for Keel. Now what? This guide walks you through everything you need to do in your first week to get your shop up and running." },
+      { "type": "heading", "text": "Day 1: Set Up Your Shop" },
+      { "type": "paragraph", "text": "After signing up, the setup wizard will guide you through choosing your business category (product or service-based), entering your store name, and configuring basic settings. Don't skip this — it determines how your dashboard behaves." },
+      { "type": "paragraph", "text": "Key decisions in setup: your business category (Clothing, Electronics, Salon, Laundry, etc.) controls which variant fields and features are available. A laundry shop gets weight-based billing; an electronics shop gets barcode scanning." },
+      { "type": "heading", "text": "Day 2: Add Your Products" },
+      { "type": "paragraph", "text": "Head to the Inventory page and start adding products. You don't need to add everything at once — start with your top 10-20 bestsellers. For each product, add a name, price, stock quantity, and optionally a cost price (needed for profit margin calculations)." },
+      { "type": "paragraph", "text": "If you're in electronics or electricals, use the barcode scanner to add products quickly. Just point your phone camera at the barcode and Keel fills in the details." },
+      { "type": "heading", "text": "Day 3: Log Your First Sale" },
+      { "type": "paragraph", "text": "Go to Sales and log a sale. Select a product, enter the quantity and amount, choose the payment method (Cash, M-Pesa, Bank, etc.), and save. Watch your stock decrease automatically and your dashboard revenue update in real time." },
+      { "type": "heading", "text": "Day 4-5: Explore Reports & Finance" },
+      { "type": "paragraph", "text": "Check the Overview dashboard to see your sales chart, top products, and low stock alerts. Visit Reports to view profit margins per product. Go to Finance to record any expenses you've incurred." },
+      { "type": "heading", "text": "Day 6-7: Set Up Your Website" },
+      { "type": "paragraph", "text": "If you're on the Pro plan, set up your website URL in Settings. Publish products from Inventory to your live catalogue. Configure banners, business info, and the WhatsApp chat widget on the Website page. Share your new site with customers!" }
+    ]
+  },
+  {
+    "slug": "manage-inventory-like-a-pro",
+    "title": "How to Manage Inventory Like a Pro",
+    "date": "2026-07-18",
+    "author": "Keel Team",
+    "excerpt": "Tips and best practices for keeping your inventory accurate, avoiding stockouts, and making data-driven restocking decisions.",
+    "tags": ["inventory", "tips"],
+    "image": null,
+    "content": [
+      { "type": "paragraph", "text": "Good inventory management is the difference between a smoothly running shop and constant firefighting. Here's how to use Keel to stay on top of your stock." },
+      { "type": "heading", "text": "Always Track Cost Prices" },
+      { "type": "paragraph", "text": "Enter the cost price for every product you add. Even if you think you know your margins, seeing them calculated automatically in Reports helps you spot products that aren't profitable enough. Keel shows you revenue, cost, profit, and margin percentage for every product." },
+      { "type": "heading", "text": "Use Low Stock Alerts" },
+      { "type": "paragraph", "text": "Set your low stock threshold in Settings → Notifications. Keel will highlight products that fall below this threshold on your dashboard and in the sidebar. This prevents stockouts on your bestsellers." },
+      { "type": "heading", "text": "Review Slow-Moving Stock" },
+      { "type": "paragraph", "text": "The Slow-Moving Stock report on the Overview page shows products with little or no sales in the last 30 days. Use this to decide which products to discount, bundle, or remove. Holding inventory that doesn't sell ties up cash." },
+      { "type": "heading", "text": "Audit with Stock History" },
+      { "type": "paragraph", "text": "Every stock change — sale, adjustment, restock — is logged in Stock History with a timestamp and reason. If stock numbers look wrong, check the history to trace what happened." },
+      { "type": "heading", "text": "Use Barcode Scanning" },
+      { "type": "paragraph", "text": "For electronics and electricals, barcode scanning speeds up product entry and checkout. Scan a barcode to find a product instantly during sales or to auto-fill fields when adding new stock." }
+    ]
+  },
+  {
+    "slug": "understanding-sales-reports",
+    "title": "Understanding Your Sales Reports",
+    "date": "2026-07-15",
+    "author": "Keel Team",
+    "excerpt": "Learn how to read your dashboard, profit margins, and P&L reports to make better business decisions.",
+    "tags": ["reports", "analytics"],
+    "image": null,
+    "content": [
+      { "type": "paragraph", "text": "Keel generates several reports that help you understand your business performance. Here's what each one means and how to use it." },
+      { "type": "heading", "text": "Dashboard Overview" },
+      { "type": "paragraph", "text": "The Overview page is your command centre. It shows today's sales amount and quantity, total products, low stock count, and a 30-day sales chart. The chart helps you spot trends — are sales growing week over week? Which days are your strongest?" },
+      { "type": "heading", "text": "Profit Margins Report" },
+      { "type": "paragraph", "text": "Found in Reports → Profit Margins. This shows every product you've sold with its revenue, cost, profit, and margin percentage. Products with high revenue but low margin may need a price increase. Products with high margin but low sales may need more marketing." },
+      { "type": "heading", "text": "P&L Statement" },
+      { "type": "paragraph", "text": "The Profit & Loss bar chart compares your total revenue against expenses over a week or month. Your net profit is revenue minus expenses. Use the week view for tactical decisions and the month view for strategic planning." },
+      { "type": "heading", "text": "Exporting Reports" },
+      { "type": "paragraph", "text": "Export your P&L data as CSV or PDF for accountants, investors, or your own records. The CSV export includes revenue, expenses, and net profit for the selected period." }
+    ]
+  },
+  {
+    "slug": "setting-up-your-website",
+    "title": "Setting Up Your Business Website with Keel",
+    "date": "2026-07-12",
+    "author": "Keel Team",
+    "excerpt": "A complete walkthrough of creating and customising your Keel-powered business website, from setup to going live.",
+    "tags": ["website", "guide"],
+    "image": null,
+    "content": [
+      { "type": "paragraph", "text": "Your Keel website is a live catalogue that showcases your products, business information, and contact options. Here's how to set it up." },
+      { "type": "heading", "text": "Prerequisites" },
+      { "type": "paragraph", "text": "The live website feature requires a Pro subscription. You'll also need a domain or subdomain where your site will live. Configure your website URL in Settings → Store." },
+      { "type": "heading", "text": "Setting Up" },
+      { "type": "paragraph", "text": "Once your website URL is set, the Website tab appears in your sidebar. From there, you can manage banners, update business info, add gallery images, and configure the chat widget." },
+      { "type": "heading", "text": "Publishing Products" },
+      { "type": "paragraph", "text": "Products don't automatically appear on your website. Go to Inventory and click the 'Publish' button on each product you want to showcase. Published products appear in your website's catalogue with their name, price, image, and description." },
+      { "type": "heading", "text": "Customising Your Site" },
+      { "type": "paragraph", "text": "Use the Website tab to add promotional banners, update your business hours, upload shop photos, and enable a WhatsApp chat widget. Changes appear on your live site instantly." }
+    ]
+  },
+  {
+    "slug": "tips-for-growing-your-small-business",
+    "title": "Tips for Growing Your Small Business",
+    "date": "2026-07-10",
+    "author": "Keel Team",
+    "excerpt": "Practical, actionable advice for small business owners looking to increase sales, improve operations, and build customer loyalty.",
+    "tags": ["business", "tips"],
+    "image": null,
+    "content": [
+      { "type": "paragraph", "text": "Running a small business in Kenya comes with unique challenges. Here are practical tips to help you grow, using Keel and other strategies." },
+      { "type": "heading", "text": "Know Your Numbers" },
+      { "type": "paragraph", "text": "Use Keel's reports to understand which products sell best, which have the best margins, and which aren't moving. Data beats gut feelings. Check your dashboard daily and review your P&L weekly." },
+      { "type": "heading", "text": "Go Digital" },
+      { "type": "paragraph", "text": "A website and social media presence are no longer optional. Keel gives you both. Publish your products online, share them on Instagram and TikTok, and let customers message you via WhatsApp directly from your site." },
+      { "type": "heading", "text": "Use QR Codes" },
+      { "type": "paragraph", "text": "Print QR codes for your products and put them on physical displays. Customers scan with their phone and see product details instantly. It bridges the gap between your physical shop and online catalogue." },
+      { "type": "heading", "text": "Track Expenses" },
+      { "type": "paragraph", "text": "Small expenses add up. Record every business expense in Keel to see where your money is going. You might be surprised how much you're spending on categories you didn't expect." },
+      { "type": "heading", "text": "Build Customer Relationships" },
+      { "type": "paragraph", "text": "Use the customers feature to track who buys from you and what they buy. Follow up with regular customers, offer loyalty discounts, and ask for referrals. A retained customer is worth more than a new one." }
+    ]
+  },
+  {
+    "slug": "keel-vs-spreadsheets",
+    "title": "Keel vs Spreadsheets: Why You Need a Dashboard",
+    "date": "2026-07-08",
+    "author": "Keel Team",
+    "excerpt": "Still using Excel or Google Sheets to run your shop? Here's why switching to Keel saves time, reduces errors, and gives you better insights.",
+    "tags": ["business", "comparison"],
+    "image": null,
+    "content": [
+      { "type": "paragraph", "text": "Many small business owners start with spreadsheets. They're free, familiar, and flexible. But as your business grows, spreadsheets become a liability. Here's why." },
+      { "type": "heading", "text": "Real-Time Stock Updates" },
+      { "type": "paragraph", "text": "When you log a sale in Keel, stock is deducted automatically. In a spreadsheet, you have to manually update stock levels — and it's easy to forget or make a typo. A missed update means you might sell a product you don't have." },
+      { "type": "heading", "text": "Automatic Reports" },
+      { "type": "paragraph", "text": "Keel generates sales charts, profit margins, and P&L statements automatically. With a spreadsheet, you build these yourself — and most people don't have the time or skills to do it properly." },
+      { "type": "heading", "text": "Multi-Device Access" },
+      { "type": "paragraph", "text": "Keel works in any browser on any device. Log sales from your phone, check reports on your laptop. Spreadsheets require file sharing, version management, and constant emailing back and forth." },
+      { "type": "heading", "text": "Built-in Website & Social" },
+      { "type": "paragraph", "text": "Keel includes a live website, WhatsApp chat, and social media tools. Spreadsheets can't do any of this. You'd need separate tools for each function, adding cost and complexity." },
+      { "type": "heading", "text": "Data Safety" },
+      { "type": "paragraph", "text": "Your Keel data is backed up, encrypted, and secure. A spreadsheet on your laptop can be lost to a hard drive crash, accidental deletion, or a corrupted file. Keel also tracks every change with timestamps." }
+    ]
+  },
+  {
+    "slug": "how-to-use-service-orders",
+    "title": "How to Use the Service Orders Feature",
+    "date": "2026-07-05",
+    "author": "Keel Team",
+    "excerpt": "A guide for service-based businesses — laundries, salons, repair shops, and more — on using Keel's order management system.",
+    "tags": ["services", "guide"],
+    "image": null,
+    "content": [
+      { "type": "paragraph", "text": "Keel isn't just for product shops. Service businesses — laundries, salons, barbershops, automotive repair, photography studios, and cleaning services — have a dedicated set of tools." },
+      { "type": "heading", "text": "Setting Up Services" },
+      { "type": "paragraph", "text": "On the Services page, define what you offer. Each service can have a name, category, price, and optional variants. For laundries, set weight-based pricing. For salons, list each treatment with its duration and price." },
+      { "type": "heading", "text": "Creating Orders" },
+      { "type": "paragraph", "text": "When a customer walks in, create an order on the Orders page. Add the customer's name and phone number, select the services they need, add notes (e.g., 'add starch' for laundry), and set the total." },
+      { "type": "heading", "text": "Tracking Order Status" },
+      { "type": "paragraph", "text": "Orders move through statuses: Pending → In Progress → Ready → Completed. Use the Queue page to see all active orders at a glance. Drag or click to update status as work progresses." },
+      { "type": "heading", "text": "Customer Profiles" },
+      { "type": "paragraph", "text": "Returning customers are automatically recognised by their phone number. View their order history, total spent, and notes from previous visits. Great for personalised service." }
+    ]
+  },
+  {
+    "slug": "increase-sales-with-qr-codes",
+    "title": "5 Ways to Increase Sales with QR Codes",
+    "date": "2026-07-01",
+    "author": "Keel Team",
+    "excerpt": "Practical ways to use QR codes generated from Keel to drive more sales and connect your physical shop to your online presence.",
+    "tags": ["marketing", "qr-codes"],
+    "image": null,
+    "content": [
+      { "type": "paragraph", "text": "QR codes are everywhere in Kenya — on shop windows, product packaging, and restaurant tables. Here's how to use Keel's QR code generator to boost your sales." },
+      { "type": "heading", "text": "1. Product QR Codes on Shelves" },
+      { "type": "paragraph", "text": "Print QR codes for individual products and place them next to the physical item on your shelf. Customers scan to see product details, variants, and pricing on their phone. This works especially well for electronics where customers want to compare specs." },
+      { "type": "heading", "text": "2. Website QR on Your Shop Door" },
+      { "type": "paragraph", "text": "Put your website QR code on your shop door or window. Passers-by can scan it to browse your catalogue even when your shop is closed. It's like having a 24-hour storefront." },
+      { "type": "heading", "text": "3. WhatsApp QR at the Counter" },
+      { "type": "paragraph", "text": "Place your WhatsApp QR code at the payment counter. Customers scan it to save your number and message you later for orders, inquiries, or referrals." },
+      { "type": "heading", "text": "4. QR Codes on Receipts" },
+      { "type": "paragraph", "text": "Print your website QR code on receipts so customers can easily find you online for repeat purchases." },
+      { "type": "heading", "text": "5. Share in Social Media" },
+      { "type": "paragraph", "text": "Download your QR codes and include them in Instagram posts, TikTok videos, or WhatsApp status updates. Make it easy for followers to browse your catalogue without leaving the app." }
+    ]
+  }
+]

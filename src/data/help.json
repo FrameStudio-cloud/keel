@@ -1,0 +1,264 @@
+[
+  {
+    "id": "quick-start",
+    "title": "Quick Start",
+    "icon": "FiZap",
+    "items": [
+      {
+        "title": "Create Your Account",
+        "description": "Sign up with your email and shop name. No credit card needed — you get a 7-day free trial. Choose your business category (products or services) and you're ready to go.",
+        "steps": [
+          "Go to keel.framestudio.co.ke and click 'Get Started'",
+          "Enter your email, shop name, and password",
+          "Select your business type — product-based or service-based",
+          "Pick your category (Clothing, Electronics, Salon, Laundry, etc.)",
+          "Complete the setup wizard with your store details"
+        ]
+      },
+      {
+        "title": "Add Your First Products",
+        "description": "Populate your inventory with products or services. Add names, prices, stock quantities, and optional barcodes for quick scanning.",
+        "steps": [
+          "Go to Inventory from the sidebar",
+          "Click 'Add Product' and fill in the name, price, and stock",
+          "Set a cost price to track profit margins",
+          "Optionally add barcode for scanner support (electronics/electricals)",
+          "For service businesses, go to Services instead"
+        ]
+      },
+      {
+        "title": "Log Your First Sale",
+        "description": "Record sales as they happen. Keel automatically deducts stock and updates your revenue dashboard in real time.",
+        "steps": [
+          "Go to Sales from the sidebar",
+          "Click 'Log Sale' and select a product",
+          "Enter quantity, total amount, and payment method (Cash, M-Pesa, etc.)",
+          "Optionally print a receipt for the customer",
+          "View the updated dashboard on the Overview page"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "inventory",
+    "title": "Inventory Management",
+    "icon": "FiPackage",
+    "items": [
+      {
+        "title": "Managing Products",
+        "description": "Add, edit, and organise your products. Each product can have a name, price, stock quantity, cost price, category, barcode, and image."
+      },
+      {
+        "title": "Stock Adjustments",
+        "description": "Manually adjust stock levels for damaged goods, returns, or corrections. Every adjustment is logged in Stock History for audit."
+      },
+      {
+        "title": "Low Stock Alerts",
+        "description": "Set a low stock threshold in Settings → Notifications. Products below this threshold are highlighted in the sidebar and on the Overview dashboard."
+      },
+      {
+        "title": "Barcode Scanning",
+        "description": "For electronics and electricals categories, use your phone camera to scan barcodes. Keel auto-fills product details when adding new items or finding products during sales."
+      },
+      {
+        "title": "Publishing to Your Website",
+        "description": "Publish products from Inventory to your live website catalogue with one tap. Only available after setting up your website URL in Settings."
+      }
+    ]
+  },
+  {
+    "id": "sales",
+    "title": "Sales & Receipts",
+    "icon": "FiTrendingUp",
+    "items": [
+      {
+        "title": "Logging Sales",
+        "description": "Record every sale with product, quantity, amount, and payment method. Stock is deducted automatically."
+      },
+      {
+        "title": "Receipts",
+        "description": "Print or share a detailed receipt for any sale. Receipts include shop name, date, items, amounts, and a custom footer message."
+      },
+      {
+        "title": "Payment Methods",
+        "description": "Choose from Cash, M-Pesa, Bank, Card, or Other. Configure your default payment method in Settings → Preferences."
+      },
+      {
+        "title": "M-Pesa Reconciliation",
+        "description": "Upload your M-Pesa statement CSV to automatically match payments with recorded sales. Available on the Finance page."
+      }
+    ]
+  },
+  {
+    "id": "finance",
+    "title": "Finance & Expenses",
+    "icon": "FiDollarSign",
+    "items": [
+      {
+        "title": "Tracking Expenses",
+        "description": "Record business expenses with descriptions, amounts, categories, and payment methods. Filter and search your expense history."
+      },
+      {
+        "title": "Daily Revenue",
+        "description": "View today's sales total and quantity broken down by payment method on the Finance page."
+      },
+      {
+        "title": "Profit & Loss",
+        "description": "See your profit and loss as a bar chart with week or month toggle. Revenue, expenses, and net profit are calculated automatically."
+      },
+      {
+        "title": "Profit Margins per Product",
+        "description": "View revenue, cost, profit, and margin percentage for each product that has been sold. Uses cost price data you set in Inventory."
+      }
+    ]
+  },
+  {
+    "id": "reports",
+    "title": "Reports & Analytics",
+    "icon": "FiBarChart2",
+    "items": [
+      {
+        "title": "Dashboard Overview",
+        "description": "The Overview page shows today's sales, total products, low stock count, a 30-day sales chart, and your top-selling products."
+      },
+      {
+        "title": "Export Options",
+        "description": "Export P&L reports as CSV or PDF for accounting or record-keeping."
+      },
+      {
+        "title": "Stock History",
+        "description": "Every stock movement — sales, adjustments, restocks — is logged with timestamps and reasons. Searchable by product name."
+      },
+      {
+        "title": "Slow-Moving Stock",
+        "description": "Identify products with low or no sales in the last 30 days to make informed restocking decisions."
+      }
+    ]
+  },
+  {
+    "id": "website",
+    "title": "Website Management",
+    "icon": "FiMonitor",
+    "items": [
+      {
+        "title": "Setting Up Your Website",
+        "description": "Go to Settings → Store and enter your website URL. Once set, the Website tab unlocks with Banners, Business Info, Gallery, and Chat Widget sections."
+      },
+      {
+        "title": "Banners",
+        "description": "Create promotional banners for your website — hero, sale, info, or alert types. Each banner can have an image, link, and sort order."
+      },
+      {
+        "title": "Business Info",
+        "description": "Update your store name, phone, address, email, and business hours. These appear on your public website."
+      },
+      {
+        "title": "Gallery",
+        "description": "Upload images of your shop, products, or workspace to build trust with website visitors."
+      },
+      {
+        "title": "Chat Widget",
+        "description": "Enable a WhatsApp chat widget on your website so visitors can message you directly. Customise the welcome message, widget color, and position."
+      }
+    ]
+  },
+  {
+    "id": "marketing",
+    "title": "Marketing & QR Codes",
+    "icon": "FiShare2",
+    "items": [
+      {
+        "title": "QR Codes",
+        "description": "Generate QR codes for your products, website, or WhatsApp number. Print them for physical displays so customers can scan and browse."
+      },
+      {
+        "title": "Promotions & Badges",
+        "description": "Mark products with sale prices or promotional badges directly in the Marketing page."
+      },
+      {
+        "title": "Print Catalogue",
+        "description": "Generate a printable catalogue of your products for offline distribution."
+      }
+    ]
+  },
+  {
+    "id": "social",
+    "title": "Social Media",
+    "icon": "FiInstagram",
+    "items": [
+      {
+        "title": "Post Scheduler",
+        "description": "Plan and schedule social media posts. Track likes, comments, and reach for each post."
+      },
+      {
+        "title": "AI Caption Generator",
+        "description": "Generate product captions using AI. Available on Pro plan."
+      }
+    ]
+  },
+  {
+    "id": "services",
+    "title": "Service Orders",
+    "icon": "FiClipboard",
+    "items": [
+      {
+        "title": "Creating Orders",
+        "description": "For service businesses (laundry, salon, automotive, etc.), create orders with customer details, items, and notes."
+      },
+      {
+        "title": "Order Status Tracking",
+        "description": "Move orders through statuses: Pending → In Progress → Ready → Completed. The Queue page shows all active orders."
+      },
+      {
+        "title": "Customer Profiles",
+        "description": "Each customer gets a profile with their contact info, order history, and total spent. Access from Customers page."
+      }
+    ]
+  },
+  {
+    "id": "account",
+    "title": "Account & Settings",
+    "icon": "FiSettings",
+    "items": [
+      {
+        "title": "Store Settings",
+        "description": "Update your store name, currency symbol, theme (light/dark), website URL, WhatsApp number, and contact details."
+      },
+      {
+        "title": "Subscription",
+        "description": "View your subscription status and expiry date. Renew through the Settings → Billing tab or from the lockout screen."
+      },
+      {
+        "title": "Profile",
+        "description": "Manage your profile picture, display name, email, and password from the Profile page."
+      },
+      {
+        "title": "Data Export & Deletion",
+        "description": "Export all your data as JSON from Settings → Data. You can also delete individual records or wipe all shop data."
+      }
+    ]
+  },
+  {
+    "id": "troubleshooting",
+    "title": "Troubleshooting",
+    "icon": "FiHelpCircle",
+    "items": [
+      {
+        "title": "Website not showing",
+        "description": "Make sure you've set your website URL in Settings → Store. Products need to be published from Inventory to appear on your site."
+      },
+      {
+        "title": "Payment not going through",
+        "description": "Ensure you have a stable internet connection. If Paystack fails, try again after a few minutes. Contact support if the issue persists."
+      },
+      {
+        "title": "Can't log in",
+        "description": "Check your email and password. Use 'Forgot Password' on the login page to reset. If you recently signed up, check your email for the confirmation link."
+      },
+      {
+        "title": "Data not loading",
+        "description": "Refresh the page or log out and back in. If the issue continues, check your internet connection or contact support."
+      }
+    ]
+  }
+]

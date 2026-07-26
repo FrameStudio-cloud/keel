@@ -1,0 +1,46 @@
+# Keel — Shop Management Dashboard
+
+> Keel is a shop management dashboard for small businesses in Kenya. Track inventory, log sales, view reports, manage a website, handle social media, and accept payments — all from one place.
+
+## Public pages
+
+- Homepage: https://keel.framestudio.co.ke/ — Landing page with features, pricing, testimonials, and FAQ
+- Features: https://keel.framestudio.co.ke/features — Full feature listing with 12 deep-dive sections
+- Use Cases: https://keel.framestudio.co.ke/use-cases — Real-world business situations and how Keel helps
+- About: https://keel.framestudio.co.ke/about — Who Framestudio is and why Keel was built
+- Terms: https://keel.framestudio.co.ke/terms — Terms of Service
+- Help Center: https://keel.framestudio.co.ke/help — User documentation, guides, and troubleshooting
+- Blog: https://keel.framestudio.co.ke/blog — Product updates, tips, and guides for small business owners
+- Login: https://keel.framestudio.co.ke/login — Sign in or create an account
+
+## Pricing
+
+- Free trial: 7 days
+- Basic: KSh 500/month — sales, inventory, expenses, stock alerts, basic reports
+- Pro: KSh 1,000/month — live website, storefront, P&L reports, social scheduler, WhatsApp bots, QR codes, M-Pesa reconciliation, data export
+
+## Key features
+
+- Multi-tenant: each shop gets its own isolated dashboard
+- Product inventory with barcode scanning (electronics/electricals)
+- Sales logging with automatic stock deduction
+- Receipt printing
+- Expense tracking with categories
+- Profit & loss reports with chart views
+- Profit margins per product
+- Live website with product catalogue, banners, gallery, chat widget
+- QR code generation (products, website, WhatsApp)
+- Social media post scheduler
+- Service order management for laundries, salons, repair shops, etc.
+- Customer profiles and order history
+- M-Pesa statement reconciliation
+- Dark mode
+- Mobile-responsive
+- Email/password and Google OAuth authentication
+
+## Tech stack
+
+- Frontend: React 19, React Router 7, Tailwind CSS 4, GSAP, Recharts
+- Backend: Supabase (Postgres, Auth, Edge Functions)
+- Hosting: Vercel
+- Payments: Paystack (subscription renewals only — KSh 500 Basic, KSh 1,000 Pro)
