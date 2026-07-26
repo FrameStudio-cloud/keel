@@ -74,62 +74,36 @@ Deno.serve(async (req: Request) => {
     const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { data: shop, error: fetchError } = await supabase
-      .from("shops")
-      .select("subscription_expires_at")
-      .eq("id", shop_id)
-      .maybeSingle();
+    const { data: rpcData, error: rpcError } = await supabase.rpc(
+      "renew_subscription",
+      {
+        p_shop_id: shop_id,
+        p_reference: reference,
+        p_amount_kobo: amountKobo,
+        p_is_pro: isPro,
+      }
+    );
 
-    if (fetchError) {
-      console.error("Failed to fetch shop:", fetchError);
-      return new Response(JSON.stringify({ error: "Failed to verify shop" }), {
-        status: 500,
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-      });
-    }
-
-    if (!shop) {
-      return new Response(JSON.stringify({ error: "Shop not found" }), {
-        status: 404,
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-      });
-    }
-
-    const now = new Date();
-    const current = shop.subscription_expires_at
-      ? new Date(shop.subscription_expires_at)
-      : now;
-    const newExpiry = new Date(
-      Math.max(current.getTime(), now.getTime()) + 30 * 86400000
-    ).toISOString();
-
-    const { error: updateError } = await supabase
-      .from("shops")
-      .update({ subscription_expires_at: newExpiry })
-      .eq("id", shop_id);
-
-    if (updateError) {
-      console.error("Failed to update subscription:", updateError);
+    if (rpcError) {
+      console.error("renew_subscription RPC failed:", rpcError);
       return new Response(JSON.stringify({ error: "Database update failed" }), {
         status: 500,
         headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
       });
     }
 
-    if (isPro) {
-      const { error: planError } = await supabase
-        .from("chat_config")
-        .upsert(
-          { shop_id, plan_tier: "pro", pro_until: newExpiry },
-          { onConflict: "shop_id" }
-        );
-
-      if (planError) {
-        console.error("Failed to update plan_tier:", planError);
-      }
+    if (!rpcData.success) {
+      return new Response(JSON.stringify({ error: rpcData.error || "Renewal failed" }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+      });
     }
 
-    return new Response(JSON.stringify({ success: true, new_expiry: newExpiry }), {
+    return new Response(JSON.stringify({
+      success: true,
+      new_expiry: rpcData.new_expiry,
+      already_processed: rpcData.already_processed || false,
+    }), {
       headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
     });
   } catch (err) {
