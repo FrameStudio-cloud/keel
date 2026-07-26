@@ -1,6 +1,21 @@
 import { supabase } from "./supabase";
 import { getShopId } from "./shop";
 
+function toRFC3339(dt) {
+  if (!dt) return dt;
+  if (dt.includes("T")) {
+    const d = new Date(dt);
+    if (!isNaN(d.getTime())) {
+      const pad = (n) => String(n).padStart(2, "0");
+      const offset = -d.getTimezoneOffset();
+      const sign = offset >= 0 ? "+" : "-";
+      const tz = `${sign}${pad(Math.floor(Math.abs(offset) / 60))}:${pad(Math.abs(offset) % 60)}`;
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00${tz}`;
+    }
+  }
+  return dt;
+}
+
 let cachedStatus = null;
 
 export async function getCalendarStatus() {
@@ -38,8 +53,8 @@ export async function createCalendarEvent({ title, description, startTime, endTi
       order_id: orderId,
       title,
       description,
-      start_time: startTime,
-      end_time: endTime || startTime,
+      start_time: toRFC3339(startTime),
+      end_time: toRFC3339(endTime || startTime),
     },
   });
   if (error) throw new Error(error.message);
@@ -58,8 +73,8 @@ export async function updateCalendarEvent({ eventId, title, description, startTi
       event_id: eventId,
       title,
       description,
-      start_time: startTime,
-      end_time: endTime || startTime,
+      start_time: toRFC3339(startTime),
+      end_time: toRFC3339(endTime || startTime),
     },
   });
   if (error) throw new Error(error.message);

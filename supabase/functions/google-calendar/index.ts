@@ -9,6 +9,21 @@ const CORS_HEADERS = {
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_CALENDAR_API = "https://www.googleapis.com/calendar/v3";
 
+function toRFC3339(dt: string): string {
+  if (!dt) return dt;
+  if (dt.includes("T")) {
+    const d = new Date(dt);
+    if (!isNaN(d.getTime())) {
+      const pad = (n: number) => String(n).padStart(2, "0");
+      const offset = -d.getTimezoneOffset();
+      const sign = offset >= 0 ? "+" : "-";
+      const tz = `${sign}${pad(Math.floor(Math.abs(offset) / 60))}:${pad(Math.abs(offset) % 60)}`;
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00${tz}`;
+    }
+  }
+  return dt;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: CORS_HEADERS });
@@ -144,7 +159,10 @@ async function handlePost(req: Request) {
     const calendarId = integration.calendar_id || "primary";
 
     if (action === "create-event" || action === "update-event") {
-      if (!title || !start_time) {
+      const fmtStart = toRFC3339(start_time);
+      const fmtEnd = toRFC3339(end_time || start_time);
+
+      if (!title || !fmtStart) {
         return new Response(JSON.stringify({ error: "Missing title or start_time" }), {
           status: 400,
           headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
@@ -154,8 +172,8 @@ async function handlePost(req: Request) {
       const event = {
         summary: title,
         description: description || "",
-        start: { dateTime: start_time, timeZone: "Africa/Nairobi" },
-        end: { dateTime: end_time || start_time, timeZone: "Africa/Nairobi" },
+        start: { dateTime: fmtStart, timeZone: "Africa/Nairobi" },
+        end: { dateTime: fmtEnd, timeZone: "Africa/Nairobi" },
       };
 
       let calRes;
