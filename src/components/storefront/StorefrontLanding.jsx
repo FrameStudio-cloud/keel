@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FiExternalLink, FiTrash2, FiRefreshCw, FiAlertTriangle, FiX, FiPlus, FiCheck, FiChevronRight } from "react-icons/fi";
+import { useState, useMemo } from "react";
+import { FiExternalLink, FiTrash2, FiRefreshCw, FiAlertTriangle, FiX, FiPlus, FiCheck, FiChevronRight, FiClock } from "react-icons/fi";
 import { IoStorefrontOutline } from "react-icons/io5";
 import StorefrontCard from "./StorefrontCard";
 import { TEMPLATES, TEMPLATE_DETAILS, GALLERY_ITEMS } from "../../data/storefrontBlueprints";
@@ -9,10 +9,12 @@ export default function StorefrontLanding({
   stats,
   redeploying,
   redeployMessage,
+  deployedAt,
   onSelectStorefront,
   onBuildCustom,
   onDelete,
   onRedeploy,
+  onDismissMessage,
 }) {
   const [activeTab, setActiveTab] = useState("classic");
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -21,6 +23,18 @@ export default function StorefrontLanding({
   const isCustom = activeTab === "custom";
   const detail = isCustom ? null : TEMPLATE_DETAILS[activeTab];
   const gallery = isCustom ? [] : (GALLERY_ITEMS[activeTab] || []);
+
+  function formatTime(iso) {
+    if (!iso) return "";
+    const d = new Date(iso);
+    const diff = Date.now() - d.getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "just now";
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    return d.toLocaleDateString();
+  }
 
   async function handleDelete() {
     setDeleteLoading(true);
@@ -68,6 +82,12 @@ export default function StorefrontLanding({
                     <div className="flex items-center gap-4 mt-2">
                       <span className="text-xs text-emerald-100/70">{stats.products} products</span>
                       <span className="text-xs text-emerald-100/70">{stats.pageViews} page views</span>
+                      {deployedAt && (
+                        <span className="text-xs text-emerald-100/50 flex items-center gap-1">
+                          <FiClock size={11} />
+                          Updated {formatTime(deployedAt)}
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>
@@ -91,14 +111,21 @@ export default function StorefrontLanding({
               </div>
             </div>
             {redeployMessage && (
-              <div className={`mt-3 px-3 py-2 rounded-lg text-sm ${
-                redeployMessage.startsWith("Error") || redeployMessage.includes("failed")
+              <div className={`mt-3 px-3 py-2.5 rounded-lg text-sm flex items-center justify-between gap-2 ${
+                redeployMessage.startsWith("Error") || redeployMessage.includes("failed") || redeployMessage.includes("Failed") || redeployMessage.includes("timed out")
                   ? "bg-red-500/20 text-red-100"
                   : redeployMessage === "Catalogue updated!"
                   ? "bg-emerald-500/20 text-emerald-100"
                   : "bg-white/10 text-white/80"
               }`}>
-                {redeployMessage}
+                <span>{redeployMessage}</span>
+                <button
+                  onClick={onDismissMessage}
+                  className="p-0.5 rounded hover:bg-white/10 transition-colors flex-shrink-0"
+                  aria-label="Dismiss"
+                >
+                  <FiX size={14} />
+                </button>
               </div>
             )}
           </div>

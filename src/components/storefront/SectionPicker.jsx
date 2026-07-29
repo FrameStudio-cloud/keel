@@ -77,8 +77,9 @@ export default function SectionPicker({ templateType, onDeploy, onBack }) {
 
   const currentStep = STEPS_CONFIG[step];
 
-  // Check if current step has a selection (skip for extras step which uses toggles)
-  const hasSelection = step >= STEPS_CONFIG.length - 1 || !!blueprint[currentStep?.key];
+  // Check if current step has a selection (extras step uses toggles — always valid)
+  const isExtrasStep = step === STEPS_CONFIG.length - 1;
+  const hasSelection = isExtrasStep || !!blueprint[currentStep?.key];
 
   function renderStep() {
     switch (step) {

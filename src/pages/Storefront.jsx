@@ -11,10 +11,10 @@ import DeployProgressModal from "../components/storefront/DeployProgressModal";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { PROVISIONER_URL } from "../lib/constants";
-import { blueprintToSectionIds, getDefaultBlueprint } from "../data/storefrontBlueprints";
+import { blueprintToSectionIds, getDefaultBlueprint, getTemplateById, buildProvisionerPayload } from "../data/storefrontBlueprints";
 
 export default function Storefront() {
-  const { planTier, businessCategory } = useSettings();
+  const { planTier, businessCategory, storeName, description, logoUrl, primaryColor, secondaryColor, accentColor } = useSettings();
   const [view, setView] = useState("landing"); // landing | detail | build | config | progress
   const [templateType, setTemplateType] = useState(
     ["clothing", "wigs"].includes(businessCategory) ? "fashion" : "classic"
@@ -24,37 +24,48 @@ export default function Storefront() {
   const [pendingSubdomain, setPendingSubdomain] = useState("");
   const [pendingSections, setPendingSections] = useState(null);
   const [pendingShopId, setPendingShopId] = useState(null);
-  const [, setLoadingExisting] = useState(true);
-  const [, setDeleteLoading] = useState(false);
+
   const [redeploying, setRedeploying] = useState(false);
   const [redeployMessage, setRedeployMessage] = useState("");
   const [stats, setStats] = useState(null);
+  const [deployedAt, setDeployedAt] = useState(null);
+
+  const shopSettings = { storeName, description, logoUrl, primaryColor, secondaryColor, accentColor }
+
+  async function refreshStats() {
+    try {
+      const shopId = await getShopId();
+      if (!shopId) return;
+      const { count: productCount } = await supabase
+        .from("catalogue")
+        .select("*", { count: "exact", head: true })
+        .eq("shop_id", shopId);
+      const { count: pageViewCount } = await supabase
+        .from("page_views")
+        .select("*", { count: "exact", head: true })
+        .eq("shop_id", shopId);
+      setStats({ products: productCount ?? 0, pageViews: pageViewCount ?? 0 });
+    } catch {
+      // stats unavailable
+    }
+  }
 
   useEffect(() => {
     (async () => {
       try {
         const shopId = await getShopId();
-        if (!shopId) { setLoadingExisting(false); return; }
+        if (!shopId) return;
         const res = await fetch(`${PROVISIONER_URL}/status?shop_id=${shopId}`);
         if (res.ok) {
           const data = await res.json();
           if (data.deployed) {
-            setDeployment({ url: data.url, domain: data.domain, subdomain: data.subdomain, templateId: data.template_id });
-            const { count: productCount } = await supabase
-              .from("catalogue")
-              .select("*", { count: "exact", head: true })
-              .eq("shop_id", shopId);
-            const { count: pageViewCount } = await supabase
-              .from("page_views")
-              .select("*", { count: "exact", head: true })
-              .eq("shop_id", shopId);
-            setStats({ products: productCount ?? 0, pageViews: pageViewCount ?? 0 });
+            setDeployment({ url: data.url, domain: data.domain, subdomain: data.subdomain, templateId: data.template_id, updatedAt: data.updated_at });
+            setDeployedAt(data.updated_at || data.created_at || null);
+            await refreshStats();
           }
         }
       } catch {
         // provisioner not reachable
-      } finally {
-        setLoadingExisting(false)
       }
     })();
   }, []);
@@ -96,8 +107,10 @@ export default function Storefront() {
   }
 
   function handleComplete(result) {
-    setDeployment({ ...result, url: undefined, templateId: templateType });
+    setDeployment({ ...result, templateId: templateType });
+    setDeployedAt(new Date().toISOString());
     setView("landing");
+    refreshStats();
   }
 
   function handleError() {
@@ -107,14 +120,12 @@ export default function Storefront() {
   async function handleDelete() {
     const shopId = await getShopId();
     if (!shopId) return;
-    setDeleteLoading(true)
     try {
       await fetch(`${PROVISIONER_URL}/delete/${shopId}`, { method: "DELETE" });
     } catch {
       // best-effort
     }
     setDeployment(null);
-    setDeleteLoading(false)
   }
 
   async function handleRedeploy() {
@@ -125,14 +136,16 @@ export default function Storefront() {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 45000);
+      const payload = buildProvisionerPayload({
+        shopId,
+        templateId: deployment.templateId || "classic",
+        subdomain: deployment.subdomain,
+        shopSettings,
+      })
       const res = await fetch(`${PROVISIONER_URL}/provision`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          shop_id: shopId,
-          subdomain: deployment.subdomain,
-          template_id: deployment.templateId || "classic",
-        }),
+        body: JSON.stringify(payload),
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
@@ -142,15 +155,21 @@ export default function Storefront() {
           ...prev,
           domain: result.domain,
         }));
+        setDeployedAt(new Date().toISOString());
         setRedeployMessage("Catalogue updated!");
+        refreshStats();
       } else {
         try { const err = await res.json(); setRedeployMessage(err.error || `Update failed (${res.status})`); }
         catch { setRedeployMessage(`Update failed (${res.status})`); }
       }
     } catch (err) {
-      setRedeployMessage(err?.name === "AbortError" ? "Request timed out" : `Error: ${err?.message || "Unknown"}`);
+      setRedeployMessage(err?.name === "AbortError" ? "Request timed out — the provisioner may be waking up. Try again." : `Error: ${err?.message || "Unknown"}`);
     }
-    setTimeout(() => { setRedeploying(false); setRedeployMessage(""); }, 4000);
+    setRedeploying(false);
+  }
+
+  function handleDismissMessage() {
+    setRedeployMessage("");
   }
 
   if (!["pro", "beta"].includes(planTier)) {
@@ -172,10 +191,12 @@ export default function Storefront() {
             stats={stats}
             redeploying={redeploying}
             redeployMessage={redeployMessage}
+            deployedAt={deployedAt}
             onSelectStorefront={handleSelectStorefront}
             onBuildCustom={handleBuildCustom}
             onDelete={handleDelete}
             onRedeploy={handleRedeploy}
+            onDismissMessage={handleDismissMessage}
           />
         )}
 
@@ -212,6 +233,7 @@ export default function Storefront() {
             onRetry={() => setView("config")}
             shopId={pendingShopId}
             sections={pendingSections}
+            shopSettings={shopSettings}
           />
         )}
       </div>

@@ -6,10 +6,13 @@ import {
   FiCopy,
   FiGlobe,
   FiAlertTriangle,
+  FiRefreshCw,
+  FiClock,
 } from "react-icons/fi";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import { getShopId } from "../../lib/shop";
 import { PROVISIONER_URL } from "../../lib/constants";
+import { buildProvisionerPayload } from "../../data/storefrontBlueprints";
 
 const steps = [
   { key: "shop", label: "Locating your shop" },
@@ -26,6 +29,7 @@ export default function DeployProgressModal({
   onRetry,
   shopId: shopIdProp,
   sections,
+  shopSettings,
 }) {
   const trapRef = useFocusTrap(true);
   const [status, setStatus] = useState({});
@@ -66,14 +70,13 @@ export default function DeployProgressModal({
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 180000);
 
-        const payload = {
-          shop_id: shopId,
-          template_id: sections ? "custom" : templateId || "classic",
+        const payload = buildProvisionerPayload({
+          shopId,
+          templateId: templateId || "classic",
           subdomain: finalSubdomain,
-        }
-        if (sections && sections.length > 0) {
-          payload.sections = sections
-        }
+          sections,
+          shopSettings: shopSettings || {},
+        })
 
         const res = await fetch(`${PROVISIONER_URL}/provision`, {
           method: "POST",
@@ -258,11 +261,25 @@ export default function DeployProgressModal({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-red-800 dark:text-red-300">
-                  Something went wrong
+                  {error.includes("timed out") || error.includes("timeout")
+                    ? "Request timed out"
+                    : error.includes("fetch") || error.includes("NetworkError") || error.includes("Failed to fetch")
+                    ? "Provisioner unreachable"
+                    : "Something went wrong"}
                 </p>
                 <p className="text-sm text-red-600 dark:text-red-400 mt-1 leading-relaxed">
                   {error}
                 </p>
+                {(error.includes("timed out") || error.includes("timeout")) && (
+                  <p className="text-xs text-red-500 dark:text-red-400/70 mt-2">
+                    The provisioner may be waking from sleep. Click Retry to try again.
+                  </p>
+                )}
+                {(error.includes("fetch") || error.includes("NetworkError") || error.includes("Failed to fetch")) && (
+                  <p className="text-xs text-red-500 dark:text-red-400/70 mt-2">
+                    Make sure the provisioner service is running. If this persists, check Railway dashboard.
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -307,10 +324,11 @@ export default function DeployProgressModal({
           {error ? (
             <>
               <button
-                onClick={() => { started.current = false; onRetry?.(); }}
-                className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all active:scale-[0.97] shadow-sm"
+                onClick={() => { setError(null); setStatus({}); started.current = false; setDone(false); }}
+                className="flex items-center gap-1.5 px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all active:scale-[0.97] shadow-sm"
               >
-                Try Again
+                <FiRefreshCw size={14} />
+                Retry
               </button>
               <button
                 onClick={onClose}
