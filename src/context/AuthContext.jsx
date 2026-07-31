@@ -76,7 +76,9 @@ export default function AuthProvider({ children }) {
             setSession(fullSession);
           }
 
+          ensuringRef.current = true;
           await ensureUserRecordsInner(userData);
+          ensuringRef.current = false;
         } catch (err) {
           console.error("OAuth token exchange failed", err);
         }
@@ -127,17 +129,24 @@ export default function AuthProvider({ children }) {
       .from("users")
       .select("id, shop_id")
       .eq("email", user.email)
-      .maybeSingle();
+      .limit(2);
 
-    if (existingByEmail) {
+    if (existingByEmail && existingByEmail.length > 0) {
+      const match = existingByEmail[0];
       await supabase
         .from("users")
         .update({ auth_user_id: user.id })
-        .eq("id", existingByEmail.id);
+        .eq("id", match.id);
+
+      if (existingByEmail.length > 1) {
+        const extraIds = existingByEmail.slice(1).map(r => r.id);
+        await supabase.from("users").delete().in("id", extraIds);
+      }
+
       const { data: shop } = await supabase
         .from("shops")
         .select("setup_completed_at")
-        .eq("id", existingByEmail.shop_id)
+        .eq("id", match.shop_id)
         .maybeSingle();
       return !!shop?.setup_completed_at;
     }
@@ -207,8 +216,8 @@ export default function AuthProvider({ children }) {
         });
         if (!ensuringRef.current) {
           ensuringRef.current = true;
-          ensureUserRecordsInner(user).then((needsSetup) => {
-            if (!needsSetup) setNeedsSetup(true);
+          ensureUserRecordsInner(user).then((setupComplete) => {
+            if (!setupComplete) setNeedsSetup(true);
             ensuringRef.current = false;
           }).catch(() => { ensuringRef.current = false; });
         }
@@ -222,6 +231,12 @@ export default function AuthProvider({ children }) {
   }
 
   async function setupSignup(sessionData) {
+    ensuringRef.current = true;
+    try {
+      await ensureUserRecordsInner(sessionData.user);
+    } catch {
+      /* will retry via useEffect on next render */
+    }
     saveSession(sessionData);
     setSession(sessionData);
     setUser(sessionData.user);

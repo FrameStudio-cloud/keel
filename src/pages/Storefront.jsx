@@ -11,7 +11,7 @@ import DeployProgressModal from "../components/storefront/DeployProgressModal";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { PROVISIONER_URL } from "../lib/constants";
-import { blueprintToSectionIds, getDefaultBlueprint, getTemplateById, buildProvisionerPayload } from "../data/storefrontBlueprints";
+import { blueprintToSectionIds, getDefaultBlueprint, buildProvisionerPayload } from "../data/storefrontBlueprints";
 
 export default function Storefront() {
   const { planTier, businessCategory, storeName, description, logoUrl, primaryColor, secondaryColor, accentColor } = useSettings();

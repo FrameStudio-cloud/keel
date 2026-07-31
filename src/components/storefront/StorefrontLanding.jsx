@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { FiExternalLink, FiTrash2, FiRefreshCw, FiAlertTriangle, FiX, FiPlus, FiCheck, FiChevronRight, FiClock } from "react-icons/fi";
 import { IoStorefrontOutline } from "react-icons/io5";
 import StorefrontCard from "./StorefrontCard";
@@ -24,10 +24,17 @@ export default function StorefrontLanding({
   const detail = isCustom ? null : TEMPLATE_DETAILS[activeTab];
   const gallery = isCustom ? [] : (GALLERY_ITEMS[activeTab] || []);
 
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(id);
+  }, []);
+
   function formatTime(iso) {
     if (!iso) return "";
     const d = new Date(iso);
-    const diff = Date.now() - d.getTime();
+    const diff = now - d.getTime();
     const mins = Math.floor(diff / 60000);
     if (mins < 1) return "just now";
     if (mins < 60) return `${mins}m ago`;

@@ -7,7 +7,6 @@ import {
   FiGlobe,
   FiAlertTriangle,
   FiRefreshCw,
-  FiClock,
 } from "react-icons/fi";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import { getShopId } from "../../lib/shop";
@@ -26,7 +25,6 @@ export default function DeployProgressModal({
   subdomain,
   templateId,
   onComplete,
-  onRetry,
   shopId: shopIdProp,
   sections,
   shopSettings,
@@ -117,7 +115,7 @@ export default function DeployProgressModal({
     })();
 
     return () => { cancelled = true; };
-  }, [subdomain, templateId, shopIdProp, sections]);
+  }, [subdomain, templateId, shopIdProp, sections, shopSettings]);
 
   const displayUrl = `https://${result?.domain || `${subdomain}.keel.framestudio.co.ke`}`;
 

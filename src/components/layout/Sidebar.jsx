@@ -4,7 +4,7 @@ import { GoGraph } from "react-icons/go";
 import { FaBoxOpen } from "react-icons/fa";
 import { FcSalesPerformance } from "react-icons/fc";
 import { MdOutlineQueue, MdOutlineReceiptLong } from "react-icons/md";
-import { IoGlobeOutline, IoSettingsOutline, IoPersonOutline, IoTimeOutline, IoWalletOutline, IoStatsChartOutline, IoMegaphoneOutline, IoStorefrontOutline, IoPeopleOutline, IoGridOutline } from "react-icons/io5";
+import { IoExtensionPuzzleOutline, IoGlobeOutline, IoSettingsOutline, IoPersonOutline, IoTimeOutline, IoWalletOutline, IoStatsChartOutline, IoMegaphoneOutline, IoStorefrontOutline, IoPeopleOutline, IoGridOutline } from "react-icons/io5";
 import { BsBuildingsFill } from "react-icons/bs";
 import { useSettings } from "../../hooks/useSettings";
 import { useLowStockCount } from "../../hooks/useQueries";
@@ -43,6 +43,12 @@ export default function Sidebar({ open, onClose }) {
         { label: "Website", icon: <IoGlobeOutline />, path: "/website" },
         ...(isService ? [] : [{ label: "Storefront", icon: <IoStorefrontOutline />, path: "/storefront" }]),
         ...(isService ? [] : [{ label: "Marketing", icon: <IoMegaphoneOutline />, path: "/marketing" }]),
+      ],
+    },
+    {
+      label: "Connect",
+      items: [
+        { label: "Integrations", icon: <IoExtensionPuzzleOutline />, path: "/integrations" },
       ],
     },
     {

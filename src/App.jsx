@@ -43,6 +43,8 @@ const Finance = lazy(() => import("./pages/Finance"));
 const Reports = lazy(() => import("./pages/Reports"));
 const Marketing = lazy(() => import("./pages/Marketing"));
 const Storefront = lazy(() => import("./pages/Storefront"));
+const Integrations = lazy(() => import("./pages/Integrations"));
+const IntegrationDetail = lazy(() => import("./pages/IntegrationDetail"));
 const PublicProduct = lazy(() => import("./pages/PublicProduct"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
@@ -128,6 +130,9 @@ function AppRoutes() {
         <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
         <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
         <Route path="/storefront" element={<ProtectedRoute><Storefront /></ProtectedRoute>} />
+        <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
+        <Route path="/integrations/:slug" element={<ProtectedRoute><IntegrationDetail /></ProtectedRoute>} />
+        <Route path="/bots" element={<Navigate to="/integrations" replace />} />
         <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
         <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
         <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />

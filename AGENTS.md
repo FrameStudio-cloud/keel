@@ -3,7 +3,9 @@
 ## Session Context
 
 - **Animated loading screen**: Replaced the plain `animate-pulse "Loading..."` text with a branded CSS animation (`src/components/LoadingScreen.jsx`). Features: pulsing "Keel" logo, two concentric spinning rings (blue + accent), orbiting dot, 5 bouncing dots. Pure CSS keyframes, zero JS animation deps. Used as Suspense fallback for all lazy pages and during auth/settings loading.
+- **Auth race conditions fixed (Jul 2026)**: `ensureUserRecordsInner` had 3 race-condition paths creating duplicate shops. (1) OAuth double-call: `initAuth` called it directly AND via `useEffect` (triggered by `setUser`) — both ran concurrently, both inserted a shop. Fixed by setting `ensuringRef` before the direct call (`AuthContext.jsx:79-81`). (2) `setupSignup` set user state before ensuring user records existed, so `SettingsProvider` called `getShopId()` immediately after signup and got `null` → blank dashboard until refresh. Fixed by awaiting `ensureUserRecordsInner` before `setUser` in `setupSignup`. (3) `clearShopId()` nullified `pendingPromise` in `shop.js:getShopId()` but the in-flight promise would still write to `currentShopId` on resolve, leaking stale shop IDs across logins. Fixed with identity check (`pendingPromise === thisPromise`) before caching.
 - **Toolchain system (Jul 2026)**: Each storefront template now has a `toolchain` config (`{ ui, icons, fonts }`) in both dashboard (`storefrontBlueprints.js`) and provisioner (`registry.js`). The provisioner resolves a variant template directory (e.g. `classic-heroui`) based on the toolchain, with automatic fallback to the base template if the variant doesn't exist. `classic-heroui` uses `@heroui/react`, `lucide-react`, and Inter + Outfit fonts, generating output sites that are ~40% less code than the classic inline version.
+- **WhatsApp bot self-onboarding (Jul 2026)**: `/integrations` (renamed from `/bots`) is a client-facing integration **app store** — tile grid (WhatsApp Bot, Google Calendar, "more coming soon") → config pages at `/integrations/:slug` with a back button. The **WhatsApp Bot** tile (`src/components/integrations/WhatsAppBotCard.jsx`) holds a 3-step wizard — type number (+254 cc prefix) → Meta SMS/VOICE 6-digit code → enter code → bot live. Clients never see webhook URLs, verify tokens, or access tokens; Keel does all Meta onboarding behind the scenes. New JWT-protected edge function `whatsapp-onboard` (actions `provision`/`verify`/`deactivate`, Pro-gated, derives shop from JWT `sub` → `users` table, reads global Meta credentials from new `app_config` table). `chat_config` gained `whatsapp_status` (`''`/`code_sent`/`connected`), `whatsapp_pin` (Keel-generated registration PIN, never shown), `whatsapp_bot_number`. `whatsapp-bot` replies now use `config.whatsapp_token || getGlobalToken()` (env `WHATSAPP_APP_TOKEN` → `app_config.whatsapp_app_token`) so token-less connected shops work. Migration `20260731_add_whatsapp_onboard.sql` applied. **Caveat**: Meta requires the number to NOT be on the WhatsApp app; 2-number WABA cap + 5-recipient cap in dev mode until business verification. Not end-to-end tested — no spare number yet.
 
 Root `/` route uses `HomeOrDashboard` wrapper — shows landing page (`Homepage.jsx`) if unauthenticated, redirects to Overview dashboard if logged in.
 Favicon + logo: `public/keel-icon.png` (logo, renamed from `keel icon.png` to remove space), `public/favicon-*.png` + `public/android-chrome-*.png` + `public/apple-touch-icon.png` (favicons). Referenced in `index.html` and used in place of inline "K" squares.
@@ -109,7 +111,12 @@ When signing up, `authSignUp` returns a user ID that may differ from the user ID
 
 ### Duplicate shop creation prevention
 
-`ensureUserRecords()` in AuthContext first checks `users` table by `auth_user_id`. If no match, it falls back to matching by `email`. If a user record exists with the same email but different `auth_user_id`, it **updates** the `auth_user_id` to the current one and returns the existing shop — preventing duplicate shop creation when Supabase Auth assigns a different auth user ID (e.g. if "Allow multiple accounts with the same email" is enabled in Supabase Auth settings, or if the auth user was deleted and recreated).
+`ensureUserRecords()` in AuthContext first checks `users` table by `auth_user_id`. If no match, it falls back to matching by `email`. If a user record exists with the same email but different `auth_user_id`, it **updates** the `auth_user_id` to the current one and returns the existing shop — preventing duplicate shop creation when Supabase Auth assigns a different auth user ID (e.g. if "Allow multiple accounts with the same email" is enabled in Supabase Auth settings, or if the auth user was deleted and recreated). Email fallback also deletes extra duplicates (`.limit(2)` + delete extras) to handle edge cases where multiple user records share an email.
+
+**Race conditions fixed (Jul 2026):** Three paths could still create duplicates despite the email fallback:
+1. **OAuth double-call** — `initAuth` called `ensureUserRecordsInner` directly without setting `ensuringRef`, so the `useEffect([user])` also ran it concurrently. Both found no existing user, both created a shop. Fixed at `AuthContext.jsx:79-81`.
+2. **setupSignup timing** — `setUser()` was called before `ensureUserRecordsInner`, so `SettingsProvider` would call `getShopId()` and get `null` (record didn't exist yet). Fixed by awaiting `ensureUserRecordsInner` before state updates.
+3. **clearShopId stale promise** — `logout()` cleared `pendingPromise` but the in-flight query still wrote to `currentShopId` on resolve, leaking stale shop IDs across logins. Fixed with `pendingPromise === thisPromise` identity check in `shop.js`.
 
 ## Incident: SPA 404 on non-root page reload + loading freeze
 
@@ -190,7 +197,7 @@ When Supabase Auth assigned a different `auth_user_id` (from re-signup or "Allow
 - `src/context/settingsContext.js` — default theme `"light"`.
 - `src/lib/shop.js` — `getShopId()` singleton with promise deduplication (reads `STORAGE_KEY` via `getPersistedSession()`, queries `users` by `auth_user_id`), `withShop()` singleton
 - `src/pages/Overview.jsx` — single `supabase.rpc("get_dashboard_summary")` call for all KPIs, chart, top products; real website analytics section querying `page_views` table (gated by `hasWebsite`)
-- `src/pages/Settings.jsx` — tabbed 25/75 layout orchestration layer (~311 lines) with 7 tabs (Store, Preferences, Notifications, Billing, Security, Data, Danger Zone). Split into `src/components/settings/` (12 files). Reads initial form values from useSettings; upsert uses `onConflict: "shop_id"`; export uses `Promise.allSettled()`; Delete Shop with type-to-confirm modal
+- `src/pages/Settings.jsx` — tabbed 25/75 layout orchestration layer (~311 lines) with 7 tabs (Store, Preferences, Notifications, Billing, Security, Data, Danger Zone). Split into `src/components/settings/` (11 files). Reads initial form values from useSettings; upsert uses `onConflict: "shop_id"`; export uses `Promise.allSettled()`; Delete Shop with type-to-confirm modal
 - `src/pages/Terms.jsx` — public Terms of Service page, imports from `src/data/terms.json` (static), no DB dependency
 - `src/pages/SetupWizard.jsx` — onboarding flow, saves `"light"` theme
 - `src/pages/Login.jsx` — signup defaults to `"light"` theme, uses `/keel icon.png` logo
@@ -219,7 +226,12 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - `src/pages/Social.jsx` — replaced fake Instagram stats with "Connect" placeholder
 - `src/components/AddProductModal.jsx` — dynamic attribute fields; pill buttons for select types, multi-value tag input for text types (pipe-delimited), collapsible "Product Attributes" section (closed by default), required attribute validation
 - `src/components/EditProductModal.jsx` — same pill + multi-value text + collapsible section as Add, pre-filled from `product_attribute_values`, upserts on save
-- `src/components/Bots.jsx` — WhatsApp + Telegram bot cards per shop
+- `src/lib/integrations.js` — **app-store registry** (`INTEGRATIONS`, `getIntegration()`, `getIntegrationStatus()`). Each entry defines `slug`, `name`, `tagline`, `icon`, `tileClass` (gradient), `tier` (feature key from tiers.js or null = free), `component` (detail view), `getStatus`. Adding a new integration = one registry entry + one component — grid/routing/status derive from the registry automatically.
+- `src/hooks/useIntegrationStatuses.js` — fetches status for all integrations in parallel (`Promise.allSettled`), computes `locked` via `isFeatureAccessible(tier, planTier)`
+- `src/pages/Integrations.jsx` — **integration store grid**: tile per integration (Link to `/integrations/:slug`), status pill (Connected / Connect / Pro lock), trailing "More coming soon" tile. Replaced the old `/bots` page (route `/bots` now redirects here).
+- `src/pages/IntegrationDetail.jsx` — detail page for `/integrations/:slug`: back button ("Connect your tools"), gradient header, renders the integration's `component`; unknown slug redirects to grid. Deep-linkable (detail components self-fetch).
+- `src/components/integrations/WhatsAppBotCard.jsx` — WhatsApp Bot detail view (3-step wizard, Pro-gated, compact upsell for free tiers)
+- `src/components/integrations/GoogleCalendarCard.jsx` — Google Calendar detail view (connect/disconnect)
 - `src/lib/format.js` — formatPrice, setCurrency, getCurrency
 - `src/payment/paymentConfig.js` — getPaymentMethods, setPaymentConfig, getDefaultPayment
 - `src/pages/Marketing.jsx` — promotions, badges, sale prices, QR codes, print catalog; client-side search by name + category via `useDebounce` + `useMemo`; select-all scoped to filtered results; website/product QR tabs disabled when no `websiteUrl` (WhatsApp QR unaffected)
@@ -259,7 +271,8 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 | `/finance` | Finance.jsx | Today's revenue, payment pie chart, expense CRUD; client-side search by description + category + payment_method |
 | `/reports` | Reports.jsx | Profit margins per product, P&L bar chart; client-side search by product name |
 | `/social` | Social.jsx | Post scheduler, Instagram "Connect" placeholder |
-| `/bots` | Bots.jsx | WhatsApp + Telegram bot management |
+| `/integrations` | Integrations.jsx | Integration store grid — tiles per integration with status pills; `/bots` redirects here |
+| `/integrations/:slug` | IntegrationDetail.jsx | Integration detail page (back button + config flow, e.g. `/integrations/whatsapp-bot`) |
 | `/storefront` | Storefront.jsx | Self-service Vercel storefront deployment — template pick, subdomain config, deploy progress; guarded by planTier (Pro/Beta only) |
 | `/website` | Website.jsx | Banners, Business Info, Gallery, Chat Widget tabs; guarded with lock screen when no websiteUrl |
 | `/settings` | Settings.jsx | Tabbed (7 tabs): store details, preferences, notifications, billing, security, data, danger zone |
@@ -291,7 +304,7 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - Removed stray `className` string rendering as raw text in ListingsTab
 - Fixed badge contrast (text-*-300 → text-*-700 for light mode)
 - Added sidebar scrollability (`overflow-y-auto` on nav)
-- Settings page reads initial form values from useSettings (2 fewer Supabase calls); redesigned as tabbed 25/75 layout with 7 tabs, split into 12 component files
+- Settings page reads initial form values from useSettings (2 fewer Supabase calls); redesigned as tabbed 25/75 layout with 7 tabs, split into 11 component files
 - BusinessTab reads businessHours from useSettings (1 fewer Supabase call)
 - ChatWidgetTab reads whatsapp from useSettings (1 fewer Supabase call)
 - Added unique constraint `store_settings_shop_id_key` for `onConflict: "shop_id"` upsert
@@ -315,7 +328,6 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - Overview lazily loaded + `manualChunks` split `recharts` (384 KB) and `vendor` (276 KB) out of main bundle
 - IntaSend removed from AGENTS.md, docs/architecture.md, PITCH.md, README.md, seed files
 - `withShop()` no longer throws on null shop — returns payload unchanged instead (`shop.js:69`)
-- `AuthContext.jsx:147-155` — `ensuringRef` dedup guard prevents double `ensureUserRecordsInner`
 - `vercel.json` rewrite simplified to `"/(.*)"` covering all routes; added CSP + security headers (X-Frame-Options, Permissions-Policy, Content-Security-Policy) and edge caching (1h TTL) for `/`
 - Homepage prerendered to static HTML via `vite-prerender-plugin` (`src/prerender.jsx`) — 52 KB index.html with full content, `404.html` for post-cache fallback
 - `index.html` has preconnect hints for Vercel Analytics, Speed Insights, and PostHog; canonical URL + robots meta + full OG/Twitter tags
@@ -367,7 +379,7 @@ Business category controls variant fields via data-driven tables (not hardcoded 
 - Topbar search redesigned: pill input with inline `CiSearch` icon, animated width, `FiX` toggle, Escape-to-close; blocked from crashing on pages without search props
 - Search added to 4 pages: Marketing (name + category), Finance (description + category + method), Reports (product name), StockHistory (server-side via `paginateQuery`)
 - Added missing `/marketing`, `/finance`, `/reports` entries to Pages & Routes table
-- Settings page redesigned from flat scroll to tabbed 25/75 layout with 7 tabs, split into 12 component files
+- Settings page redesigned from flat scroll to tabbed 25/75 layout with 7 tabs, split into 11 component files
 - Profile page redesigned with same tabbed layout (3 tabs), split into 4 component files
 - Notifications tab rebuilt from placeholder to full UI with email input, 5 toggle switches, low-stock threshold, WhatsApp display
 - `notification_preferences` JSONB column added to `store_settings` (migration 20260713)
@@ -464,7 +476,7 @@ Keel Dashboard → direct fetch → storefront-provisioner (Railway) → Vercel 
 
 ### Frontend
 - `src/lib/googleCalendar.js` — helper lib: `getCalendarStatus()`, `getConnectUrl()`, `createCalendarEvent()`, `updateCalendarEvent()`, `deleteCalendarEvent()`, `disconnectCalendar()`
-- `src/components/settings/BillingTab.jsx` — Google Calendar section under billing: shows connect/disconnect UI, reads cal status on mount, handles OAuth redirect detection (URL param `?calendar=connected`)
+- `src/components/integrations/GoogleCalendarCard.jsx` — Google Calendar connect/disconnect card on the Integrations detail page: reads cal status on mount, handles OAuth redirect detection (URL param `?calendar=connected`)
 - `src/components/NewOrderModal.jsx` — added datetime-local input for scheduling, checkbox toggle "Sync to Google Calendar" (gated to Pro, only visible when connected)
 - `src/components/EditOrderModal.jsx` — same schedule field + calendar sync checkbox (shows "Update calendar event" when event already exists)
 - `src/pages/Orders.jsx` — triggers `createCalendarEvent` / `updateCalendarEvent` after save when sync is enabled; shows scheduled date on order card
