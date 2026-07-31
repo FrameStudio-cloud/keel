@@ -1,15 +1,24 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useSettings } from "../../hooks/useSettings";
 import { supabase } from "../../lib/supabase";
 import { getShopId } from "../../lib/shop";
 import { useToast } from "../../context/ToastProvider";
+import useIntegrationGoals from "../../hooks/useIntegrationGoals";
+import GoalsStep from "./GoalsStep";
+import IntegrationStats from "./IntegrationStats";
 import {
   FiMessageCircle, FiSmartphone, FiZap, FiTrash2, FiCheckCircle,
-  FiLock, FiClock, FiMessageSquare, FiRotateCw, FiAward,
+  FiLock, FiClock, FiMessageSquare, FiRotateCw, FiCheck, FiSliders,
 } from "react-icons/fi";
 
 const inputClass = "w-full bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 transition-colors";
+
+const WIZARD_STEPS = [
+  { key: "goal", label: "Goal" },
+  { key: "connect", label: "Connect" },
+  { key: "verify", label: "Verify" },
+  { key: "live", label: "Live" },
+];
 
 function Toggle({ checked, onChange }) {
   return (
@@ -22,6 +31,41 @@ function Toggle({ checked, onChange }) {
     >
       <span className="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all" style={{ left: checked ? "1.375rem" : "0.125rem" }} />
     </button>
+  );
+}
+
+function Stepper({ current }) {
+  return (
+    <ol className="flex items-center gap-1.5 sm:gap-2">
+      {WIZARD_STEPS.map((step, i) => {
+        const isDone = i < current;
+        const isActive = i === current;
+        return (
+          <li key={step.key} className="flex items-center gap-1.5 sm:gap-2 flex-1 last:flex-none">
+            <div className="flex items-center gap-1.5">
+              <span
+                aria-label={`Step ${i + 1}: ${step.label}`}
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
+                  isDone
+                    ? "bg-green-500 text-white"
+                    : isActive
+                      ? "bg-blue-600 text-white shadow shadow-blue-600/30"
+                      : "bg-slate-200 dark:bg-white/10 text-slate-400 dark:text-slate-500"
+                }`}
+              >
+                {isDone ? <FiCheck size={12} /> : i + 1}
+              </span>
+              <span className={`hidden sm:inline text-[10px] font-semibold whitespace-nowrap ${isActive ? "text-blue-600 dark:text-blue-400" : isDone ? "text-gray-600 dark:text-slate-300" : "text-gray-400 dark:text-slate-500"}`}>
+                {step.label}
+              </span>
+            </div>
+            {i < WIZARD_STEPS.length - 1 && (
+              <span className={`h-px flex-1 ${isDone ? "bg-green-400" : "bg-slate-200 dark:bg-white/10"}`} />
+            )}
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
@@ -47,7 +91,6 @@ function maskNumber(num) {
 }
 
 export default function WhatsAppBotCard() {
-  const { planTier } = useSettings();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -64,6 +107,12 @@ export default function WhatsAppBotCard() {
   const [codeMethod, setCodeMethod] = useState("SMS");
   const [code, setCode] = useState("");
   const [resendCountdown, setResendCountdown] = useState(0);
+
+  const [goalsDone, setGoalsDone] = useState(false);
+  const [selectedGoals, setSelectedGoals] = useState([]);
+  const [stats, setStats] = useState(null);
+
+  const { saved: goalsSaved, loading: goalsLoading, saveGoals } = useIntegrationGoals("whatsapp-bot");
 
   useEffect(() => {
     let cancelled = false;
@@ -92,6 +141,24 @@ export default function WhatsAppBotCard() {
           const d = String(cfg.whatsapp_bot_number || "").replace(/\D/g, "");
           setPhone(d.startsWith("254") && d.length === 12 ? d.slice(3) : d);
           setCode("");
+          setGoalsDone(true);
+        }
+        if (isConnected) {
+          const totalRes = await supabase
+            .from("chat_messages")
+            .select("id", { count: "exact", head: true })
+            .eq("shop_id", id);
+          const answeredRes = await supabase
+            .from("chat_messages")
+            .select("id", { count: "exact", head: true })
+            .eq("shop_id", id)
+            .eq("status", "answered");
+          if (!cancelled) {
+            setStats({
+              total: totalRes.count || 0,
+              answered: answeredRes.count || 0,
+            });
+          }
         }
       }
       setLoading(false);
@@ -174,6 +241,7 @@ export default function WhatsAppBotCard() {
       setMasked("");
       setPhone("");
       setCode("");
+      setStats(null);
       showToast("Bot disconnected");
     } catch (e) {
       showToast(e.message, "error");
@@ -194,32 +262,37 @@ export default function WhatsAppBotCard() {
     showToast(next ? "Bot is now live" : "Bot paused");
   }
 
-  return (
-    <div className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm p-6">
-      {!["pro", "beta"].includes(planTier) ? (
-        <div className="mt-5 flex flex-col items-center text-center py-4 px-2 rounded-xl border border-dashed border-gray-200 dark:border-white/10">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20 mb-3">
-            <FiAward size={22} className="text-white" />
-          </div>
-          <p className="text-sm font-semibold text-gray-800 dark:text-white">WhatsApp Bot is a Pro feature</p>
-          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 max-w-[220px]">
-            Auto-reply to customers with product info, prices and opening hours.
-          </p>
-          <Link
-            to="/settings?tab=billing"
-            className="mt-4 inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-lg shadow-amber-500/20"
-          >
-            Upgrade to Pro
-          </Link>
-        </div>
-      ) : loading ? (
-        <div className="mt-5 space-y-3">
+  async function handleGoalsContinue() {
+    setBusy(true);
+    try {
+      await saveGoals(selectedGoals);
+      setGoalsDone(true);
+    } catch (e) {
+      showToast(e.message, "error");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const showGoals = !connected && !goalsDone && goalsSaved.length === 0;
+  const currentStep = connected ? 3 : phoneId ? 2 : showGoals ? 0 : 1;
+
+  if (loading || (!connected && goalsLoading)) {
+    return (
+      <div className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm p-6">
+        <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="h-12 bg-slate-100 dark:bg-white/5 rounded-xl animate-pulse" />
           ))}
         </div>
-      ) : connected ? (
-        <div className="mt-5">
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm p-6">
+      {connected ? (
+        <div className="space-y-5">
           <div className="rounded-xl border border-green-200 dark:border-green-500/20 bg-green-50 dark:bg-green-500/10 p-4 flex items-start gap-3">
             <FiCheckCircle size={18} className="text-green-600 dark:text-green-400 mt-0.5 shrink-0" />
             <div className="flex-1">
@@ -235,7 +308,31 @@ export default function WhatsAppBotCard() {
             </div>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-3">
+          {stats && (
+            <IntegrationStats
+              stats={[
+                { icon: FiMessageCircle, label: "Conversations handled", value: stats.total.toLocaleString() },
+                { icon: FiCheckCircle, label: "Answered automatically", value: stats.answered.toLocaleString() },
+              ]}
+            />
+          )}
+
+          <Link
+            to="/website"
+            className="flex items-center gap-3 p-3 rounded-xl border border-blue-200 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10 hover:border-blue-300 dark:hover:border-blue-500/40 transition-colors"
+          >
+            <div className="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+              <FiSliders size={15} />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-semibold text-blue-700 dark:text-blue-300">Next step — personalize your bot</p>
+              <p className="text-[11px] text-blue-600/80 dark:text-blue-300/80 mt-0.5">
+                Add FAQs and a greeting message on your chat widget.
+              </p>
+            </div>
+          </Link>
+
+          <div className="flex flex-wrap items-center gap-3 pt-1">
             <button
               onClick={handleDisconnect}
               disabled={busy}
@@ -244,12 +341,28 @@ export default function WhatsAppBotCard() {
               <FiTrash2 size={13} />
               {busy ? "Disconnecting..." : "Disconnect number"}
             </button>
-            <span className="text-xs text-gray-400 dark:text-slate-500">Your customers message this number and get instant answers about your products.</span>
           </div>
         </div>
       ) : (
-        <div className="mt-5 space-y-5">
-          {!phoneId ? (
+        <div className="space-y-5">
+          <Stepper current={currentStep} />
+
+          {showGoals ? (
+            <GoalsStep
+              goals={[
+                { id: "answer_product_questions", label: "Answer questions about my products" },
+                { id: "order_updates", label: "Send order updates to customers" },
+                { id: "promotions", label: "Share promotions and announcements" },
+                { id: "bookings", label: "Take bookings or service appointments" },
+                { id: "hours_info", label: "Share business hours and location" },
+              ]}
+              selected={selectedGoals}
+              onChange={setSelectedGoals}
+              onContinue={handleGoalsContinue}
+              saving={busy}
+              heading="What do you want to use it for?"
+            />
+          ) : !phoneId ? (
             <>
               <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-4 text-xs text-slate-500 dark:text-slate-400 flex items-start gap-2">
                 <FiLock size={14} className="mt-0.5 shrink-0" />
@@ -268,7 +381,7 @@ export default function WhatsAppBotCard() {
                     value={phone}
                     onChange={(e) => setPhone(normalizePhone(e.target.value))}
                     placeholder="7XX XXX XXX"
-                    className={inputClass}
+                    className={`${inputClass} flex-1 min-w-0`}
                   />
                 </div>
               </div>
@@ -354,17 +467,6 @@ export default function WhatsAppBotCard() {
               </div>
             </>
           )}
-        </div>
-      )}
-
-      {!connected && ["pro", "beta"].includes(planTier) && (
-        <div className="mt-5 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-blue-700 dark:text-blue-400 mb-2">How it works</h3>
-          <ol className="text-xs text-blue-700/80 dark:text-blue-300/80 space-y-1.5 list-decimal list-inside">
-            <li>Add your WhatsApp number — we'll send you a 6-digit code to confirm it's yours.</li>
-            <li>Enter the code and your bot goes live in seconds.</li>
-            <li>Customers message the number and get instant answers about your products, prices, delivery and more.</li>
-          </ol>
         </div>
       )}
     </div>
