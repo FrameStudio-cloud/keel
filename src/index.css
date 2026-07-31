@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --font-serif: "Newsreader Variable", "Times New Roman", serif;
+}
+
 body {
   background: #f1f5f9;
   color: #0f172a;
@@ -36,4 +40,19 @@ body {
 
 .dark * {
   scrollbar-color: #334155 transparent;
+}
+
+@keyframes home-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.home-marquee {
+  animation: home-marquee 30s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-marquee {
+    animation: none;
+  }
 }
