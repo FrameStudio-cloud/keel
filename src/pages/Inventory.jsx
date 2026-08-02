@@ -184,7 +184,7 @@ export default function Inventory() {
         <p>Tap <strong>Add Product</strong> to create your first item with stock, price, and category.</p>
       </ContextTip>
       <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-gray-400 dark:text-slate-500">
+        <p className="text-sm text-text-faint">
           {total} products
         </p>
         <div className="flex items-center gap-2">
@@ -192,7 +192,7 @@ export default function Inventory() {
           <button
             data-onboarding="add-product"
             onClick={() => setShowModal(true)}
-            className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all"
+            className="bg-brand text-white text-sm px-4 py-2 rounded-lg hover:bg-brand-strong transition-all"
           >
             + Add product
           </button>
@@ -200,19 +200,19 @@ export default function Inventory() {
       </div>
 
       {!hasWebsite && (
-        <div className="mb-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl px-4 py-2.5 flex items-center gap-2.5">
-          <FiGlobe size={14} className="text-amber-500 shrink-0" />
-          <p className="text-xs text-amber-700 dark:text-amber-400">
+        <div className="mb-4 bg-warning-muted border border-warning rounded-xl px-4 py-2.5 flex items-center gap-2.5">
+          <FiGlobe size={14} className="text-accent shrink-0" />
+          <p className="text-xs text-warning">
             Set your website URL in <Link to="/settings" className="font-semibold underline hover:no-underline">Settings</Link> to publish products to your mini-catalogue.
           </p>
         </div>
       )}
 
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden">
+      <div className="bg-surface-1 rounded-xl border border-border-subtle overflow-hidden">
         {loading ? (
           <div className="space-y-2 p-3">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-[#1a1a2e] rounded-xl">
+              <div key={i} className="flex items-start gap-3 p-3 bg-surface-2 rounded-xl">
                 <Skeleton className="w-14 h-14 rounded-lg flex-shrink-0" />
                 <div className="flex-1 space-y-2 min-w-0">
                   <Skeleton className="h-4 w-3/5" />
@@ -249,41 +249,41 @@ export default function Inventory() {
                 return (
                   <div
                     key={p.id}
-                    className="bg-slate-50 dark:bg-[#1a1a2e] rounded-xl px-4 py-3"
+                    className="bg-surface-2 rounded-xl px-4 py-3"
                   >
                     <div className="flex items-start gap-3 mb-3">
                       {p.image ? (
                         <img src={p.image} alt={p.name} className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
                       ) : (
-                        <div className="w-14 h-14 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center flex-shrink-0">
-                          <FiImage size={20} className="text-gray-400" />
+                        <div className="w-14 h-14 rounded-lg bg-surface-2 dark:bg-white/5 flex items-center justify-center flex-shrink-0">
+                          <FiImage size={20} className="text-text-faint" />
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
-                        <p className="text-slate-900 dark:text-white text-sm font-semibold">{p.name}</p>
-                        <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">{p.category}</p>
+                        <p className="text-text-primary text-sm font-semibold">{p.name}</p>
+                        <p className="text-text-muted text-xs mt-0.5">{p.category}</p>
                         <div className="flex flex-wrap items-center gap-1.5 mt-2">
                           <Badge label={status.label} color={status.color} />
-                          <span className="text-xs text-slate-600 dark:text-slate-400">Stock: {p.stock}</span>
-                          {p.new_arrival && <span className="text-[10px] font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-500/20 px-1.5 py-0.5 rounded">New</span>}
+                          <span className="text-xs text-text-body">Stock: {p.stock}</span>
+                          {p.new_arrival && <span className="text-[10px] font-semibold text-success bg-success-muted px-1.5 py-0.5 rounded">New</span>}
                           {p.badge && (
                             <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
-                              p.badge === "New" ? "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-500/20" :
-                              p.badge === "Best Seller" ? "text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-500/20" :
-                              p.badge === "Sale" ? "text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-500/20" :
-                              p.badge === "Hot" ? "text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/20" :
-                              "text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-500/20"
+                              p.badge === "New" ? "text-success bg-success-muted" :
+                              p.badge === "Best Seller" ? "text-warning bg-warning-muted" :
+                              p.badge === "Sale" ? "text-danger bg-danger-muted" :
+                              p.badge === "Hot" ? "text-chart-2 bg-chart-2/10" :
+                              "text-brand bg-brand-muted"
                             }`}>{p.badge}</span>
                           )}
                           {showBarcode && p.barcode && (
-                            <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">{p.barcode}</span>
+                            <span className="text-[10px] font-mono text-text-faint">{p.barcode}</span>
                           )}
                         </div>
                         {attributeMap[p.id]?.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1.5">
                             {attributeMap[p.id].flatMap((av) =>
                               av.value.split("|||").map((v, j) => (
-                                <span key={`${av.attribute_id}-${j}`} className="text-[10px] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded whitespace-nowrap">
+                                <span key={`${av.attribute_id}-${j}`} className="text-[10px] bg-brand-muted text-brand px-1.5 py-0.5 rounded whitespace-nowrap">
                                   {av.attribute?.name}: {v}
                                 </span>
                               ))
@@ -292,27 +292,27 @@ export default function Inventory() {
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center justify-between border-t border-gray-200 dark:border-white/10 pt-3">
+                    <div className="flex items-center justify-between border-t border-border-subtle pt-3">
                       <div>
                         {p.sale_price != null ? (
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs text-gray-400 dark:text-slate-500 line-through">{formatPrice(p.price)}</span>
-                            <span className="text-red-600 dark:text-red-400 text-base font-bold">{formatPrice(p.sale_price)}</span>
+                            <span className="text-xs text-text-faint line-through">{formatPrice(p.price)}</span>
+                            <span className="text-accent-strong text-base font-bold">{formatPrice(p.sale_price)}</span>
                           </div>
                         ) : (
-                          <p className="text-blue-600 dark:text-blue-400 text-base font-bold">{formatPrice(p.price)}</p>
+                          <p className="text-brand text-base font-bold">{formatPrice(p.price)}</p>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setSelectedProduct(p)}
-                          className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all"
+                          className="px-3 py-1.5 text-xs font-medium bg-surface-1 border border-brand-soft text-brand rounded-lg hover:bg-brand-muted transition-all"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => setAdjustProduct(p)}
-                          className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-gray-200 dark:border-white/10 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+                          className="px-3 py-1.5 text-xs font-medium bg-surface-1 border border-border-subtle text-text-body rounded-lg hover:bg-surface-2 transition-all"
                         >
                           Stock
                         </button>
@@ -321,7 +321,7 @@ export default function Inventory() {
                             onClick={() => handleUnpublish(p)}
                             disabled={!hasWebsite || publishingId === p.id}
                             title={!hasWebsite ? "Set your website URL in Settings first" : ""}
-                            className="px-3 py-1.5 text-xs font-medium bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-100 dark:hover:bg-green-500/20 transition-all disabled:opacity-50"
+                            className="px-3 py-1.5 text-xs font-medium bg-success-muted border border-success text-success rounded-lg hover:bg-success-muted transition-all disabled:opacity-50"
                           >
                             {publishingId === p.id ? "..." : "Published"}
                           </button>
@@ -330,7 +330,7 @@ export default function Inventory() {
                             onClick={() => handlePublish(p)}
                             disabled={!hasWebsite || publishingId === p.id}
                             title={!hasWebsite ? "Set your website URL in Settings first" : ""}
-                            className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-gray-200 dark:border-white/10 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all disabled:opacity-50"
+                            className="px-3 py-1.5 text-xs font-medium bg-surface-1 border border-border-subtle text-text-body rounded-lg hover:bg-surface-2 transition-all disabled:opacity-50"
                           >
                             {publishingId === p.id ? "..." : "Publish"}
                           </button>
@@ -343,34 +343,34 @@ export default function Inventory() {
             </div>
             <table className="hidden sm:table w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100 dark:border-white/10">
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                <tr className="border-b border-border-subtle">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                     Product
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                     Category
                   </th>
                   {showBarcode && (
-                    <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                    <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                       Barcode
                     </th>
                   )}
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                     Image
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                     Price
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                     Stock
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                     Status
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                     Website
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                     Actions
                   </th>
                 </tr>
@@ -381,16 +381,16 @@ export default function Inventory() {
                   return (
                     <tr
                       key={p.id}
-                      className="border-b border-gray-50 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+                      className="border-b border-border-subtle dark:border-border-subtle hover:bg-surface-2 transition-all"
                     >
-                      <td className="px-4 py-3 font-medium text-gray-800 dark:text-white">
+                      <td className="px-4 py-3 font-medium text-text-primary">
                         {p.name}
-                        {p.new_arrival && <span className="ml-2 text-[10px] font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-500/20 px-1.5 py-0.5 rounded align-middle">New</span>}
+                        {p.new_arrival && <span className="ml-2 text-[10px] font-semibold text-success bg-success-muted px-1.5 py-0.5 rounded align-middle">New</span>}
                         {attributeMap[p.id]?.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1">
                             {attributeMap[p.id].flatMap((av) =>
                               av.value.split("|||").map((v, j) => (
-                                <span key={`${av.attribute_id}-${j}`} className="text-[10px] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded whitespace-nowrap">
+                                <span key={`${av.attribute_id}-${j}`} className="text-[10px] bg-brand-muted text-brand px-1.5 py-0.5 rounded whitespace-nowrap">
                                   {v}
                                 </span>
                               ))
@@ -398,9 +398,9 @@ export default function Inventory() {
                           </div>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-gray-400 dark:text-slate-500">{p.category}</td>
+                      <td className="px-4 py-3 text-text-faint">{p.category}</td>
                       {showBarcode && (
-                        <td className="px-4 py-3 font-mono text-xs text-gray-500 dark:text-slate-400">
+                        <td className="px-4 py-3 font-mono text-xs text-text-muted">
                           {p.barcode || "—"}
                         </td>
                       )}
@@ -408,15 +408,15 @@ export default function Inventory() {
                         {p.image ? (
                           <img src={p.image} alt={p.name} className="w-10 h-10 rounded-lg object-cover" />
                         ) : (
-                          <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center">
-                            <FiImage size={14} className="text-gray-400" />
+                          <div className="w-10 h-10 rounded-lg bg-surface-2 dark:bg-white/5 flex items-center justify-center">
+                            <FiImage size={14} className="text-text-faint" />
                           </div>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-gray-800 dark:text-white">
+                      <td className="px-4 py-3 text-text-primary">
                         {formatPrice(p.price)}
                       </td>
-                      <td className="px-4 py-3 text-gray-800 dark:text-white">{p.stock}</td>
+                      <td className="px-4 py-3 text-text-primary">{p.stock}</td>
                       <td className="px-4 py-3">
                         <Badge label={status.label} color={status.color} />
                       </td>
@@ -426,7 +426,7 @@ export default function Inventory() {
                             onClick={() => handleUnpublish(p)}
                             disabled={!hasWebsite || publishingId === p.id}
                             title={!hasWebsite ? "Set your website URL in Settings first" : ""}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-500 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-500/30 transition-all disabled:opacity-50"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-success-muted border border-success text-success rounded-lg hover:bg-danger-muted hover:text-danger hover:border-danger transition-all disabled:opacity-50"
                           >
                             <FiGlobe size={12} />
                             {publishingId === p.id ? "..." : "Unpublish"}
@@ -436,7 +436,7 @@ export default function Inventory() {
                             onClick={() => handlePublish(p)}
                             disabled={!hasWebsite || publishingId === p.id}
                             title={!hasWebsite ? "Set your website URL in Settings first" : ""}
-                            className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-500/30 transition-all disabled:opacity-50"
+                            className="px-3 py-1.5 text-xs font-medium bg-surface-1 border border-border-subtle text-text-body rounded-lg hover:bg-brand-muted hover:text-brand hover:border-brand-soft transition-all disabled:opacity-50"
                           >
                             {publishingId === p.id ? "..." : "Publish"}
                           </button>
@@ -446,13 +446,13 @@ export default function Inventory() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setSelectedProduct(p)}
-                            className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all"
+                            className="px-3 py-1.5 text-xs font-medium bg-surface-1 border border-brand-soft text-brand rounded-lg hover:bg-brand-muted transition-all"
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => setAdjustProduct(p)}
-                            className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-50 dark:hover:bg-white/[0.05] transition-all"
+                            className="px-3 py-1.5 text-xs font-medium bg-surface-1 border border-border-subtle text-text-body rounded-lg hover:bg-surface-2 transition-all"
                           >
                             Stock
                           </button>

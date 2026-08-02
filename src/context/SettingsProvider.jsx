@@ -6,6 +6,7 @@ import { setPaymentConfig } from "../lib/paymentConfig";
 import { SettingsContext, DEFAULT_NOTIF_PREFS } from "./settingsContext";
 import { DEFAULT_PROGRESS } from "../lib/onboarding";
 import { AuthContext } from "./AuthContext";
+import { applyTheme, normalizeTheme, getThemeMode } from "../lib/themes";
 
 export default function SettingsProvider({ children }) {
   const { user } = useContext(AuthContext);
@@ -17,7 +18,7 @@ export default function SettingsProvider({ children }) {
     lowStockThreshold: 6,
     defaultPayment: "Cash",
     receiptFooter: "",
-    theme: "light",
+    theme: "keel-light",
     websiteUrl: "",
     whatsapp: "",
     email: "",
@@ -68,8 +69,8 @@ export default function SettingsProvider({ children }) {
         const paymentMethods = store.payment_methods || ["Cash", "M-Pesa", "Bank"];
         setPaymentConfig(paymentMethods, store.default_payment);
 
-        const theme = store.theme || "light";
-        document.documentElement.classList.toggle("dark", theme === "dark");
+        const theme = normalizeTheme(store.theme);
+        applyTheme(theme);
 
         const planTier = chatCfg?.plan_tier || "free";
 
@@ -82,6 +83,7 @@ export default function SettingsProvider({ children }) {
           defaultPayment: store.default_payment || "Cash",
           receiptFooter: store.receipt_footer || "",
           theme,
+          themeMode: getThemeMode(theme),
           websiteUrl: store.website_url || "",
           whatsapp: store.whatsapp || "",
           email: store.email || "",
@@ -132,7 +134,7 @@ export default function SettingsProvider({ children }) {
   }, [user]);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", settings.theme === "dark");
+    applyTheme(settings.theme);
   }, [settings.theme]);
 
   const refreshSettings = async () => {

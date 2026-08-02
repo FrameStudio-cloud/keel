@@ -6,8 +6,8 @@ export default function FaqSection({ faq }) {
 
   return (
     <section>
-      <h3 className="text-lg font-bold text-gray-800 dark:text-white">Questions</h3>
-      <div className="mt-4 divide-y divide-gray-100 dark:divide-white/5 bg-white dark:bg-[#16213e] rounded-2xl border border-gray-200 dark:border-white/10 px-5">
+      <h3 className="text-lg font-bold text-text-primary">Questions</h3>
+      <div className="mt-4 divide-y divide-border-subtle dark:divide-white/5 bg-surface-1 rounded-2xl border border-border-subtle px-5">
         {faq.map((item, i) => {
           const isOpen = open === i;
           return (
@@ -18,14 +18,14 @@ export default function FaqSection({ faq }) {
                 aria-expanded={isOpen}
                 className="w-full flex items-center justify-between gap-3 py-4 text-left"
               >
-                <span className="text-sm font-semibold text-gray-800 dark:text-white">{item.q}</span>
+                <span className="text-sm font-semibold text-text-primary">{item.q}</span>
                 <FiChevronDown
                   size={16}
-                  className={`text-gray-400 shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                  className={`text-text-faint shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
                 />
               </button>
               {isOpen && (
-                <p className="pb-4 text-xs text-gray-500 dark:text-slate-400 leading-relaxed">{item.a}</p>
+                <p className="pb-4 text-xs text-text-muted leading-relaxed">{item.a}</p>
               )}
             </div>
           );

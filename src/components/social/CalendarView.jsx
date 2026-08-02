@@ -173,30 +173,30 @@ export default function CalendarView({
         <div className="flex items-center gap-2">
           <button
             onClick={prevMonth}
-            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.05] text-gray-500 dark:text-slate-400"
+            className="p-1.5 rounded-lg hover:bg-surface-2 text-text-muted"
             aria-label="Previous month"
           >
             <FiChevronLeft size={18} />
           </button>
-          <h3 className="text-sm font-medium text-gray-800 dark:text-white sm:min-w-[160px] text-center">
+          <h3 className="text-sm font-medium text-text-primary sm:min-w-[160px] text-center">
             {monthName}
           </h3>
           <button
             onClick={nextMonth}
-            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.05] text-gray-500 dark:text-slate-400"
+            className="p-1.5 rounded-lg hover:bg-surface-2 text-text-muted"
             aria-label="Next month"
           >
             <FiChevronRight size={18} />
           </button>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex bg-gray-100 dark:bg-white/[0.05] rounded-lg p-0.5">
+          <div className="flex bg-surface-2 dark:bg-white/[0.05] rounded-lg p-0.5">
             <button
               onClick={() => setView("month")}
               className={`text-[11px] font-medium px-2.5 py-1 rounded-md transition-all ${
                 view === "month"
-                  ? "bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white shadow-sm"
-                  : "text-gray-500 dark:text-slate-400 hover:text-gray-700"
+                  ? "bg-surface-1 text-text-primary shadow-sm"
+                  : "text-text-muted hover:text-text-body"
               }`}
             >
               Month
@@ -205,8 +205,8 @@ export default function CalendarView({
               onClick={() => setView("week")}
               className={`text-[11px] font-medium px-2.5 py-1 rounded-md transition-all ${
                 view === "week"
-                  ? "bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white shadow-sm"
-                  : "text-gray-500 dark:text-slate-400 hover:text-gray-700"
+                  ? "bg-surface-1 text-text-primary shadow-sm"
+                  : "text-text-muted hover:text-text-body"
               }`}
             >
               Week
@@ -214,7 +214,7 @@ export default function CalendarView({
           </div>
           <button
             onClick={jumpToToday}
-            className="flex items-center gap-1.5 text-xs font-medium border border-gray-200 dark:border-white/10 text-gray-600 dark:text-slate-300 px-3 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+            className="flex items-center gap-1.5 text-xs font-medium border border-border-subtle text-text-body px-3 py-1.5 rounded-lg hover:bg-surface-2 transition-all"
           >
             <FiCalendar size={14} /> Today
           </button>
@@ -229,7 +229,7 @@ export default function CalendarView({
               </button>
             ) : (
               <span
-                className="flex items-center gap-1.5 text-xs font-medium border border-gray-200 dark:border-white/10 text-gray-300 dark:text-slate-600 px-3 py-1.5 rounded-lg cursor-not-allowed select-none"
+                className="flex items-center gap-1.5 text-xs font-medium border border-border-subtle text-text-faint dark:text-text-body px-3 py-1.5 rounded-lg cursor-not-allowed select-none"
                 title="AI Caption Generator — Pro feature"
               >
                 <FiLock size={11} />
@@ -238,7 +238,7 @@ export default function CalendarView({
             )}
             <button
               onClick={() => onAddPost()}
-              className="flex items-center gap-1.5 text-xs font-medium bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all"
+              className="flex items-center gap-1.5 text-xs font-medium bg-brand text-white px-3 py-1.5 rounded-lg hover:bg-brand-strong transition-all"
             >
               <FiPlus size={14} /> Plan post
             </button>
@@ -256,7 +256,7 @@ export default function CalendarView({
           </button>
         ) : (
           <span
-            className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium border border-gray-200 dark:border-white/10 text-gray-300 dark:text-slate-600 px-3 py-2 rounded-lg cursor-not-allowed select-none"
+            className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium border border-border-subtle text-text-faint dark:text-text-body px-3 py-2 rounded-lg cursor-not-allowed select-none"
             title="AI Caption Generator — Pro feature"
           >
             <FiLock size={12} />
@@ -265,21 +265,21 @@ export default function CalendarView({
         )}
         <button
           onClick={() => onAddPost()}
-          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-all"
+          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium bg-brand text-white px-3 py-2 rounded-lg hover:bg-brand-strong transition-all"
         >
           <FiPlus size={14} /> Plan post
         </button>
       </div>
 
       {stats.total > 0 && (
-        <div className="flex items-center gap-3 mb-3 text-[11px] text-gray-500 dark:text-slate-400">
-          <span><span className="font-medium text-gray-700 dark:text-gray-200">{stats.total}</span> posts this month</span>
-          <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-slate-600" />
-          <span><span className="font-medium text-gray-700 dark:text-gray-200">{stats.thisWeek}</span> this week</span>
+        <div className="flex items-center gap-3 mb-3 text-[11px] text-text-muted">
+          <span><span className="font-medium text-text-body">{stats.total}</span> posts this month</span>
+          <span className="w-1 h-1 rounded-full bg-surface-3" />
+          <span><span className="font-medium text-text-body">{stats.thisWeek}</span> this week</span>
           {stats.busiest && (
             <>
-              <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-slate-600" />
-              <span>Busiest: <span className="font-medium text-gray-700 dark:text-gray-200">{stats.busiest}</span></span>
+              <span className="w-1 h-1 rounded-full bg-surface-3" />
+              <span>Busiest: <span className="font-medium text-text-body">{stats.busiest}</span></span>
             </>
           )}
         </div>
@@ -301,12 +301,12 @@ export default function CalendarView({
           <div className="min-w-[672px] grid grid-cols-7 gap-1">
           {DAYS.map((d) => (
             <div key={d} className="h-8 flex items-center justify-center">
-              <div className="h-3 w-6 bg-gray-200 dark:bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-6 bg-surface-2 dark:bg-white/5 rounded animate-pulse" />
             </div>
           ))}
           {[...Array(35)].map((_, i) => (
             <div key={i} className="h-[100px] p-1">
-              <div className="w-full h-full bg-gray-200 dark:bg-white/5 rounded-lg animate-pulse" />
+              <div className="w-full h-full bg-surface-2 dark:bg-white/5 rounded-lg animate-pulse" />
             </div>
           ))}
           </div>
@@ -317,12 +317,12 @@ export default function CalendarView({
             <div className="min-w-[672px]">
               <div className="grid grid-cols-7 gap-px mb-px">
                 {DAYS.map((d) => (
-                  <div key={d} className="h-7 flex items-center justify-center text-[11px] font-medium text-gray-400 dark:text-slate-500">
+                  <div key={d} className="h-7 flex items-center justify-center text-[11px] font-medium text-text-faint">
                     {d}
                   </div>
                 ))}
               </div>
-              <div className="grid grid-cols-7 gap-px bg-gray-100 dark:bg-white/5 rounded-xl overflow-hidden border border-gray-100 dark:border-white/5">
+              <div className="grid grid-cols-7 gap-px bg-surface-2 dark:bg-white/5 rounded-xl overflow-hidden border border-border-subtle dark:border-border-subtle">
                 {weeks.map((week, wi) =>
                   week.map((day, di) => {
                     if (day === null) return <div key={`e-${wi}-${di}`} />;
@@ -344,20 +344,20 @@ export default function CalendarView({
                         onClick={(e) => handleCellClick(day, e)}
                       >
                     <div
-                      className={`h-[100px] overflow-hidden bg-white dark:bg-[#16213e] p-1.5 transition-all hover:bg-gray-50 dark:hover:bg-white/[0.03] ${
-                        isToday ? "ring-1 ring-blue-400 dark:ring-blue-500/30" : ""
+                      className={`h-[100px] overflow-hidden bg-surface-1 p-1.5 transition-all hover:bg-surface-2 ${
+                        isToday ? "ring-1 ring-brand-soft" : ""
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
                         <span
                           className={`text-xs font-semibold leading-none ${
-                            isToday ? "text-blue-600 dark:text-blue-400" : "text-gray-700 dark:text-gray-200"
+                            isToday ? "text-brand" : "text-text-body"
                           }`}
                         >
                           {day}
                         </span>
                         {dayPosts.length > 0 && (
-                          <span className="text-[10px] text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-white/[0.06] px-1.5 py-0.5 rounded-full leading-none">
+                          <span className="text-[10px] text-text-faint bg-surface-2 dark:bg-white/[0.06] px-1.5 py-0.5 rounded-full leading-none">
                             {dayPosts.length}
                           </span>
                         )}
@@ -373,13 +373,13 @@ export default function CalendarView({
                                 key={p.id}
                                 className={`border-l-[3px] ${style} pl-1 flex items-center gap-1 min-h-0`}
                               >
-                                <Icon size={9} className="shrink-0 text-gray-400 dark:text-slate-500" />
+                                <Icon size={9} className="shrink-0 text-text-faint" />
                                 {typeLabel && (
-                                  <span className="text-[8px] uppercase font-semibold text-gray-400 dark:text-slate-500 shrink-0">
+                                  <span className="text-[8px] uppercase font-semibold text-text-faint shrink-0">
                                     {typeLabel}
                                   </span>
                                 )}
-                                <span className="text-[10px] text-gray-600 dark:text-slate-300 truncate leading-tight">
+                                <span className="text-[10px] text-text-body truncate leading-tight">
                                   {p.caption || ""}
                                 </span>
                                 <span
@@ -393,7 +393,7 @@ export default function CalendarView({
                         </div>
                       )}
                       {overflow > 0 && (
-                        <div className="absolute bottom-1 right-1.5 text-[10px] font-medium text-gray-400 dark:text-slate-500 bg-white/80 dark:bg-[#16213e]/80 px-1 rounded leading-none">
+                        <div className="absolute bottom-1 right-1.5 text-[10px] font-medium text-text-faint bg-surface-1/80 px-1 rounded leading-none">
                           +{overflow}
                         </div>
                       )}

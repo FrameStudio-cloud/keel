@@ -11,7 +11,7 @@ import {
   FiLock, FiClock, FiMessageSquare, FiRotateCw, FiCheck, FiSliders,
 } from "react-icons/fi";
 
-const inputClass = "w-full bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 transition-colors";
+const inputClass = "w-full bg-surface-1 border border-border-subtle rounded-lg px-3 py-2.5 text-sm text-text-primary placeholder-text-faint focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 transition-colors";
 
 const WIZARD_STEPS = [
   { key: "goal", label: "Goal" },
@@ -27,9 +27,9 @@ function Toggle({ checked, onChange }) {
       onClick={onChange}
       aria-pressed={checked}
       aria-label={checked ? "Turn off WhatsApp bot" : "Turn on WhatsApp bot"}
-      className={`relative w-11 h-6 rounded-full transition-all shrink-0 ${checked ? "bg-blue-600" : "bg-slate-300 dark:bg-slate-600"}`}
+      className={`relative w-11 h-6 rounded-full transition-all shrink-0 ${checked ? "bg-brand" : "bg-surface-3"}`}
     >
-      <span className="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all" style={{ left: checked ? "1.375rem" : "0.125rem" }} />
+      <span className="absolute top-0.5 w-5 h-5 bg-surface-1 rounded-full shadow transition-all" style={{ left: checked ? "1.375rem" : "0.125rem" }} />
     </button>
   );
 }
@@ -49,18 +49,18 @@ function Stepper({ current }) {
                   isDone
                     ? "bg-green-500 text-white"
                     : isActive
-                      ? "bg-blue-600 text-white shadow shadow-blue-600/30"
-                      : "bg-slate-200 dark:bg-white/10 text-slate-400 dark:text-slate-500"
+                      ? "bg-brand text-white shadow shadow-brand/30"
+                      : "bg-surface-2 text-text-faint"
                 }`}
               >
                 {isDone ? <FiCheck size={12} /> : i + 1}
               </span>
-              <span className={`hidden sm:inline text-[10px] font-semibold whitespace-nowrap ${isActive ? "text-blue-600 dark:text-blue-400" : isDone ? "text-gray-600 dark:text-slate-300" : "text-gray-400 dark:text-slate-500"}`}>
+              <span className={`hidden sm:inline text-[10px] font-semibold whitespace-nowrap ${isActive ? "text-brand" : isDone ? "text-text-body" : "text-text-faint"}`}>
                 {step.label}
               </span>
             </div>
             {i < WIZARD_STEPS.length - 1 && (
-              <span className={`h-px flex-1 ${isDone ? "bg-green-400" : "bg-slate-200 dark:bg-white/10"}`} />
+              <span className={`h-px flex-1 ${isDone ? "bg-green-400" : "bg-surface-2"}`} />
             )}
           </li>
         );
@@ -279,10 +279,10 @@ export default function WhatsAppBotCard() {
 
   if (loading || (!connected && goalsLoading)) {
     return (
-      <div className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm p-6">
+      <div className="bg-surface-1 rounded-2xl border border-border-subtle shadow-sm p-6">
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-12 bg-slate-100 dark:bg-white/5 rounded-xl animate-pulse" />
+            <div key={i} className="h-12 bg-surface-2 dark:bg-white/5 rounded-xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -290,20 +290,20 @@ export default function WhatsAppBotCard() {
   }
 
   return (
-    <div className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm p-6">
+    <div className="bg-surface-1 rounded-2xl border border-border-subtle shadow-sm p-6">
       {connected ? (
         <div className="space-y-5">
-          <div className="rounded-xl border border-green-200 dark:border-green-500/20 bg-green-50 dark:bg-green-500/10 p-4 flex items-start gap-3">
-            <FiCheckCircle size={18} className="text-green-600 dark:text-green-400 mt-0.5 shrink-0" />
+          <div className="rounded-xl border border-success dark:border-green-500/20 bg-success-muted p-4 flex items-start gap-3">
+            <FiCheckCircle size={18} className="text-success mt-0.5 shrink-0" />
             <div className="flex-1">
-              <p className="text-sm font-semibold text-green-700 dark:text-green-400">Bot is live</p>
-              <p className="text-xs text-green-600/80 dark:text-green-300/80 mt-0.5">
+              <p className="text-sm font-semibold text-success">Bot is live</p>
+              <p className="text-xs text-success/80 mt-0.5">
                 Messages to <span className="font-mono">{masked || botNumber}</span> are answered automatically.
                 {connectedAt ? ` Connected ${new Date(connectedAt).toLocaleDateString()}.` : ""}
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
-              <span className="text-xs text-gray-400 dark:text-slate-500">{enabled ? "Active" : "Paused"}</span>
+              <span className="text-xs text-text-faint">{enabled ? "Active" : "Paused"}</span>
               <Toggle checked={enabled} onChange={handleToggle} />
             </div>
           </div>
@@ -319,14 +319,14 @@ export default function WhatsAppBotCard() {
 
           <Link
             to="/website"
-            className="flex items-center gap-3 p-3 rounded-xl border border-blue-200 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10 hover:border-blue-300 dark:hover:border-blue-500/40 transition-colors"
+            className="flex items-center gap-3 p-3 rounded-xl border border-brand-soft dark:border-blue-500/20 bg-brand-muted hover:border-brand-soft transition-colors"
           >
-            <div className="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-lg bg-brand text-white flex items-center justify-center shrink-0">
               <FiSliders size={15} />
             </div>
             <div className="flex-1">
-              <p className="text-xs font-semibold text-blue-700 dark:text-blue-300">Next step — personalize your bot</p>
-              <p className="text-[11px] text-blue-600/80 dark:text-blue-300/80 mt-0.5">
+              <p className="text-xs font-semibold text-brand">Next step — personalize your bot</p>
+              <p className="text-[11px] text-brand/80 mt-0.5">
                 Add FAQs and a greeting message on your chat widget.
               </p>
             </div>
@@ -336,7 +336,7 @@ export default function WhatsAppBotCard() {
             <button
               onClick={handleDisconnect}
               disabled={busy}
-              className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-red-500 border border-red-200 dark:border-red-500/20 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-danger border border-danger rounded-lg hover:bg-danger-muted transition-all disabled:opacity-50"
             >
               <FiTrash2 size={13} />
               {busy ? "Disconnecting..." : "Disconnect number"}
@@ -364,15 +364,15 @@ export default function WhatsAppBotCard() {
             />
           ) : !phoneId ? (
             <>
-              <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-4 text-xs text-slate-500 dark:text-slate-400 flex items-start gap-2">
+              <div className="rounded-xl border border-border-subtle bg-surface-2 dark:bg-white/5 p-4 text-xs text-text-muted flex items-start gap-2">
                 <FiLock size={14} className="mt-0.5 shrink-0" />
                 <span>Connect any WhatsApp number. Your customers will message it and get instant answers about your products, prices and opening hours.</span>
               </div>
 
               <div>
-                <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1.5">WhatsApp number</label>
+                <label className="block text-xs text-text-faint mb-1.5">WhatsApp number</label>
                 <div className="flex gap-2">
-                  <div className="flex items-center gap-1 px-3 bg-slate-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg text-sm text-gray-500 dark:text-slate-400 shrink-0">
+                  <div className="flex items-center gap-1 px-3 bg-surface-2 dark:bg-white/5 border border-border-subtle rounded-lg text-sm text-text-muted shrink-0">
                     <FiSmartphone size={14} /> +254
                   </div>
                   <input
@@ -387,7 +387,7 @@ export default function WhatsAppBotCard() {
               </div>
 
               <div>
-                <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1.5">How do you want to receive the code?</label>
+                <label className="block text-xs text-text-faint mb-1.5">How do you want to receive the code?</label>
                 <div className="grid grid-cols-2 gap-2">
                   {["SMS", "VOICE"].map((m) => (
                     <button
@@ -396,8 +396,8 @@ export default function WhatsAppBotCard() {
                       onClick={() => setCodeMethod(m)}
                       className={`flex items-center justify-center gap-2 py-2.5 border rounded-lg text-sm font-semibold transition-all ${
                         codeMethod === m
-                          ? "border-blue-400 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400"
-                          : "border-slate-200 dark:border-white/10 text-gray-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5"
+                          ? "border-brand bg-brand-muted text-brand"
+                          : "border-border-subtle text-text-body hover:bg-surface-2 dark:hover:bg-white/5"
                       }`}
                     >
                       {m === "SMS" ? <FiMessageSquare size={14} /> : <FiMessageCircle size={14} />}
@@ -410,25 +410,25 @@ export default function WhatsAppBotCard() {
               <button
                 onClick={handleConnect}
                 disabled={busy}
-                className="w-full flex items-center justify-center gap-2 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm rounded-lg transition-all disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 py-3 bg-brand hover:bg-brand-soft text-white font-semibold text-sm rounded-lg transition-all disabled:opacity-50"
               >
                 <FiZap size={15} />
                 {busy ? "Sending code..." : "Send me a verification code"}
               </button>
 
-              <p className="text-xs text-gray-400 dark:text-slate-500 leading-relaxed">
+              <p className="text-xs text-text-faint leading-relaxed">
                 We'll send a 6-digit code to this number to confirm it's yours. This number must not be registered on the WhatsApp app on your phone.
               </p>
             </>
           ) : (
             <>
-              <div className="rounded-xl border border-blue-200 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10 p-4 text-sm text-blue-700 dark:text-blue-300 flex items-start gap-2">
+              <div className="rounded-xl border border-brand-soft dark:border-blue-500/20 bg-brand-muted p-4 text-sm text-brand flex items-start gap-2">
                 <FiClock size={15} className="mt-0.5 shrink-0" />
                 <span>We sent a 6-digit code to <span className="font-mono font-semibold">{masked || maskNumber(phone)}</span>. Enter it below to activate your bot.</span>
               </div>
 
               <div>
-                <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1.5">Verification code</label>
+                <label className="block text-xs text-text-faint mb-1.5">Verification code</label>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -443,7 +443,7 @@ export default function WhatsAppBotCard() {
               <button
                 onClick={handleVerify}
                 disabled={busy}
-                className="w-full flex items-center justify-center gap-2 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm rounded-lg transition-all disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 py-3 bg-brand hover:bg-brand-soft text-white font-semibold text-sm rounded-lg transition-all disabled:opacity-50"
               >
                 <FiCheckCircle size={15} />
                 {busy ? "Activating..." : "Verify & activate bot"}
@@ -453,14 +453,14 @@ export default function WhatsAppBotCard() {
                 <button
                   onClick={handleResend}
                   disabled={resendCountdown > 0 || busy}
-                  className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50 disabled:no-underline"
+                  className="flex items-center gap-1.5 text-xs font-semibold text-brand hover:underline disabled:opacity-50 disabled:no-underline"
                 >
                   <FiRotateCw size={12} />
                   {resendCountdown > 0 ? `Resend code in ${resendCountdown}s` : "Resend code"}
                 </button>
                 <button
                   onClick={() => { setPhoneId(""); setPhone(""); setCode(""); }}
-                  className="text-xs text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300"
+                  className="text-xs text-text-faint hover:text-text-body dark:hover:text-text-body"
                 >
                   Use a different number
                 </button>

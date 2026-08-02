@@ -9,32 +9,32 @@ const SUGGESTION_TYPES = {
   best_seller: {
     icon: FiTrendingUp,
     label: "Best Seller",
-    color: "bg-green-50 dark:bg-green-500/10 border-green-200 dark:border-green-500/20 text-green-700 dark:text-green-400",
+    color: "bg-success-muted border-success dark:border-green-500/20 text-success",
   },
   almost_gone: {
     icon: FiAlertTriangle,
     label: "Almost Gone",
-    color: "bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400",
+    color: "bg-danger-muted border-danger text-danger",
   },
   new_arrival: {
     icon: FiStar,
     label: "New Arrival",
-    color: "bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20 text-blue-600 dark:text-blue-400",
+    color: "bg-brand-muted border-brand-soft dark:border-blue-500/20 text-brand",
   },
   back_in_stock: {
     icon: FiPackage,
     label: "Back in Stock",
-    color: "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 text-amber-600 dark:text-amber-400",
+    color: "bg-warning-muted border-warning text-warning",
   },
   needs_boost: {
     icon: FiClock,
     label: "Needs Boost",
-    color: "bg-purple-50 dark:bg-purple-500/10 border-purple-200 dark:border-purple-500/20 text-purple-600 dark:text-purple-400",
+    color: "bg-chart-4/10 border-chart-4/40 text-chart-4",
   },
   popular_views: {
     icon: FiEye,
     label: "Popular",
-    color: "bg-cyan-50 dark:bg-cyan-500/10 border-cyan-200 dark:border-cyan-500/20 text-cyan-600 dark:text-cyan-400",
+    color: "bg-chart-6/10 border-chart-6/40 text-chart-6",
   },
 };
 
@@ -239,7 +239,7 @@ export default function PostSuggestions({ onUseSuggestion }) {
     return (
       <div className="flex flex-col gap-2">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="rounded-xl border border-gray-100 dark:border-white/5 p-3">
+          <div key={i} className="rounded-xl border border-border-subtle dark:border-border-subtle p-3">
             <Skeleton className="h-3 w-24 mb-2" />
             <Skeleton className="h-3 w-full mb-1" />
             <Skeleton className="h-3 w-3/4" />
@@ -253,7 +253,7 @@ export default function PostSuggestions({ onUseSuggestion }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">
+      <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">
         Post Ideas
       </h3>
       {visible.map((s) => {
@@ -275,21 +275,21 @@ export default function PostSuggestions({ onUseSuggestion }) {
                 onClick={() =>
                   setDismissed((prev) => new Set(prev).add(s.product.id + s.type))
                 }
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                className="text-text-faint hover:text-text-body dark:hover:text-text-faint"
                 aria-label="Dismiss"
               >
                 <FiX size={14} />
               </button>
             </div>
-            <p className="font-medium text-gray-800 dark:text-gray-100 mb-1">
+            <p className="font-medium text-text-primary mb-1">
               {s.product.name}
             </p>
-            <p className="text-gray-500 dark:text-slate-400 mb-2 leading-relaxed">
+            <p className="text-text-muted mb-2 leading-relaxed">
               {caption}
             </p>
             <button
               onClick={() => onUseSuggestion(caption)}
-              className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline font-medium"
+              className="flex items-center gap-1 text-brand hover:underline font-medium"
             >
               <FiPlus size={12} /> Add to calendar
             </button>

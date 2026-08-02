@@ -75,24 +75,24 @@ export default function Sales() {
         <p>When a customer buys, tap <strong>Log Sale</strong> — receipt and revenue tracked automatically.</p>
       </ContextTip>
       <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-gray-400 dark:text-slate-500">{total} transactions</p>
+        <p className="text-sm text-text-faint">{total} transactions</p>
         <div className="flex items-center gap-2">
           <QueueStatus />
           <button
             data-onboarding="log-sale"
             onClick={() => setShowModal(true)}
-            className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all"
+            className="bg-brand text-white text-sm px-4 py-2 rounded-lg hover:bg-brand-strong transition-all"
           >
             + Log sale
           </button>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden">
+      <div className="bg-surface-1 rounded-xl border border-border-subtle overflow-hidden">
         {loading ? (
           <div className="space-y-2 p-3">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-slate-50 dark:bg-[#1a1a2e] rounded-xl px-4 py-3">
+              <div key={i} className="bg-surface-2 rounded-xl px-4 py-3">
                 <div className="flex items-start justify-between">
                   <div className="min-w-0 flex-1 space-y-1.5">
                     <Skeleton className="h-4 w-3/5" />
@@ -124,24 +124,24 @@ export default function Sales() {
                 <div
                   key={s.id}
                   onClick={() => setReceiptSale(s)}
-                  className="bg-slate-50 dark:bg-[#1a1a2e] rounded-xl px-4 py-3 cursor-pointer active:scale-[0.99] transition-transform"
+                  className="bg-surface-2 rounded-xl px-4 py-3 cursor-pointer active:scale-[0.99] transition-transform"
                 >
                   <div className="flex items-start justify-between">
                     <div className="min-w-0 flex-1">
-                      <p className="text-slate-900 dark:text-white text-sm font-medium truncate">{s.product_name}</p>
-                      <p className="text-slate-500 dark:text-slate-400 text-xs">{formatDate(s.created_at)}</p>
+                      <p className="text-text-primary text-sm font-medium truncate">{s.product_name}</p>
+                      <p className="text-text-muted text-xs">{formatDate(s.created_at)}</p>
                     </div>
-                    <p className="text-blue-600 dark:text-blue-400 text-sm font-semibold flex-shrink-0 ml-3">
+                    <p className="text-brand text-sm font-semibold flex-shrink-0 ml-3">
                       {formatPrice(s.amount)}
                     </p>
                   </div>
                   <div className="flex items-center gap-3 mt-2">
-                    <span className="text-xs text-slate-500 dark:text-slate-400">Qty: {s.quantity}</span>
-                    <span className="text-xs text-slate-500 dark:text-slate-400">· {s.method}</span>
+                    <span className="text-xs text-text-muted">Qty: {s.quantity}</span>
+                    <span className="text-xs text-text-muted">· {s.method}</span>
                     <Badge label="Paid" color="green" />
                     <button
                       onClick={(e) => { e.stopPropagation(); setReceiptSale(s); }}
-                      className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all ml-auto"
+                      className="px-3 py-1.5 text-xs font-medium bg-surface-1 border border-brand-soft text-brand rounded-lg hover:bg-brand-muted transition-all ml-auto"
                     >
                       Receipt
                     </button>
@@ -151,26 +151,26 @@ export default function Sales() {
             </div>
             <table className="hidden sm:table w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100 dark:border-white/10">
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                <tr className="border-b border-border-subtle">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                     Item
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                     Date
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                     Qty
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                     Method
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                     Amount
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                     Status
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">
                     Actions
                   </th>
                 </tr>
@@ -180,17 +180,17 @@ export default function Sales() {
                   <tr
                     key={s.id}
                     onClick={() => setReceiptSale(s)}
-                    className="border-b border-gray-50 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all cursor-pointer"
+                    className="border-b border-border-subtle dark:border-border-subtle hover:bg-surface-2 transition-all cursor-pointer"
                   >
-                    <td className="px-4 py-3 font-medium text-gray-800 dark:text-white">
+                    <td className="px-4 py-3 font-medium text-text-primary">
                       {s.product_name}
                     </td>
-                    <td className="px-4 py-3 text-gray-400 dark:text-slate-500">
+                    <td className="px-4 py-3 text-text-faint">
                       {formatDate(s.created_at)}
                     </td>
-                    <td className="px-4 py-3 text-gray-400 dark:text-slate-500">{s.quantity}</td>
-                    <td className="px-4 py-3 text-gray-400 dark:text-slate-500">{s.method}</td>
-                    <td className="px-4 py-3 font-medium text-blue-700 dark:text-blue-400">
+                    <td className="px-4 py-3 text-text-faint">{s.quantity}</td>
+                    <td className="px-4 py-3 text-text-faint">{s.method}</td>
+                    <td className="px-4 py-3 font-medium text-brand">
                       {formatPrice(s.amount)}
                     </td>
                     <td className="px-4 py-3">
@@ -199,7 +199,7 @@ export default function Sales() {
                     <td className="px-4 py-3">
                       <button
                         onClick={(e) => { e.stopPropagation(); setReceiptSale(s); }}
-                        className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all"
+                        className="px-3 py-1.5 text-xs font-medium bg-surface-1 border border-brand-soft text-brand rounded-lg hover:bg-brand-muted transition-all"
                       >
                         Receipt
                       </button>

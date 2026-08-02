@@ -55,36 +55,36 @@ export default function ServiceFormModal({ service, defaultCategory, onSave, onC
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div
         ref={trapRef}
-        className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-100 dark:border-white/10 p-6 w-full max-w-md mx-4"
+        className="bg-surface-1 rounded-2xl border border-border-subtle p-6 w-full max-w-md mx-4"
         role="dialog"
         aria-modal="true"
         aria-label={service ? "Edit service" : "Add service"}
       >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-sm font-medium text-gray-800 dark:text-white">{service ? "Edit service" : "Add service"}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg" aria-label="Close"><FiX /></button>
+          <h2 className="text-sm font-medium text-text-primary">{service ? "Edit service" : "Add service"}</h2>
+          <button onClick={onClose} className="text-text-faint hover:text-text-body text-lg" aria-label="Close"><FiX /></button>
         </div>
 
         <div className="flex flex-col gap-3">
           <div>
-            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Service name</label>
+            <label className="text-xs text-text-faint mb-1 block">Service name</label>
             <input
               name="name"
               value={form.name}
               onChange={handleChange}
               placeholder="e.g. Wash & Fold"
-              className={`w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 ${errors.name ? "border-red-400" : "border-gray-200 dark:border-white/10"}`}
+              className={`w-full border rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand ${errors.name ? "border-danger" : "border-border-subtle"}`}
             />
-            {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
+            {errors.name && <p className="text-danger text-xs mt-1">{errors.name}</p>}
           </div>
 
           <div>
-            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Pricing mode</label>
+            <label className="text-xs text-text-faint mb-1 block">Pricing mode</label>
             <select
               name="pricing_mode"
               value={form.pricing_mode}
               onChange={handleChange}
-              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+              className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
             >
               {pricingModes.map((m) => (
                 <option key={m.value} value={m.value}>{m.label}</option>
@@ -94,7 +94,7 @@ export default function ServiceFormModal({ service, defaultCategory, onSave, onC
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Price</label>
+              <label className="text-xs text-text-faint mb-1 block">Price</label>
               <input
                 name="price"
                 value={form.price}
@@ -102,40 +102,40 @@ export default function ServiceFormModal({ service, defaultCategory, onSave, onC
                 type="number"
                 min="0"
                 placeholder="200"
-                className={`w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 ${errors.price ? "border-red-400" : "border-gray-200 dark:border-white/10"}`}
+                className={`w-full border rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand ${errors.price ? "border-danger" : "border-border-subtle"}`}
               />
-              {errors.price && <p className="text-red-400 text-xs mt-1">{errors.price}</p>}
+              {errors.price && <p className="text-danger text-xs mt-1">{errors.price}</p>}
             </div>
             {form.pricing_mode !== "flat" && (
               <div>
-                <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Unit label</label>
+                <label className="text-xs text-text-faint mb-1 block">Unit label</label>
                 <input
                   name="unit_label"
                   value={form.unit_label}
                   onChange={handleChange}
                   placeholder="kg, item, hour"
-                  className={`w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 ${errors.unit_label ? "border-red-400" : "border-gray-200 dark:border-white/10"}`}
+                  className={`w-full border rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand ${errors.unit_label ? "border-danger" : "border-border-subtle"}`}
                 />
-                {errors.unit_label && <p className="text-red-400 text-xs mt-1">{errors.unit_label}</p>}
+                {errors.unit_label && <p className="text-danger text-xs mt-1">{errors.unit_label}</p>}
               </div>
             )}
           </div>
 
           {form.pricing_mode !== "flat" && (
-            <p className="text-xs text-gray-400 dark:text-slate-500">
+            <p className="text-xs text-text-faint">
               Example: {formatPrice(parseInt(form.price) || 0)} per {form.unit_label || "unit"}
             </p>
           )}
 
           <div>
-            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Description (optional)</label>
+            <label className="text-xs text-text-faint mb-1 block">Description (optional)</label>
             <textarea
               name="description"
               value={form.description}
               onChange={handleChange}
               placeholder="Brief description of this service"
               rows={2}
-              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 resize-none"
+              className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand resize-none"
             />
           </div>
         </div>
@@ -143,13 +143,13 @@ export default function ServiceFormModal({ service, defaultCategory, onSave, onC
         <div className="flex gap-2 mt-5">
           <button
             onClick={onClose}
-            className="flex-1 border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 text-sm py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+            className="flex-1 border border-border-subtle text-text-muted text-sm py-2 rounded-lg hover:bg-surface-2 transition-all"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="flex-1 bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700 transition-all"
+            className="flex-1 bg-brand text-white text-sm py-2 rounded-lg hover:bg-brand-strong transition-all"
           >
             {service ? "Save changes" : "Add service"}
           </button>

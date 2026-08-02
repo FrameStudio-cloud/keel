@@ -40,7 +40,7 @@ export default function ServiceOverview() {
   if (loading) {
     return (
       <>
-        <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-3">Orders Overview</p>
+        <p className="text-[11px] font-semibold tracking-widest uppercase text-text-muted mb-3">Orders Overview</p>
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
           {[...Array(5)].map((_, i) => <div key={i} className="h-24 bg-white/5 rounded-xl animate-pulse" />)}
         </div>
@@ -51,29 +51,29 @@ export default function ServiceOverview() {
 
   return (
     <>
-      <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-3">Orders Overview</p>
+      <p className="text-[11px] font-semibold tracking-widest uppercase text-text-muted mb-3">Orders Overview</p>
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
         {stats.map((s) => (
           <StatCard key={s.label} label={s.label} value={s.value} change={s.change} up={s.up} />
         ))}
       </div>
 
-      <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-3">Recent Activity</p>
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden">
+      <p className="text-[11px] font-semibold tracking-widest uppercase text-text-muted mb-3">Recent Activity</p>
+      <div className="bg-surface-1 rounded-card border border-border-subtle overflow-hidden">
         {orders.length === 0 ? (
-          <div className="p-6 text-center text-sm text-gray-400 dark:text-slate-500">No orders yet</div>
+          <div className="p-6 text-center text-sm text-text-faint">No orders yet</div>
         ) : (
           <div className="space-y-1 p-3">
             {orders.slice(0, 5).map((order) => (
-              <div key={order.id} className="flex items-center gap-3 px-3 py-2.5 bg-slate-50 dark:bg-[#1a1a2e] rounded-lg">
-                <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                  <FiShoppingBag className="text-blue-600 dark:text-blue-400" size={14} />
+              <div key={order.id} className="flex items-center gap-3 px-3 py-2.5 bg-surface-2 rounded-lg">
+                <div className="w-8 h-8 rounded-lg bg-brand-muted flex items-center justify-center flex-shrink-0">
+                  <FiShoppingBag className="text-brand" size={14} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm text-slate-900 dark:text-white font-medium truncate">{order.customer.name}</p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500">{order.items.length} item{(order.items.length > 1 ? "s" : "")} · {order.id}</p>
+                  <p className="text-sm text-text-primary font-medium truncate">{order.customer.name}</p>
+                  <p className="text-xs text-text-faint">{order.items.length} item{(order.items.length > 1 ? "s" : "")} · {order.id}</p>
                 </div>
-                <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">{formatPrice(order.total)}</p>
+                <p className="text-sm font-semibold text-brand">{formatPrice(order.total)}</p>
               </div>
             ))}
           </div>

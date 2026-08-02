@@ -178,16 +178,16 @@ export default function AddProductModal({ onClose, onAdded }) {
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div
         ref={trapRef}
-        className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-100 dark:border-white/10 p-6 w-full max-w-md mx-4 max-h-[85vh] overflow-y-auto"
+        className="bg-surface-1 rounded-2xl border border-border-subtle p-6 w-full max-w-md mx-4 max-h-[85vh] overflow-y-auto"
         role="dialog"
         aria-modal="true"
         aria-label="Add product"
       >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-sm font-medium text-gray-800 dark:text-white">Add product</h2>
+          <h2 className="text-sm font-medium text-text-primary">Add product</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 dark:text-slate-500 hover:text-gray-600 text-lg"
+            className="text-text-faint hover:text-text-body text-lg"
             aria-label="Close"
           >
             <FiX />
@@ -196,7 +196,7 @@ export default function AddProductModal({ onClose, onAdded }) {
 
         <div className="flex flex-col gap-3">
           <div>
-            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+            <label className="text-xs text-text-faint mb-1 block">
               Product name
             </label>
             <input
@@ -204,24 +204,24 @@ export default function AddProductModal({ onClose, onAdded }) {
               value={form.name}
               onChange={handleChange}
               placeholder="e.g. iPhone 15 case"
-              className={`w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 ${errors.name ? "border-red-400" : "border-gray-200 dark:border-white/10"}`}
+              className={`w-full border rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand ${errors.name ? "border-danger" : "border-border-subtle"}`}
             />
-            {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
+            {errors.name && <p className="text-danger text-xs mt-1">{errors.name}</p>}
           </div>
           <div>
-            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Category</label>
+            <label className="text-xs text-text-faint mb-1 block">Category</label>
             <input
               name="category"
               value={form.category}
               onChange={handleChange}
               placeholder="e.g. Cases"
-              className={`w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 ${errors.category ? "border-red-400" : "border-gray-200 dark:border-white/10"}`}
+              className={`w-full border rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand ${errors.category ? "border-danger" : "border-border-subtle"}`}
             />
-            {errors.category && <p className="text-red-400 text-xs mt-1">{errors.category}</p>}
+            {errors.category && <p className="text-danger text-xs mt-1">{errors.category}</p>}
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+              <label className="text-xs text-text-faint mb-1 block">
                 Price
               </label>
               <input
@@ -230,12 +230,12 @@ export default function AddProductModal({ onClose, onAdded }) {
                 onChange={handleChange}
                 placeholder="350"
                 type="number"
-                className={`w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 ${errors.price ? "border-red-400" : "border-gray-200 dark:border-white/10"}`}
+                className={`w-full border rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand ${errors.price ? "border-danger" : "border-border-subtle"}`}
               />
-              {errors.price && <p className="text-red-400 text-xs mt-1">{errors.price}</p>}
+              {errors.price && <p className="text-danger text-xs mt-1">{errors.price}</p>}
             </div>
             <div>
-              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+              <label className="text-xs text-text-faint mb-1 block">
                 Cost price
               </label>
               <input
@@ -244,11 +244,11 @@ export default function AddProductModal({ onClose, onAdded }) {
                 onChange={handleChange}
                 placeholder="200"
                 type="number"
-                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
               />
             </div>
             <div>
-              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+              <label className="text-xs text-text-faint mb-1 block">
                 Stock
               </label>
               <input
@@ -257,33 +257,33 @@ export default function AddProductModal({ onClose, onAdded }) {
                 onChange={handleChange}
                 placeholder="10"
                 type="number"
-                className={`w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 ${errors.stock ? "border-red-400" : "border-gray-200 dark:border-white/10"}`}
+                className={`w-full border rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand ${errors.stock ? "border-danger" : "border-border-subtle"}`}
               />
-              {errors.stock && <p className="text-red-400 text-xs mt-1">{errors.stock}</p>}
+              {errors.stock && <p className="text-danger text-xs mt-1">{errors.stock}</p>}
             </div>
           </div>
 
           {attributes.length > 0 && (
-            <div className="border-t border-gray-100 dark:border-white/10 pt-3">
+            <div className="border-t border-border-subtle pt-3">
               <button
                 type="button"
                 onClick={() => setShowVariants((v) => !v)}
-                className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-slate-500 font-medium mb-1 hover:text-gray-600 dark:hover:text-slate-300 transition-colors w-full text-left"
+                className="flex items-center gap-1.5 text-xs text-text-faint font-medium mb-1 hover:text-text-body dark:hover:text-text-body transition-colors w-full text-left"
               >
                 <span className={`transition-transform ${showVariants ? "rotate-90" : ""}`}>▸</span>
                 Product Attributes
                 {!attributes.some((a) => a.required) && (
-                  <span className="text-gray-300 dark:text-slate-600 font-normal">(Optional)</span>
+                  <span className="text-text-faint dark:text-text-body font-normal">(Optional)</span>
                 )}
               </button>
               {showVariants && (
                 <div className="flex flex-col gap-3 mt-3">
-                  {errors.attributes && <p className="text-red-400 text-xs">{errors.attributes}</p>}
+                  {errors.attributes && <p className="text-danger text-xs">{errors.attributes}</p>}
                   {attributes.map((attr) => (
                     <div key={attr.id}>
-                      <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+                      <label className="text-xs text-text-faint mb-1 block">
                         {attr.name}
-                        {attr.required && <span className="text-red-400 ml-0.5">*</span>}
+                        {attr.required && <span className="text-danger ml-0.5">*</span>}
                       </label>
                       {attr.type === "select" && attr.options ? (
                         <div>
@@ -307,8 +307,8 @@ export default function AddProductModal({ onClose, onAdded }) {
                                     }}
                                     className={`px-2.5 py-1 text-xs rounded-lg border transition-all ${
                                       selected
-                                        ? "bg-blue-50 border-blue-300 text-blue-700 dark:bg-blue-500/15 dark:border-blue-500/30 dark:text-blue-300"
-                                        : "border-gray-200 text-gray-600 hover:border-gray-300 dark:border-white/10 dark:text-slate-400 dark:hover:border-white/20"
+                                        ? "bg-brand-muted border-brand-soft text-brand"
+                                        : "border-border-subtle text-text-body hover:border-border-strong dark:border-white/10 dark:hover:border-white/20"
                                     }`}
                                   >
                                     {selected && <span className="mr-1">✓</span>}
@@ -321,7 +321,7 @@ export default function AddProductModal({ onClose, onAdded }) {
                               <button
                                 type="button"
                                 onClick={() => setShowAllAttrs((prev) => ({ ...prev, [attr.id]: true }))}
-                                className="px-2.5 py-1 text-xs rounded-lg border border-dashed border-gray-200 text-gray-400 hover:text-gray-600 hover:border-gray-300 dark:border-white/10 dark:text-slate-500 dark:hover:text-slate-300 transition-all"
+                                className="px-2.5 py-1 text-xs rounded-lg border border-dashed border-border-subtle text-text-faint hover:text-text-body hover:border-border-strong dark:border-white/10 dark:text-text-muted dark:hover:text-text-body transition-all"
                               >
                                 + {attr.options.length - 3} more
                               </button>
@@ -338,8 +338,8 @@ export default function AddProductModal({ onClose, onAdded }) {
                               }}
                               className={`px-2.5 py-1 text-xs rounded-lg border border-dashed transition-all ${
                                 attributeValues[attr.id] === "__other__"
-                                  ? "bg-blue-50 border-blue-300 text-blue-700 dark:bg-blue-500/15 dark:border-blue-500/30 dark:text-blue-300"
-                                  : "border-gray-200 text-gray-400 hover:text-gray-600 hover:border-gray-300 dark:border-white/10 dark:text-slate-500 dark:hover:text-slate-300"
+                                  ? "bg-brand-muted border-brand-soft text-brand"
+                                  : "border-border-subtle text-text-faint hover:text-text-body hover:border-border-strong dark:border-white/10 dark:text-text-muted dark:hover:text-text-body"
                               }`}
                             >
                               {attributeValues[attr.id] === "__other__" ? "✓ Custom" : "+ Add"}
@@ -350,7 +350,7 @@ export default function AddProductModal({ onClose, onAdded }) {
                               value={customAttrValues[attr.id] || ""}
                               onChange={(e) => setCustomAttrValues((prev) => ({ ...prev, [attr.id]: e.target.value }))}
                               placeholder={`Type custom ${attr.name.toLowerCase()}`}
-                              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 mt-2"
+                              className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand mt-2"
                               autoFocus
                             />
                           )}
@@ -359,7 +359,7 @@ export default function AddProductModal({ onClose, onAdded }) {
                         <div>
                           <div className="flex flex-wrap gap-1.5 mb-1.5">
                             {(attributeValues[attr.id] || "").split("|||").filter(Boolean).map((val, i) => (
-                              <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-lg bg-blue-50 border border-blue-200 text-blue-700 dark:bg-blue-500/15 dark:border-blue-500/30 dark:text-blue-300">
+                              <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-lg bg-brand-muted border border-brand-soft text-brand">
                                 {val}
                                 <button
                                   type="button"
@@ -368,7 +368,7 @@ export default function AddProductModal({ onClose, onAdded }) {
                                     vals.splice(i, 1);
                                     handleAttrChange(attr.id, vals.join("|||"));
                                   }}
-                                  className="hover:text-blue-900 dark:hover:text-blue-100 leading-none"
+                                  className="hover:text-brand-soft leading-none"
                                 >
                                   ×
                                 </button>
@@ -388,7 +388,7 @@ export default function AddProductModal({ onClose, onAdded }) {
                                 }
                               }}
                               placeholder={`Type ${attr.name.toLowerCase()} and press Enter`}
-                              className="flex-1 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                              className="flex-1 border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
                             />
                             <button
                               type="button"
@@ -400,7 +400,7 @@ export default function AddProductModal({ onClose, onAdded }) {
                                   setCustomAttrValues((prev) => ({ ...prev, [attr.id]: "" }));
                                 }
                               }}
-                              className="px-3 py-2 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all"
+                              className="px-3 py-2 text-xs font-medium rounded-lg bg-brand text-white hover:bg-brand-strong transition-all"
                             >
                               Add
                             </button>
@@ -412,7 +412,7 @@ export default function AddProductModal({ onClose, onAdded }) {
                           onChange={(e) => handleAttrChange(attr.id, e.target.value)}
                           type="number"
                           placeholder={`Enter ${attr.name.toLowerCase()}`}
-                          className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                          className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
                         />
                       )}
                     </div>
@@ -424,7 +424,7 @@ export default function AddProductModal({ onClose, onAdded }) {
 
           {showBarcode && (
             <div>
-              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+              <label className="text-xs text-text-faint mb-1 block">
                 Barcode
               </label>
               <div className="flex gap-2">
@@ -433,12 +433,12 @@ export default function AddProductModal({ onClose, onAdded }) {
                   value={form.barcode}
                   onChange={handleChange}
                   placeholder="Scan or type barcode"
-                  className="flex-1 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 font-mono"
+                  className="flex-1 border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand font-mono"
                 />
                 <button
                   type="button"
                   onClick={() => setShowScanner(true)}
-                  className="flex items-center gap-1.5 px-3 border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 text-xs rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+                  className="flex items-center gap-1.5 px-3 border border-border-subtle text-text-muted text-xs rounded-lg hover:bg-surface-2 transition-all"
                 >
                   <FiCamera size={14} />
                   Scan
@@ -463,7 +463,7 @@ export default function AddProductModal({ onClose, onAdded }) {
           )}
 
           {existingProduct && (
-            <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-lg px-3 py-2 text-xs text-amber-700 dark:text-amber-300">
+            <div className="bg-warning-muted border border-warning rounded-lg px-3 py-2 text-xs text-accent-300">
               <p className="font-medium mb-1">
                 "{existingProduct.name}" already exists
               </p>
@@ -471,7 +471,7 @@ export default function AddProductModal({ onClose, onAdded }) {
                 Current stock: {existingProduct.stock} &nbsp;·&nbsp; Price:{" "}
                 {formatPrice(existingProduct.price)}
               </p>
-              <p className="mt-1 text-amber-500 dark:text-amber-400">
+              <p className="mt-1 text-accent">
                 Your new stock and price values will replace these.
               </p>
             </div>
@@ -481,14 +481,14 @@ export default function AddProductModal({ onClose, onAdded }) {
         <div className="flex gap-2 mt-5">
           <button
             onClick={onClose}
-            className="flex-1 border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 text-sm py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+            className="flex-1 border border-border-subtle text-text-muted text-sm py-2 rounded-lg hover:bg-surface-2 transition-all"
           >
             Cancel
           </button>
           <button
             onClick={existingProduct ? handleUpdate : handleSubmit}
             disabled={loading}
-            className="flex-1 bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50"
+            className="flex-1 bg-brand text-white text-sm py-2 rounded-lg hover:bg-brand-strong transition-all disabled:opacity-50"
           >
             {loading
               ? "Saving..."

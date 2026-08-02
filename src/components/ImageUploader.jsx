@@ -98,7 +98,7 @@ export default function ImageUploader({ currentImage, onImageChange }) {
 
   return (
     <div>
-      <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+      <label className="text-xs text-text-faint mb-1 block">
         Photo
       </label>
 
@@ -107,7 +107,7 @@ export default function ImageUploader({ currentImage, onImageChange }) {
           <img
             src={preview || currentImage}
             alt="preview"
-            className={`w-full h-40 object-cover rounded-xl border border-gray-200 dark:border-white/10 ${
+            className={`w-full h-40 object-cover rounded-xl border border-border-subtle ${
               preview ? "opacity-90" : ""
             }`}
           />
@@ -133,28 +133,28 @@ export default function ImageUploader({ currentImage, onImageChange }) {
             onClick={() => { if (!compressing) browseRef.current?.click() }}
             className={`hidden sm:flex flex-col items-center justify-center h-40 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
               compressing
-                ? "border-blue-300 bg-blue-50 dark:bg-blue-500/10 cursor-wait"
+                ? "border-brand-soft bg-brand-muted cursor-wait"
                 : dragging
-                  ? "border-blue-400 bg-blue-50 dark:bg-blue-500/10"
-                  : "border-gray-300 dark:border-white/20 hover:border-blue-300 dark:hover:border-blue-400 bg-gray-50 dark:bg-[#1a1a2e]"
+                  ? "border-brand bg-brand-muted"
+                  : "border-border-strong hover:border-brand-soft dark:hover:border-brand bg-surface-0"
             }`}
           >
             {compressing ? (
               <>
-                <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin mb-2" />
-                <p className="text-sm text-blue-500 font-medium">Compressing image...</p>
-                <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">Just a moment</p>
+                <div className="w-8 h-8 border-2 border-brand border-t-transparent rounded-full animate-spin mb-2" />
+                <p className="text-sm text-brand font-medium">Compressing image...</p>
+                <p className="text-xs text-text-faint mt-0.5">Just a moment</p>
               </>
             ) : (
               <>
                 <FiUploadCloud
                   size={32}
-                  className={`mb-2 ${dragging ? "text-blue-500" : "text-gray-400 dark:text-slate-500"}`}
+                  className={`mb-2 ${dragging ? "text-brand" : "text-text-faint"}`}
                 />
-                <p className="text-sm text-gray-500 dark:text-slate-400">
+                <p className="text-sm text-text-muted">
                   {dragging ? "Drop image here" : "Drag & drop image here"}
                 </p>
-                <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
+                <p className="text-xs text-text-faint mt-0.5">
                   or click to browse
                 </p>
               </>
@@ -165,7 +165,7 @@ export default function ImageUploader({ currentImage, onImageChange }) {
             <button
               onClick={() => { if (!compressing) cameraRef.current?.click() }}
               disabled={compressing}
-              className="flex-1 flex items-center justify-center gap-2 border border-gray-300 dark:border-white/20 rounded-xl py-3 text-sm text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 border border-border-strong rounded-xl py-3 text-sm text-text-body hover:bg-surface-2 transition-all disabled:opacity-50"
             >
               <FiCamera size={16} />
               {compressing ? "Optimizing..." : "Take Photo"}
@@ -173,7 +173,7 @@ export default function ImageUploader({ currentImage, onImageChange }) {
             <button
               onClick={() => { if (!compressing) browseRef.current?.click() }}
               disabled={compressing}
-              className="flex-1 flex items-center justify-center gap-2 border border-gray-300 dark:border-white/20 rounded-xl py-3 text-sm text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 border border-border-strong rounded-xl py-3 text-sm text-text-body hover:bg-surface-2 transition-all disabled:opacity-50"
             >
               <FiImage size={16} />
               {compressing ? "Optimizing..." : "Browse"}

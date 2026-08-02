@@ -1,6 +1,6 @@
 function LoadingScreen() {
   return (
-    <div className="flex items-center justify-center h-screen bg-slate-100 dark:bg-[#1a1a2e]">
+    <div className="flex items-center justify-center h-screen bg-surface-2">
       <style>{`
         .ls-logo-ring {
           position: relative;
@@ -76,7 +76,7 @@ function LoadingScreen() {
           <span className="ls-dot" />
           <div className="ls-ring" />
           <div className="ls-ring-dash" />
-          <span className="ls-brand text-3xl font-bold text-blue-600 dark:text-blue-400">Keel</span>
+          <span className="ls-brand text-3xl font-bold text-brand">Keel</span>
         </div>
         <div className="ls-dots">
           <span /><span /><span /><span /><span />

@@ -11,22 +11,22 @@ const VARIANTS = {
   success: {
     icon: FiCheck,
     border: "border-green-500/20",
-    iconColor: "text-green-400",
+    iconColor: "text-success",
   },
   error: {
     icon: FiAlertCircle,
     border: "border-red-500/20",
-    iconColor: "text-red-400",
+    iconColor: "text-danger",
   },
   warning: {
     icon: FiAlertTriangle,
     border: "border-amber-500/20",
-    iconColor: "text-amber-400",
+    iconColor: "text-accent-300",
   },
   info: {
     icon: FiInfo,
     border: "border-blue-500/20",
-    iconColor: "text-blue-400",
+    iconColor: "text-brand-soft",
   },
   pending: {
     icon: FiClock,

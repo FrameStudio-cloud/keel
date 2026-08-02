@@ -237,37 +237,37 @@ export default function ChatWidgetTab() {
     );
   }
 
-  const inputClass = "w-full bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 transition-colors";
+  const inputClass = "w-full bg-surface-1 border border-border-subtle rounded-lg px-3 py-2 text-sm text-text-primary placeholder-text-faint focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 transition-colors";
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
       {callbacks.length > 0 && (
-        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
+        <div className="bg-surface-1 rounded-xl border border-border-subtle p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
-            <FiPhone size={14} className="text-slate-400" />
-            <h3 className="text-sm font-medium text-slate-800 dark:text-white">Callback Requests</h3>
-            <span className="text-[10px] bg-amber-100 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold px-2 py-0.5 rounded-full ml-auto">{callbacks.filter(c => c.status === "pending").length} pending</span>
+            <FiPhone size={14} className="text-text-faint" />
+            <h3 className="text-sm font-medium text-text-primary">Callback Requests</h3>
+            <span className="text-[10px] bg-warning-muted text-warning font-semibold px-2 py-0.5 rounded-full ml-auto">{callbacks.filter(c => c.status === "pending").length} pending</span>
           </div>
           <div className="space-y-2">
             {callbacks.slice(0, 20).map(cb => (
-              <div key={cb.id} className="bg-slate-50 dark:bg-[#1a1a2e] rounded-lg border border-slate-200 dark:border-white/10 p-3">
+              <div key={cb.id} className="bg-surface-2 rounded-lg border border-border-subtle p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">{cb.name}</p>
-                    <p className="text-xs text-blue-600 dark:text-blue-400">{cb.phone}</p>
-                    {cb.question && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{cb.question}</p>}
-                    <p className="text-[10px] text-slate-400 mt-1">{new Date(cb.created_at).toLocaleDateString()}</p>
+                    <p className="text-sm font-medium text-text-primary">{cb.name}</p>
+                    <p className="text-xs text-brand">{cb.phone}</p>
+                    {cb.question && <p className="text-xs text-text-muted mt-1 line-clamp-2">{cb.question}</p>}
+                    <p className="text-[10px] text-text-faint mt-1">{new Date(cb.created_at).toLocaleDateString()}</p>
                   </div>
                   {cb.status === "pending" && (
                     <button
                       onClick={() => markCallbackCalled(cb.id)}
-                      className="shrink-0 px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white text-[10px] font-semibold rounded-lg transition-all"
+                      className="shrink-0 px-3 py-1.5 bg-success hover:bg-success-500 text-success-contrast text-[10px] font-semibold rounded-lg transition-all"
                     >
                       Mark Called
                     </button>
                   )}
                   {cb.status !== "pending" && (
-                    <span className="shrink-0 text-[10px] text-slate-400 font-medium uppercase">{cb.status}</span>
+                    <span className="shrink-0 text-[10px] text-text-faint font-medium uppercase">{cb.status}</span>
                   )}
                 </div>
               </div>
@@ -277,27 +277,27 @@ export default function ChatWidgetTab() {
       )}
 
       {stockAlerts.length > 0 && (
-        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
+        <div className="bg-surface-1 rounded-xl border border-border-subtle p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
-            <FiAlertCircle size={14} className="text-slate-400" />
-            <h3 className="text-sm font-medium text-slate-800 dark:text-white">Stock Alerts</h3>
-            <span className="text-[10px] bg-amber-100 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold px-2 py-0.5 rounded-full ml-auto">{stockAlerts.filter(s => s.status === "pending").length} pending</span>
+            <FiAlertCircle size={14} className="text-text-faint" />
+            <h3 className="text-sm font-medium text-text-primary">Stock Alerts</h3>
+            <span className="text-[10px] bg-warning-muted text-warning font-semibold px-2 py-0.5 rounded-full ml-auto">{stockAlerts.filter(s => s.status === "pending").length} pending</span>
           </div>
           <div className="space-y-2">
             {stockAlerts.slice(0, 20).map(sa => (
-              <div key={sa.id} className="bg-slate-50 dark:bg-[#1a1a2e] rounded-lg border border-slate-200 dark:border-white/10 p-3">
+              <div key={sa.id} className="bg-surface-2 rounded-lg border border-border-subtle p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">{sa.product_name}</p>
-                    {sa.customer_note && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">{sa.customer_note}</p>}
-                    <p className="text-[10px] text-slate-400 mt-1">{new Date(sa.created_at).toLocaleDateString()}</p>
+                    <p className="text-sm font-medium text-text-primary">{sa.product_name}</p>
+                    {sa.customer_note && <p className="text-xs text-text-muted mt-0.5 line-clamp-2">{sa.customer_note}</p>}
+                    <p className="text-[10px] text-text-faint mt-1">{new Date(sa.created_at).toLocaleDateString()}</p>
                   </div>
                   <button
                     onClick={() => toggleRestocked(sa.id, sa.status)}
                     className={`shrink-0 px-3 py-1.5 text-[10px] font-semibold rounded-lg transition-all ${
                       sa.status === "restocked"
-                        ? "bg-green-100 dark:bg-green-500/10 text-green-600 dark:text-green-400"
-                        : "bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400 hover:bg-green-600 hover:text-white"
+                        ? "bg-success-muted text-success"
+                        : "bg-surface-2 text-text-body hover:bg-success-600 hover:text-success-contrast"
                     }`}
                   >
                     {sa.status === "restocked" ? "Restocked" : "Mark Restocked"}
@@ -309,16 +309,16 @@ export default function ChatWidgetTab() {
         </div>
       )}
 
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
+      <div className="bg-surface-1 rounded-xl border border-border-subtle p-5 shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-medium text-slate-800 dark:text-white">Widget Settings</h3>
+          <h3 className="text-sm font-medium text-text-primary">Widget Settings</h3>
           <button
             onClick={() => setConfig({ ...config, enabled: !config.enabled })}
             className={`relative w-10 h-5 rounded-full transition-all ${
-              config.enabled ? "bg-blue-600" : "bg-slate-300 dark:bg-slate-600"
+              config.enabled ? "bg-brand" : "bg-surface-3"
             }`}
           >
-            <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${
+            <span className={`absolute top-0.5 w-4 h-4 bg-surface-1 rounded-full shadow transition-all ${
               config.enabled ? "left-5" : "left-0.5"
             }`} />
           </button>
@@ -326,7 +326,7 @@ export default function ChatWidgetTab() {
 
         <div className="space-y-3">
           <div>
-            <label className="block text-xs text-slate-400 dark:text-slate-500 mb-1">Welcome Message</label>
+            <label className="block text-xs text-text-faint mb-1">Welcome Message</label>
             <textarea
               rows={2}
               value={config.welcome_message}
@@ -336,16 +336,16 @@ export default function ChatWidgetTab() {
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs text-slate-400 dark:text-slate-500 mb-1">Widget Color</label>
+              <label className="block text-xs text-text-faint mb-1">Widget Color</label>
               <input
                 type="color"
                 value={config.widget_color}
                 onChange={(e) => setConfig({ ...config, widget_color: e.target.value })}
-                className="w-full h-9 rounded-lg border border-gray-200 dark:border-white/10 cursor-pointer bg-white dark:bg-[#1a1a2e]"
+                className="w-full h-9 rounded-lg border border-border-subtle cursor-pointer bg-surface-1"
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-400 dark:text-slate-500 mb-1">Position</label>
+              <label className="block text-xs text-text-faint mb-1">Position</label>
               <select
                 value={config.position}
                 onChange={(e) => setConfig({ ...config, position: e.target.value })}
@@ -357,7 +357,7 @@ export default function ChatWidgetTab() {
               </select>
             </div>
             <div>
-              <label className="block text-xs text-slate-400 dark:text-slate-500 mb-1">WhatsApp</label>
+              <label className="block text-xs text-text-faint mb-1">WhatsApp</label>
               <input
                 type="text"
                 value={config.whatsapp_number}
@@ -372,19 +372,19 @@ export default function ChatWidgetTab() {
         <button
           onClick={saveConfig}
           disabled={saving}
-          className="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-lg transition-all disabled:opacity-50"
+          className="mt-4 w-full py-2 bg-brand hover:bg-brand-soft text-white font-bold text-sm rounded-lg transition-all disabled:opacity-50"
         >
           {saving ? "Saving..." : "Save Settings"}
         </button>
       </div>
 
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
-        <h3 className="text-sm font-medium text-slate-800 dark:text-white mb-4">FAQs</h3>
+      <div className="bg-surface-1 rounded-xl border border-border-subtle p-5 shadow-sm">
+        <h3 className="text-sm font-medium text-text-primary mb-4">FAQs</h3>
 
         {faqs.map((faq, i) => (
           <div
             key={faq.id}
-            className="bg-slate-50 dark:bg-[#1a1a2e] rounded-lg border border-slate-200 dark:border-white/10 p-3 mb-2"
+            className="bg-surface-2 rounded-lg border border-border-subtle p-3 mb-2"
           >
             {editingFaq === faq.id ? (
               <div className="space-y-2">
@@ -422,13 +422,13 @@ export default function ChatWidgetTab() {
                       setEditingFaq(null);
                       showToast("FAQ updated!");
                     }}
-                    className="px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-500"
+                    className="px-3 py-1.5 bg-brand text-white text-xs font-semibold rounded-lg hover:bg-brand-soft"
                   >
                     Save
                   </button>
                   <button
                     onClick={() => setEditingFaq(null)}
-                    className="px-3 py-1.5 bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400 text-xs font-semibold rounded-lg"
+                    className="px-3 py-1.5 bg-surface-2 text-text-body text-xs font-semibold rounded-lg"
                   >
                     Cancel
                   </button>
@@ -437,20 +437,20 @@ export default function ChatWidgetTab() {
             ) : (
               <div className="flex items-start gap-3">
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-900 dark:text-white">{faq.question}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">{faq.answer}</p>
+                  <p className="text-sm font-medium text-text-primary">{faq.question}</p>
+                  <p className="text-xs text-text-muted mt-0.5 line-clamp-2">{faq.answer}</p>
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0">
-                  <button onClick={() => moveFaq(faq.id, -1)} disabled={i === 0} className="p-1 text-slate-400 hover:text-white disabled:opacity-30">
+                  <button onClick={() => moveFaq(faq.id, -1)} disabled={i === 0} className="p-1 text-text-faint hover:text-white disabled:opacity-30">
                     <FiChevronUp size={14} />
                   </button>
-                  <button onClick={() => moveFaq(faq.id, 1)} disabled={i === faqs.length - 1} className="p-1 text-slate-400 hover:text-white disabled:opacity-30">
+                  <button onClick={() => moveFaq(faq.id, 1)} disabled={i === faqs.length - 1} className="p-1 text-text-faint hover:text-white disabled:opacity-30">
                     <FiChevronDown size={14} />
                   </button>
-                  <button onClick={() => setEditingFaq(faq.id)} className="p-1 text-slate-400 hover:text-blue-400">
+                  <button onClick={() => setEditingFaq(faq.id)} className="p-1 text-text-faint hover:text-brand-soft">
                     <FiCheck size={14} />
                   </button>
-                  <button onClick={() => deleteFaq(faq.id)} className="p-1 text-slate-400 hover:text-red-400">
+                  <button onClick={() => deleteFaq(faq.id)} className="p-1 text-text-faint hover:text-danger">
                     <FiTrash2 size={14} />
                   </button>
                 </div>
@@ -459,7 +459,7 @@ export default function ChatWidgetTab() {
           </div>
         ))}
 
-        <div className="bg-slate-50 dark:bg-[#1a1a2e] rounded-lg border border-slate-200 dark:border-white/10 p-3 mt-2">
+        <div className="bg-surface-2 rounded-lg border border-border-subtle p-3 mt-2">
           <div className="space-y-2">
             <input
               type="text"
@@ -478,7 +478,7 @@ export default function ChatWidgetTab() {
             <button
               onClick={addFaq}
               disabled={!newFaq.question.trim() || !newFaq.answer.trim()}
-              className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-2 bg-brand hover:bg-brand-soft text-white font-bold text-sm rounded-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <FiPlus size={14} />
               Add FAQ
@@ -487,16 +487,16 @@ export default function ChatWidgetTab() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 p-5 shadow-sm">
+      <div className="bg-surface-1 rounded-xl border border-border-subtle p-5 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
-          <FiMessageCircle size={14} className="text-slate-400" />
-          <div className="flex gap-1 bg-slate-100 dark:bg-[#1a1a2e] rounded-lg p-0.5">
+          <FiMessageCircle size={14} className="text-text-faint" />
+          <div className="flex gap-1 bg-surface-2 rounded-lg p-0.5">
             <button
               onClick={() => setMsgTab("unanswered")}
               className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
                 msgTab === "unanswered"
-                  ? "bg-white dark:bg-[#16213e] text-slate-900 dark:text-white shadow-sm"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+                  ? "bg-surface-1 text-text-primary shadow-sm"
+                  : "text-text-muted hover:text-text-body dark:hover:text-text-body"
               }`}
             >
               Unanswered ({msgTotal})
@@ -505,8 +505,8 @@ export default function ChatWidgetTab() {
               onClick={() => setMsgTab("answered")}
               className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
                 msgTab === "answered"
-                  ? "bg-white dark:bg-[#16213e] text-slate-900 dark:text-white shadow-sm"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+                  ? "bg-surface-1 text-text-primary shadow-sm"
+                  : "text-text-muted hover:text-text-body dark:hover:text-text-body"
               }`}
             >
               Answered ({answeredTotal})
@@ -520,11 +520,11 @@ export default function ChatWidgetTab() {
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className="bg-slate-50 dark:bg-[#1a1a2e] rounded-lg border border-slate-200 dark:border-white/10 p-3 mb-2"
+                  className="bg-surface-2 rounded-lg border border-border-subtle p-3 mb-2"
                 >
-                  <p className="text-sm text-slate-900 dark:text-white">{msg.question}</p>
+                  <p className="text-sm text-text-primary">{msg.question}</p>
                   {msg.customer_name && (
-                    <p className="text-xs text-slate-400 mt-1">— {msg.customer_name}</p>
+                    <p className="text-xs text-text-faint mt-1">— {msg.customer_name}</p>
                   )}
                   <div className="mt-2">
                     <textarea
@@ -532,20 +532,20 @@ export default function ChatWidgetTab() {
                       value={replies[msg.id] || ""}
                       onChange={(e) => setReplies({ ...replies, [msg.id]: e.target.value })}
                       placeholder="Type your reply..."
-                      className="w-full bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-xs text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 transition-colors resize-none"
+                      className="w-full bg-surface-1 border border-border-subtle rounded-lg px-3 py-2 text-xs text-text-primary placeholder-text-faint focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 transition-colors resize-none"
                     />
                     <div className="flex gap-2 mt-2">
                       <button
                         onClick={() => sendReply(msg.id)}
                         disabled={!replies[msg.id]?.trim() || sendingReply === msg.id}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-500 transition-all disabled:opacity-50"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-brand text-white text-xs font-semibold rounded-lg hover:bg-brand-soft transition-all disabled:opacity-50"
                       >
                         <FiSend size={12} />
                         {sendingReply === msg.id ? "Sending..." : "Send Reply"}
                       </button>
                       <button
                         onClick={() => markAnswered(msg.id)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-green-500 transition-all"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-success text-success-contrast text-xs font-semibold rounded-lg hover:bg-success-500 transition-all"
                       >
                         <FiCheckCircle size={12} />
                         Mark Answered
@@ -557,7 +557,7 @@ export default function ChatWidgetTab() {
               <Pagination page={msgPage} total={msgTotal} pageSize={MSG_PAGE_SIZE} onPageChange={setMsgPage} />
             </>
           ) : (
-            <p className="text-xs text-slate-400 dark:text-slate-500 text-center py-6">
+            <p className="text-xs text-text-faint text-center py-6">
               No unanswered questions.
             </p>
           )
@@ -567,23 +567,23 @@ export default function ChatWidgetTab() {
               {answeredMessages.map((msg) => (
                 <div
                   key={msg.id}
-                  className="bg-slate-50 dark:bg-[#1a1a2e] rounded-lg border border-slate-200 dark:border-white/10 p-3 mb-2"
+                  className="bg-surface-2 rounded-lg border border-border-subtle p-3 mb-2"
                 >
-                  <p className="text-sm font-medium text-slate-900 dark:text-white">Q: {msg.question}</p>
+                  <p className="text-sm font-medium text-text-primary">Q: {msg.question}</p>
                   {msg.answer && (
-                    <div className="mt-1.5 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-lg px-3 py-2">
-                      <p className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 mb-0.5">Your reply:</p>
-                      <p className="text-xs text-slate-700 dark:text-slate-300">{msg.answer}</p>
+                    <div className="mt-1.5 bg-brand-muted border border-brand-soft dark:border-blue-500/20 rounded-lg px-3 py-2">
+                      <p className="text-[10px] font-semibold text-brand mb-0.5">Your reply:</p>
+                      <p className="text-xs text-text-body">{msg.answer}</p>
                     </div>
                   )}
                   {msg.customer_name && (
-                    <p className="text-xs text-slate-400 mt-1">— {msg.customer_name}</p>
+                    <p className="text-xs text-text-faint mt-1">— {msg.customer_name}</p>
                   )}
                   {msg.feedback && (
                     <span className={`inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                       msg.feedback === "helpful"
-                        ? "bg-green-100 dark:bg-green-500/10 text-green-600 dark:text-green-400"
-                        : "bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400"
+                        ? "bg-success-muted text-success"
+                        : "bg-danger-muted text-danger"
                     }`}>
                       {msg.feedback === "helpful" ? "👍 Helpful" : "👎 Not helpful"}
                     </span>
@@ -593,7 +593,7 @@ export default function ChatWidgetTab() {
               <Pagination page={answeredPage} total={answeredTotal} pageSize={MSG_PAGE_SIZE} onPageChange={setAnsweredPage} />
             </>
           ) : (
-            <p className="text-xs text-slate-400 dark:text-slate-500 text-center py-6">
+            <p className="text-xs text-text-faint text-center py-6">
               No answered messages yet.
             </p>
           )

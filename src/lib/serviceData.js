@@ -295,7 +295,6 @@ export async function fetchServiceRevenue() {
   const paymentData = Object.entries(methodMap).map(([method, amount]) => ({
     name: method,
     value: amount,
-    color: { Cash: "#10b981", "M-Pesa": "#3b82f6", Card: "#8b5cf6", "Bank Transfer": "#f59e0b" }[method] || "#6b7280",
   }));
 
   return { revenue, transactions: completed.length, paymentData };

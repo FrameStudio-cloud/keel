@@ -7,6 +7,7 @@ import { supabase, getPersistedSession } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
 import { setCurrency } from "../lib/format";
 import { setPaymentConfig } from "../lib/paymentConfig";
+import { normalizeTheme, applyTheme } from "../lib/themes";
 import { useSettings } from "../hooks/useSettings";
 import { AuthContext } from "../context/AuthContext";
 import { useToast } from "../context/ToastProvider";
@@ -76,7 +77,7 @@ export default function Settings() {
     store_name: settings.storeName, store_phone: settings.storePhone,
     store_address: settings.storeAddress, currency_symbol: settings.currencySymbol,
     low_stock_threshold: settings.lowStockThreshold, default_payment: settings.defaultPayment,
-    receipt_footer: settings.receiptFooter, theme: settings.theme || "light",
+    receipt_footer: settings.receiptFooter, theme: normalizeTheme(settings.theme),
     website_url: settings.websiteUrl, whatsapp: settings.whatsapp,
     business_category: settings.businessCategory,
     notification_preferences: settings.notificationPreferences,
@@ -105,7 +106,7 @@ export default function Settings() {
       store_address: safe(settings.storeAddress), currency_symbol: safe(settings.currencySymbol),
       low_stock_threshold: settings.lowStockThreshold ?? 6,
       default_payment: safe(settings.defaultPayment), receipt_footer: safe(settings.receiptFooter),
-      theme: settings.theme || "light", website_url: safe(settings.websiteUrl),
+      theme: normalizeTheme(settings.theme), website_url: safe(settings.websiteUrl),
       whatsapp: safe(settings.whatsapp), business_category: settings.businessCategory || "general",
       notification_preferences: settings.notificationPreferences,
       primary_color: settings.primaryColor || "#000000",
@@ -135,8 +136,8 @@ export default function Settings() {
   const isDirty = pristineSnapshot !== null && currentSnapshot !== pristineSnapshot;
 
   function handleThemeChange(theme) {
-    setForm((prev) => ({ ...prev, theme }));
-    document.documentElement.classList.toggle("dark", theme === "dark");
+    const themeId = applyTheme(theme);
+    setForm((prev) => ({ ...prev, theme: themeId }));
   }
 
   function updateHour(key, field, value) {
@@ -150,7 +151,7 @@ export default function Settings() {
       store_address: safe(settings.storeAddress), currency_symbol: safe(settings.currencySymbol),
       low_stock_threshold: settings.lowStockThreshold ?? 6,
       default_payment: safe(settings.defaultPayment), receipt_footer: safe(settings.receiptFooter),
-      theme: settings.theme || "light", website_url: safe(settings.websiteUrl),
+      theme: normalizeTheme(settings.theme), website_url: safe(settings.websiteUrl),
       whatsapp: safe(settings.whatsapp), business_category: settings.businessCategory || "general",
       notification_preferences: settings.notificationPreferences,
       primary_color: settings.primaryColor || "#000000",
@@ -163,7 +164,7 @@ export default function Settings() {
     });
     setHours(hoursFromSettings(settings.businessHours));
     setValidationErrors({});
-    document.documentElement.classList.toggle("dark", settings.theme === "dark");
+    applyTheme(settings.theme);
   }
 
   async function handleSave() {
@@ -228,7 +229,7 @@ export default function Settings() {
 
     setCurrency(form.currency_symbol);
     setPaymentConfig(null, form.default_payment);
-    document.documentElement.classList.toggle("dark", form.theme === "dark");
+    applyTheme(form.theme);
 
     const bh = {};
     hours.forEach((h) => { bh[h.key] = { open: h.open, close: h.close, active: h.active }; });

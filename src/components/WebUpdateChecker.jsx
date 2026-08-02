@@ -36,7 +36,7 @@ export default function WebUpdateChecker() {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
-      <div className="bg-blue-600 text-white rounded-b-xl shadow-2xl px-5 py-3 flex items-center justify-between gap-3 text-sm pointer-events-auto animate-[slideDown_0.3s_ease-out] max-w-lg w-full mx-4 mt-0">
+      <div className="bg-brand text-white rounded-b-xl shadow-2xl px-5 py-3 flex items-center justify-between gap-3 text-sm pointer-events-auto animate-[slideDown_0.3s_ease-out] max-w-lg w-full mx-4 mt-0">
         <div className="flex items-center gap-2 min-w-0">
           <FiRefreshCw size={14} className="shrink-0" />
           <span className="font-medium truncate">A new version of Keel is available</span>
@@ -44,7 +44,7 @@ export default function WebUpdateChecker() {
         <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={() => window.location.reload()}
-            className="bg-white text-blue-600 px-3.5 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-50 transition-all"
+            className="bg-surface-1 text-brand px-3.5 py-1.5 rounded-lg text-xs font-bold hover:bg-brand-muted transition-all"
           >
             Refresh
           </button>

@@ -173,7 +173,7 @@ export default function AuthProvider({ children }) {
       supabase.from("store_settings").insert({
         shop_id: shopData.id,
         store_name: displayName,
-        theme: "light",
+        theme: "keel-light",
       }),
       supabase.from("chat_config").upsert({
         shop_id: shopData.id,

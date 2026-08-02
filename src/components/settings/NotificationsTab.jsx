@@ -7,21 +7,21 @@ import {
 
 function Toggle({ enabled, onChange, label, desc }) {
   return (
-    <label className="flex items-start gap-3 px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-white/[0.03] cursor-pointer hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors">
+    <label className="flex items-start gap-3 px-3 py-2.5 rounded-xl bg-surface-2 dark:bg-white/[0.03] cursor-pointer hover:bg-surface-2 dark:hover:bg-white/[0.06] transition-colors">
       <button
         type="button"
         onClick={(e) => { e.preventDefault(); onChange(!enabled); }}
         className={`w-9 h-5 rounded-full relative transition-all shrink-0 mt-0.5 ${
-          enabled ? "bg-blue-600" : "bg-slate-300 dark:bg-slate-600"
+          enabled ? "bg-brand" : "bg-surface-3"
         }`}
       >
-        <div className={`w-3.5 h-3.5 rounded-full bg-white absolute top-0.5 transition-all shadow-sm ${
+        <div className={`w-3.5 h-3.5 rounded-full bg-surface-1 absolute top-0.5 transition-all shadow-sm ${
           enabled ? "left-[18px]" : "left-[3px]"
         }`} />
       </button>
       <div className="min-w-0">
-        <p className="text-sm font-medium text-slate-800 dark:text-white">{label}</p>
-        {desc && <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{desc}</p>}
+        <p className="text-sm font-medium text-text-primary">{label}</p>
+        {desc && <p className="text-xs text-text-faint mt-0.5">{desc}</p>}
       </div>
     </label>
   );
@@ -41,11 +41,11 @@ export default function NotificationsTab({ form, setForm, whatsapp }) {
     <>
       <SectionCard icon={FiMail} title="Notification Email">
         <div>
-          <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">
+          <label className="block text-xs text-text-faint mb-1">
             Where to receive email alerts
           </label>
           <div className="relative">
-            <FiMail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <FiMail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-faint" />
             <input
               type="email"
               value={prefs.email || ""}
@@ -54,7 +54,7 @@ export default function NotificationsTab({ form, setForm, whatsapp }) {
               className={`${inputClass} pl-9`}
             />
           </div>
-          <p className="text-[10px] text-gray-400 dark:text-slate-500 mt-1">
+          <p className="text-[10px] text-text-faint mt-1">
             Used for low stock alerts, daily summaries, and other automated notifications.
             Leave blank to use your account email.
           </p>
@@ -63,7 +63,7 @@ export default function NotificationsTab({ form, setForm, whatsapp }) {
 
       <SectionCard icon={FiTag} title="Low Stock Threshold">
         <div>
-          <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">
+          <label className="block text-xs text-text-faint mb-1">
             Minimum stock level before alert
           </label>
           <input
@@ -72,7 +72,7 @@ export default function NotificationsTab({ form, setForm, whatsapp }) {
             onChange={(e) => setForm({ ...form, low_stock_threshold: parseInt(e.target.value) || 0 })}
             className={`${inputClass} max-w-[120px]`}
           />
-          <p className="text-[10px] text-gray-400 dark:text-slate-500 mt-1">
+          <p className="text-[10px] text-text-faint mt-1">
             Products at or below this level trigger low-stock warnings in the bell icon and alerts.
           </p>
         </div>
@@ -126,15 +126,15 @@ export default function NotificationsTab({ form, setForm, whatsapp }) {
 
       {whatsapp && (
         <SectionCard icon={FiMessageCircle} title="WhatsApp">
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-white/[0.03]">
-            <FiPhone size={14} className="text-gray-400 shrink-0" />
-            <span className="text-sm text-gray-800 dark:text-white">{whatsapp}</span>
-            <span className="text-[10px] text-gray-400 dark:text-slate-500 ml-auto flex items-center gap-1">
+          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-surface-2 dark:bg-white/[0.03]">
+            <FiPhone size={14} className="text-text-faint shrink-0" />
+            <span className="text-sm text-text-primary">{whatsapp}</span>
+            <span className="text-[10px] text-text-faint ml-auto flex items-center gap-1">
               <FiCheck size={10} />
               Connected
             </span>
           </div>
-          <p className="text-[10px] text-gray-400 dark:text-slate-500 mt-2">
+          <p className="text-[10px] text-text-faint mt-2">
             WhatsApp bot notifications are coming soon. You'll be able to receive alerts directly
             on WhatsApp.
           </p>

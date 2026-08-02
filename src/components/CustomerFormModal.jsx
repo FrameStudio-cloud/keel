@@ -39,62 +39,62 @@ export default function CustomerFormModal({ customer, onSave, onClose }) {
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div
         ref={trapRef}
-        className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-100 dark:border-white/10 p-6 w-full max-w-md mx-4"
+        className="bg-surface-1 rounded-2xl border border-border-subtle p-6 w-full max-w-md mx-4"
         role="dialog"
         aria-modal="true"
         aria-label={customer ? "Edit customer" : "Add customer"}
       >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-sm font-medium text-gray-800 dark:text-white">{customer ? "Edit customer" : "Add customer"}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg" aria-label="Close"><FiX /></button>
+          <h2 className="text-sm font-medium text-text-primary">{customer ? "Edit customer" : "Add customer"}</h2>
+          <button onClick={onClose} className="text-text-faint hover:text-text-body text-lg" aria-label="Close"><FiX /></button>
         </div>
 
         <div className="flex flex-col gap-3">
           <div>
-            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Customer name</label>
+            <label className="text-xs text-text-faint mb-1 block">Customer name</label>
             <input
               name="name"
               value={form.name}
               onChange={handleChange}
               placeholder="e.g. Jane Muthoni"
-              className={`w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 ${errors.name ? "border-red-400" : "border-gray-200 dark:border-white/10"}`}
+              className={`w-full border rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand ${errors.name ? "border-danger" : "border-border-subtle"}`}
             />
-            {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
+            {errors.name && <p className="text-danger text-xs mt-1">{errors.name}</p>}
           </div>
 
           <div>
-            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Phone number</label>
+            <label className="text-xs text-text-faint mb-1 block">Phone number</label>
             <input
               name="phone"
               value={form.phone}
               onChange={handleChange}
               placeholder="e.g. 0712345678"
-              className={`w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 ${errors.phone ? "border-red-400" : "border-gray-200 dark:border-white/10"}`}
+              className={`w-full border rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand ${errors.phone ? "border-danger" : "border-border-subtle"}`}
             />
-            {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone}</p>}
+            {errors.phone && <p className="text-danger text-xs mt-1">{errors.phone}</p>}
           </div>
 
           <div>
-            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Email (optional)</label>
+            <label className="text-xs text-text-faint mb-1 block">Email (optional)</label>
             <input
               name="email"
               value={form.email}
               onChange={handleChange}
               placeholder="e.g. jane@email.com"
               type="email"
-              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+              className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
             />
           </div>
 
           <div>
-            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Notes (optional)</label>
+            <label className="text-xs text-text-faint mb-1 block">Notes (optional)</label>
             <textarea
               name="notes"
               value={form.notes}
               onChange={handleChange}
               placeholder="Preferences, instructions, notes..."
               rows={2}
-              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 resize-none"
+              className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand resize-none"
             />
           </div>
         </div>
@@ -102,13 +102,13 @@ export default function CustomerFormModal({ customer, onSave, onClose }) {
         <div className="flex gap-2 mt-5">
           <button
             onClick={onClose}
-            className="flex-1 border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 text-sm py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+            className="flex-1 border border-border-subtle text-text-muted text-sm py-2 rounded-lg hover:bg-surface-2 transition-all"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="flex-1 bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700 transition-all"
+            className="flex-1 bg-brand text-white text-sm py-2 rounded-lg hover:bg-brand-strong transition-all"
           >
             {customer ? "Save changes" : "Add customer"}
           </button>

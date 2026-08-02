@@ -12,12 +12,14 @@ import {
 } from "recharts";
 import { useDebounce } from "../hooks/useDebounce";
 import { useSettings } from "../hooks/useSettings";
+import useThemeColors from "../hooks/useThemeColors";
 import { SERVICE_CATEGORIES } from "../lib/constants";
 import { fetchOrders, fetchRevenuePerService } from "../lib/serviceData";
 
 export default function Reports() {
   const { businessCategory } = useSettings();
   const isService = SERVICE_CATEGORIES.includes(businessCategory);
+  const theme = useThemeColors();
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearch = useDebounce(searchQuery, 300);
   const [timeRange, setTimeRange] = useState("week");
@@ -213,9 +215,9 @@ export default function Reports() {
       <ContextTip tipKey="reports" title="Reports & Insights">
         See how each product or service performs — profit margins, revenue, costs. The P&amp;L chart shows your daily profit and loss over a week or month.
       </ContextTip>
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 mb-6">
+      <div className="bg-surface-1 rounded-xl border border-border-subtle p-4 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-          <p className="text-sm font-medium text-gray-800 dark:text-white">{isService ? "Revenue per Service" : "Profit Margin per Product"}</p>
+          <p className="text-sm font-medium text-text-primary">{isService ? "Revenue per Service" : "Profit Margin per Product"}</p>
           <div className="flex gap-2">
             <ProGate feature="reports_pnl">
               <button
@@ -231,47 +233,47 @@ export default function Reports() {
                   { label: "Profit", value: (r) => r.profit },
                   { label: "Margin %", value: (r) => r.margin },
                 ])}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                className="text-xs text-brand hover:underline"
               >
                 CSV
               </button>
             </ProGate>
             <ProGate feature="reports_pnl">
-              <button onClick={exportPDF} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">PDF</button>
+              <button onClick={exportPDF} className="text-xs text-brand hover:underline">PDF</button>
             </ProGate>
           </div>
         </div>
         {profitData.length === 0 ? (
-          <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-6">
+          <p className="text-xs text-text-faint text-center py-6">
             {isService ? "No completed orders yet." : "No sales data yet. Start logging sales to see profit margins."}
           </p>
         ) : filteredProfitData.length === 0 ? (
-          <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-6">
+          <p className="text-xs text-text-faint text-center py-6">
             No products match your search.
           </p>
         ) : (
           <>
             <div className="sm:hidden space-y-2">
               {filteredProfitData.map((p) => (
-                <div key={p.name} className="bg-slate-50 dark:bg-[#1a1a2e] rounded-xl p-3">
-                  <p className="text-sm font-semibold text-gray-800 dark:text-white mb-2">{p.name}</p>
+                <div key={p.name} className="bg-surface-2 rounded-xl p-3">
+                  <p className="text-sm font-semibold text-text-primary mb-2">{p.name}</p>
                   <div className="grid grid-cols-2 gap-y-1.5 text-xs">
-                    <span className="text-gray-400 dark:text-slate-500">Sold</span>
-                    <span className="text-right text-gray-700 dark:text-slate-300">{p.qty}</span>
-                    <span className="text-gray-400 dark:text-slate-500">Revenue</span>
-                    <span className="text-right font-medium text-gray-800 dark:text-white">{formatPrice(p.revenue)}</span>
-                    {!isService && <><span className="text-gray-400 dark:text-slate-500">Cost</span>
-                    <span className="text-right text-gray-600 dark:text-slate-400">{formatPrice(p.totalCost)}</span>
-                    <span className="text-gray-400 dark:text-slate-500">Profit</span>
-                    <span className={`text-right font-medium ${p.profit >= 0 ? "text-green-500" : "text-red-500"}`}>{formatPrice(p.profit)}</span></>}
+                    <span className="text-text-faint">Sold</span>
+                    <span className="text-right text-text-body">{p.qty}</span>
+                    <span className="text-text-faint">Revenue</span>
+                    <span className="text-right font-medium text-text-primary">{formatPrice(p.revenue)}</span>
+                    {!isService && <><span className="text-text-faint">Cost</span>
+                    <span className="text-right text-text-body">{formatPrice(p.totalCost)}</span>
+                    <span className="text-text-faint">Profit</span>
+                    <span className={`text-right font-medium ${p.profit >= 0 ? "text-success" : "text-danger"}`}>{formatPrice(p.profit)}</span></>}
                   </div>
                   {!isService && (
-                  <div className="mt-2 pt-2 border-t border-gray-200 dark:border-white/10 flex justify-between items-center">
-                    <span className="text-xs text-gray-400 dark:text-slate-500">Margin</span>
+                  <div className="mt-2 pt-2 border-t border-border-subtle flex justify-between items-center">
+                    <span className="text-xs text-text-faint">Margin</span>
                     <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
-                      p.margin >= 30 ? "bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400"
-                      : p.margin >= 10 ? "bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400"
-                      : "bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400"
+                      p.margin >= 30 ? "bg-success-muted text-success"
+                      : p.margin >= 10 ? "bg-warning-muted text-warning"
+                      : "bg-danger-muted text-danger"
                     }`}>
                       {p.margin}%
                     </span>
@@ -283,30 +285,30 @@ export default function Reports() {
             <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#1a1a2e]">
-                    <th className="px-3 py-2.5 text-xs font-semibold text-left text-gray-500 dark:text-slate-400 uppercase">{isService ? "Service" : "Product"}</th>
-                    <th className="px-3 py-2.5 text-xs font-semibold text-right text-gray-500 dark:text-slate-400 uppercase">Sold</th>
-                    <th className="px-3 py-2.5 text-xs font-semibold text-right text-gray-500 dark:text-slate-400 uppercase">Revenue</th>
-                    {!isService && <><th className="px-3 py-2.5 text-xs font-semibold text-right text-gray-500 dark:text-slate-400 uppercase">Cost</th>
-                    <th className="px-3 py-2.5 text-xs font-semibold text-right text-gray-500 dark:text-slate-400 uppercase">Profit</th>
-                    <th className="px-3 py-2.5 text-xs font-semibold text-right text-gray-500 dark:text-slate-400 uppercase">Margin</th></>}
+                  <tr className="border-b border-border-subtle bg-surface-0">
+                    <th className="px-3 py-2.5 text-xs font-semibold text-left text-text-muted uppercase">{isService ? "Service" : "Product"}</th>
+                    <th className="px-3 py-2.5 text-xs font-semibold text-right text-text-muted uppercase">Sold</th>
+                    <th className="px-3 py-2.5 text-xs font-semibold text-right text-text-muted uppercase">Revenue</th>
+                    {!isService && <><th className="px-3 py-2.5 text-xs font-semibold text-right text-text-muted uppercase">Cost</th>
+                    <th className="px-3 py-2.5 text-xs font-semibold text-right text-text-muted uppercase">Profit</th>
+                    <th className="px-3 py-2.5 text-xs font-semibold text-right text-text-muted uppercase">Margin</th></>}
                   </tr>
                 </thead>
                 <tbody>
                   {filteredProfitData.map((p, i) => (
-                    <tr key={p.name} className={`border-b border-white/5 hover:bg-black/[0.03] dark:hover:bg-white/[0.05] transition-colors ${i === filteredProfitData.length - 1 ? "border-0" : ""}`}>
-                      <td className="px-3 py-2.5 font-medium text-gray-800 dark:text-white">{p.name}</td>
-                      <td className="px-3 py-2.5 text-right text-gray-600 dark:text-slate-400">{p.qty}</td>
-                      <td className="px-3 py-2.5 text-right font-medium text-gray-800 dark:text-white">{formatPrice(p.revenue)}</td>
-                      {!isService && <><td className="px-3 py-2.5 text-right text-gray-600 dark:text-slate-400">{formatPrice(p.totalCost)}</td>
-                      <td className={`px-3 py-2.5 text-right font-medium ${p.profit >= 0 ? "text-green-500" : "text-red-500"}`}>
+                    <tr key={p.name} className={`border-b border-border-subtle hover:bg-surface-2 transition-colors ${i === filteredProfitData.length - 1 ? "border-0" : ""}`}>
+                      <td className="px-3 py-2.5 font-medium text-text-primary">{p.name}</td>
+                      <td className="px-3 py-2.5 text-right text-text-body">{p.qty}</td>
+                      <td className="px-3 py-2.5 text-right font-medium text-text-primary">{formatPrice(p.revenue)}</td>
+                      {!isService && <><td className="px-3 py-2.5 text-right text-text-body">{formatPrice(p.totalCost)}</td>
+                      <td className={`px-3 py-2.5 text-right font-medium ${p.profit >= 0 ? "text-success" : "text-danger"}`}>
                         {formatPrice(p.profit)}
                       </td>
                       <td className="px-3 py-2.5 text-right">
                         <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${
-                          p.margin >= 30 ? "bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400"
-                          : p.margin >= 10 ? "bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400"
-                          : "bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400"
+                          p.margin >= 30 ? "bg-success-muted text-success"
+                          : p.margin >= 10 ? "bg-warning-muted text-warning"
+                          : "bg-danger-muted text-danger"
                         }`}>
                           {p.margin}%
                         </span>
@@ -321,19 +323,19 @@ export default function Reports() {
       </div>
 
       <ProGate feature="reports_pnl">
-        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
+        <div className="bg-surface-1 rounded-xl border border-border-subtle p-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-            <p className="text-sm font-medium text-gray-800 dark:text-white">Profit & Loss</p>
+            <p className="text-sm font-medium text-text-primary">Profit & Loss</p>
             <div className="flex items-center gap-3">
-              <div className="flex gap-1 bg-gray-100 dark:bg-[#1a1a2e] rounded-lg p-0.5">
+              <div className="flex gap-1 bg-surface-2 rounded-lg p-0.5">
                 {["week", "month"].map((r) => (
                   <button
                     key={r}
                     onClick={() => setTimeRange(r)}
                     className={`px-2.5 py-1 text-xs rounded-md font-medium capitalize ${
                       timeRange === r
-                        ? "bg-white dark:bg-[#16213e] text-blue-600 dark:text-blue-400 shadow-sm"
-                        : "text-gray-500 dark:text-slate-400"
+                        ? "bg-surface-1 text-brand shadow-sm"
+                        : "text-text-muted"
                     }`}
                   >
                     {r}
@@ -347,46 +349,52 @@ export default function Reports() {
                   { label: "Expenses", value: (r) => r.expenses },
                   { label: "Profit", value: (r) => r.profit },
                 ])}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                className="text-xs text-brand hover:underline"
               >
                 CSV
               </button>
-              <button onClick={exportPDF} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">PDF</button>
+              <button onClick={exportPDF} className="text-xs text-brand hover:underline">PDF</button>
             </div>
           </div>
           {pnlData.length === 0 ? (
-            <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-8">No data for this period</p>
+            <p className="text-xs text-text-faint text-center py-8">No data for this period</p>
           ) : (
             <>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={pnlData} barSize={timeRange === "week" ? 20 : 6} barCategoryGap={timeRange === "week" ? "20%" : "10%"}>
-                  <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#9ca3af" }} axisLine={false} tickLine={false} interval={timeRange === "month" ? 5 : 0} />
+                  <XAxis dataKey="day" tick={{ fontSize: 10, fill: theme.textFaint }} axisLine={false} tickLine={false} interval={timeRange === "month" ? 5 : 0} />
                   <YAxis hide />
                   <Tooltip
                     formatter={(value) => formatPrice(value)}
-                    contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #f3f4f6" }}
+                    contentStyle={{
+                      fontSize: 12,
+                      borderRadius: 8,
+                      border: `1px solid ${theme.borderSubtle}`,
+                      background: theme.surface1,
+                      color: theme.textPrimary,
+                    }}
                   />
                   <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Bar dataKey="revenue" fill="#2563eb" radius={[4, 4, 0, 0]} name="Revenue" />
-                  <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expenses" />
+                  <Bar dataKey="revenue" fill={theme.chart1} radius={[4, 4, 0, 0]} name="Revenue" />
+                  <Bar dataKey="expenses" fill={theme.danger} radius={[4, 4, 0, 0]} name="Expenses" />
                 </BarChart>
               </ResponsiveContainer>
               <div className="grid grid-cols-3 gap-3 mt-3 sm:flex sm:justify-center sm:gap-6 text-sm">
                 <div className="text-center">
-                  <p className="text-xs text-gray-400 dark:text-slate-500">Total Revenue</p>
-                  <p className="font-semibold text-gray-800 dark:text-white">
+                  <p className="text-xs text-text-faint">Total Revenue</p>
+                  <p className="font-semibold text-text-primary">
                     {formatPrice(pnlData.reduce((s, r) => s + r.revenue, 0))}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs text-gray-400 dark:text-slate-500">Total Expenses</p>
-                  <p className="font-semibold text-red-500">
+                  <p className="text-xs text-text-faint">Total Expenses</p>
+                  <p className="font-semibold text-danger">
                     {formatPrice(pnlData.reduce((s, r) => s + r.expenses, 0))}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs text-gray-400 dark:text-slate-500">Net Profit</p>
-                  <p className={`font-semibold ${pnlData.reduce((s, r) => s + r.profit, 0) >= 0 ? "text-green-500" : "text-red-500"}`}>
+                  <p className="text-xs text-text-faint">Net Profit</p>
+                  <p className={`font-semibold ${pnlData.reduce((s, r) => s + r.profit, 0) >= 0 ? "text-success" : "text-danger"}`}>
                     {formatPrice(pnlData.reduce((s, r) => s + r.profit, 0))}
                   </p>
                 </div>

@@ -5,11 +5,11 @@ export default function IntegrationStats({ stats }) {
       {stats.map((s) => (
         <div
           key={s.label}
-          className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-200 dark:border-white/10 p-4 text-center"
+          className="bg-surface-1 rounded-xl border border-border-subtle p-4 text-center"
         >
-          <s.icon className="mx-auto text-blue-500" size={18} />
-          <p className="mt-2 text-lg font-bold text-gray-800 dark:text-white">{s.value}</p>
-          <p className="text-[11px] text-gray-400 dark:text-slate-500">{s.label}</p>
+          <s.icon className="mx-auto text-brand" size={18} />
+          <p className="mt-2 text-lg font-bold text-text-primary">{s.value}</p>
+          <p className="text-[11px] text-text-faint">{s.label}</p>
         </div>
       ))}
     </div>

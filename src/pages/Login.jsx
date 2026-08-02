@@ -61,7 +61,7 @@ export default function Login() {
           await supabase.from("store_settings").insert({
             shop_id: shopData.id,
             store_name: shopName,
-            theme: "light",
+            theme: "keel-light",
           });
 
           await supabase.from("users").insert({

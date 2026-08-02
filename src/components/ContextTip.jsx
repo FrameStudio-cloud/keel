@@ -112,7 +112,7 @@ export default function ContextTip({ tipKey, targetSelector, title, children }) 
   return (
     <div
       ref={tipRef}
-      className="fixed z-40 bg-blue-600 text-white rounded-xl p-4 shadow-xl max-w-xs"
+      className="fixed z-40 bg-brand text-white rounded-xl p-4 shadow-xl max-w-xs"
       style={{ top: pos.top, left: pos.left }}
     >
       {pos.side === "top" && (

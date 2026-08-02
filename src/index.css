@@ -1,18 +1,128 @@
 @import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where([data-theme="keel-dark"], [data-theme="keel-dark"] *, [data-theme="midnight"], [data-theme="midnight"] *));
 
+/*
+ * Keel Design Tokens
+ * Semantic tokens are the single source of truth for color. Every utility
+ * (bg-surface-1, text-text-muted, border-border-subtle, ...) resolves to
+ * `var(--color-*)`, so a theme block below can recolor the whole app at
+ * runtime — no component re-renders required.
+ *
+ * Roles (one job per token — never mix):
+ *   surface-0..3   page -> card -> chip/inset -> raised
+ *   border-*       card borders / dividers
+ *   text-*         primary / body / muted / faint hierarchy
+ *   brand-*        primary actions, active nav, links
+ *   accent-*       warmth, highlights, momentum
+ *   success/warning/danger/info   status ONLY
+ *   chart-1..6     categorical data-viz (colorblind-safe, hue-separated)
+ *
+ * Adding a new theme = one [data-theme] block here + one entry in src/lib/themes.js
+ */
 @theme {
-  --font-serif: "Newsreader Variable", "Times New Roman", serif;
+  /* Surfaces */
+  --color-surface-0: #f6f6f3;
+  --color-surface-1: #ffffff;
+  --color-surface-2: #f0efeb;
+  --color-surface-3: #e6e4de;
+  /* Borders */
+  --color-border-subtle: #e8e7e1;
+  --color-border-strong: #d4d2cb;
+  /* Text */
+  --color-text-primary: #16181d;
+  --color-text-body: #3d434b;
+  --color-text-muted: #6b7280;
+  --color-text-faint: #9ca3af;
+  /* Brand (primary) */
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-200: #bfdbfe;
+  --color-brand-300: #93c5fd;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-800: #1e40af;
+  --color-brand-900: #1e3a5f;
+  --color-brand-950: #172554;
+  --color-brand: #2563eb;
+  --color-brand-strong: #1d4ed8;
+  --color-brand-soft: #3b82f6;
+  --color-brand-muted: #eff6ff;
+  --color-brand-contrast: #ffffff;
+  /* Accent (warm highlights) */
+  --color-accent-300: #fcd34d;
+  --color-accent-400: #fbbf24;
+  --color-accent-500: #f59e0b;
+  --color-accent-600: #d97706;
+  --color-accent: #f59e0b;
+  --color-accent-strong: #d97706;
+  --color-accent-muted: #fffbeb;
+  --color-accent-contrast: #1f2937;
+  /* Success */
+  --color-success-50: #f0fdf4;
+  --color-success-100: #d1fae5;
+  --color-success-400: #34d399;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+  --color-success: #059669;
+  --color-success-muted: #f0fdf4;
+  --color-success-contrast: #ffffff;
+  /* Warning */
+  --color-warning-50: #fff7ed;
+  --color-warning-100: #ffedd5;
+  --color-warning-400: #fb923c;
+  --color-warning-500: #f97316;
+  --color-warning-600: #ea580c;
+  --color-warning-700: #c2410c;
+  --color-warning: #ea580c;
+  --color-warning-muted: #fff7ed;
+  --color-warning-contrast: #ffffff;
+  /* Danger */
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-400: #f87171;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+  --color-danger: #dc2626;
+  --color-danger-muted: #fef2f2;
+  --color-danger-contrast: #ffffff;
+  /* Info */
+  --color-info-50: #f0f9ff;
+  --color-info-100: #e0f2fe;
+  --color-info-400: #38bdf8;
+  --color-info-500: #0ea5e9;
+  --color-info-600: #0284c7;
+  --color-info-700: #0369a1;
+  --color-info: #0284c7;
+  --color-info-muted: #f0f9ff;
+  --color-info-contrast: #ffffff;
+  /* Chart categorical (colorblind-safe, hue-separated) */
+  --color-chart-1: #2563eb;
+  --color-chart-2: #f59e0b;
+  --color-chart-3: #10b981;
+  --color-chart-4: #8b5cf6;
+  --color-chart-5: #ec4899;
+  --color-chart-6: #06b6d4;
+  /* Radius + shadow */
+  --radius-card: 1rem;
+  --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.05), 0 1px 3px 0 rgb(15 23 42 / 0.06);
+  --shadow-pop: 0 10px 30px -6px rgb(15 23 42 / 0.15);
+  /* Decorative gradients (shared across themes) */
+  --background-image-gradient-brand: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+  --background-image-gradient-accent: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  --background-image-gradient-info: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+  --background-image-gradient-warning: linear-gradient(135deg, #7c2d12 0%, #ea580c 100%);
+  --background-image-gradient-danger: linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%);
+  --background-image-gradient-success: linear-gradient(135deg, #14532d 0%, #16a34a 100%);
+  --background-image-gradient-maintenance: linear-gradient(135deg, #1e293b 0%, #475569 100%);
 }
 
 body {
-  background: #f1f5f9;
-  color: #0f172a;
-}
-
-.dark body {
-  background: #1a1a2e;
-  color: #ffffff;
+  background: var(--color-surface-0);
+  color: var(--color-text-primary);
 }
 
 ::-webkit-scrollbar {
@@ -25,21 +135,264 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--color-border-strong);
   border-radius: 3px;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: #334155;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: var(--color-border-strong) transparent;
 }
 
-.dark * {
-  scrollbar-color: #334155 transparent;
+/*
+ * Theme: Keel Dark
+ * Proper elevation ramp (page -> card -> chip -> raised). Replaces the old
+ * single `#1a1a2e`/`#16213e` collision with distinct surface depths.
+ */
+[data-theme="keel-dark"] {
+  --color-surface-0: #0d1117;
+  --color-surface-1: #161b22;
+  --color-surface-2: #1e2530;
+  --color-surface-3: #28313d;
+  --color-border-subtle: #222b36;
+  --color-border-strong: #2f3a47;
+  --color-text-primary: #f2f4f8;
+  --color-text-body: #c9d1dc;
+  --color-text-muted: #8b98a8;
+  --color-text-faint: #5f6d7a;
+  --color-brand-50: #17263f;
+  --color-brand-100: #1d3050;
+  --color-brand-200: #24406b;
+  --color-brand-300: #2e4f86;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-800: #1e40af;
+  --color-brand-900: #172554;
+  --color-brand-950: #0f2a5e;
+  --color-brand: #3b82f6;
+  --color-brand-strong: #2563eb;
+  --color-brand-soft: #60a5fa;
+  --color-brand-muted: #17263f;
+  --color-brand-contrast: #ffffff;
+  --color-accent-300: #fde68a;
+  --color-accent-400: #fcd34d;
+  --color-accent-500: #fbbf24;
+  --color-accent-600: #f59e0b;
+  --color-accent: #fbbf24;
+  --color-accent-strong: #f59e0b;
+  --color-accent-muted: #2a2210;
+  --color-accent-contrast: #1f2937;
+  --color-success-50: #0b3326;
+  --color-success-100: #0f3d2c;
+  --color-success-400: #34d399;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+  --color-success: #34d399;
+  --color-success-muted: #0b3326;
+  --color-success-contrast: #06281e;
+  --color-warning-50: #33160a;
+  --color-warning-100: #3f1c0c;
+  --color-warning-400: #fb923c;
+  --color-warning-500: #f97316;
+  --color-warning-600: #ea580c;
+  --color-warning-700: #c2410c;
+  --color-warning: #fb923c;
+  --color-warning-muted: #33160a;
+  --color-warning-contrast: #1f1206;
+  --color-danger-50: #3a1218;
+  --color-danger-100: #47151d;
+  --color-danger-400: #f87171;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+  --color-danger: #f87171;
+  --color-danger-muted: #3a1218;
+  --color-danger-contrast: #2c0a10;
+  --color-info-50: #0a2733;
+  --color-info-100: #0e3140;
+  --color-info-400: #38bdf8;
+  --color-info-500: #0ea5e9;
+  --color-info-600: #0284c7;
+  --color-info-700: #0369a1;
+  --color-info: #38bdf8;
+  --color-info-muted: #0a2733;
+  --color-info-contrast: #07202a;
+  --color-chart-1: #60a5fa;
+  --color-chart-2: #fbbf24;
+  --color-chart-3: #34d399;
+  --color-chart-4: #a78bfa;
+  --color-chart-5: #f472b6;
+  --color-chart-6: #22d3ee;
+}
+
+/*
+ * Theme: Midnight
+ * Indigo-violet night theme. Brand becomes indigo; surfaces lean violet.
+ */
+[data-theme="midnight"] {
+  --color-surface-0: #0b1020;
+  --color-surface-1: #131a30;
+  --color-surface-2: #1b2440;
+  --color-surface-3: #252f52;
+  --color-border-subtle: #252f52;
+  --color-border-strong: #33406b;
+  --color-text-primary: #f4f6fe;
+  --color-text-body: #cbd2ea;
+  --color-text-muted: #8b93bf;
+  --color-text-faint: #5f6691;
+  --color-brand-50: #171b36;
+  --color-brand-100: #1d2244;
+  --color-brand-200: #242b56;
+  --color-brand-300: #2d3570;
+  --color-brand-400: #5658d8;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+  --color-brand-800: #3730a3;
+  --color-brand-900: #312e81;
+  --color-brand-950: #1e1b4b;
+  --color-brand: #818cf8;
+  --color-brand-strong: #6366f1;
+  --color-brand-soft: #a5b4fc;
+  --color-brand-muted: #171b36;
+  --color-brand-contrast: #ffffff;
+  --color-accent-300: #fde68a;
+  --color-accent-400: #fcd34d;
+  --color-accent-500: #fbbf24;
+  --color-accent-600: #f59e0b;
+  --color-accent: #fbbf24;
+  --color-accent-strong: #f59e0b;
+  --color-accent-muted: #2a2210;
+  --color-accent-contrast: #1f2937;
+  --color-success-50: #0b3326;
+  --color-success-100: #0f3d2c;
+  --color-success-400: #34d399;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+  --color-success: #34d399;
+  --color-success-muted: #0b3326;
+  --color-success-contrast: #06281e;
+  --color-warning-50: #33160a;
+  --color-warning-100: #3f1c0c;
+  --color-warning-400: #fb923c;
+  --color-warning-500: #f97316;
+  --color-warning-600: #ea580c;
+  --color-warning-700: #c2410c;
+  --color-warning: #fb923c;
+  --color-warning-muted: #33160a;
+  --color-warning-contrast: #1f1206;
+  --color-danger-50: #3a1218;
+  --color-danger-100: #47151d;
+  --color-danger-400: #f87171;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+  --color-danger: #f87171;
+  --color-danger-muted: #3a1218;
+  --color-danger-contrast: #2c0a10;
+  --color-info-50: #0a2733;
+  --color-info-100: #0e3140;
+  --color-info-400: #38bdf8;
+  --color-info-500: #0ea5e9;
+  --color-info-600: #0284c7;
+  --color-info-700: #0369a1;
+  --color-info: #38bdf8;
+  --color-info-muted: #0a2733;
+  --color-info-contrast: #07202a;
+  --color-chart-1: #818cf8;
+  --color-chart-2: #fbbf24;
+  --color-chart-3: #34d399;
+  --color-chart-4: #f472b6;
+  --color-chart-5: #22d3ee;
+  --color-chart-6: #a78bfa;
+}
+
+/*
+ * Theme: Forest
+ * Fresh emerald light theme. Brand is green; success shifts to teal so
+ * status never collides with brand.
+ */
+[data-theme="forest"] {
+  --color-surface-0: #f4f7f4;
+  --color-surface-1: #ffffff;
+  --color-surface-2: #edf1ec;
+  --color-surface-3: #e2e8e0;
+  --color-border-subtle: #e0e6dd;
+  --color-border-strong: #c6d2c2;
+  --color-text-primary: #16211a;
+  --color-text-body: #3b4a40;
+  --color-text-muted: #66736b;
+  --color-text-faint: #93a097;
+  --color-brand-50: #ecfdf5;
+  --color-brand-100: #d1fae5;
+  --color-brand-200: #a7f3d0;
+  --color-brand-300: #6ee7b7;
+  --color-brand-400: #34d399;
+  --color-brand-500: #10b981;
+  --color-brand-600: #059669;
+  --color-brand-700: #047857;
+  --color-brand-800: #065f46;
+  --color-brand-900: #064e3b;
+  --color-brand-950: #022c22;
+  --color-brand: #059669;
+  --color-brand-strong: #047857;
+  --color-brand-soft: #10b981;
+  --color-brand-muted: #ecfdf5;
+  --color-brand-contrast: #ffffff;
+  --color-accent-300: #fcd34d;
+  --color-accent-400: #fbbf24;
+  --color-accent-500: #f59e0b;
+  --color-accent-600: #d97706;
+  --color-accent: #f59e0b;
+  --color-accent-strong: #d97706;
+  --color-accent-muted: #fffbeb;
+  --color-accent-contrast: #1f2937;
+  --color-success-50: #f0fdfa;
+  --color-success-100: #ccfbf1;
+  --color-success-400: #2dd4bf;
+  --color-success-500: #14b8a6;
+  --color-success-600: #0d9488;
+  --color-success-700: #0f766e;
+  --color-success: #0d9488;
+  --color-success-muted: #f0fdfa;
+  --color-success-contrast: #ffffff;
+  --color-warning-50: #fff7ed;
+  --color-warning-100: #ffedd5;
+  --color-warning-400: #fb923c;
+  --color-warning-500: #f97316;
+  --color-warning-600: #ea580c;
+  --color-warning-700: #c2410c;
+  --color-warning: #ea580c;
+  --color-warning-muted: #fff7ed;
+  --color-warning-contrast: #ffffff;
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-400: #f87171;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+  --color-danger: #dc2626;
+  --color-danger-muted: #fef2f2;
+  --color-danger-contrast: #ffffff;
+  --color-info-50: #f0f9ff;
+  --color-info-100: #e0f2fe;
+  --color-info-400: #38bdf8;
+  --color-info-500: #0ea5e9;
+  --color-info-600: #0284c7;
+  --color-info-700: #0369a1;
+  --color-info: #0284c7;
+  --color-info-muted: #f0f9ff;
+  --color-info-contrast: #ffffff;
+  --color-chart-1: #059669;
+  --color-chart-2: #f59e0b;
+  --color-chart-3: #0ea5e9;
+  --color-chart-4: #8b5cf6;
+  --color-chart-5: #ec4899;
+  --color-chart-6: #d97706;
 }
 
 @keyframes home-marquee {

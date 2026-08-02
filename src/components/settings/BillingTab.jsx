@@ -28,13 +28,13 @@ export default function BillingTab({ subscriptionExpiresAt, refreshSettings }) {
         {subscriptionExpiresAt ? (
           <div className="space-y-3">
             {expiringSoon && (
-              <div className="flex items-start gap-2.5 p-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
-                <FiAlertTriangle className="text-amber-500 shrink-0 mt-0.5" size={14} />
+              <div className="flex items-start gap-2.5 p-3 rounded-lg bg-warning-muted border border-warning">
+                <FiAlertTriangle className="text-accent shrink-0 mt-0.5" size={14} />
                 <div>
-                  <p className="text-xs font-medium text-amber-800 dark:text-amber-300">
+                  <p className="text-xs font-medium text-warning-700 text-accent-300">
                     Expiring soon
                   </p>
-                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+                  <p className="text-xs text-warning mt-0.5">
                     Your subscription expires in {daysRemaining} day{daysRemaining !== 1 ? "s" : ""}. Renew to keep your shop active.
                   </p>
                 </div>
@@ -42,13 +42,13 @@ export default function BillingTab({ subscriptionExpiresAt, refreshSettings }) {
             )}
 
             {isExpired && (
-              <div className="flex items-start gap-2.5 p-3 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
-                <FiAlertTriangle className="text-red-500 shrink-0 mt-0.5" size={14} />
+              <div className="flex items-start gap-2.5 p-3 rounded-lg bg-danger-muted border border-danger">
+                <FiAlertTriangle className="text-danger shrink-0 mt-0.5" size={14} />
                 <div>
-                  <p className="text-xs font-medium text-red-800 dark:text-red-300">
+                  <p className="text-xs font-medium text-danger-700 text-danger">
                     Subscription expired
                   </p>
-                  <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">
+                  <p className="text-xs text-danger mt-0.5">
                     Your subscription expired. Renew to regain access to your dashboard.
                   </p>
                 </div>
@@ -56,36 +56,36 @@ export default function BillingTab({ subscriptionExpiresAt, refreshSettings }) {
             )}
 
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-400 dark:text-slate-500">Status</span>
+              <span className="text-xs text-text-faint">Status</span>
               {isExpired ? (
-                <span className="text-xs font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-full px-2.5 py-0.5">Expired</span>
+                <span className="text-xs font-semibold text-danger bg-danger-muted border border-danger rounded-full px-2.5 py-0.5">Expired</span>
               ) : (
-                <span className="text-xs font-semibold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 rounded-full px-2.5 py-0.5">Active</span>
+                <span className="text-xs font-semibold text-success bg-success-muted border border-success dark:border-green-500/20 rounded-full px-2.5 py-0.5">Active</span>
               )}
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-400 dark:text-slate-500">Expires</span>
-              <span className="text-sm font-medium text-gray-800 dark:text-white">
+              <span className="text-xs text-text-faint">Expires</span>
+              <span className="text-sm font-medium text-text-primary">
                 {expiry.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-400 dark:text-slate-500">Days remaining</span>
-              <span className="text-sm font-medium text-gray-800 dark:text-white">
+              <span className="text-xs text-text-faint">Days remaining</span>
+              <span className="text-sm font-medium text-text-primary">
                 {daysRemaining}
               </span>
             </div>
 
-            <div className="flex flex-col gap-2 pt-3 border-t border-gray-100 dark:border-white/10">
+            <div className="flex flex-col gap-2 pt-3 border-t border-border-subtle">
               <button
                 onClick={() => { setRenewPlan("basic"); setShowRenew(true); }}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-sm transition-all shadow-lg shadow-blue-600/25"
+                className="px-4 py-2 bg-brand hover:bg-brand-soft text-white font-semibold rounded-lg text-sm transition-all shadow-lg shadow-brand/25"
               >
                 Renew — KSh 500 / 30 days
               </button>
               <button
                 onClick={() => { setRenewPlan("pro"); setShowRenew(true); }}
-                className="px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-semibold rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-600/25"
+                className="px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-semibold rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-accent-600/25"
               >
                 <FiStar size={14} />
                 Upgrade to Pro — KSh 1,000 / 30 days
@@ -93,7 +93,7 @@ export default function BillingTab({ subscriptionExpiresAt, refreshSettings }) {
               <button
                 onClick={handleCheckStatus}
                 disabled={checking}
-                className="px-4 py-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-700 dark:text-gray-300 font-medium rounded-lg text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="px-4 py-2 bg-surface-2 dark:bg-white/10 hover:bg-surface-2 dark:hover:bg-white/20 text-text-body font-medium rounded-lg text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <FiRefreshCw className={`${checking ? "animate-spin" : ""}`} size={14} />
                 {checking ? "Checking..." : "Check Subscription Status"}
@@ -102,11 +102,11 @@ export default function BillingTab({ subscriptionExpiresAt, refreshSettings }) {
           </div>
         ) : (
           <div className="text-center py-6">
-            <p className="text-sm text-gray-500 dark:text-slate-400">No subscription expiry set. Your shop is active.</p>
+            <p className="text-sm text-text-muted">No subscription expiry set. Your shop is active.</p>
             <button
               onClick={handleCheckStatus}
               disabled={checking}
-              className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-semibold rounded-lg text-sm transition-all flex items-center justify-center gap-2 mx-auto shadow-lg shadow-blue-600/25"
+              className="mt-4 px-4 py-2 bg-brand hover:bg-brand-soft disabled:opacity-50 text-white font-semibold rounded-lg text-sm transition-all flex items-center justify-center gap-2 mx-auto shadow-lg shadow-brand/25"
             >
               <FiRefreshCw className={`${checking ? "animate-spin" : ""}`} size={14} />
               {checking ? "Checking..." : "Refresh Status"}

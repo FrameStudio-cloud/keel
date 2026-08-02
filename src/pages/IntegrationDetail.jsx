@@ -26,7 +26,7 @@ export default function IntegrationDetail() {
       <div className="max-w-4xl mx-auto space-y-10">
         <Link
           to="/integrations"
-          className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-brand transition-colors"
         >
           <FiArrowLeft size={15} />
           Connect your tools
@@ -46,24 +46,24 @@ export default function IntegrationDetail() {
         )}
 
         <section id="setup" className="scroll-mt-6">
-          <h3 className="text-lg font-bold text-gray-800 dark:text-white">
+          <h3 className="text-lg font-bold text-text-primary">
             {status.connected ? `Manage ${integration.name}` : `Set up ${integration.name}`}
           </h3>
           <div className="mt-4">
             {status.locked ? (
-              <div className="bg-white dark:bg-[#16213e] rounded-2xl border border-dashed border-amber-200 dark:border-amber-500/20 p-8 text-center">
-                <div className="w-12 h-12 mx-auto rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
+              <div className="bg-surface-1 rounded-2xl border border-dashed border-warning p-8 text-center">
+                <div className="w-12 h-12 mx-auto rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-accent-500/20">
                   <FiAward size={22} className="text-white" />
                 </div>
-                <p className="mt-3 text-sm font-semibold text-gray-800 dark:text-white">
+                <p className="mt-3 text-sm font-semibold text-text-primary">
                   {integration.name} is a Pro feature
                 </p>
-                <p className="mt-1 text-xs text-gray-500 dark:text-slate-400 max-w-[280px] mx-auto">
+                <p className="mt-1 text-xs text-text-muted max-w-[280px] mx-auto">
                   Unlock auto-replies on WhatsApp, calendar sync, and more with the Pro plan.
                 </p>
                 <Link
                   to="/settings?tab=billing"
-                  className="mt-4 inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-lg shadow-amber-500/20"
+                  className="mt-4 inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-lg shadow-accent-500/20"
                 >
                   Upgrade to Pro
                 </Link>

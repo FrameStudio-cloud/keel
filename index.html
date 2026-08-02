@@ -1,7 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="keel-light">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("keel-theme");
+          if (t) {
+            document.documentElement.setAttribute("data-theme", t);
+          }
+        } catch (e) {}
+      })();
+    </script>
     <link rel="icon" type="image/x-icon" href="https://keel.framestudio.co.ke/favicon.ico" />
     <link rel="icon" type="image/png" sizes="192x192" href="https://keel.framestudio.co.ke/android-chrome-192x192.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="https://keel.framestudio.co.ke/favicon-32x32.png" />

@@ -95,11 +95,11 @@ export default function QuickStartCard() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-5 text-white mb-6 shadow-xl shadow-blue-600/20">
+    <div className="bg-gradient-to-br from-brand-strong to-brand rounded-card p-5 text-brand-contrast mb-6 shadow-pop">
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="font-bold text-sm">Getting Started</h3>
-          <p className="text-blue-200 text-xs mt-0.5">{doneCount} of {MILESTONES.length} done</p>
+          <p className="text-brand-100 text-xs mt-0.5">{doneCount} of {MILESTONES.length} done</p>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold text-white/80 bg-white/15 rounded-full px-2.5 py-0.5">
@@ -114,7 +114,7 @@ export default function QuickStartCard() {
       <div className="flex items-center gap-2 mb-4">
         <div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
           <div
-            className="h-full bg-white rounded-full transition-all duration-500"
+            className="h-full bg-surface-1 rounded-full transition-all duration-500"
             style={{ width: `${(doneCount / MILESTONES.length) * 100}%` }}
           />
         </div>

@@ -120,26 +120,26 @@ export default function RenewModal({ onClose, subscriptionExpiresAt, onRenewed, 
         role="dialog"
         aria-modal="true"
         aria-label="Renew subscription"
-        className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-100 dark:border-white/10 p-6 w-full max-w-md mx-4 shadow-xl"
+        className="bg-surface-1 rounded-2xl border border-border-subtle p-6 w-full max-w-md mx-4 shadow-xl"
       >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-bold text-gray-900 dark:text-white">
+          <h2 className="text-base font-bold text-text-primary">
             {step === "plan" && "Renew Subscription"}
             {step === "pay" && "Complete Payment"}
             {step === "success" && "Payment Successful"}
           </h2>
           <button
             onClick={onClose}
-            className="p-1.5 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
+            className="p-1.5 hover:bg-surface-2 rounded-lg transition-colors"
             aria-label="Close"
           >
-            <FiX size={16} className="text-gray-400" />
+            <FiX size={16} className="text-text-faint" />
           </button>
         </div>
 
         {step === "plan" && (
           <div className="space-y-3">
-            <p className="text-xs text-gray-500 dark:text-slate-400">
+            <p className="text-xs text-text-muted">
               Choose a plan to renew your subscription for 30 days.
             </p>
             {PLANS.map((p) => {
@@ -150,26 +150,26 @@ export default function RenewModal({ onClose, subscriptionExpiresAt, onRenewed, 
                   onClick={() => setSelectedPlan(p.id)}
                   className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                     isSelected
-                      ? "border-blue-500 bg-blue-50/50 dark:bg-blue-500/10 dark:border-blue-400"
-                      : "border-gray-100 dark:border-white/10 hover:border-gray-200 dark:hover:border-white/20"
+                      ? "border-brand bg-brand-muted border-brand"
+                      : "border-border-subtle hover:border-border-subtle dark:hover:border-white/20"
                   }`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
                       {p.id === "pro" ? (
-                        <FiStar className="text-amber-500" size={16} />
+                        <FiStar className="text-accent" size={16} />
                       ) : (
-                        <FiShield className="text-blue-500" size={16} />
+                        <FiShield className="text-brand" size={16} />
                       )}
-                      <span className="font-semibold text-sm text-gray-900 dark:text-white">
+                      <span className="font-semibold text-sm text-text-primary">
                         {p.label}
                       </span>
                     </div>
-                    <span className="font-bold text-base text-gray-900 dark:text-white">
+                    <span className="font-bold text-base text-text-primary">
                       KSh {p.price.toLocaleString()}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 ml-7">
+                  <p className="text-xs text-text-muted mt-1 ml-7">
                     {p.desc}
                   </p>
                   <ul className="mt-2 ml-7 space-y-0.5">
@@ -178,8 +178,8 @@ export default function RenewModal({ onClose, subscriptionExpiresAt, onRenewed, 
                         key={f}
                         className={`text-xs flex items-center gap-1.5 ${
                           isSelected
-                            ? "text-blue-700 dark:text-blue-300"
-                            : "text-gray-500 dark:text-slate-400"
+                            ? "text-brand"
+                            : "text-text-muted"
                         }`}
                       >
                         <FiCheck size={10} className="shrink-0" />
@@ -192,7 +192,7 @@ export default function RenewModal({ onClose, subscriptionExpiresAt, onRenewed, 
             })}
             <button
               onClick={() => setStep("pay")}
-              className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25"
+              className="w-full py-2.5 bg-brand hover:bg-brand-soft text-white font-semibold rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand/25"
             >
               Continue
             </button>
@@ -201,33 +201,33 @@ export default function RenewModal({ onClose, subscriptionExpiresAt, onRenewed, 
 
         {step === "pay" && (
           <div className="space-y-4">
-            <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-4 space-y-2">
+            <div className="bg-surface-2 dark:bg-white/5 rounded-xl p-4 space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500 dark:text-slate-400">Plan</span>
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="text-text-muted">Plan</span>
+                <span className="font-medium text-text-primary">
                   {plan.label}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500 dark:text-slate-400">Duration</span>
-                <span className="font-medium text-gray-900 dark:text-white">30 days</span>
+                <span className="text-text-muted">Duration</span>
+                <span className="font-medium text-text-primary">30 days</span>
               </div>
-              <div className="border-t border-gray-200 dark:border-white/10 pt-2 flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">Total</span>
-                <span className="text-lg font-bold text-gray-900 dark:text-white">
+              <div className="border-t border-border-subtle pt-2 flex items-center justify-between">
+                <span className="text-sm font-semibold text-text-primary">Total</span>
+                <span className="text-lg font-bold text-text-primary">
                   KSh {plan.price.toLocaleString()}
                 </span>
               </div>
             </div>
 
             {error && (
-              <p className="text-xs text-red-500 text-center">{error}</p>
+              <p className="text-xs text-danger text-center">{error}</p>
             )}
 
             <button
               onClick={handlePay}
               disabled={processing}
-              className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25"
+              className="w-full py-2.5 bg-brand hover:bg-brand-soft disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand/25"
             >
               {processing ? (
                 <>
@@ -242,7 +242,7 @@ export default function RenewModal({ onClose, subscriptionExpiresAt, onRenewed, 
               )}
             </button>
 
-            <p className="text-xs text-center text-gray-400 dark:text-slate-500">
+            <p className="text-xs text-center text-text-faint">
               Secure payment. Your information is encrypted.
             </p>
           </div>
@@ -250,16 +250,16 @@ export default function RenewModal({ onClose, subscriptionExpiresAt, onRenewed, 
 
         {step === "success" && (
           <div className="text-center py-4 space-y-4">
-            <div className="w-14 h-14 mx-auto rounded-full bg-green-100 dark:bg-green-500/10 flex items-center justify-center">
-              <FiCheck className="text-green-500" size={26} />
+            <div className="w-14 h-14 mx-auto rounded-full bg-success-muted flex items-center justify-center">
+              <FiCheck className="text-success" size={26} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white">
+              <p className="text-sm font-semibold text-text-primary">
                 Subscription Renewed
               </p>
-              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+              <p className="text-xs text-text-muted mt-1">
                 Your subscription is now active until{" "}
-                <span className="font-medium text-gray-700 dark:text-slate-300">
+                <span className="font-medium text-text-body">
                   {getNewExpiry().toLocaleDateString("en-KE", {
                     year: "numeric",
                     month: "long",
@@ -271,7 +271,7 @@ export default function RenewModal({ onClose, subscriptionExpiresAt, onRenewed, 
             </div>
             <button
               onClick={handleDone}
-              className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-sm transition-all shadow-lg shadow-blue-600/25"
+              className="w-full py-2.5 bg-brand hover:bg-brand-soft text-white font-semibold rounded-lg text-sm transition-all shadow-lg shadow-brand/25"
             >
               Done
             </button>

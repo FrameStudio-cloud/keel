@@ -71,15 +71,15 @@ export default function PostCard({ post, onEdit, onSaveAsTemplate, onMarkPublish
     : post.caption?.slice(0, 120) + "...";
 
   return (
-    <div className={`bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 border-l-4 ${platformColor} p-4`}>
+    <div className={`bg-surface-1 rounded-xl border border-border-subtle border-l-4 ${platformColor} p-4`}>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-gray-500 dark:text-slate-400">
+          <span className="text-xs font-medium text-text-muted">
             {post.platform}
-            {isBroadcast && <span className="ml-1.5 text-green-500 dark:text-green-400">· Broadcast</span>}
+            {isBroadcast && <span className="ml-1.5 text-success">· Broadcast</span>}
           </span>
           {typeLabel && (
-            <span className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-white/[0.05] px-1.5 py-0.5 rounded">
+            <span className="text-[10px] uppercase tracking-wider text-text-faint bg-surface-2 dark:bg-white/[0.05] px-1.5 py-0.5 rounded">
               {typeLabel}
             </span>
           )}
@@ -87,50 +87,50 @@ export default function PostCard({ post, onEdit, onSaveAsTemplate, onMarkPublish
         <Badge label={isScheduled ? "Scheduled" : "Published"} color={isScheduled ? "blue" : "green"} />
       </div>
 
-      <p className="text-sm text-gray-700 dark:text-gray-100 leading-relaxed cursor-pointer" onClick={() => setExpanded((e) => !e)}>
+      <p className="text-sm text-text-body leading-relaxed cursor-pointer" onClick={() => setExpanded((e) => !e)}>
         {displayCaption || "No caption"}
-        {captionLong && <span className="text-blue-500 dark:text-blue-400 text-xs ml-1">{expanded ? "less" : "more"}</span>}
+        {captionLong && <span className="text-brand text-xs ml-1">{expanded ? "less" : "more"}</span>}
       </p>
 
       {post.product_id && (
-        <div className="mt-2 flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400">
+        <div className="mt-2 flex items-center gap-1.5 text-xs text-brand">
           <FiExternalLink size={11} />
           <span>Linked to product</span>
         </div>
       )}
 
-      <div className="flex items-start justify-between flex-wrap gap-2 mt-3 pt-2 border-t border-gray-100 dark:border-white/10">
+      <div className="flex items-start justify-between flex-wrap gap-2 mt-3 pt-2 border-t border-border-subtle">
         {isScheduled ? (
-          <span className="text-xs text-gray-400 dark:text-slate-500 flex items-center gap-1">
+          <span className="text-xs text-text-faint flex items-center gap-1">
             <FiClock /> {formatDate(post.scheduled_at)}
           </span>
         ) : (
-          <div className="flex flex-wrap gap-x-2 gap-y-0.5 text-xs text-gray-400 dark:text-slate-500">
+          <div className="flex flex-wrap gap-x-2 gap-y-0.5 text-xs text-text-faint">
             {editingEngagement ? (
               <div className="flex flex-wrap items-center gap-1.5">
                 <input
                   type="number"
                   value={engagement.likes}
                   onChange={(e) => setEngagement({ ...engagement, likes: Number(e.target.value) })}
-                  className="w-12 px-1 py-0.5 text-xs border border-gray-200 dark:border-white/10 rounded bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white"
+                  className="w-12 px-1 py-0.5 text-xs border border-border-subtle rounded bg-surface-1 text-text-primary"
                   placeholder="Likes"
                 />
                 <input
                   type="number"
                   value={engagement.comments}
                   onChange={(e) => setEngagement({ ...engagement, comments: Number(e.target.value) })}
-                  className="w-12 px-1 py-0.5 text-xs border border-gray-200 dark:border-white/10 rounded bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white"
+                  className="w-12 px-1 py-0.5 text-xs border border-border-subtle rounded bg-surface-1 text-text-primary"
                   placeholder="Comments"
                 />
                 <input
                   type="number"
                   value={engagement.reach}
                   onChange={(e) => setEngagement({ ...engagement, reach: Number(e.target.value) })}
-                  className="w-16 px-1 py-0.5 text-xs border border-gray-200 dark:border-white/10 rounded bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white"
+                  className="w-16 px-1 py-0.5 text-xs border border-border-subtle rounded bg-surface-1 text-text-primary"
                   placeholder="Reach"
                 />
-                <button onClick={saveEngagement} className="text-green-600 dark:text-green-400 hover:underline text-xs">Save</button>
-                <button onClick={() => setEditingEngagement(false)} className="text-gray-400 hover:text-gray-600 text-xs">Cancel</button>
+                <button onClick={saveEngagement} className="text-success hover:underline text-xs">Save</button>
+                <button onClick={() => setEditingEngagement(false)} className="text-text-faint hover:text-text-body text-xs">Cancel</button>
               </div>
             ) : (
               <>
@@ -145,14 +145,14 @@ export default function PostCard({ post, onEdit, onSaveAsTemplate, onMarkPublish
         <div className="flex flex-wrap gap-1">
           <button
             onClick={() => onEdit(post)}
-            className="text-xs text-gray-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/[0.05] transition-all"
+            className="text-xs text-text-faint hover:text-brand px-2 py-1 rounded hover:bg-surface-2 transition-all"
           >
             Edit
           </button>
           {isScheduled && onMarkPublished && (
             <button
               onClick={() => onMarkPublished(post)}
-              className="text-xs text-gray-400 dark:text-slate-500 hover:text-green-600 dark:hover:text-green-400 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/[0.05] transition-all flex items-center gap-1"
+              className="text-xs text-text-faint hover:text-success px-2 py-1 rounded hover:bg-surface-2 transition-all flex items-center gap-1"
             >
               <FiCheckCircle size={11} /> Mark published
             </button>
@@ -160,7 +160,7 @@ export default function PostCard({ post, onEdit, onSaveAsTemplate, onMarkPublish
           {!isScheduled && (
             <button
               onClick={() => setEditingEngagement((e) => !e)}
-              className="text-xs text-gray-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/[0.05] transition-all flex items-center gap-1"
+              className="text-xs text-text-faint hover:text-brand px-2 py-1 rounded hover:bg-surface-2 transition-all flex items-center gap-1"
             >
               <FiEdit3 size={11} /> Stats
             </button>
@@ -169,16 +169,16 @@ export default function PostCard({ post, onEdit, onSaveAsTemplate, onMarkPublish
             <div className="relative">
               <button
                 onClick={() => setShareOpen((v) => !v)}
-                className="text-xs text-gray-400 dark:text-slate-500 hover:text-green-600 dark:hover:text-green-400 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/[0.05] transition-all flex items-center gap-1"
+                className="text-xs text-text-faint hover:text-success px-2 py-1 rounded hover:bg-surface-2 transition-all flex items-center gap-1"
               >
                 <FiShare2 size={11} /> Share
               </button>
               {shareOpen && (
-                <div className="absolute right-0 top-full mt-1 bg-white dark:bg-[#16213e] border border-gray-100 dark:border-white/10 rounded-xl shadow-lg p-1 min-w-[160px] z-10">
-                  <button onClick={() => { handleWhatsAppShare(false); setShareOpen(false); }} className="w-full text-left text-xs text-gray-600 dark:text-slate-300 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05]">
+                <div className="absolute right-0 top-full mt-1 bg-surface-1 border border-border-subtle rounded-xl shadow-lg p-1 min-w-[160px] z-10">
+                  <button onClick={() => { handleWhatsAppShare(false); setShareOpen(false); }} className="w-full text-left text-xs text-text-body px-3 py-2 rounded-lg hover:bg-surface-2">
                     Share as message
                   </button>
-                  <button onClick={() => { handleWhatsAppShare(true); setShareOpen(false); }} className="w-full text-left text-xs text-gray-600 dark:text-slate-300 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05]">
+                  <button onClick={() => { handleWhatsAppShare(true); setShareOpen(false); }} className="w-full text-left text-xs text-text-body px-3 py-2 rounded-lg hover:bg-surface-2">
                     Post as status update
                   </button>
                 </div>
@@ -187,7 +187,7 @@ export default function PostCard({ post, onEdit, onSaveAsTemplate, onMarkPublish
           )}
           <button
             onClick={() => onSaveAsTemplate?.(post)}
-            className="text-xs text-gray-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/[0.05] transition-all"
+            className="text-xs text-text-faint hover:text-brand px-2 py-1 rounded hover:bg-surface-2 transition-all"
             title="Save as template"
           >
             <FiSave size={11} />

@@ -133,8 +133,8 @@ export default function DeployProgressModal({
     const s = status[key];
     if (s === "current") {
       return (
-        <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center">
-          <FiLoader size={16} className="animate-spin text-blue-600 dark:text-blue-400" />
+        <div className="w-8 h-8 rounded-full bg-brand-muted flex items-center justify-center">
+          <FiLoader size={16} className="animate-spin text-brand" />
         </div>
       );
     }
@@ -146,8 +146,8 @@ export default function DeployProgressModal({
       );
     }
     return (
-      <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center">
-        <span className="w-3 h-3 rounded-full border-2 border-gray-300 dark:border-slate-600" />
+      <div className="w-8 h-8 rounded-full bg-surface-2 dark:bg-white/5 flex items-center justify-center">
+        <span className="w-3 h-3 rounded-full border-2 border-border-strong" />
       </div>
     );
   }
@@ -162,7 +162,7 @@ export default function DeployProgressModal({
         role="dialog"
         aria-modal="true"
         aria-label={done ? "Deployment complete" : "Deploying storefront"}
-        className="bg-white dark:bg-[#16213e] rounded-xl shadow-xl w-full max-w-lg overflow-hidden"
+        className="bg-surface-1 rounded-xl shadow-xl w-full max-w-lg overflow-hidden"
       >
         {/* Step indicator */}
         <div className="flex items-center gap-2 px-5 pt-5 pb-0">
@@ -171,8 +171,8 @@ export default function DeployProgressModal({
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-all ${
                   s < 3 || done
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 dark:bg-white/10 text-gray-400 dark:text-slate-500"
+                    ? "bg-brand text-white"
+                    : "bg-surface-2 dark:bg-white/10 text-text-faint"
                 }`}
               >
                 {s < 3 ? <FiCheckCircle size={14} /> : done ? <FiCheckCircle size={14} /> : 3}
@@ -180,8 +180,8 @@ export default function DeployProgressModal({
               <span
                 className={`text-xs hidden sm:block ${
                   s < 3 || done
-                    ? "text-blue-600 dark:text-blue-400 font-medium"
-                    : "text-gray-400 dark:text-slate-500"
+                    ? "text-brand font-medium"
+                    : "text-text-faint"
                 }`}
               >
                 {s === 1 ? "Template" : s === 2 ? "Configure" : "Deploy"}
@@ -190,8 +190,8 @@ export default function DeployProgressModal({
                 <div
                   className={`flex-1 h-px mx-1 ${
                     s < 3
-                      ? "bg-blue-600"
-                      : "bg-gray-200 dark:bg-white/10"
+                      ? "bg-brand"
+                      : "bg-surface-2 dark:bg-white/10"
                   }`}
                 />
               )}
@@ -201,15 +201,15 @@ export default function DeployProgressModal({
 
         {/* Header */}
         <div className="px-5 pt-4 pb-3">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-text-primary flex items-center gap-2">
             {error ? (
               <>
-                <FiAlertTriangle className="text-red-500" size={22} />
+                <FiAlertTriangle className="text-danger" size={22} />
                 Deployment Failed
               </>
             ) : done ? (
               <>
-                <FiCheckCircle className="text-green-500" size={22} />
+                <FiCheckCircle className="text-success" size={22} />
                 Deployment Complete
               </>
             ) : (
@@ -217,7 +217,7 @@ export default function DeployProgressModal({
             )}
           </h2>
           {!done && !error && (
-            <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+            <p className="text-sm text-text-muted mt-1">
               Building and deploying — this usually takes 1-2 minutes
             </p>
           )}
@@ -232,17 +232,17 @@ export default function DeployProgressModal({
                 <p
                   className={`text-sm ${
                     status[s.key] === "done"
-                      ? "text-gray-800 dark:text-white font-medium"
+                      ? "text-text-primary font-medium"
                       : status[s.key] === "current"
-                      ? "text-blue-600 dark:text-blue-400 font-medium"
-                      : "text-gray-400 dark:text-slate-500"
+                      ? "text-brand font-medium"
+                      : "text-text-faint"
                   }`}
                 >
                   {s.label}
                 </p>
               </div>
               {status[s.key] === "done" && (
-                <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                <span className="text-xs text-success font-medium">
                   Done
                 </span>
               )}
@@ -252,29 +252,29 @@ export default function DeployProgressModal({
 
         {/* Error state */}
         {error && (
-          <div className="mx-5 mb-3 p-4 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-500/10 dark:to-rose-500/5 rounded-xl border border-red-200 dark:border-red-500/20">
+          <div className="mx-5 mb-3 p-4 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-500/10 dark:to-rose-500/5 rounded-xl border border-danger">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                <FiAlertTriangle size={18} className="text-red-600 dark:text-red-400" />
+              <div className="w-10 h-10 rounded-full bg-danger-muted flex items-center justify-center flex-shrink-0">
+                <FiAlertTriangle size={18} className="text-danger" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-red-800 dark:text-red-300">
+                <p className="text-sm font-semibold text-danger-700 text-danger">
                   {error.includes("timed out") || error.includes("timeout")
                     ? "Request timed out"
                     : error.includes("fetch") || error.includes("NetworkError") || error.includes("Failed to fetch")
                     ? "Provisioner unreachable"
                     : "Something went wrong"}
                 </p>
-                <p className="text-sm text-red-600 dark:text-red-400 mt-1 leading-relaxed">
+                <p className="text-sm text-danger mt-1 leading-relaxed">
                   {error}
                 </p>
                 {(error.includes("timed out") || error.includes("timeout")) && (
-                  <p className="text-xs text-red-500 dark:text-red-400/70 mt-2">
+                  <p className="text-xs text-danger mt-2">
                     The provisioner may be waking from sleep. Click Retry to try again.
                   </p>
                 )}
                 {(error.includes("fetch") || error.includes("NetworkError") || error.includes("Failed to fetch")) && (
-                  <p className="text-xs text-red-500 dark:text-red-400/70 mt-2">
+                  <p className="text-xs text-danger mt-2">
                     Make sure the provisioner service is running. If this persists, check Railway dashboard.
                   </p>
                 )}
@@ -285,13 +285,13 @@ export default function DeployProgressModal({
 
         {/* Success state */}
         {done && !error && (
-          <div className="mx-5 mb-3 p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/5 rounded-xl border border-green-200 dark:border-green-500/20">
+          <div className="mx-5 mb-3 p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/5 rounded-xl border border-success dark:border-green-500/20">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center flex-shrink-0 shadow-sm">
                 <FiGlobe size={18} className="text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-green-800 dark:text-green-300">
+                <p className="text-sm font-semibold text-success-700 text-success">
                   Your storefront is live
                 </p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -299,14 +299,14 @@ export default function DeployProgressModal({
                     href={displayUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-mono flex items-center gap-1"
+                    className="text-sm text-brand hover:underline font-mono flex items-center gap-1"
                   >
                     {displayUrl}
                     <FiExternalLink size={13} />
                   </a>
                   <button
                     onClick={handleCopy}
-                    className="flex items-center gap-1 px-2 py-0.5 text-xs rounded bg-white dark:bg-white/10 border border-gray-200 dark:border-white/20 hover:bg-gray-50 dark:hover:bg-white/20 transition-colors text-gray-600 dark:text-slate-400"
+                    className="flex items-center gap-1 px-2 py-0.5 text-xs rounded bg-surface-1 dark:bg-white/10 border border-border-subtle dark:border-white/20 hover:bg-surface-2 dark:hover:bg-white/20 transition-colors text-text-body"
                   >
                     {copied ? "Copied!" : <FiCopy size={12} />}
                     {!copied && "Copy"}
@@ -318,19 +318,19 @@ export default function DeployProgressModal({
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-5 py-4 border-t border-gray-100 dark:border-white/10">
+        <div className="flex items-center justify-between px-5 py-4 border-t border-border-subtle">
           {error ? (
             <>
               <button
                 onClick={() => { setError(null); setStatus({}); started.current = false; setDone(false); }}
-                className="flex items-center gap-1.5 px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all active:scale-[0.97] shadow-sm"
+                className="flex items-center gap-1.5 px-6 py-2 text-sm font-medium text-white bg-brand rounded-lg hover:bg-brand-strong transition-all active:scale-[0.97] shadow-sm"
               >
                 <FiRefreshCw size={14} />
                 Retry
               </button>
               <button
                 onClick={onClose}
-                className="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 transition-colors"
+                className="text-sm text-text-muted hover:text-text-body dark:hover:text-text-body transition-colors"
               >
                 Cancel
               </button>
@@ -341,7 +341,7 @@ export default function DeployProgressModal({
                 href={displayUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-blue-600 border border-blue-200 dark:border-blue-500/30 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-brand border border-brand-soft rounded-lg hover:bg-brand-muted transition-colors"
               >
                 <FiExternalLink size={14} />
                 View Storefront
@@ -351,7 +351,7 @@ export default function DeployProgressModal({
                   onComplete({ url: displayUrl, domain: result?.domain || `${subdomain}.keel.framestudio.co.ke`, subdomain });
                   onClose();
                 }}
-                className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all active:scale-[0.97] shadow-sm"
+                className="px-6 py-2 text-sm font-medium text-white bg-brand rounded-lg hover:bg-brand-strong transition-all active:scale-[0.97] shadow-sm"
               >
                 Done
               </button>
@@ -359,7 +359,7 @@ export default function DeployProgressModal({
           ) : (
             <button
               onClick={onClose}
-              className="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 transition-colors"
+              className="text-sm text-text-muted hover:text-text-body dark:hover:text-text-body transition-colors"
             >
               Close
             </button>

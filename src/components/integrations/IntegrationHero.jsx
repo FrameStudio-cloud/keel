@@ -10,7 +10,7 @@ export default function IntegrationHero({ integration, status }) {
   const connected = !!status?.connected;
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${integration.tileClass} p-6 sm:p-8 text-white shadow-xl shadow-blue-900/10`}>
+    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${integration.tileClass} p-6 sm:p-8 text-white shadow-xl shadow-brand/10`}>
       <div className="absolute -right-10 -top-10 w-44 h-44 rounded-full bg-white/10" />
       <div className="absolute -right-2 top-16 w-24 h-24 rounded-full bg-white/10" />
       <div className="absolute right-28 -bottom-20 w-48 h-48 rounded-full bg-white/10" />
@@ -33,7 +33,7 @@ export default function IntegrationHero({ integration, status }) {
           {locked ? (
             <Link
               to="/settings?tab=billing"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-gray-800 font-semibold text-sm rounded-lg shadow-lg hover:shadow-xl transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-surface-1 text-text-primary font-semibold text-sm rounded-lg shadow-lg hover:shadow-xl transition-all"
             >
               <FiAward size={15} />
               Upgrade to Pro
@@ -47,7 +47,7 @@ export default function IntegrationHero({ integration, status }) {
             <button
               type="button"
               onClick={scrollToSetup}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-gray-800 font-semibold text-sm rounded-lg shadow-lg hover:shadow-xl transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-surface-1 text-text-primary font-semibold text-sm rounded-lg shadow-lg hover:shadow-xl transition-all"
             >
               <FiZap size={15} />
               Set up {integration.name}

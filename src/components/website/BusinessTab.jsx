@@ -25,7 +25,7 @@ function hoursFromSettings(businessHours) {
   });
 }
 
-const inputClass = "w-full bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 transition-colors";
+const inputClass = "w-full bg-surface-1 border border-border-subtle rounded-lg px-3 py-2 text-sm text-text-primary placeholder-text-faint focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 transition-colors";
 
 export default function BusinessTab() {
   const settings = useSettings();
@@ -111,8 +111,8 @@ export default function BusinessTab() {
     <div className="max-w-xl mx-auto">
       <div className="space-y-6">
 
-        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5 shadow-sm">
-          <h3 className="text-sm font-medium text-gray-800 dark:text-white mb-3">Store Description</h3>
+        <div className="bg-surface-1 rounded-xl border border-border-subtle p-5 shadow-sm">
+          <h3 className="text-sm font-medium text-text-primary mb-3">Store Description</h3>
           <textarea
             rows={3}
             value={form.description}
@@ -122,57 +122,57 @@ export default function BusinessTab() {
           />
         </div>
 
-        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5 shadow-sm">
-          <h3 className="text-sm font-medium text-gray-800 dark:text-white mb-3">Contact & Social</h3>
+        <div className="bg-surface-1 rounded-xl border border-border-subtle p-5 shadow-sm">
+          <h3 className="text-sm font-medium text-text-primary mb-3">Contact & Social</h3>
           <div className="flex flex-col gap-3">
             <div>
-              <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Email</label>
+              <label className="block text-xs text-text-faint mb-1">Email</label>
               <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputClass} />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Instagram</label>
+                <label className="block text-xs text-text-faint mb-1">Instagram</label>
                 <input type="text" value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="https://instagram.com/..." className={inputClass} />
               </div>
               <div>
-                <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">Facebook</label>
+                <label className="block text-xs text-text-faint mb-1">Facebook</label>
                 <input type="text" value={form.facebook} onChange={(e) => setForm({ ...form, facebook: e.target.value })} placeholder="https://facebook.com/..." className={inputClass} />
               </div>
               <div>
-                <label className="block text-xs text-gray-400 dark:text-slate-500 mb-1">TikTok</label>
+                <label className="block text-xs text-text-faint mb-1">TikTok</label>
                 <input type="text" value={form.tiktok} onChange={(e) => setForm({ ...form, tiktok: e.target.value })} placeholder="https://tiktok.com/..." className={inputClass} />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5 shadow-sm">
-          <h3 className="text-sm font-medium text-gray-800 dark:text-white mb-3">Store Logo</h3>
+        <div className="bg-surface-1 rounded-xl border border-border-subtle p-5 shadow-sm">
+          <h3 className="text-sm font-medium text-text-primary mb-3">Store Logo</h3>
           <ImageUploader currentImage={form.logo_url} onImageChange={(file) => setLogoFile(file)} />
         </div>
 
-        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-5 shadow-sm">
-          <h3 className="text-sm font-medium text-gray-800 dark:text-white mb-3">Business Hours</h3>
-          <div className="bg-slate-50 dark:bg-[#1a1a2e] rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
+        <div className="bg-surface-1 rounded-xl border border-border-subtle p-5 shadow-sm">
+          <h3 className="text-sm font-medium text-text-primary mb-3">Business Hours</h3>
+          <div className="bg-surface-2 rounded-xl border border-border-subtle overflow-hidden">
             {hours.map((h, i) => (
               <div
                 key={h.key}
                 className={`flex items-center gap-3 px-4 py-2.5 ${
-                  i < hours.length - 1 ? "border-b border-slate-200 dark:border-white/10" : ""
+                  i < hours.length - 1 ? "border-b border-border-subtle" : ""
                 }`}
               >
                 <button
                   onClick={() => updateHour(h.key, "active", !h.active)}
                   className={`w-5 h-5 rounded-md flex items-center justify-center transition-all flex-shrink-0 ${
                     h.active
-                      ? "bg-blue-600 text-white"
-                      : "bg-slate-200 dark:bg-white/10 text-transparent"
+                      ? "bg-brand text-white"
+                      : "bg-surface-2 text-transparent"
                   }`}
                 >
                   {h.active && <FiCheck size={12} />}
                 </button>
                 <span className={`text-sm w-10 font-medium flex-shrink-0 ${
-                  h.active ? "text-slate-900 dark:text-white" : "text-slate-400 dark:text-slate-500"
+                  h.active ? "text-text-primary" : "text-text-faint"
                 }`}>
                   {h.label}
                 </span>
@@ -182,25 +182,25 @@ export default function BusinessTab() {
                       type="time"
                       value={h.open}
                       onChange={(e) => updateHour(h.key, "open", e.target.value)}
-                      className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500/50"
+                      className="bg-surface-1 border border-border-subtle rounded-lg px-2 py-1.5 text-xs text-text-primary focus:outline-none focus:border-brand/50"
                     />
-                    <span className="text-xs text-slate-400">—</span>
+                    <span className="text-xs text-text-faint">—</span>
                     <input
                       type="time"
                       value={h.close}
                       onChange={(e) => updateHour(h.key, "close", e.target.value)}
-                      className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500/50"
+                      className="bg-surface-1 border border-border-subtle rounded-lg px-2 py-1.5 text-xs text-text-primary focus:outline-none focus:border-brand/50"
                     />
                   </div>
                 ) : (
-                  <span className="text-xs text-slate-400 dark:text-slate-500 ml-auto">Closed</span>
+                  <span className="text-xs text-text-faint ml-auto">Closed</span>
                 )}
               </div>
             ))}
           </div>
         </div>
 
-        <button onClick={handleSave} disabled={saving} className="w-full py-2.5 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-500 transition-all disabled:opacity-50">
+        <button onClick={handleSave} disabled={saving} className="w-full py-2.5 bg-brand text-white font-bold text-sm rounded-xl hover:bg-brand-soft transition-all disabled:opacity-50">
           {saving ? "Saving..." : "Save Business Info"}
         </button>
       </div>
