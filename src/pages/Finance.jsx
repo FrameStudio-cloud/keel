@@ -14,6 +14,7 @@ import { FiEdit2, FiTrash2, FiPlus, FiChevronDown, FiChevronUp, FiUpload, FiChec
 import { useDebounce } from "../hooks/useDebounce";
 import { useSettings } from "../hooks/useSettings";
 import useThemeColors from "../hooks/useThemeColors";
+import { track } from "../lib/posthog";
 import { SERVICE_CATEGORIES } from "../lib/constants";
 import { parseCSV, matchTransactions } from "../engine/mpesa-reconciliation";
 import { fetchServiceRevenue } from "../lib/serviceData";
@@ -124,6 +125,11 @@ export default function Finance() {
     };
     const { error } = await supabase.from("expenses").insert(payload);
     if (!error) {
+      track("create_expense", {
+        category: expenseForm.category,
+        amount: parseInt(expenseForm.amount),
+        payment_method: expenseForm.payment_method,
+      });
       setExpenseForm({ description: "", amount: "", category: "General", payment_method: "Cash", expense_date: new Date().toISOString().slice(0, 10) });
       setShowForm(false);
       setRefreshKey((k) => k + 1);

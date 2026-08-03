@@ -6,9 +6,11 @@ import { useToast } from "../../context/ToastProvider";
 import useIntegrationGoals from "../../hooks/useIntegrationGoals";
 import GoalsStep from "./GoalsStep";
 import IntegrationStats from "./IntegrationStats";
+import { track } from "../../lib/posthog";
 import {
   FiMessageCircle, FiSmartphone, FiZap, FiTrash2, FiCheckCircle,
   FiLock, FiClock, FiMessageSquare, FiRotateCw, FiCheck, FiSliders,
+  FiInbox, FiAlertTriangle,
 } from "react-icons/fi";
 
 const inputClass = "w-full bg-surface-1 border border-border-subtle rounded-lg px-3 py-2.5 text-sm text-text-primary placeholder-text-faint focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 transition-colors";
@@ -102,6 +104,7 @@ export default function WhatsAppBotCard() {
   const [botNumber, setBotNumber] = useState("");
   const [phoneId, setPhoneId] = useState("");
   const [masked, setMasked] = useState("");
+  const [retention, setRetention] = useState(90);
 
   const [phone, setPhone] = useState("");
   const [codeMethod, setCodeMethod] = useState("SMS");
@@ -124,7 +127,7 @@ export default function WhatsAppBotCard() {
 
       const { data: cfg } = await supabase
         .from("chat_config")
-        .select("whatsapp_phone_id, whatsapp_bot_number, whatsapp_bot_enabled, whatsapp_connected_at, whatsapp_status")
+        .select("whatsapp_phone_id, whatsapp_bot_number, whatsapp_bot_enabled, whatsapp_connected_at, whatsapp_status, message_retention_days")
         .eq("shop_id", id)
         .maybeSingle();
 
@@ -137,6 +140,7 @@ export default function WhatsAppBotCard() {
         setBotNumber(cfg.whatsapp_bot_number || "");
         setMasked(maskNumber(cfg.whatsapp_bot_number));
         setPhoneId(cfg.whatsapp_phone_id || "");
+        setRetention(cfg.message_retention_days ?? 90);
         if (cfg.whatsapp_status === "code_sent") {
           const d = String(cfg.whatsapp_bot_number || "").replace(/\D/g, "");
           setPhone(d.startsWith("254") && d.length === 12 ? d.slice(3) : d);
@@ -221,6 +225,7 @@ export default function WhatsAppBotCard() {
       setConnectedAt(new Date().toISOString());
       setBotNumber(phone);
       setMasked(maskNumber(phone));
+      track("connect_whatsapp", { number: phone });
       showToast("WhatsApp bot is live!");
     } catch (e) {
       showToast(e.message, "error");
@@ -262,6 +267,17 @@ export default function WhatsAppBotCard() {
     showToast(next ? "Bot is now live" : "Bot paused");
   }
 
+  async function handleRetentionChange(value) {
+    const days = value === "0" ? 0 : Number(value);
+    setRetention(days);
+    const { error } = await supabase
+      .from("chat_config")
+      .update({ message_retention_days: days })
+      .eq("shop_id", shopId);
+    if (error) return showToast(error.message, "error");
+    showToast(days === 0 ? "Chats are kept forever" : `Chats are kept for ${days} days`);
+  }
+
   async function handleGoalsContinue() {
     setBusy(true);
     try {
@@ -296,10 +312,18 @@ export default function WhatsAppBotCard() {
           <div className="rounded-xl border border-success dark:border-green-500/20 bg-success-muted p-4 flex items-start gap-3">
             <FiCheckCircle size={18} className="text-success mt-0.5 shrink-0" />
             <div className="flex-1">
-              <p className="text-sm font-semibold text-success">Bot is live</p>
+              <p className="text-sm font-semibold text-success">{enabled ? "Bot is live" : "Bot is paused"}</p>
               <p className="text-xs text-success/80 mt-0.5">
-                Messages to <span className="font-mono">{masked || botNumber}</span> are answered automatically.
-                {connectedAt ? ` Connected ${new Date(connectedAt).toLocaleDateString()}.` : ""}
+                {enabled ? (
+                  <>
+                    Messages to <span className="font-mono">{masked || botNumber}</span> are answered automatically.
+                    {connectedAt ? ` Connected ${new Date(connectedAt).toLocaleDateString()}.` : ""}
+                  </>
+                ) : (
+                  <>
+                    You're answering chats manually — new conversations appear in your Inbox and are not auto-replied.
+                  </>
+                )}
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
@@ -317,20 +341,68 @@ export default function WhatsAppBotCard() {
             />
           )}
 
-          <Link
-            to="/website"
-            className="flex items-center gap-3 p-3 rounded-xl border border-brand-soft dark:border-blue-500/20 bg-brand-muted hover:border-brand-soft transition-colors"
-          >
-            <div className="w-9 h-9 rounded-lg bg-brand text-white flex items-center justify-center shrink-0">
-              <FiSliders size={15} />
+          <div className="rounded-xl border border-border-subtle dark:border-white/5 bg-surface-2 dark:bg-white/[0.03] p-4">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-lg bg-surface-3 dark:bg-white/10 text-text-muted flex items-center justify-center shrink-0">
+                <FiClock size={15} />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div>
+                    <p className="text-xs font-semibold text-text-body">Chat history</p>
+                    <p className="text-[11px] text-text-faint mt-0.5">Keep chats for this long to save storage space.</p>
+                  </div>
+                  <select
+                    value={retention}
+                    onChange={(e) => handleRetentionChange(e.target.value)}
+                    className="text-xs bg-surface-1 border border-border-subtle rounded-lg px-2.5 py-2 text-text-primary focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 transition-colors"
+                  >
+                    <option value={30}>30 days</option>
+                    <option value={60}>60 days</option>
+                    <option value={90}>90 days</option>
+                    <option value={180}>6 months</option>
+                    <option value={365}>1 year</option>
+                    <option value={0}>Keep forever</option>
+                  </select>
+                </div>
+                <p className="text-[11px] text-text-faint mt-2 leading-relaxed">
+                  Messages and chats older than this are removed automatically every day.
+                </p>
+              </div>
             </div>
-            <div className="flex-1">
-              <p className="text-xs font-semibold text-brand">Next step — personalize your bot</p>
-              <p className="text-[11px] text-brand/80 mt-0.5">
-                Add FAQs and a greeting message on your chat widget.
-              </p>
-            </div>
-          </Link>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-3">
+            <Link
+              to="/inbox"
+              className="flex items-center gap-3 p-3 rounded-xl border border-brand-soft dark:border-blue-500/20 bg-brand-muted hover:border-brand-soft transition-colors"
+            >
+              <div className="w-9 h-9 rounded-lg bg-brand text-white flex items-center justify-center shrink-0">
+                <FiInbox size={15} />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-brand">Open your Inbox</p>
+                <p className="text-[11px] text-brand/80 mt-0.5">
+                  Chat with customers personally and take over any conversation.
+                </p>
+              </div>
+            </Link>
+
+            <Link
+              to="/website"
+              className="flex items-center gap-3 p-3 rounded-xl border border-border-subtle dark:border-white/5 bg-surface-2 dark:bg-white/[0.03] hover:border-brand-soft transition-colors"
+            >
+              <div className="w-9 h-9 rounded-lg bg-surface-3 dark:bg-white/10 text-text-muted flex items-center justify-center shrink-0">
+                <FiSliders size={15} />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-text-body">Next step — personalize your bot</p>
+                <p className="text-[11px] text-text-faint mt-0.5">
+                  Add FAQs and a greeting message on your chat widget.
+                </p>
+              </div>
+            </Link>
+          </div>
 
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <button
@@ -416,8 +488,21 @@ export default function WhatsAppBotCard() {
                 {busy ? "Sending code..." : "Send me a verification code"}
               </button>
 
+              <div className="rounded-xl border border-danger bg-danger-muted p-4 text-xs text-danger/90 leading-relaxed">
+                <p className="flex items-center gap-2 font-bold text-danger mb-1">
+                  <FiAlertTriangle size={14} className="shrink-0" />
+                  Use a number that is NOT on the WhatsApp app
+                </p>
+                <p className="text-danger/80">
+                  The number you connect must not be linked to any WhatsApp account — Meta rejects numbers already registered on the app.
+                </p>
+                <p className="text-danger/80 mt-1">
+                  Once connected, Meta makes it API-only: you will not be able to use it in the WhatsApp app again. A spare SIM is ideal.
+                </p>
+              </div>
+
               <p className="text-xs text-text-faint leading-relaxed">
-                We'll send a 6-digit code to this number to confirm it's yours. This number must not be registered on the WhatsApp app on your phone.
+                We'll send a 6-digit code to this number to confirm it's yours. To your customers, it looks like any normal WhatsApp number.
               </p>
             </>
           ) : (

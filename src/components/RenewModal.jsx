@@ -3,6 +3,7 @@ import { useFocusTrap } from "../hooks/useFocusTrap";
 import { AuthContext } from "../context/AuthContext";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
+import { track } from "../lib/posthog";
 import { FiX, FiCheck, FiStar, FiShield } from "react-icons/fi";
 
 const PLANS = [
@@ -73,6 +74,7 @@ export default function RenewModal({ onClose, subscriptionExpiresAt, onRenewed, 
       const shopId = await getShopId();
       if (!window.PaystackPop?.setup) throw new Error("Payment service unavailable");
 
+      // eslint-disable-next-line react-hooks/purity -- Date.now() builds a unique payment reference; flagged as false positive once track() is added to the success callback below
       const payRef = `KEL-${shopId.slice(0, 8)}-${Date.now()}`;
       const payAmount = plan.price * 100;
 
@@ -90,6 +92,7 @@ export default function RenewModal({ onClose, subscriptionExpiresAt, onRenewed, 
           ).then(({ data, error: fnError }) => {
             if (fnError) throw new Error(fnError.message);
             if (!data.success) throw new Error(data.error || "Verification failed");
+            track("upgrade_plan", { plan: plan.id, price: plan.price });
             setStep("success");
           }).catch((e) => {
             setError(e.message);

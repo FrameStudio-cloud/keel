@@ -8,6 +8,7 @@ import { formatPrice } from "../lib/format";
 import { useSettings } from "../hooks/useSettings";
 import { useFocusTrap } from "../hooks/useFocusTrap";
 import { enqueueWrite } from "../lib/writeQueue";
+import { track } from "../lib/posthog";
 import BarcodeScanner from "./BarcodeScanner";
 
 export default function LogSaleModal({ onClose, onAdded }) {
@@ -59,6 +60,13 @@ export default function LogSaleModal({ onClose, onAdded }) {
 
     onAdded();
     onClose();
+
+    track("log_sale", {
+      amount: total,
+      quantity: parseInt(form.quantity),
+      method: form.method,
+      product_name: selectedProduct.name,
+    });
 
     enqueueWrite({
       type: "logSale",

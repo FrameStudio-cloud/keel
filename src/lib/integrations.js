@@ -45,14 +45,17 @@ export const INTEGRATIONS = [
       { icon: FiSmartphone,    title: "Runs on Your Number", desc: "No extra app — the bot lives on your existing WhatsApp number" },
     ],
     steps: [
+      { title: "Get a number that isn't on WhatsApp", desc: "Any number that's never been registered on the WhatsApp app works — a spare SIM is easiest. Meta won't accept a number already linked to WhatsApp." },
       { title: "Add your WhatsApp number", desc: "We'll send a 6-digit code by SMS or voice call to confirm it's yours." },
       { title: "Enter the code", desc: "Verify it and your bot goes live in seconds — no setup after that." },
       { title: "Customers message you", desc: "They get instant answers about your products, prices, delivery and hours." },
     ],
     faq: [
-      { q: "Do I need a separate number?", a: "The number can't be registered on the WhatsApp app on your phone — Meta requires it to be a standalone business number. You can use any number that isn't on the WhatsApp app, or get a cheap SIM for your business." },
+      { q: "Will my number still work in the WhatsApp app?", variant: "danger", a: "No — and that's the one thing to know before you start. Once your number is connected to Keel, it's registered for use with your shop only: you won't be able to open it in the WhatsApp app on your phone again. Use a number you don't need for personal WhatsApp, or get a cheap SIM for your shop." },
+      { q: "Do I need a separate number?", a: "It's the safest way. Any number that's never been used on WhatsApp works — a cheap prepaid SIM is perfect. To your customers it looks and behaves like any normal WhatsApp number." },
       { q: "What can the bot answer?", a: "Product names, prices, stock, opening hours, location, delivery info, and any FAQs you've added to your chat widget. It reads straight from your inventory, so answers are always live." },
-      { q: "Does it cost anything extra?", a: "The bot is included with your Pro plan. Meta may charge per conversation after your free service tier runs out — you'll see those charges from Meta directly." },
+      { q: "Are there limits from Meta?", a: "Replying to customers who message you is always unlimited — no daily cap. The only limit is on broadcasts where you reach out to customers first: you start at 250 unique customers per day, and Meta raises that automatically as your business gets verified and your messages get good responses." },
+      { q: "Does it cost anything extra?", a: "The bot is included with your Pro plan. Meta may charge per message after your free monthly allowance runs out — you'll see those charges from Meta directly." },
       { q: "Can I pause or disconnect it?", a: "Yes. Use the toggle to pause the bot, or Disconnect to remove the number entirely. Pausing keeps your number connected but stops auto-replies." },
     ],
     goals: [

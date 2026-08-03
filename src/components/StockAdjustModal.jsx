@@ -3,6 +3,7 @@ import { getShopId } from "../lib/shop";
 import { useSettings } from "../hooks/useSettings";
 import { useFocusTrap } from "../hooks/useFocusTrap";
 import { enqueueWrite } from "../lib/writeQueue";
+import { track } from "../lib/posthog";
 import { FiX } from "react-icons/fi";
 
 export default function StockAdjustModal({ product, onClose, onAdjusted }) {
@@ -25,6 +26,12 @@ export default function StockAdjustModal({ product, onClose, onAdjusted }) {
 
     onAdjusted();
     onClose();
+
+    track("adjust_stock", {
+      product_name: product.name,
+      change,
+      reason,
+    });
 
     enqueueWrite({
       type: "adjustStock",

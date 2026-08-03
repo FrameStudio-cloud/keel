@@ -7,6 +7,7 @@ export default function PageLayout({
   children,
   searchQuery,
   setSearchQuery,
+  flush,
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -20,7 +21,7 @@ export default function PageLayout({
           setSearchQuery={setSearchQuery}
           onToggleSidebar={() => setSidebarOpen(true)}
         />
-        <main className="flex-1 overflow-y-auto p-5 w-full mx-auto max-w-[1720px]">{children}</main>
+        <main className={`flex-1 overflow-y-auto w-full mx-auto ${flush ? "" : "p-5 max-w-[1720px]"}`}>{children}</main>
       </div>
     </div>
   );

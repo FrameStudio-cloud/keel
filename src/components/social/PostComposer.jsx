@@ -6,6 +6,7 @@ import { useFocusTrap } from "../../hooks/useFocusTrap";
 import { useSettings } from "../../hooks/useSettings";
 import { isFeatureAccessible } from "../../lib/tiers";
 import { aiGenerateVariants } from "../../lib/ai";
+import { track } from "../../lib/posthog";
 
 const PLATFORMS = ["Instagram", "TikTok", "WhatsApp"];
 const POST_TYPES = [
@@ -150,6 +151,13 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
     onAdded();
     onClose();
     setLoading(false);
+
+    track("publish_post", {
+      platform: form.platform,
+      post_type: form.post_type || "custom",
+      is_broadcast: form.is_broadcast || false,
+      has_product: !!form.product_id,
+    });
   }
 
   const product = products.find((x) => x.id === form.product_id);

@@ -19,6 +19,7 @@ import { paginateQuery } from "../lib/paginate";
 import { useDebounce } from "../hooks/useDebounce";
 import { useSettings } from "../hooks/useSettings";
 import { formatPrice } from "../lib/format";
+import { track } from "../lib/posthog";
 import { CRITICAL_STOCK_THRESHOLD } from "../lib/constants";
 
 const PAGE_SIZE = 50;
@@ -161,6 +162,12 @@ export default function Inventory() {
 
     setPublishingId(null);
     fetchCatalogue();
+
+    track("publish_catalogue", {
+      product_name: product.name,
+      category: product.category,
+      price: product.price,
+    });
   }
 
   async function handleUnpublish(product) {
@@ -171,6 +178,8 @@ export default function Inventory() {
     await supabase.from("catalogue").delete().eq("id", item.id).eq("shop_id", shopId);
     setPublishingId(null);
     fetchCatalogue();
+
+    track("unpublish_catalogue", { product_name: product.name });
   }
 
   return (

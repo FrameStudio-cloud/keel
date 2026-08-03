@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { FiAlertTriangle, FiRefreshCw } from "react-icons/fi";
+import posthog from "../lib/posthog";
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
@@ -13,6 +14,10 @@ export default class ErrorBoundary extends Component {
 
   componentDidCatch(error) {
     console.error("ErrorBoundary caught:", error);
+    posthog.captureException(error, {
+      error_name: error?.name || "UnknownError",
+      page: typeof window !== "undefined" ? window.location.pathname : "n/a",
+    });
     if (
       error.name === "ChunkLoadError" ||
       /Loading chunk|Failed to fetch dynamically imported module|dynamic import/.test(error.message)

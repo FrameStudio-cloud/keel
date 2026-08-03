@@ -51,8 +51,12 @@ const INTENTS = [
     patterns: ["pay", "payment", "malipo", "mpesa", "m-pesa", "lipa", "paypal", "accept", "how do i pay"],
   },
   {
+    key: "human",
+    patterns: ["human", "agent", "staff", "talk to", "representative", "real person", "customer care", "someone", "unga", "ongea na mtu"],
+  },
+  {
     key: "contact",
-    patterns: ["phone", "call", "contact", "number", "nambari", "simu", "email", "talk to", "agent", "human", "staff", "reach you"],
+    patterns: ["phone", "call", "contact", "number", "nambari", "simu", "email", "reach you"],
   },
 ];
 
@@ -122,13 +126,6 @@ async function handleMessage(req: Request) {
     const phoneNumberId = value?.metadata?.phone_number_id;
     if (!phoneNumberId) return ack();
 
-    const msg = messages[0];
-    if (!msg || msg.type !== "text") return ack();
-
-    const text = (msg.text?.body || "").trim();
-    const from = msg.from;
-    if (!text || !from) return ack();
-
     const supabase = await getSupabase();
 
     const { data: config } = await supabase
@@ -137,43 +134,69 @@ async function handleMessage(req: Request) {
       .eq("whatsapp_phone_id", phoneNumberId)
       .maybeSingle();
 
-    if (!config || !config.whatsapp_bot_enabled) return ack();
-    if (!PRO_PLANS.includes(config.plan_tier)) return ack();
+    if (!config || !PRO_PLANS.includes(config.plan_tier)) return ack();
 
     const sendToken = config.whatsapp_token || await getGlobalToken(supabase);
-    if (!sendToken) return ack();
 
-    const { data: settings } = await supabase
-      .from("store_settings")
-      .select("store_name, currency_symbol, store_address, store_phone, whatsapp, email, business_hours, payment_methods, default_payment")
-      .eq("shop_id", config.shop_id)
-      .maybeSingle();
+    for (const msg of messages) {
+      if (msg.type !== "text") continue;
+      const text = (msg.text?.body || "").trim();
+      const from = msg.from;
+      if (!text || !from) continue;
 
-    const { data: products } = await supabase
-      .from("products")
-      .select("name, price, sale_price, sale_ends_at, stock")
-      .eq("shop_id", config.shop_id)
-      .order("created_at", { ascending: false })
-      .limit(MAX_PRODUCTS);
+      const customerName = msg?.contacts?.[0]?.profile?.name || null;
+      const conversation = await getOrCreateConversation(supabase, config.shop_id, from, customerName);
+      if (!conversation) continue;
 
-    const { data: faqs } = await supabase
-      .from("chat_faqs")
-      .select("question, answer")
-      .eq("shop_id", config.shop_id)
-      .order("sort_order", { ascending: true })
-      .limit(50);
+      await logInbound(supabase, conversation, text, msg.id);
 
-    const reply = await buildReply(text, {
-      config,
-      settings,
-      products: products || [],
-      faqs: faqs || [],
-    });
+      // Manual mode (bot toggle off) or a chat the owner took over → owner replies from Inbox.
+      if (!config.whatsapp_bot_enabled || conversation.mode === "human") continue;
 
-    if (reply) {
-      const sent = await sendReply(sendToken, phoneNumberId, from, reply);
-      if (sent) {
-        await logMessage(supabase, config.shop_id, text, reply, msg);
+      // "talk to a human" hands the conversation over to the owner.
+      if (detectIntent(text) === "human") {
+        await setConversationMode(supabase, conversation.id, "human");
+        const handoff = "A member of our team will reply to you shortly. Thanks for reaching out!";
+        if (sendToken) {
+          const sent = await sendReply(sendToken, phoneNumberId, from, handoff);
+          if (sent) await logOutbound(supabase, conversation, handoff, "bot");
+        }
+        continue;
+      }
+
+      const { data: settings } = await supabase
+        .from("store_settings")
+        .select("store_name, currency_symbol, store_address, store_phone, whatsapp, email, business_hours, payment_methods, default_payment")
+        .eq("shop_id", config.shop_id)
+        .maybeSingle();
+
+      const { data: products } = await supabase
+        .from("products")
+        .select("name, price, sale_price, sale_ends_at, stock")
+        .eq("shop_id", config.shop_id)
+        .order("created_at", { ascending: false })
+        .limit(MAX_PRODUCTS);
+
+      const { data: faqs } = await supabase
+        .from("chat_faqs")
+        .select("question, answer")
+        .eq("shop_id", config.shop_id)
+        .order("sort_order", { ascending: true })
+        .limit(50);
+
+      const reply = await buildReply(text, {
+        config,
+        settings,
+        products: products || [],
+        faqs: faqs || [],
+      });
+
+      if (reply && sendToken) {
+        const sent = await sendReply(sendToken, phoneNumberId, from, reply);
+        if (sent) {
+          await logOutbound(supabase, conversation, reply, "bot");
+          await logMessage(supabase, config.shop_id, text, reply, msg);
+        }
       }
     }
 
@@ -409,4 +432,65 @@ async function logMessage(supabase: any, shopId: string, question: string, answe
     customer_name: customerName,
     status: "answered",
   });
+}
+
+async function getOrCreateConversation(supabase: any, shopId: string, customerPhone: string, customerName: string | null) {
+  const { data } = await supabase
+    .from("whatsapp_conversations")
+    .select("*")
+    .eq("shop_id", shopId)
+    .eq("customer_phone", customerPhone)
+    .maybeSingle();
+  if (data) return data;
+  const { data: created } = await supabase
+    .from("whatsapp_conversations")
+    .insert({ shop_id: shopId, customer_phone: customerPhone, customer_name: customerName || null })
+    .select()
+    .single();
+  return created || null;
+}
+
+async function setConversationMode(supabase: any, conversationId: string, mode: string) {
+  await supabase.from("whatsapp_conversations").update({ mode }).eq("id", conversationId);
+}
+
+async function logInbound(supabase: any, conversation: any, body: string, waMessageId?: string) {
+  if (waMessageId) {
+    const { data: existing } = await supabase
+      .from("whatsapp_messages")
+      .select("id")
+      .eq("shop_id", conversation.shop_id)
+      .eq("wa_message_id", waMessageId)
+      .maybeSingle();
+    if (existing) return false;
+  }
+  await supabase.from("whatsapp_messages").insert({
+    conversation_id: conversation.id,
+    shop_id: conversation.shop_id,
+    direction: "inbound",
+    sender: "customer",
+    body,
+    wa_message_id: waMessageId || null,
+  });
+  await supabase.from("whatsapp_conversations").update({
+    last_message_at: new Date().toISOString(),
+    last_message_preview: body.slice(0, 80),
+    unread_count: (conversation.unread_count || 0) + 1,
+  }).eq("id", conversation.id);
+  return true;
+}
+
+async function logOutbound(supabase: any, conversation: any, body: string, sender: string) {
+  await supabase.from("whatsapp_messages").insert({
+    conversation_id: conversation.id,
+    shop_id: conversation.shop_id,
+    direction: "outbound",
+    sender: sender || "bot",
+    body,
+  });
+  await supabase.from("whatsapp_conversations").update({
+    last_message_at: new Date().toISOString(),
+    last_message_preview: body.slice(0, 80),
+    unread_count: 0,
+  }).eq("id", conversation.id);
 }

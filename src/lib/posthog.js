@@ -11,4 +11,8 @@ export function initPostHog() {
   }
 }
 
+export function track(event, properties = {}) {
+  if (posthog.__loaded) posthog.capture(event, properties);
+}
+
 export default posthog;

@@ -210,13 +210,17 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
       if (user) {
-        posthog.identify(user.id, {
-          email: user.email,
-          name: user.user_metadata?.full_name || user.email?.split('@')[0],
-        });
         if (!ensuringRef.current) {
           ensuringRef.current = true;
           ensureUserRecordsInner(user).then((setupComplete) => {
+            supabase
+              .from("users")
+              .select("shop_id")
+              .eq("auth_user_id", user.id)
+              .maybeSingle()
+              .then(({ data }) => {
+                if (data?.shop_id) posthog.identify(String(data.shop_id), { shop_id: String(data.shop_id) });
+              });
             if (!setupComplete) setNeedsSetup(true);
             ensuringRef.current = false;
           }).catch(() => { ensuringRef.current = false; });

@@ -7,6 +7,7 @@ import { uploadImage, deleteImage } from "../lib/storage";
 import { useSettings } from "../hooks/useSettings";
 import { useFocusTrap } from "../hooks/useFocusTrap";
 import { enqueueWrite } from "../lib/writeQueue";
+import { track } from "../lib/posthog";
 import ImageUploader from "./ImageUploader";
 import BarcodeScanner from "./BarcodeScanner";
 
@@ -125,6 +126,13 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
     onClose();
     setLoading(false);
 
+    track("update_product", {
+      product_name: product.name,
+      category: form.category,
+      price: parseInt(form.price),
+      stock: parseInt(form.stock),
+    });
+
     enqueueWrite({
       type: "updateProduct",
       shopId,
@@ -144,6 +152,8 @@ export default function EditProductModal({ product, onClose, onUpdated }) {
     onUpdated();
     onClose();
     setLoading(false);
+
+    track("delete_product", { product_name: product.name });
 
     enqueueWrite({
       type: "deleteProduct",

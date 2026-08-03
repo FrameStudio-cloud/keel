@@ -9,6 +9,7 @@ import { formatPrice } from "../lib/format";
 import ImageUploader from "./ImageUploader";
 import { useFocusTrap } from "../hooks/useFocusTrap";
 import { enqueueWrite } from "../lib/writeQueue";
+import { track } from "../lib/posthog";
 import BarcodeScanner from "./BarcodeScanner";
 
 export default function AddProductModal({ onClose, onAdded }) {
@@ -132,6 +133,15 @@ export default function AddProductModal({ onClose, onAdded }) {
     onAdded();
     onClose();
     setLoading(false);
+
+    track("add_product", {
+      category: form.category,
+      price: parseInt(form.price),
+      stock: parseInt(form.stock),
+      has_image: !!image,
+      has_barcode: !!payload.barcode,
+      attribute_count: attrEntries.length,
+    });
 
     enqueueWrite({
       type: "addProduct",
