@@ -76,7 +76,9 @@ export default function AuthProvider({ children }) {
             setSession(fullSession);
           }
 
+          ensuringRef.current = true;
           await ensureUserRecordsInner(userData);
+          ensuringRef.current = false;
         } catch (err) {
           console.error("OAuth token exchange failed", err);
         }
@@ -127,17 +129,24 @@ export default function AuthProvider({ children }) {
       .from("users")
       .select("id, shop_id")
       .eq("email", user.email)
-      .maybeSingle();
+      .limit(2);
 
-    if (existingByEmail) {
+    if (existingByEmail && existingByEmail.length > 0) {
+      const match = existingByEmail[0];
       await supabase
         .from("users")
         .update({ auth_user_id: user.id })
-        .eq("id", existingByEmail.id);
+        .eq("id", match.id);
+
+      if (existingByEmail.length > 1) {
+        const extraIds = existingByEmail.slice(1).map(r => r.id);
+        await supabase.from("users").delete().in("id", extraIds);
+      }
+
       const { data: shop } = await supabase
         .from("shops")
         .select("setup_completed_at")
-        .eq("id", existingByEmail.shop_id)
+        .eq("id", match.shop_id)
         .maybeSingle();
       return !!shop?.setup_completed_at;
     }
@@ -164,7 +173,7 @@ export default function AuthProvider({ children }) {
       supabase.from("store_settings").insert({
         shop_id: shopData.id,
         store_name: displayName,
-        theme: "light",
+        theme: "keel-light",
       }),
       supabase.from("chat_config").upsert({
         shop_id: shopData.id,
@@ -201,14 +210,18 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
       if (user) {
-        posthog.identify(user.id, {
-          email: user.email,
-          name: user.user_metadata?.full_name || user.email?.split('@')[0],
-        });
         if (!ensuringRef.current) {
           ensuringRef.current = true;
-          ensureUserRecordsInner(user).then((needsSetup) => {
-            if (!needsSetup) setNeedsSetup(true);
+          ensureUserRecordsInner(user).then((setupComplete) => {
+            supabase
+              .from("users")
+              .select("shop_id")
+              .eq("auth_user_id", user.id)
+              .maybeSingle()
+              .then(({ data }) => {
+                if (data?.shop_id) posthog.identify(String(data.shop_id), { shop_id: String(data.shop_id) });
+              });
+            if (!setupComplete) setNeedsSetup(true);
             ensuringRef.current = false;
           }).catch(() => { ensuringRef.current = false; });
         }
@@ -222,6 +235,12 @@ export default function AuthProvider({ children }) {
   }
 
   async function setupSignup(sessionData) {
+    ensuringRef.current = true;
+    try {
+      await ensureUserRecordsInner(sessionData.user);
+    } catch {
+      /* will retry via useEffect on next render */
+    }
     saveSession(sessionData);
     setSession(sessionData);
     setUser(sessionData.user);

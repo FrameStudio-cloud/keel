@@ -3,6 +3,7 @@ import { getShopId } from "../lib/shop";
 import { useSettings } from "../hooks/useSettings";
 import { useFocusTrap } from "../hooks/useFocusTrap";
 import { enqueueWrite } from "../lib/writeQueue";
+import { track } from "../lib/posthog";
 import { FiX } from "react-icons/fi";
 
 export default function StockAdjustModal({ product, onClose, onAdjusted }) {
@@ -26,6 +27,12 @@ export default function StockAdjustModal({ product, onClose, onAdjusted }) {
     onAdjusted();
     onClose();
 
+    track("adjust_stock", {
+      product_name: product.name,
+      change,
+      reason,
+    });
+
     enqueueWrite({
       type: "adjustStock",
       shopId,
@@ -40,21 +47,21 @@ export default function StockAdjustModal({ product, onClose, onAdjusted }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div
         ref={trapRef}
-        className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-6 w-full max-w-md mx-4"
+        className="bg-surface-1 border border-border-subtle rounded-2xl p-6 w-full max-w-md mx-4"
         role="dialog"
         aria-modal="true"
         aria-label="Adjust stock"
       >
         <div className="flex items-center justify-between mb-5">
           <h2
-            className="text-slate-900 dark:text-white font-bold text-sm"
+            className="text-text-primary font-bold text-sm"
             style={{ fontFamily: "inherit" }}
           >
             Adjust Stock
           </h2>
           <button
             onClick={onClose}
-            className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white"
+            className="text-text-body hover:text-text-primary"
           >
             <FiX size={16} />
           </button>
@@ -62,8 +69,8 @@ export default function StockAdjustModal({ product, onClose, onAdjusted }) {
 
         <div className="space-y-3">
           <div className="flex justify-between text-sm">
-            <span className="text-slate-600 dark:text-slate-400">{product.name}</span>
-            <span className="text-slate-900 dark:text-white font-semibold">
+            <span className="text-text-body">{product.name}</span>
+            <span className="text-text-primary font-semibold">
               Current: {product.stock}
             </span>
           </div>
@@ -76,31 +83,31 @@ export default function StockAdjustModal({ product, onClose, onAdjusted }) {
           )}
 
           {newStock < 0 && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 text-xs text-red-400">
+            <div className="bg-danger-muted border border-danger rounded-lg px-3 py-2 text-xs text-danger">
               Stock cannot go below 0
             </div>
           )}
 
           <div>
-            <label className="text-xs text-slate-600 dark:text-slate-400 mb-1 block">
+            <label className="text-xs text-text-body mb-1 block">
               Change (+/-)
             </label>
             <input
               type="number"
               value={change}
               onChange={(e) => setChange(parseInt(e.target.value) || 0)}
-              className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500/50"
+              className="w-full bg-surface-2 border border-border-subtle rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:border-brand/50"
               placeholder="e.g. -2 or +5"
             />
           </div>
 
           <div>
-            <label className="text-xs text-slate-600 dark:text-slate-400 mb-1 block">Reason</label>
+            <label className="text-xs text-text-body mb-1 block">Reason</label>
             <input
               type="text"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500/50"
+              className="w-full bg-surface-2 border border-border-subtle rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:border-brand/50"
               placeholder="e.g. Damaged, restock, return"
             />
           </div>
@@ -109,14 +116,14 @@ export default function StockAdjustModal({ product, onClose, onAdjusted }) {
         <div className="flex gap-2 mt-5">
           <button
             onClick={onClose}
-            className="flex-1 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 text-sm py-2.5 rounded-xl hover:text-slate-900 dark:text-white transition-colors"
+            className="flex-1 border border-border-subtle text-text-body text-sm py-2.5 rounded-xl hover:text-text-primary transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={change === 0 || !reason || newStock < 0}
-            className="flex-1 bg-blue-600 text-white font-bold text-sm py-2.5 rounded-xl hover:bg-blue-500 transition-all disabled:opacity-50"
+            className="flex-1 bg-brand text-white font-bold text-sm py-2.5 rounded-xl hover:bg-brand-soft transition-all disabled:opacity-50"
           >
             Save
           </button>

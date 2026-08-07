@@ -43,7 +43,7 @@ export default function GalleryTab() {
 
   if (items.length === 0) {
     return (
-      <div className="text-center py-12 text-slate-600 dark:text-slate-400">
+      <div className="text-center py-12 text-text-body">
         <p className="text-sm">No images in your catalogue yet.</p>
       </div>
     );
@@ -53,7 +53,7 @@ export default function GalleryTab() {
     <>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {items.map((item) => (
-          <div key={item.id} className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden">
+          <div key={item.id} className="bg-surface-1 border border-border-subtle rounded-xl overflow-hidden">
             {item.image && (
               <img
                 src={item.image}
@@ -62,9 +62,9 @@ export default function GalleryTab() {
               />
             )}
             <div className="p-3">
-              <p className="text-slate-900 dark:text-white text-sm font-medium truncate">{item.name}</p>
+              <p className="text-text-primary text-sm font-medium truncate">{item.name}</p>
               {item.category && (
-                <p className="text-slate-600 dark:text-slate-400 text-xs">{item.category}</p>
+                <p className="text-text-body text-xs">{item.category}</p>
               )}
             </div>
           </div>

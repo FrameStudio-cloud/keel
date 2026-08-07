@@ -13,15 +13,25 @@ import {
 import { FiEdit2, FiTrash2, FiPlus, FiChevronDown, FiChevronUp, FiUpload, FiCheck, FiX, FiSearch } from "react-icons/fi";
 import { useDebounce } from "../hooks/useDebounce";
 import { useSettings } from "../hooks/useSettings";
+import useThemeColors from "../hooks/useThemeColors";
+import { track } from "../lib/posthog";
 import { SERVICE_CATEGORIES } from "../lib/constants";
 import { parseCSV, matchTransactions } from "../engine/mpesa-reconciliation";
 import { fetchServiceRevenue } from "../lib/serviceData";
 
-const PAYMENT_COLORS = { Cash: "#10b981", "M-Pesa": "#3b82f6", Bank: "#f59e0b" };
+const PAYMENT_TOKEN = {
+  Cash: "chart3",
+  "M-Pesa": "chart1",
+  Bank: "chart2",
+  Card: "chart4",
+  "Bank Transfer": "chart2",
+};
 const EXPENSE_CATEGORIES = ["Supplies", "Utilities", "Transport", "Marketing", "Maintenance", "Salary", "General"];
 
 export default function Finance() {
   const { businessCategory } = useSettings();
+  const theme = useThemeColors();
+  const paymentColor = (method) => theme[PAYMENT_TOKEN[method]] || theme.chart6;
   const isService = SERVICE_CATEGORIES.includes(businessCategory);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearch = useDebounce(searchQuery, 300);
@@ -93,7 +103,6 @@ export default function Finance() {
           Object.entries(methodMap).map(([method, amount]) => ({
             name: method,
             value: amount,
-            color: PAYMENT_COLORS[method] || "#6b7280",
           }))
         );
 
@@ -116,6 +125,11 @@ export default function Finance() {
     };
     const { error } = await supabase.from("expenses").insert(payload);
     if (!error) {
+      track("create_expense", {
+        category: expenseForm.category,
+        amount: parseInt(expenseForm.amount),
+        payment_method: expenseForm.payment_method,
+      });
       setExpenseForm({ description: "", amount: "", category: "General", payment_method: "Cash", expense_date: new Date().toISOString().slice(0, 10) });
       setShowForm(false);
       setRefreshKey((k) => k + 1);
@@ -315,17 +329,17 @@ export default function Finance() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-          <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
+          <div className="bg-surface-1 rounded-xl border border-border-subtle p-4">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-medium text-gray-800 dark:text-white">Payment Breakdown</p>
+            <p className="text-sm font-medium text-text-primary">Payment Breakdown</p>
             <div className="flex items-center gap-2">
-              <button onClick={() => { setShowHistory(!showHistory); if (!showHistory) fetchHistory(); }} className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-white/10 px-3 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all">
+              <button onClick={() => { setShowHistory(!showHistory); if (!showHistory) fetchHistory(); }} className="flex items-center gap-1.5 text-xs font-medium text-text-muted border border-border-subtle px-3 py-1.5 rounded-lg hover:bg-surface-2 transition-all">
                 {showHistory ? <FiX size={14} /> : null}
                 Past Reconciliations
               </button>
               <ProGate feature="finance_mpesa">
                 {!isService && (
-                  <button onClick={() => { if (!showRecon) { setShowRecon(true); fetchMpesaSales(); } else setShowRecon(!showRecon); }} className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all">
+                  <button onClick={() => { if (!showRecon) { setShowRecon(true); fetchMpesaSales(); } else setShowRecon(!showRecon); }} className="flex items-center gap-1.5 text-xs font-medium text-brand bg-brand-muted px-3 py-1.5 rounded-lg hover:bg-brand-muted transition-all">
                     {showRecon ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
                     Reconcile M-Pesa
                   </button>
@@ -334,7 +348,7 @@ export default function Finance() {
             </div>
           </div>
           {paymentData.length === 0 ? (
-            <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-8">No sales today</p>
+            <p className="text-xs text-text-faint text-center py-8">No sales today</p>
           ) : (
             <div className="flex items-center gap-4">
               <div className="w-40 h-40 flex-shrink-0">
@@ -342,10 +356,19 @@ export default function Finance() {
                   <PieChart>
                     <Pie data={paymentData} cx="50%" cy="50%" innerRadius={40} outerRadius={60} dataKey="value" paddingAngle={3}>
                       {paymentData.map((entry, i) => (
-                        <Cell key={i} fill={entry.color} />
+                        <Cell key={i} fill={paymentColor(entry.name)} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(v) => formatPrice(v)} />
+                    <Tooltip
+                      formatter={(v) => formatPrice(v)}
+                      contentStyle={{
+                        fontSize: 12,
+                        borderRadius: 8,
+                        border: `1px solid ${theme.borderSubtle}`,
+                        background: theme.surface1,
+                        color: theme.textPrimary,
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -353,15 +376,15 @@ export default function Finance() {
                 {paymentData.map((p) => (
                   <div key={p.name} className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: p.color }} />
-                      <span className="text-gray-600 dark:text-slate-400">{p.name}</span>
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: paymentColor(p.name) }} />
+                      <span className="text-text-body">{p.name}</span>
                     </div>
-                    <span className="font-medium text-gray-800 dark:text-white">{formatPrice(p.value)}</span>
+                    <span className="font-medium text-text-primary">{formatPrice(p.value)}</span>
                   </div>
                 ))}
-                <div className="border-t border-gray-100 dark:border-white/10 pt-2 flex items-center justify-between text-sm font-semibold">
-                  <span className="text-gray-800 dark:text-white">Total</span>
-                  <span className="text-gray-800 dark:text-white">{formatPrice(summary.revenue)}</span>
+                <div className="border-t border-border-subtle pt-2 flex items-center justify-between text-sm font-semibold">
+                  <span className="text-text-primary">Total</span>
+                  <span className="text-text-primary">{formatPrice(summary.revenue)}</span>
                 </div>
               </div>
             </div>
@@ -371,13 +394,13 @@ export default function Finance() {
         <ContextTip tipKey="finance-overview" title="Finance">
           Track today&apos;s revenue, see payment breakdowns, and log expenses. Use M-Pesa reconciliation to match payments to sales automatically.
         </ContextTip>
-        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
-          <p className="text-sm font-medium text-gray-800 dark:text-white mb-4">Today's Expenses</p>
+        <div className="bg-surface-1 rounded-xl border border-border-subtle p-4">
+          <p className="text-sm font-medium text-text-primary mb-4">Today's Expenses</p>
           {!showForm ? (
             <button
               data-onboarding="log-expense"
               onClick={() => { setEditingExpense(null); setExpenseForm({ description: "", amount: "", category: "General", payment_method: "Cash", expense_date: new Date().toISOString().slice(0, 10) }); setShowForm(true); }}
-              className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+              className="flex items-center gap-2 text-xs text-brand hover:underline"
             >
               <FiPlus /> Log expense
             </button>
@@ -387,7 +410,7 @@ export default function Finance() {
                 value={expenseForm.description}
                 onChange={(e) => setExpenseForm({ ...expenseForm, description: e.target.value })}
                 placeholder="Description"
-                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
               />
               <div className="grid grid-cols-2 gap-2">
                 <input
@@ -395,12 +418,12 @@ export default function Finance() {
                   onChange={(e) => setExpenseForm({ ...expenseForm, amount: e.target.value })}
                   placeholder="Amount"
                   type="number"
-                  className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                  className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
                 />
                 <select
                   value={expenseForm.category}
                   onChange={(e) => setExpenseForm({ ...expenseForm, category: e.target.value })}
-                  className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                  className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
                 >
                   {EXPENSE_CATEGORIES.map((c) => (<option key={c}>{c}</option>))}
                 </select>
@@ -409,7 +432,7 @@ export default function Finance() {
                 <select
                   value={expenseForm.payment_method}
                   onChange={(e) => setExpenseForm({ ...expenseForm, payment_method: e.target.value })}
-                  className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                  className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
                 >
                   <option>Cash</option>
                   <option>M-Pesa</option>
@@ -419,19 +442,19 @@ export default function Finance() {
                   value={expenseForm.expense_date}
                   onChange={(e) => setExpenseForm({ ...expenseForm, expense_date: e.target.value })}
                   type="date"
-                  className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                  className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
                 />
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={editingExpense ? handleUpdateExpense : handleAddExpense}
-                  className="flex-1 bg-blue-600 text-white text-xs py-2 rounded-lg hover:bg-blue-700 transition-all"
+                  className="flex-1 bg-brand text-white text-xs py-2 rounded-lg hover:bg-brand-strong transition-all"
                 >
                   {editingExpense ? "Update" : "Add expense"}
                 </button>
                 <button
                   onClick={() => { setShowForm(false); setEditingExpense(null); }}
-                  className="flex-1 border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 text-xs py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+                  className="flex-1 border border-border-subtle text-text-muted text-xs py-2 rounded-lg hover:bg-surface-2 transition-all"
                 >
                   Cancel
                 </button>
@@ -439,21 +462,21 @@ export default function Finance() {
             </div>
           )}
           {expenses.length === 0 ? (
-            <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-4">No expenses logged today</p>
+            <p className="text-xs text-text-faint text-center py-4">No expenses logged today</p>
           ) : filteredExpenses.length === 0 ? (
-            <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-4">No matching expenses</p>
+            <p className="text-xs text-text-faint text-center py-4">No matching expenses</p>
           ) : (
             <div className="space-y-1.5 mt-2">
               {filteredExpenses.map((e) => (
-                <div key={e.id} className="flex items-center justify-between text-sm py-1.5 border-b border-gray-50 dark:border-white/5 last:border-0">
+                <div key={e.id} className="flex items-center justify-between text-sm py-1.5 border-b border-border-subtle dark:border-border-subtle last:border-0">
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-800 dark:text-white truncate">{e.description}</p>
-                    <p className="text-xs text-gray-400 dark:text-slate-500">{e.category} · {e.payment_method}</p>
+                    <p className="text-text-primary truncate">{e.description}</p>
+                    <p className="text-xs text-text-faint">{e.category} · {e.payment_method}</p>
                   </div>
                   <div className="flex items-center gap-2 ml-2">
-                    <span className="font-medium text-red-500 dark:text-red-400 text-sm">{formatPrice(e.amount)}</span>
-                    <button onClick={() => startEdit(e)} className="px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-500/30 transition-all"><FiEdit2 size={13} className="mr-1 inline" /> Edit</button>
-                    <button onClick={() => handleDeleteExpense(e.id)} className="px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-500 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-500/30 transition-all"><FiTrash2 size={13} className="mr-1 inline" /> Delete</button>
+                    <span className="font-medium text-danger text-sm">{formatPrice(e.amount)}</span>
+                    <button onClick={() => startEdit(e)} className="px-2.5 py-1.5 text-xs font-medium bg-surface-1 border border-border-subtle text-text-muted rounded-lg hover:bg-brand-muted hover:text-brand hover:border-brand-soft transition-all"><FiEdit2 size={13} className="mr-1 inline" /> Edit</button>
+                    <button onClick={() => handleDeleteExpense(e.id)} className="px-2.5 py-1.5 text-xs font-medium bg-surface-1 border border-border-subtle text-text-muted rounded-lg hover:bg-danger-muted hover:text-danger hover:border-danger transition-all"><FiTrash2 size={13} className="mr-1 inline" /> Delete</button>
                   </div>
                 </div>
               ))}
@@ -463,35 +486,35 @@ export default function Finance() {
       </div>
 
       {showHistory && (
-        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 mb-6 transition-all">
+        <div className="bg-surface-1 rounded-xl border border-border-subtle p-4 mb-6 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-800 dark:text-white">Past Reconciliations</h3>
-            <button onClick={closeHistory} className="text-gray-400 dark:text-slate-500 hover:text-gray-600"><FiX size={16} /></button>
+            <h3 className="text-sm font-medium text-text-primary">Past Reconciliations</h3>
+            <button onClick={closeHistory} className="text-text-faint hover:text-text-body"><FiX size={16} /></button>
           </div>
           {historyLoading ? (
-            <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-10 bg-gray-100 dark:bg-white/5 rounded-lg animate-pulse" />)}</div>
+            <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-10 bg-surface-2 dark:bg-white/5 rounded-lg animate-pulse" />)}</div>
           ) : historyData.length === 0 ? (
-            <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-6">No past reconciliations yet. Upload a CSV or enter transactions manually to start.</p>
+            <p className="text-xs text-text-faint text-center py-6">No past reconciliations yet. Upload a CSV or enter transactions manually to start.</p>
           ) : (
-            <div className="border border-gray-200 dark:border-white/10 rounded-lg overflow-x-auto">
+            <div className="border border-border-subtle rounded-lg overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="border-b border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/[0.03]">
-                    <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Receipt No.</th>
-                    <th className="text-right px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Amount</th>
-                    <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Date</th>
-                    <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Sender</th>
-                    <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Status</th>
+                  <tr className="border-b border-border-subtle bg-surface-2 dark:bg-white/[0.03]">
+                    <th className="text-left px-3 py-2 font-medium text-text-muted">Receipt No.</th>
+                    <th className="text-right px-3 py-2 font-medium text-text-muted">Amount</th>
+                    <th className="text-left px-3 py-2 font-medium text-text-muted">Date</th>
+                    <th className="text-left px-3 py-2 font-medium text-text-muted">Sender</th>
+                    <th className="text-left px-3 py-2 font-medium text-text-muted">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {historyData.map((tx) => (
-                    <tr key={tx.id} className="border-b border-gray-50 dark:border-white/5">
-                      <td className="px-3 py-2 text-gray-800 dark:text-white font-mono">{tx.receipt_no}</td>
-                      <td className="px-3 py-2 text-right text-gray-800 dark:text-white font-medium">{formatPrice(tx.amount)}</td>
-                      <td className="px-3 py-2 text-gray-400 dark:text-slate-500">{tx.completion_time ? new Date(tx.completion_time).toLocaleDateString("en-KE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}</td>
-                      <td className="px-3 py-2 text-gray-400 dark:text-slate-500">{tx.sender || "—"}</td>
-                      <td className="px-3 py-2"><span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${tx.matched_sale_id ? "bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400" : "bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400"}`}>{tx.matched_sale_id ? <><FiCheck size={11} /> Matched</> : <><FiX size={11} /> Unmatched</>}</span></td>
+                    <tr key={tx.id} className="border-b border-border-subtle dark:border-border-subtle">
+                      <td className="px-3 py-2 text-text-primary font-mono">{tx.receipt_no}</td>
+                      <td className="px-3 py-2 text-right text-text-primary font-medium">{formatPrice(tx.amount)}</td>
+                      <td className="px-3 py-2 text-text-faint">{tx.completion_time ? new Date(tx.completion_time).toLocaleDateString("en-KE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}</td>
+                      <td className="px-3 py-2 text-text-faint">{tx.sender || "—"}</td>
+                      <td className="px-3 py-2"><span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${tx.matched_sale_id ? "bg-success-muted text-success" : "bg-warning-muted text-warning"}`}>{tx.matched_sale_id ? <><FiCheck size={11} /> Matched</> : <><FiX size={11} /> Unmatched</>}</span></td>
                     </tr>
                   ))}
                 </tbody>
@@ -503,70 +526,70 @@ export default function Finance() {
 
       <ProGate feature="finance_mpesa">
       {!isService && showRecon && (
-        <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 mb-6 transition-all">
+        <div className="bg-surface-1 rounded-xl border border-border-subtle p-4 mb-6 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-800 dark:text-white">M-Pesa Reconciliation</h3>
+            <h3 className="text-sm font-medium text-text-primary">M-Pesa Reconciliation</h3>
             <div className="flex items-center gap-2">
               {reconStep === "upload" && (
-                <div className="flex bg-gray-100 dark:bg-white/[0.06] rounded-lg p-0.5 text-xs">
-                  <button onClick={() => { setReconMode("csv"); setCsvText(""); setParsedTx([]); setManualTxs([]); }} className={`px-3 py-1.5 rounded-md transition-all ${reconMode === "csv" ? "bg-white dark:bg-[#16213e] text-gray-800 dark:text-white shadow-sm" : "text-gray-500 dark:text-slate-400 hover:text-gray-700"}`}>Upload CSV</button>
-                  <button onClick={() => { setReconMode("manual"); setCsvText(""); setParsedTx([]); setManualTxs([]); }} className={`px-3 py-1.5 rounded-md transition-all ${reconMode === "manual" ? "bg-white dark:bg-[#16213e] text-gray-800 dark:text-white shadow-sm" : "text-gray-500 dark:text-slate-400 hover:text-gray-700"}`}>Manual Entry</button>
+                <div className="flex bg-surface-2 dark:bg-white/[0.06] rounded-lg p-0.5 text-xs">
+                  <button onClick={() => { setReconMode("csv"); setCsvText(""); setParsedTx([]); setManualTxs([]); }} className={`px-3 py-1.5 rounded-md transition-all ${reconMode === "csv" ? "bg-surface-1 text-text-primary shadow-sm" : "text-text-muted hover:text-text-body"}`}>Upload CSV</button>
+                  <button onClick={() => { setReconMode("manual"); setCsvText(""); setParsedTx([]); setManualTxs([]); }} className={`px-3 py-1.5 rounded-md transition-all ${reconMode === "manual" ? "bg-surface-1 text-text-primary shadow-sm" : "text-text-muted hover:text-text-body"}`}>Manual Entry</button>
                 </div>
               )}
-              <button onClick={resetRecon} className="text-gray-400 dark:text-slate-500 hover:text-gray-600" aria-label="Close reconciliation"><FiX size={16} /></button>
+              <button onClick={resetRecon} className="text-text-faint hover:text-text-body" aria-label="Close reconciliation"><FiX size={16} /></button>
             </div>
           </div>
 
           {reconStep === "upload" && reconMode === "csv" && (
             <div>
-              <p className="text-xs text-gray-400 dark:text-slate-500 mb-3">Download your M-Pesa statement from the Safaricom app (M-Pesa &gt; Statement &gt; Download as CSV), then paste it below or upload the file.</p>
-              <textarea value={csvText} onChange={(e) => handleCsvChange(e.target.value)} placeholder="Paste CSV content here..." rows={6} className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 font-mono" />
-              <label className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 cursor-pointer mt-2 hover:underline">
+              <p className="text-xs text-text-faint mb-3">Download your M-Pesa statement from the Safaricom app (M-Pesa &gt; Statement &gt; Download as CSV), then paste it below or upload the file.</p>
+              <textarea value={csvText} onChange={(e) => handleCsvChange(e.target.value)} placeholder="Paste CSV content here..." rows={6} className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand font-mono" />
+              <label className="flex items-center gap-2 text-xs text-brand cursor-pointer mt-2 hover:underline">
                 <FiUpload size={14} /> Upload CSV file
                 <input type="file" accept=".csv" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) { const r = new FileReader(); r.onload = () => handleCsvChange(r.result); r.readAsText(f); } }} />
               </label>
               {csvText.trim() && parsedTx.length === 0 && (
-                <p className="text-xs text-red-500 mt-2">Could not find any valid transactions. Check that your CSV has receipt numbers and amounts.</p>
+                <p className="text-xs text-danger mt-2">Could not find any valid transactions. Check that your CSV has receipt numbers and amounts.</p>
               )}
             </div>
           )}
 
           {reconStep === "upload" && reconMode === "manual" && (
             <div>
-              <p className="text-xs text-gray-400 dark:text-slate-500 mb-3">Enter one or more M-Pesa transactions manually to match against your sales.</p>
+              <p className="text-xs text-text-faint mb-3">Enter one or more M-Pesa transactions manually to match against your sales.</p>
               <div className="grid grid-cols-4 gap-2 mb-3">
-                <input value={manualForm.receiptNo} onChange={(e) => setManualForm(f => ({ ...f, receiptNo: e.target.value }))} placeholder="Receipt No *" className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 font-mono" />
-                <input value={manualForm.amount} onChange={(e) => setManualForm(f => ({ ...f, amount: e.target.value }))} placeholder="Amount *" type="number" step="0.01" className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400" />
-                <input value={manualForm.date} onChange={(e) => setManualForm(f => ({ ...f, date: e.target.value }))} placeholder="Date (optional)" type="datetime-local" className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400" />
-                <input value={manualForm.sender} onChange={(e) => setManualForm(f => ({ ...f, sender: e.target.value }))} placeholder="Sender (optional)" className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400" />
+                <input value={manualForm.receiptNo} onChange={(e) => setManualForm(f => ({ ...f, receiptNo: e.target.value }))} placeholder="Receipt No *" className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand font-mono" />
+                <input value={manualForm.amount} onChange={(e) => setManualForm(f => ({ ...f, amount: e.target.value }))} placeholder="Amount *" type="number" step="0.01" className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand" />
+                <input value={manualForm.date} onChange={(e) => setManualForm(f => ({ ...f, date: e.target.value }))} placeholder="Date (optional)" type="datetime-local" className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand" />
+                <input value={manualForm.sender} onChange={(e) => setManualForm(f => ({ ...f, sender: e.target.value }))} placeholder="Sender (optional)" className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand" />
               </div>
-              <button onClick={handleAddManual} disabled={!manualForm.receiptNo || !manualForm.amount} className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all disabled:opacity-50">
+              <button onClick={handleAddManual} disabled={!manualForm.receiptNo || !manualForm.amount} className="flex items-center gap-1.5 text-xs text-brand bg-brand-muted px-3 py-1.5 rounded-lg hover:bg-brand-muted transition-all disabled:opacity-50">
                 <FiPlus size={13} /> Add transaction
               </button>
 
               {manualTxs.length > 0 && (
                 <div className="mt-4">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs text-gray-400 dark:text-slate-500">{manualTxs.length} transaction(s) added</p>
-                    <button onClick={handleRunMatch} className="text-xs text-white bg-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all">Match against sales</button>
+                    <p className="text-xs text-text-faint">{manualTxs.length} transaction(s) added</p>
+                    <button onClick={handleRunMatch} className="text-xs text-white bg-brand px-3 py-1.5 rounded-lg hover:bg-brand-strong transition-all">Match against sales</button>
                   </div>
-                  <div className="border border-gray-200 dark:border-white/10 rounded-lg overflow-x-auto">
+                  <div className="border border-border-subtle rounded-lg overflow-x-auto">
                     <table className="w-full text-xs">
                       <thead>
-                        <tr className="border-b border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/[0.03]">
-                          <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Receipt</th>
-                          <th className="text-right px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Amount</th>
-                          <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Sender</th>
-                          <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Actions</th>
+                        <tr className="border-b border-border-subtle bg-surface-2 dark:bg-white/[0.03]">
+                          <th className="text-left px-3 py-2 font-medium text-text-muted">Receipt</th>
+                          <th className="text-right px-3 py-2 font-medium text-text-muted">Amount</th>
+                          <th className="text-left px-3 py-2 font-medium text-text-muted">Sender</th>
+                          <th className="text-left px-3 py-2 font-medium text-text-muted">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         {manualTxs.map((tx, i) => (
-                          <tr key={i} className="border-b border-gray-50 dark:border-white/5">
-                            <td className="px-3 py-2 text-gray-800 dark:text-white font-mono">{tx.receiptNo}</td>
-                            <td className="px-3 py-2 text-right text-gray-800 dark:text-white font-medium">{formatPrice(tx.amount)}</td>
-                            <td className="px-3 py-2 text-gray-400 dark:text-slate-500">{tx.sender || "—"}</td>
-                            <td className="px-3 py-2"><button onClick={() => handleRemoveManual(i)} className="text-red-500 hover:text-red-600 text-xs"><FiX size={13} /></button></td>
+                          <tr key={i} className="border-b border-border-subtle dark:border-border-subtle">
+                            <td className="px-3 py-2 text-text-primary font-mono">{tx.receiptNo}</td>
+                            <td className="px-3 py-2 text-right text-text-primary font-medium">{formatPrice(tx.amount)}</td>
+                            <td className="px-3 py-2 text-text-faint">{tx.sender || "—"}</td>
+                            <td className="px-3 py-2"><button onClick={() => handleRemoveManual(i)} className="text-danger hover:text-danger-700 text-xs"><FiX size={13} /></button></td>
                           </tr>
                         ))}
                       </tbody>
@@ -580,32 +603,32 @@ export default function Finance() {
           {reconStep === "preview" && parsedTx.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-gray-400 dark:text-slate-500">{parsedTx.length} transactions found</p>
+                <p className="text-xs text-text-faint">{parsedTx.length} transactions found</p>
                 <div className="flex gap-2">
-                  <button onClick={() => setReconStep("upload")} className="text-xs text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-white/10 px-3 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05]">Back</button>
-                  <button onClick={handleRunMatch} className="text-xs text-white bg-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all">Match against sales</button>
+                  <button onClick={() => setReconStep("upload")} className="text-xs text-text-muted border border-border-subtle px-3 py-1.5 rounded-lg hover:bg-surface-2">Back</button>
+                  <button onClick={handleRunMatch} className="text-xs text-white bg-brand px-3 py-1.5 rounded-lg hover:bg-brand-strong transition-all">Match against sales</button>
                 </div>
               </div>
-              <div className="border border-gray-200 dark:border-white/10 rounded-lg overflow-x-auto">
+              <div className="border border-border-subtle rounded-lg overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="border-b border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/[0.03]">
-                      <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Receipt</th>
-                      <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Date</th>
-                      <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Sender</th>
-                      <th className="text-right px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Amount</th>
+                    <tr className="border-b border-border-subtle bg-surface-2 dark:bg-white/[0.03]">
+                      <th className="text-left px-3 py-2 font-medium text-text-muted">Receipt</th>
+                      <th className="text-left px-3 py-2 font-medium text-text-muted">Date</th>
+                      <th className="text-left px-3 py-2 font-medium text-text-muted">Sender</th>
+                      <th className="text-right px-3 py-2 font-medium text-text-muted">Amount</th>
                     </tr>
                   </thead>
                   <tbody>
                     {parsedTx.slice(0, 50).map((tx, i) => (
-                      <tr key={i} className="border-b border-gray-50 dark:border-white/5">
-                        <td className="px-3 py-2 text-gray-800 dark:text-white font-mono">{tx.receiptNo}</td>
-                        <td className="px-3 py-2 text-gray-400 dark:text-slate-500">{tx.completionTime ? new Date(tx.completionTime).toLocaleDateString("en-KE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}</td>
-                        <td className="px-3 py-2 text-gray-600 dark:text-slate-400">{tx.sender || "—"}</td>
-                        <td className="px-3 py-2 text-right text-gray-800 dark:text-white font-medium">{formatPrice(tx.amount)}</td>
+                      <tr key={i} className="border-b border-border-subtle dark:border-border-subtle">
+                        <td className="px-3 py-2 text-text-primary font-mono">{tx.receiptNo}</td>
+                        <td className="px-3 py-2 text-text-faint">{tx.completionTime ? new Date(tx.completionTime).toLocaleDateString("en-KE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}</td>
+                        <td className="px-3 py-2 text-text-body">{tx.sender || "—"}</td>
+                        <td className="px-3 py-2 text-right text-text-primary font-medium">{formatPrice(tx.amount)}</td>
                       </tr>
                     ))}
-                    {parsedTx.length > 50 && <tr><td colSpan={4} className="px-3 py-2 text-center text-gray-400 text-xs">+{parsedTx.length - 50} more</td></tr>}
+                    {parsedTx.length > 50 && <tr><td colSpan={4} className="px-3 py-2 text-center text-text-faint text-xs">+{parsedTx.length - 50} more</td></tr>}
                   </tbody>
                 </table>
               </div>
@@ -615,48 +638,48 @@ export default function Finance() {
           {reconStep === "results" && matchResult && (
             <div>
               <div className="grid grid-cols-3 gap-3 mb-4">
-                <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-green-700 dark:text-green-400">{matchResult.matched.length}</p>
-                  <p className="text-xs text-green-600 dark:text-green-500">Matched</p>
-                  <p className="text-xs text-green-500 dark:text-green-400">{formatPrice(matchResult.matched.reduce((s, m) => s + Number(m.transaction.amount), 0))}</p>
+                <div className="bg-success-muted border border-success dark:border-green-500/20 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-success">{matchResult.matched.length}</p>
+                  <p className="text-xs text-success">Matched</p>
+                  <p className="text-xs text-success">{formatPrice(matchResult.matched.reduce((s, m) => s + Number(m.transaction.amount), 0))}</p>
                 </div>
-                <div className="bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">{matchResult.unmatchedMpesa.length}</p>
-                  <p className="text-xs text-yellow-600 dark:text-yellow-500">Unmatched M-Pesa</p>
-                  <p className="text-xs text-yellow-500 dark:text-yellow-400">{formatPrice(matchResult.unmatchedMpesa.reduce((s, t) => s + Number(t.amount), 0))}</p>
+                <div className="bg-warning-muted border border-warning rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-warning">{matchResult.unmatchedMpesa.length}</p>
+                  <p className="text-xs text-warning">Unmatched M-Pesa</p>
+                  <p className="text-xs text-warning">{formatPrice(matchResult.unmatchedMpesa.reduce((s, t) => s + Number(t.amount), 0))}</p>
                 </div>
-                <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-red-700 dark:text-red-400">{matchResult.unmatchedSales.length}</p>
-                  <p className="text-xs text-red-600 dark:text-red-500">Unmatched Sales</p>
-                  <p className="text-xs text-red-500 dark:text-red-400">{formatPrice(matchResult.unmatchedSales.reduce((s, t) => s + Number(t.amount), 0))}</p>
+                <div className="bg-danger-muted border border-danger rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-danger">{matchResult.unmatchedSales.length}</p>
+                  <p className="text-xs text-danger">Unmatched Sales</p>
+                  <p className="text-xs text-danger">{formatPrice(matchResult.unmatchedSales.reduce((s, t) => s + Number(t.amount), 0))}</p>
                 </div>
               </div>
 
-              <div className="border border-gray-200 dark:border-white/10 rounded-lg overflow-x-auto mb-4">
+              <div className="border border-border-subtle rounded-lg overflow-x-auto mb-4">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="border-b border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/[0.03]">
-                      <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Receipt</th>
-                      <th className="text-right px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Amount</th>
-                      <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Date</th>
-                      <th className="text-left px-3 py-2 font-medium text-gray-500 dark:text-slate-400">Status</th>
+                    <tr className="border-b border-border-subtle bg-surface-2 dark:bg-white/[0.03]">
+                      <th className="text-left px-3 py-2 font-medium text-text-muted">Receipt</th>
+                      <th className="text-right px-3 py-2 font-medium text-text-muted">Amount</th>
+                      <th className="text-left px-3 py-2 font-medium text-text-muted">Date</th>
+                      <th className="text-left px-3 py-2 font-medium text-text-muted">Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {matchResult.matched.map((m, i) => (
-                      <tr key={i} className="border-b border-gray-50 dark:border-white/5">
-                        <td className="px-3 py-2 text-gray-800 dark:text-white font-mono">{m.transaction.receiptNo}</td>
-                        <td className="px-3 py-2 text-right text-gray-800 dark:text-white font-medium">{formatPrice(m.transaction.amount)}</td>
-                        <td className="px-3 py-2 text-gray-400 dark:text-slate-500">{m.transaction.completionTime ? new Date(m.transaction.completionTime).toLocaleDateString("en-KE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}</td>
-                        <td className="px-3 py-2"><span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${m.confidence === "exact" ? "bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400" : "bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400"}`}>{m.confidence === "exact" ? <><FiCheck size={11} /> Exact</> : <><FiSearch size={11} /> Suggested</>}</span></td>
+                      <tr key={i} className="border-b border-border-subtle dark:border-border-subtle">
+                        <td className="px-3 py-2 text-text-primary font-mono">{m.transaction.receiptNo}</td>
+                        <td className="px-3 py-2 text-right text-text-primary font-medium">{formatPrice(m.transaction.amount)}</td>
+                        <td className="px-3 py-2 text-text-faint">{m.transaction.completionTime ? new Date(m.transaction.completionTime).toLocaleDateString("en-KE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}</td>
+                        <td className="px-3 py-2"><span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${m.confidence === "exact" ? "bg-success-muted text-success" : "bg-warning-muted text-warning"}`}>{m.confidence === "exact" ? <><FiCheck size={11} /> Exact</> : <><FiSearch size={11} /> Suggested</>}</span></td>
                       </tr>
                     ))}
                     {matchResult.unmatchedMpesa.map((tx, i) => (
-                      <tr key={`u-${i}`} className="border-b border-gray-50 dark:border-white/5">
-                        <td className="px-3 py-2 text-gray-800 dark:text-white font-mono">{tx.receiptNo}</td>
-                        <td className="px-3 py-2 text-right text-gray-800 dark:text-white font-medium">{formatPrice(tx.amount)}</td>
-                        <td className="px-3 py-2 text-gray-400 dark:text-slate-500">{tx.completionTime ? new Date(tx.completionTime).toLocaleDateString("en-KE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}</td>
-                        <td className="px-3 py-2"><span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400"><FiX size={11} /> No match</span></td>
+                      <tr key={`u-${i}`} className="border-b border-border-subtle dark:border-border-subtle">
+                        <td className="px-3 py-2 text-text-primary font-mono">{tx.receiptNo}</td>
+                        <td className="px-3 py-2 text-right text-text-primary font-medium">{formatPrice(tx.amount)}</td>
+                        <td className="px-3 py-2 text-text-faint">{tx.completionTime ? new Date(tx.completionTime).toLocaleDateString("en-KE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}</td>
+                        <td className="px-3 py-2"><span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-warning-muted text-warning"><FiX size={11} /> No match</span></td>
                       </tr>
                     ))}
                   </tbody>
@@ -664,16 +687,16 @@ export default function Finance() {
               </div>
 
               {saved ? (
-                <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 rounded-lg px-4 py-3 text-xs text-green-700 dark:text-green-400 flex items-center justify-between">
+                <div className="bg-success-muted border border-success dark:border-green-500/20 rounded-lg px-4 py-3 text-xs text-success flex items-center justify-between">
                   <span><FiCheck size={14} className="inline mr-1" /> Saved successfully. {matchResult.matched.length} transactions matched.</span>
-                  <button onClick={resetRecon} className="text-green-600 dark:text-green-400 underline">Close</button>
+                  <button onClick={resetRecon} className="text-success underline">Close</button>
                 </div>
               ) : (
                 <div className="flex gap-2">
-                  <button onClick={handleSaveMatches} disabled={saving || matchResult.matched.length === 0} className="flex-1 bg-blue-600 text-white text-xs py-2 rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50">
+                  <button onClick={handleSaveMatches} disabled={saving || matchResult.matched.length === 0} className="flex-1 bg-brand text-white text-xs py-2 rounded-lg hover:bg-brand-strong transition-all disabled:opacity-50">
                     {saving ? "Saving..." : `Save ${matchResult.matched.length} match(es)`}
                   </button>
-                  <button onClick={resetRecon} className="flex-1 border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 text-xs py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05]">Cancel</button>
+                  <button onClick={resetRecon} className="flex-1 border border-border-subtle text-text-muted text-xs py-2 rounded-lg hover:bg-surface-2">Cancel</button>
                 </div>
               )}
             </div>

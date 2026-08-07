@@ -7,12 +7,13 @@ import { supabase, getPersistedSession } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
 import { setCurrency } from "../lib/format";
 import { setPaymentConfig } from "../lib/paymentConfig";
+import { normalizeTheme, applyTheme } from "../lib/themes";
 import { useSettings } from "../hooks/useSettings";
 import { AuthContext } from "../context/AuthContext";
 import { useToast } from "../context/ToastProvider";
 import {
   FiShoppingBag, FiSettings, FiBell, FiCreditCard,
-  FiLock, FiDownload, FiAlertTriangle, FiCpu
+  FiLock, FiDownload, FiAlertTriangle
 } from "react-icons/fi";
 import TabButton from "../components/settings/TabButton";
 import SettingsSaveBar from "../components/settings/SettingsSaveBar";
@@ -22,7 +23,6 @@ import StoreTab from "../components/settings/StoreTab";
 import PreferencesTab from "../components/settings/PreferencesTab";
 import NotificationsTab from "../components/settings/NotificationsTab";
 import BillingTab from "../components/settings/BillingTab";
-import IntegrationsTab from "../components/settings/IntegrationsTab";
 import SecurityTab from "../components/settings/SecurityTab";
 import DataTab from "../components/settings/DataTab";
 import DangerZoneTab from "../components/settings/DangerZoneTab";
@@ -32,7 +32,6 @@ const TABS = [
   { id: "preferences", label: "Preferences", subtitle: "Theme, currency & defaults", icon: FiSettings },
   { id: "notifications", label: "Notifications", subtitle: "Alerts & reminders", icon: FiBell },
   { id: "billing", label: "Billing", subtitle: "Subscription & plan", icon: FiCreditCard },
-  { id: "integrations", label: "Integrations", subtitle: "Google Calendar & connectors", icon: FiCpu },
   { id: "security", label: "Security", subtitle: "Password & account", icon: FiLock },
   { id: "data", label: "Data", subtitle: "Export & backups", icon: FiDownload },
   { id: "danger", label: "Danger Zone", subtitle: "Irreversible actions", icon: FiAlertTriangle },
@@ -78,7 +77,7 @@ export default function Settings() {
     store_name: settings.storeName, store_phone: settings.storePhone,
     store_address: settings.storeAddress, currency_symbol: settings.currencySymbol,
     low_stock_threshold: settings.lowStockThreshold, default_payment: settings.defaultPayment,
-    receipt_footer: settings.receiptFooter, theme: settings.theme || "light",
+    receipt_footer: settings.receiptFooter, theme: normalizeTheme(settings.theme),
     website_url: settings.websiteUrl, whatsapp: settings.whatsapp,
     business_category: settings.businessCategory,
     notification_preferences: settings.notificationPreferences,
@@ -107,7 +106,7 @@ export default function Settings() {
       store_address: safe(settings.storeAddress), currency_symbol: safe(settings.currencySymbol),
       low_stock_threshold: settings.lowStockThreshold ?? 6,
       default_payment: safe(settings.defaultPayment), receipt_footer: safe(settings.receiptFooter),
-      theme: settings.theme || "light", website_url: safe(settings.websiteUrl),
+      theme: normalizeTheme(settings.theme), website_url: safe(settings.websiteUrl),
       whatsapp: safe(settings.whatsapp), business_category: settings.businessCategory || "general",
       notification_preferences: settings.notificationPreferences,
       primary_color: settings.primaryColor || "#000000",
@@ -137,8 +136,8 @@ export default function Settings() {
   const isDirty = pristineSnapshot !== null && currentSnapshot !== pristineSnapshot;
 
   function handleThemeChange(theme) {
-    setForm((prev) => ({ ...prev, theme }));
-    document.documentElement.classList.toggle("dark", theme === "dark");
+    const themeId = applyTheme(theme);
+    setForm((prev) => ({ ...prev, theme: themeId }));
   }
 
   function updateHour(key, field, value) {
@@ -152,7 +151,7 @@ export default function Settings() {
       store_address: safe(settings.storeAddress), currency_symbol: safe(settings.currencySymbol),
       low_stock_threshold: settings.lowStockThreshold ?? 6,
       default_payment: safe(settings.defaultPayment), receipt_footer: safe(settings.receiptFooter),
-      theme: settings.theme || "light", website_url: safe(settings.websiteUrl),
+      theme: normalizeTheme(settings.theme), website_url: safe(settings.websiteUrl),
       whatsapp: safe(settings.whatsapp), business_category: settings.businessCategory || "general",
       notification_preferences: settings.notificationPreferences,
       primary_color: settings.primaryColor || "#000000",
@@ -165,7 +164,7 @@ export default function Settings() {
     });
     setHours(hoursFromSettings(settings.businessHours));
     setValidationErrors({});
-    document.documentElement.classList.toggle("dark", settings.theme === "dark");
+    applyTheme(settings.theme);
   }
 
   async function handleSave() {
@@ -230,7 +229,7 @@ export default function Settings() {
 
     setCurrency(form.currency_symbol);
     setPaymentConfig(null, form.default_payment);
-    document.documentElement.classList.toggle("dark", form.theme === "dark");
+    applyTheme(form.theme);
 
     const bh = {};
     hours.forEach((h) => { bh[h.key] = { open: h.open, close: h.close, active: h.active }; });
@@ -400,7 +399,6 @@ export default function Settings() {
               <BillingTab subscriptionExpiresAt={settings.subscriptionExpiresAt}
                 refreshSettings={settings.refreshSettings} />
             )}
-            {activeTab === "integrations" && <IntegrationsTab />}
             {activeTab === "security" && <SecurityTab sessionEmail={sessionEmail} />}
             {activeTab === "data" && <DataTab onExport={handleExport} />}
             {activeTab === "danger" && (

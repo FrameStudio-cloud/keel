@@ -81,8 +81,8 @@ export default function QueueStatus() {
         onClick={() => setOpen(!open)}
         className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg border transition-all ${
           failed.length > 0
-            ? "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20"
-            : "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20"
+            ? "text-danger bg-danger-muted border-danger"
+            : "text-warning bg-warning-muted border-warning"
         }`}
       >
         {failed.length > 0 ? <FiAlertCircle size={14} /> : <FiClock size={14} />}
@@ -90,15 +90,15 @@ export default function QueueStatus() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-[#16213e] border border-gray-200 dark:border-white/10 rounded-xl shadow-lg z-50 overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-100 dark:border-white/10 flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-700 dark:text-slate-300">
+        <div className="absolute right-0 top-full mt-2 w-72 bg-surface-1 border border-border-subtle rounded-xl shadow-lg z-50 overflow-hidden">
+          <div className="px-4 py-3 border-b border-border-subtle flex items-center justify-between">
+            <span className="text-xs font-medium text-text-body">
               Pending writes ({pending.length})
             </span>
             {failed.length > 1 && (
               <button
                 onClick={() => { retryAllFailed(); refresh(); }}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                className="text-xs text-brand hover:underline flex items-center gap-1"
               >
                 <FiRefreshCw size={12} /> Retry all
               </button>
@@ -106,41 +106,41 @@ export default function QueueStatus() {
           </div>
           <div className="max-h-64 overflow-y-auto">
             {pending.length === 0 ? (
-              <div className="px-4 py-6 text-center text-xs text-gray-400">All caught up</div>
+              <div className="px-4 py-6 text-center text-xs text-text-faint">All caught up</div>
             ) : (
               pending.map((item) => (
                 <div
                   key={item.id}
-                  className="px-4 py-3 border-b border-gray-50 dark:border-white/5 last:border-0"
+                  className="px-4 py-3 border-b border-border-subtle dark:border-border-subtle last:border-0"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-xs font-medium text-gray-800 dark:text-white truncate">
+                      <p className="text-xs font-medium text-text-primary truncate">
                         {TYPE_LABELS[item.type] || item.type}
                       </p>
                       {getItemLabel(item) && (
-                        <p className="text-[11px] text-gray-400 dark:text-slate-500 truncate mt-0.5">
+                        <p className="text-[11px] text-text-faint truncate mt-0.5">
                           {getItemLabel(item)}
                         </p>
                       )}
                       <div className="mt-1.5 flex items-center gap-1.5">
                         {item.status === "pending" && (
-                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400" />
+                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-warning" />
                         )}
                         {item.status === "retrying" && (
                           <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
                         )}
                         {item.status === "failed" && (
-                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500" />
+                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-danger" />
                         )}
-                        <span className="text-[10px] text-gray-400 dark:text-slate-500">
+                        <span className="text-[10px] text-text-faint">
                           {item.status === "pending" && "Pending"}
                           {item.status === "retrying" && `Retry ${item.retryCount}/${item.maxRetries}`}
                           {item.status === "failed" && `Failed`}
                         </span>
                       </div>
                       {item.lastError && (
-                        <p className="text-[10px] text-red-400 mt-0.5 truncate" title={item.lastError}>
+                        <p className="text-[10px] text-danger mt-0.5 truncate" title={item.lastError}>
                           {item.lastError}
                         </p>
                       )}
@@ -149,7 +149,7 @@ export default function QueueStatus() {
                       {item.status === "failed" && (
                         <button
                           onClick={() => { retryWrite(item.id); refresh(); }}
-                          className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-all"
+                          className="p-1.5 text-brand hover:bg-brand-muted rounded-lg transition-all"
                           title="Retry"
                         >
                           <FiRefreshCw size={14} />

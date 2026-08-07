@@ -8,6 +8,7 @@ import { formatPrice } from "../lib/format";
 import { useSettings } from "../hooks/useSettings";
 import { useFocusTrap } from "../hooks/useFocusTrap";
 import { enqueueWrite } from "../lib/writeQueue";
+import { track } from "../lib/posthog";
 import BarcodeScanner from "./BarcodeScanner";
 
 export default function LogSaleModal({ onClose, onAdded }) {
@@ -60,6 +61,13 @@ export default function LogSaleModal({ onClose, onAdded }) {
     onAdded();
     onClose();
 
+    track("log_sale", {
+      amount: total,
+      quantity: parseInt(form.quantity),
+      method: form.method,
+      product_name: selectedProduct.name,
+    });
+
     enqueueWrite({
       type: "logSale",
       shopId,
@@ -81,16 +89,16 @@ export default function LogSaleModal({ onClose, onAdded }) {
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div
         ref={trapRef}
-        className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-100 dark:border-white/10 p-6 w-full max-w-md mx-4"
+        className="bg-surface-1 rounded-2xl border border-border-subtle p-6 w-full max-w-md mx-4"
         role="dialog"
         aria-modal="true"
         aria-label="Log a sale"
       >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-sm font-medium text-gray-800 dark:text-white">Log a sale</h2>
+          <h2 className="text-sm font-medium text-text-primary">Log a sale</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 dark:text-slate-500 hover:text-gray-600 text-lg"
+            className="text-text-faint hover:text-text-body text-lg"
             aria-label="Close"
           >
             <FiX />
@@ -99,20 +107,20 @@ export default function LogSaleModal({ onClose, onAdded }) {
 
         <div className="flex flex-col gap-3">
           <div>
-            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Product</label>
+            <label className="text-xs text-text-faint mb-1 block">Product</label>
             <div className="relative">
-              <FiSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <FiSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-faint" />
               <input
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setForm((prev) => ({ ...prev, product_id: "" })); }}
                 placeholder={showBarcode ? "Search by name or scan barcode..." : "Search by name..."}
-                className="w-full border border-gray-200 dark:border-white/10 rounded-lg pl-9 pr-9 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                className="w-full border border-border-subtle rounded-lg pl-9 pr-9 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
               />
               {showBarcode && (
                 <button
                   type="button"
                   onClick={() => setShowScanner(true)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-500 transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-text-faint hover:text-brand transition-colors"
                   title="Scan barcode"
                 >
                   <FiCamera size={16} />
@@ -138,7 +146,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
             )}
             <div className="relative mt-2">
               {search && !form.product_id && (
-                <div className="absolute z-10 w-full bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-white/10 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                <div className="absolute z-10 w-full bg-surface-1 border border-border-subtle rounded-lg shadow-lg max-h-48 overflow-y-auto">
                   {(() => {
                     const q = search.toLowerCase();
                     const filtered = products.filter((p) =>
@@ -147,7 +155,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
                       (showBarcode && p.barcode && p.barcode.toLowerCase().includes(q))
                     );
                     return filtered.length === 0 ? (
-                      <div className="px-3 py-2 text-xs text-gray-400">No products found</div>
+                      <div className="px-3 py-2 text-xs text-text-faint">No products found</div>
                     ) : (
                       filtered.map((p) => (
                         <button
@@ -157,10 +165,10 @@ export default function LogSaleModal({ onClose, onAdded }) {
                             setForm((prev) => ({ ...prev, product_id: p.id }));
                             setSearch(`${p.name} — ${formatPrice(p.price)} (stock: ${p.stock})`);
                           }}
-                          className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-colors flex items-center justify-between"
+                          className="w-full text-left px-3 py-2 text-sm text-text-body hover:bg-surface-2 transition-colors flex items-center justify-between"
                         >
                           <span>{p.name}</span>
-                          <span className="text-xs text-gray-400">{formatPrice(p.price)} · stock: {p.stock}</span>
+                          <span className="text-xs text-text-faint">{formatPrice(p.price)} · stock: {p.stock}</span>
                         </button>
                       ))
                     );
@@ -169,7 +177,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
               )}
             </div>
             {form.product_id && selectedProduct && (
-              <div className="mt-2 flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
+              <div className="mt-2 flex items-center gap-2 text-xs text-success">
                 <FiCheck size={14} />
                 {selectedProduct.name} — {formatPrice(selectedProduct.price)}
               </div>
@@ -178,7 +186,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+              <label className="text-xs text-text-faint mb-1 block">
                 Quantity
               </label>
               <input
@@ -187,18 +195,18 @@ export default function LogSaleModal({ onClose, onAdded }) {
                 onChange={handleChange}
                 type="number"
                 min="1"
-                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
               />
             </div>
             <div>
-              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+              <label className="text-xs text-text-faint mb-1 block">
                 Payment method
               </label>
               <select
                 name="method"
                 value={form.method}
                 onChange={handleChange}
-                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
               >
                 {getPaymentMethods().map((m) => (
                   <option key={m}>{m}</option>
@@ -209,21 +217,21 @@ export default function LogSaleModal({ onClose, onAdded }) {
 
           {form.method === "M-Pesa" && (
             <div>
-              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">M-Pesa Receipt Code (optional)</label>
+              <label className="text-xs text-text-faint mb-1 block">M-Pesa Receipt Code (optional)</label>
               <input
                 name="mpesa_code"
                 value={form.mpesa_code}
                 onChange={handleChange}
                 placeholder="e.g. SDF34JKL"
-                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 font-mono"
+                className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand font-mono"
               />
             </div>
           )}
 
           {selectedProduct && (
-            <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg px-4 py-3 flex justify-between items-center">
-              <span className="text-xs text-blue-500">Total</span>
-              <span className="text-sm font-medium text-blue-700 dark:text-blue-400">
+            <div className="bg-brand-muted rounded-lg px-4 py-3 flex justify-between items-center">
+              <span className="text-xs text-brand">Total</span>
+              <span className="text-sm font-medium text-brand">
                 {formatPrice(total)}
               </span>
             </div>
@@ -231,7 +239,7 @@ export default function LogSaleModal({ onClose, onAdded }) {
         </div>
 
         {error && (
-          <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-lg px-3 py-2 text-xs text-red-600 dark:text-red-400">
+          <div className="bg-danger-muted border border-danger rounded-lg px-3 py-2 text-xs text-danger">
             {error}
           </div>
         )}
@@ -239,13 +247,13 @@ export default function LogSaleModal({ onClose, onAdded }) {
         <div className="flex gap-2 mt-5">
           <button
             onClick={onClose}
-            className="flex-1 border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 text-sm py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+            className="flex-1 border border-border-subtle text-text-muted text-sm py-2 rounded-lg hover:bg-surface-2 transition-all"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="flex-1 bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700 transition-all"
+            className="flex-1 bg-brand text-white text-sm py-2 rounded-lg hover:bg-brand-strong transition-all"
           >
             Log sale
           </button>

@@ -79,7 +79,7 @@ export default function Services() {
         <button
           data-onboarding="add-service"
           onClick={() => { setEditing(null); setShowModal(true); }}
-          className="flex items-center justify-center gap-3 bg-blue-600 text-white font-medium text-base px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-[0.97] w-full sm:w-auto"
+          className="flex items-center justify-center gap-3 bg-brand text-white font-medium text-base px-8 py-4 rounded-2xl hover:bg-brand-strong transition-all shadow-lg shadow-brand/25 active:scale-[0.97] w-full sm:w-auto"
         >
           <FiPlus size={22} />
           <span>Add service</span>
@@ -88,12 +88,12 @@ export default function Services() {
           Define the services you offer — set a name, category, pricing mode (fixed/weight-based/service-based), and price. These appear in the order form.
         </ContextTip>
       </div>
-      <p className="text-sm text-gray-400 dark:text-slate-500 mb-4 -mt-2">{filtered.length} service{filtered.length !== 1 ? "s" : ""}</p>
+      <p className="text-sm text-text-faint mb-4 -mt-2">{filtered.length} service{filtered.length !== 1 ? "s" : ""}</p>
 
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden">
+      <div className="bg-surface-1 rounded-xl border border-border-subtle overflow-hidden">
         {loading ? (
           <div className="space-y-2 p-3">
-            {[...Array(3)].map((_, i) => <div key={i} className="h-16 bg-slate-50 dark:bg-[#1a1a2e] rounded-xl animate-pulse" />)}
+            {[...Array(3)].map((_, i) => <div key={i} className="h-16 bg-surface-2 rounded-xl animate-pulse" />)}
           </div>
         ) : filtered.length === 0 ? (
           <EmptyState
@@ -107,27 +107,27 @@ export default function Services() {
           <>
             <div className="sm:hidden space-y-2 p-3">
               {filtered.map((s) => (
-                <div key={s.id} className="bg-slate-50 dark:bg-[#1a1a2e] rounded-xl px-4 py-3">
+                <div key={s.id} className="bg-surface-2 rounded-xl px-4 py-3">
                   <div className="flex items-start justify-between">
                     <div className="min-w-0 flex-1">
-                      <p className="text-slate-900 dark:text-white text-sm font-medium truncate">{s.name}</p>
-                      <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">{s.category} · {pricingModeLabels[s.pricing_mode]}</p>
+                      <p className="text-text-primary text-sm font-medium truncate">{s.name}</p>
+                      <p className="text-text-muted text-xs mt-0.5">{s.category} · {pricingModeLabels[s.pricing_mode]}</p>
                     </div>
-                    <p className="text-blue-600 dark:text-blue-400 text-sm font-semibold flex-shrink-0 ml-3">{formatPrice(s.price)}</p>
+                    <p className="text-brand text-sm font-semibold flex-shrink-0 ml-3">{formatPrice(s.price)}</p>
                   </div>
                   {s.unit_label && (
-                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Per {s.unit_label}</p>
+                    <p className="text-xs text-text-faint mt-1">Per {s.unit_label}</p>
                   )}
                   <div className="flex gap-2 mt-2">
                     <button
                       onClick={() => { setEditing(s); setShowModal(true); }}
-                      className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+                      className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-border-subtle text-text-muted rounded-lg hover:bg-surface-2 transition-all"
                     >
                       <FiEdit2 size={12} /> Edit
                     </button>
                     <button
                       onClick={() => handleDelete(s.id)}
-                      className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-red-200 dark:border-red-500/20 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
+                      className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-danger text-danger rounded-lg hover:bg-danger-muted transition-all"
                     >
                       <FiTrash2 size={12} /> Delete
                     </button>
@@ -138,38 +138,38 @@ export default function Services() {
 
             <table className="hidden sm:table w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100 dark:border-white/10">
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">Service</th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">Category</th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">Pricing</th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">Price</th>
-                  <th className="text-left text-xs font-medium text-gray-400 dark:text-slate-500 px-4 py-3">Actions</th>
+                <tr className="border-b border-border-subtle">
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">Service</th>
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">Category</th>
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">Pricing</th>
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">Price</th>
+                  <th className="text-left text-xs font-medium text-text-faint px-4 py-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((s) => (
-                  <tr key={s.id} className="border-b border-gray-50 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all">
+                  <tr key={s.id} className="border-b border-border-subtle dark:border-border-subtle hover:bg-surface-2 transition-all">
                     <td className="px-4 py-3">
-                      <p className="font-medium text-gray-800 dark:text-white">{s.name}</p>
-                      <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">{s.description}</p>
+                      <p className="font-medium text-text-primary">{s.name}</p>
+                      <p className="text-xs text-text-faint mt-0.5">{s.description}</p>
                     </td>
-                    <td className="px-4 py-3 text-gray-400 dark:text-slate-500">{s.category}</td>
-                    <td className="px-4 py-3 text-gray-400 dark:text-slate-500">
+                    <td className="px-4 py-3 text-text-faint">{s.category}</td>
+                    <td className="px-4 py-3 text-text-faint">
                       {pricingModeLabels[s.pricing_mode]}
                       {s.unit_label && <span className="text-xs ml-1">({s.unit_label})</span>}
                     </td>
-                    <td className="px-4 py-3 font-medium text-blue-700 dark:text-blue-400">{formatPrice(s.price)}</td>
+                    <td className="px-4 py-3 font-medium text-brand">{formatPrice(s.price)}</td>
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
                         <button
                           onClick={() => { setEditing(s); setShowModal(true); }}
-                          className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+                          className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-border-subtle text-text-muted rounded-lg hover:bg-surface-2 transition-all"
                         >
                           <FiEdit2 size={12} /> Edit
                         </button>
                         <button
                           onClick={() => handleDelete(s.id)}
-                          className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-red-200 dark:border-red-500/20 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
+                          className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-danger text-danger rounded-lg hover:bg-danger-muted transition-all"
                         >
                           <FiTrash2 size={12} /> Delete
                         </button>

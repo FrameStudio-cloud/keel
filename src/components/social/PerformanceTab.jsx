@@ -137,7 +137,7 @@ export default function PerformanceTab() {
     return (
       <div className="grid grid-cols-2 gap-3">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="rounded-xl border border-gray-100 dark:border-white/5 p-4">
+          <div key={i} className="rounded-xl border border-border-subtle dark:border-border-subtle p-4">
             <Skeleton className="h-3 w-20 mb-2" />
             <Skeleton className="h-6 w-12" />
           </div>
@@ -149,60 +149,60 @@ export default function PerformanceTab() {
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#16213e] p-4">
-          <span className="text-xs text-gray-400 dark:text-slate-500">Total posts</span>
-          <p className="text-xl font-semibold text-gray-800 dark:text-white mt-1">{stats.total}</p>
-          <div className="flex gap-2 mt-1 text-xs text-gray-400">
+        <div className="rounded-xl border border-border-subtle dark:border-border-subtle bg-surface-1 p-4">
+          <span className="text-xs text-text-faint">Total posts</span>
+          <p className="text-xl font-semibold text-text-primary mt-1">{stats.total}</p>
+          <div className="flex gap-2 mt-1 text-xs text-text-faint">
             <span>{stats.published} published</span>
             <span>{stats.scheduled} scheduled</span>
           </div>
         </div>
-        <div className="rounded-xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#16213e] p-4">
-          <span className="text-xs text-gray-400 dark:text-slate-500">Products linked</span>
-          <p className="text-xl font-semibold text-gray-800 dark:text-white mt-1">{stats.linkedProducts}</p>
-          <p className="text-xs text-gray-400 mt-1">products featured in posts</p>
+        <div className="rounded-xl border border-border-subtle dark:border-border-subtle bg-surface-1 p-4">
+          <span className="text-xs text-text-faint">Products linked</span>
+          <p className="text-xl font-semibold text-text-primary mt-1">{stats.linkedProducts}</p>
+          <p className="text-xs text-text-faint mt-1">products featured in posts</p>
         </div>
-        <div className="rounded-xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#16213e] p-4">
-          <span className="text-xs text-gray-400 dark:text-slate-500">Sales lift</span>
-          <p className="text-xl font-semibold text-green-600 dark:text-green-400 mt-1">+{stats.totalSalesLift}</p>
-          <p className="text-xs text-gray-400 mt-1">
+        <div className="rounded-xl border border-border-subtle dark:border-border-subtle bg-surface-1 p-4">
+          <span className="text-xs text-text-faint">Sales lift</span>
+          <p className="text-xl font-semibold text-success mt-1">+{stats.totalSalesLift}</p>
+          <p className="text-xs text-text-faint mt-1">
             units within 3d of a post
             {stats.salesLiftPosts > 0 && ` (${stats.salesLiftPosts} posts)`}
           </p>
         </div>
-        <div className="rounded-xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#16213e] p-4">
-          <span className="text-xs text-gray-400 dark:text-slate-500">Revenue driven</span>
-          <p className="text-xl font-semibold text-blue-600 dark:text-blue-400 mt-1">
+        <div className="rounded-xl border border-border-subtle dark:border-border-subtle bg-surface-1 p-4">
+          <span className="text-xs text-text-faint">Revenue driven</span>
+          <p className="text-xl font-semibold text-brand mt-1">
             {formatPrice(stats.totalRevenueLift)}
           </p>
-          <p className="text-xs text-gray-400 mt-1">from linked product sales within 3d</p>
+          <p className="text-xs text-text-faint mt-1">from linked product sales within 3d</p>
         </div>
       </div>
 
       {bestHour !== null && (
-        <div className="rounded-xl border border-gray-100 dark:border-white/5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-500/5 dark:to-indigo-500/5 p-4">
-          <span className="text-xs text-gray-400 dark:text-slate-500">Best time to post</span>
-          <p className="text-lg font-semibold text-gray-800 dark:text-white mt-1">
+        <div className="rounded-xl border border-border-subtle dark:border-border-subtle bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-500/5 dark:to-indigo-500/5 p-4">
+          <span className="text-xs text-text-faint">Best time to post</span>
+          <p className="text-lg font-semibold text-text-primary mt-1">
             {new Date(0, 0, 0, bestHour).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
           </p>
-          <p className="text-xs text-gray-400 mt-1">highest avg reach based on your published posts</p>
+          <p className="text-xs text-text-faint mt-1">highest avg reach based on your published posts</p>
         </div>
       )}
 
       {revenueEntries.length > 1 && (
         <div>
-          <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+          <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
             Revenue trend (last {revenueEntries.length} days)
           </h4>
-          <div className="rounded-xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#16213e] p-4">
+          <div className="rounded-xl border border-border-subtle dark:border-border-subtle bg-surface-1 p-4">
             <div className="flex items-end gap-1 h-24">
               {revenueEntries.map(([day, rev]) => (
                 <div key={day} className="flex-1 flex flex-col items-center gap-1">
                   <div
-                    className="w-full bg-blue-500 dark:bg-blue-400 rounded-t"
+                    className="w-full bg-brand-soft bg-brand-soft rounded-t"
                     style={{ height: `${Math.max((rev / maxRev) * 100, 4)}%` }}
                   />
-                  <span className="text-[8px] text-gray-400 dark:text-slate-500 truncate w-full text-center">
+                  <span className="text-[8px] text-text-faint truncate w-full text-center">
                     {day.split(" ").pop()}
                   </span>
                 </div>
@@ -214,19 +214,19 @@ export default function PerformanceTab() {
 
       {Object.keys(stats.typePerformance).length > 0 && (
         <div>
-          <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+          <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
             Post type performance
           </h4>
           <div className="flex flex-col gap-1.5">
             {Object.entries(stats.typePerformance).map(([type, perf]) => (
-              <div key={type} className="rounded-lg border border-gray-100 dark:border-white/5 bg-white dark:bg-[#16213e] p-3 text-xs">
+              <div key={type} className="rounded-lg border border-border-subtle dark:border-border-subtle bg-surface-1 p-3 text-xs">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-gray-800 dark:text-gray-100 capitalize">
+                  <span className="font-medium text-text-primary capitalize">
                     {type.replace(/_/g, " ")}
                   </span>
-                  <span className="text-gray-400">{perf.count} posts</span>
+                  <span className="text-text-faint">{perf.count} posts</span>
                 </div>
-                <div className="flex gap-3 text-gray-500 dark:text-slate-400">
+                <div className="flex gap-3 text-text-muted">
                   <span>❤️ {Math.round(perf.totalLikes / perf.count)} avg</span>
                   <span>💬 {Math.round(perf.totalComments / perf.count)} avg</span>
                   <span>👁 {Math.round(perf.totalReach / perf.count)} avg</span>

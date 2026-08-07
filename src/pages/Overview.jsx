@@ -19,7 +19,7 @@ import { supabase } from "../lib/supabase";
 import { getShopId } from "../lib/shop";
 import { FiSun, FiMoon, FiCloud } from "react-icons/fi";
 
-const pageColors = { Instagram: "#E4405F", WhatsApp: "#25D366", TikTok: "#000000", Google: "#4285F4", Facebook: "#1877F2", Direct: "#6b7280" };
+const pageColors = { Instagram: "#E4405F", WhatsApp: "#25D366", TikTok: "#000000", Google: "#4285F4", Facebook: "#1877F2", Direct: "var(--color-text-muted)" };
 
 function buildChartData(raw, range) {
   if (!raw?.length) return [];
@@ -111,7 +111,7 @@ export default function Overview() {
       trafficSources: (pv.trafficSources || []).map((s) => ({
         label: s.label,
         count: s.count,
-        color: pageColors[s.label] || "#8b5cf6",
+        color: pageColors[s.label] || "var(--color-chart-4)",
         pct: pv.total ? Math.round((s.count / pv.total) * 100) : 0,
       })),
       viewedProducts: (pv.viewedProducts || []).map((p) => ({ name: p.name, count: p.count, pct: Math.round((p.count / prodMax) * 100) })),
@@ -167,14 +167,14 @@ export default function Overview() {
         <>
           <div className="mb-7 flex items-start justify-between">
             <div className="flex items-start gap-4">
-              <div className="hidden sm:flex w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-500/20 dark:from-amber-400/10 dark:to-orange-500/10 items-center justify-center shrink-0 mt-0.5">
-                <GreetingIcon className="text-lg text-amber-500 dark:text-amber-400" />
+              <div className="hidden sm:flex w-10 h-10 rounded-xl bg-accent-muted items-center justify-center shrink-0 mt-0.5">
+                <GreetingIcon className="text-lg text-accent" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">
+                <h1 className="text-xl font-bold text-text-primary leading-tight">
                   {greeting}, {storeName || "there"}
                 </h1>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                <p className="text-sm text-text-muted mt-1">
                   {todayStr} &middot; Here's your daily snapshot
                 </p>
               </div>
@@ -185,14 +185,14 @@ export default function Overview() {
             <ServiceOverview />
           ) : (
             <>
-            <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-3">Sales Overview</p>
+            <p className="text-[11px] font-semibold tracking-widest uppercase text-text-muted mb-3">Sales Overview</p>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
               <StatCard label="Sales today" value={formatPrice(stats.salesToday)} change={stats.salesToday > 0 ? "From today's transactions" : "No sales yet today"} up={stats.salesToday > 0} />
               <StatCard label="Items sold" value={stats.itemsSold} change={stats.itemsSold > 0 ? "Units today" : "None yet"} up={stats.itemsSold > 0} />
               <StatCard label="Low stock alerts" value={stats.lowStock} change={stats.lowStock > 0 ? "Products need restocking" : "All stock healthy"} up={stats.lowStock === 0} />
               <StatCard label="Total products" value={stats.totalProducts} change="In your inventory" up />
             </div>
-            <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-3">Performance</p>
+            <p className="text-[11px] font-semibold tracking-widest uppercase text-text-muted mb-3">Performance</p>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="flex flex-col gap-4 h-full">
                 <div className="h-[248px] shrink-0">
@@ -208,7 +208,7 @@ export default function Overview() {
           )}
           {!isService && hasWebsite && isFeatureAccessible("overview_analytics", planTier) && (
             <>
-              <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400 mt-8 mb-3">Website Analytics</p>
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-text-muted mt-8 mb-3">Website Analytics</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <StatCard label="Total Views" value={(pageViews?.total || 0).toLocaleString()} change="All time" up />
                 <StatCard label="Today" value={(pageViews?.today || 0).toLocaleString()} change="Visits today" up={pageViews?.today > 0} />
@@ -217,49 +217,49 @@ export default function Overview() {
               </div>
               <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {pageViews?.topPages?.length > 0 && (
-                  <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
-                    <p className="text-xs font-medium text-gray-800 dark:text-white mb-3">Most Viewed Pages</p>
+                  <div className="bg-surface-1 rounded-card border border-border-subtle p-4">
+                    <p className="text-xs font-medium text-text-primary mb-3">Most Viewed Pages</p>
                   <div className="flex flex-col gap-2.5">
                     {pageViews.topPages.map((p) => (
                       <div key={p.name} className="flex items-center gap-2">
-                        <span className="text-[11px] text-gray-500 dark:text-slate-400 w-16 flex-shrink-0 truncate">{p.name}</span>
-                        <div className="flex-1 h-2 bg-gray-100 dark:bg-[#1a1a2e] rounded-full overflow-hidden">
-                          <div className="h-full rounded-full bg-purple-500" style={{ width: `${p.pct}%` }} />
+                        <span className="text-[11px] text-text-muted w-16 flex-shrink-0 truncate">{p.name}</span>
+                        <div className="flex-1 h-2 bg-surface-2 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full bg-chart-4" style={{ width: `${p.pct}%` }} />
                         </div>
-                        <span className="text-[11px] text-gray-500 dark:text-slate-400 w-10 text-right">{p.pct}%</span>
+                        <span className="text-[11px] text-text-muted w-10 text-right">{p.pct}%</span>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
               {pageViews?.trafficSources?.length > 0 && (
-                <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
-                  <p className="text-xs font-medium text-gray-800 dark:text-white mb-3">Traffic Sources</p>
+                <div className="bg-surface-1 rounded-card border border-border-subtle p-4">
+                  <p className="text-xs font-medium text-text-primary mb-3">Traffic Sources</p>
                   <div className="flex flex-col gap-2.5">
                     {pageViews.trafficSources.map((s) => (
                       <div key={s.label} className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
-                        <span className="text-[11px] text-gray-500 dark:text-slate-400 w-20 flex-shrink-0">{s.label}</span>
-                        <div className="flex-1 h-2 bg-gray-100 dark:bg-[#1a1a2e] rounded-full overflow-hidden">
+                        <span className="text-[11px] text-text-muted w-20 flex-shrink-0">{s.label}</span>
+                        <div className="flex-1 h-2 bg-surface-2 rounded-full overflow-hidden">
                           <div className="h-full rounded-full" style={{ width: `${s.pct}%`, backgroundColor: s.color }} />
                         </div>
-                        <span className="text-[11px] text-gray-500 dark:text-slate-400 w-10 text-right">{s.pct}%</span>
+                        <span className="text-[11px] text-text-muted w-10 text-right">{s.pct}%</span>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
               {pageViews?.viewedProducts?.length > 0 && (
-                <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4">
-                  <p className="text-xs font-medium text-gray-800 dark:text-white mb-3">Top Viewed Products</p>
+                <div className="bg-surface-1 rounded-card border border-border-subtle p-4">
+                  <p className="text-xs font-medium text-text-primary mb-3">Top Viewed Products</p>
                   <div className="flex flex-col gap-2.5">
                     {pageViews.viewedProducts.map((p) => (
                       <div key={p.name} className="flex items-center gap-2">
-                        <span className="text-[11px] text-gray-500 dark:text-slate-400 w-24 flex-shrink-0 truncate">{p.name}</span>
-                        <div className="flex-1 h-2 bg-gray-100 dark:bg-[#1a1a2e] rounded-full overflow-hidden">
-                          <div className="h-full rounded-full bg-emerald-500" style={{ width: `${p.pct}%` }} />
+                        <span className="text-[11px] text-text-muted w-24 flex-shrink-0 truncate">{p.name}</span>
+                        <div className="flex-1 h-2 bg-surface-2 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full bg-chart-3" style={{ width: `${p.pct}%` }} />
                         </div>
-                        <span className="text-[11px] text-gray-500 dark:text-slate-400 w-10 text-right">{p.pct}%</span>
+                        <span className="text-[11px] text-text-muted w-10 text-right">{p.pct}%</span>
                       </div>
                     ))}
                   </div>

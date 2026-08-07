@@ -145,7 +145,7 @@ export default function SetupWizard() {
       currency_symbol: form.currencySymbol,
       default_payment: form.defaultPayment,
       low_stock_threshold: form.lowStockThreshold,
-      theme: "light",
+      theme: "keel-light",
       logo_url,
     };
 
@@ -165,24 +165,24 @@ export default function SetupWizard() {
     return (
       <>
         <style>{KEYFRAME_STYLE}</style>
-        <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="min-h-screen bg-surface-0 flex items-center justify-center p-4 relative overflow-hidden">
           <div className="fixed inset-0 pointer-events-none">
             <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-[120px] animate-blob-1" />
             <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-indigo-500/15 rounded-full blur-[120px] animate-blob-2" />
             <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px] animate-blob-3" />
             <div className="absolute inset-0 opacity-[0.04] dark:opacity-[0.06]" style={{ backgroundImage: "radial-gradient(circle, #0f172a 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
           </div>
-          <div className="relative z-10 bg-white/80 dark:bg-[#16213e]/90 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl p-8 w-full max-w-md text-center shadow-xl shadow-black/5 dark:shadow-black/20">
-            <div className="w-14 h-14 rounded-full bg-green-100 dark:bg-green-500/10 flex items-center justify-center mx-auto mb-4 animate-scale-in">
-              <span className="text-2xl text-green-600 dark:text-green-400">✓</span>
+          <div className="relative z-10 bg-surface-1/90 backdrop-blur-xl border border-border-subtle rounded-2xl p-8 w-full max-w-md text-center shadow-xl shadow-black/5 dark:shadow-black/20">
+            <div className="w-14 h-14 rounded-full bg-success-muted flex items-center justify-center mx-auto mb-4 animate-scale-in">
+              <span className="text-2xl text-success">✓</span>
             </div>
-            <h2 className="text-slate-900 dark:text-white font-bold text-lg mb-2">You're all set!</h2>
-            <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">
+            <h2 className="text-text-primary font-bold text-lg mb-2">You're all set!</h2>
+            <p className="text-text-body text-sm mb-6">
               Your shop is ready. Start adding products and managing sales.
             </p>
             <button
               onClick={() => navigate("/", { replace: true })}
-              className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition-all"
+              className="w-full py-2.5 bg-brand hover:bg-brand-soft text-white font-bold rounded-xl text-sm transition-all"
             >
               Go to Dashboard
             </button>
@@ -196,14 +196,14 @@ export default function SetupWizard() {
     <>
       <Helmet><title>Setup — Keel</title></Helmet>
       <style>{KEYFRAME_STYLE}</style>
-    <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-surface-0 flex items-center justify-center p-4 relative overflow-hidden">
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-[120px] animate-blob-1" />
         <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-indigo-500/15 rounded-full blur-[120px] animate-blob-2" />
         <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px] animate-blob-3" />
         <div className="absolute inset-0 opacity-[0.04] dark:opacity-[0.06]" style={{ backgroundImage: "radial-gradient(circle, #0f172a 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
       </div>
-      <div className="relative z-10 bg-white/80 dark:bg-[#16213e]/90 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl p-8 w-full max-w-md shadow-xl shadow-black/5 dark:shadow-black/20">
+      <div className="relative z-10 bg-surface-1/90 backdrop-blur-xl border border-border-subtle rounded-2xl p-8 w-full max-w-md shadow-xl shadow-black/5 dark:shadow-black/20">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center flex-1 max-w-xs mx-auto">
             {STEPS.slice(0, -1).map((_, i) => (
@@ -211,10 +211,10 @@ export default function SetupWizard() {
                 <div className={`
                   w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all duration-300 border-2
                   ${i < step
-                    ? "bg-blue-600 border-blue-600 text-white"
+                    ? "bg-brand border-brand text-white"
                     : i === step
-                    ? "bg-blue-600 border-blue-600 text-white shadow-[0_0_0_4px_rgba(59,130,246,0.2)] dark:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
-                    : "border-slate-300 dark:border-white/20 text-slate-400 dark:text-slate-500 bg-transparent"
+                    ? "bg-brand border-brand text-white shadow-[0_0_0_4px_rgba(59,130,246,0.2)] dark:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
+                    : "border-border-strong dark:border-white/20 text-text-faint bg-transparent"
                   }
                 `}>
                   {i < step ? (
@@ -226,28 +226,28 @@ export default function SetupWizard() {
                   )}
                 </div>
                 {i < STEPS.length - 2 && (
-                  <div className={`flex-1 h-0.5 mx-1.5 transition-colors duration-300 ${i < step ? "bg-blue-600" : "bg-slate-200 dark:bg-white/10"}`} />
+                  <div className={`flex-1 h-0.5 mx-1.5 transition-colors duration-300 ${i < step ? "bg-brand" : "bg-surface-2"}`} />
                 )}
               </div>
             ))}
           </div>
           <button
             onClick={logout}
-            className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 shrink-0 ml-4"
+            className="text-xs text-text-faint hover:text-text-body dark:hover:text-text-body shrink-0 ml-4"
           >
             Sign out
           </button>
         </div>
 
         <div key={step} className="animate-slide-up">
-          <h2 className="text-slate-900 dark:text-white font-bold text-lg mb-1">
+          <h2 className="text-text-primary font-bold text-lg mb-1">
             {STEPS[step] === "category" && "What do you sell?"}
             {STEPS[step] === "store" && "Shop name"}
             {STEPS[step] === "details" && "Contact details"}
             {STEPS[step] === "currency" && "Currency"}
             {STEPS[step] === "payment" && "Payment settings"}
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+          <p className="text-text-muted text-sm mb-6">
             {STEPS[step] === "category" && "Choose your business category so we can tailor the experience."}
             {STEPS[step] === "store" && "What's your store called?"}
             {STEPS[step] === "details" && "Phone number and location for receipts and website."}
@@ -260,7 +260,7 @@ export default function SetupWizard() {
               <div className="space-y-4 max-h-[340px] overflow-y-auto pr-1">
                 {CATEGORY_GROUPS.map((group) => (
                   <div key={group.name}>
-                    <p className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-semibold mb-2">
+                    <p className="text-[10px] uppercase tracking-widest text-text-faint font-semibold mb-2">
                       {group.name}
                     </p>
                     <div className="grid grid-cols-2 gap-2">
@@ -270,8 +270,8 @@ export default function SetupWizard() {
                           onClick={() => setForm({ ...form, category: cat.id })}
                           className={`flex flex-col items-center text-center p-3 rounded-xl border text-sm transition-all ${
                             form.category === cat.id
-                              ? "border-blue-500 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300"
-                              : "border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-slate-300"
+                              ? "border-brand bg-brand-muted text-brand"
+                              : "border-border-subtle text-text-body hover:border-border-strong"
                           }`}
                         >
                           <cat.icon className="text-lg mb-1.5" />
@@ -291,7 +291,7 @@ export default function SetupWizard() {
                   placeholder="e.g. Lewis Electronics"
                   value={form.storeName}
                   onChange={(e) => setForm({ ...form, storeName: e.target.value })}
-                  className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500/50"
+                  className="w-full bg-surface-2 border border-border-subtle rounded-xl px-3 py-2.5 text-sm text-text-primary placeholder-text-faint focus:outline-none focus:border-brand/50"
                 />
                 <ImageUploader currentImage={null} onImageChange={(file) => setLogoFile(file)} />
               </>
@@ -304,14 +304,14 @@ export default function SetupWizard() {
                   placeholder="+254 700 000 000"
                   value={form.storePhone}
                   onChange={(e) => setForm({ ...form, storePhone: e.target.value })}
-                  className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500/50"
+                  className="w-full bg-surface-2 border border-border-subtle rounded-xl px-3 py-2.5 text-sm text-text-primary placeholder-text-faint focus:outline-none focus:border-brand/50"
                 />
                 <input
                   type="text"
                   placeholder="Thika, Kenya"
                   value={form.storeAddress}
                   onChange={(e) => setForm({ ...form, storeAddress: e.target.value })}
-                  className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500/50"
+                  className="w-full bg-surface-2 border border-border-subtle rounded-xl px-3 py-2.5 text-sm text-text-primary placeholder-text-faint focus:outline-none focus:border-brand/50"
                 />
               </>
             )}
@@ -320,7 +320,7 @@ export default function SetupWizard() {
               <select
                 value={form.currencySymbol}
                 onChange={(e) => setForm({ ...form, currencySymbol: e.target.value })}
-                className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500/50"
+                className="w-full bg-surface-2 border border-border-subtle rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:border-brand/50"
               >
                 <option value="KSh">KSh — Kenyan Shilling</option>
                 <option value="$">$ — US Dollar</option>
@@ -338,7 +338,7 @@ export default function SetupWizard() {
                 <select
                   value={form.defaultPayment}
                   onChange={(e) => setForm({ ...form, defaultPayment: e.target.value })}
-                  className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500/50"
+                  className="w-full bg-surface-2 border border-border-subtle rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:border-brand/50"
                 >
                   <option value="Cash">Cash</option>
                   <option value="M-Pesa">M-Pesa</option>
@@ -346,14 +346,14 @@ export default function SetupWizard() {
 
                 </select>
                 <div>
-                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
+                  <label className="block text-xs text-text-muted mb-1">
                     Low stock alert at
                   </label>
                   <input
                     type="number"
                     value={form.lowStockThreshold}
                     onChange={(e) => setForm({ ...form, lowStockThreshold: parseInt(e.target.value) || 6 })}
-                    className="w-full bg-slate-100 dark:bg-[#1a1a2e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500/50"
+                    className="w-full bg-surface-2 border border-border-subtle rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:border-brand/50"
                   />
                 </div>
               </>
@@ -365,7 +365,7 @@ export default function SetupWizard() {
           {step > 0 && (
             <button
               onClick={() => setStep(step - 1)}
-              className="flex-1 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 text-sm py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.05] transition-all flex items-center justify-center gap-1.5"
+              className="flex-1 border border-border-subtle text-text-body text-sm py-2.5 rounded-xl hover:bg-surface-2 transition-all flex items-center justify-center gap-1.5"
             >
               <FiArrowLeft className="text-sm" />
               Back
@@ -374,7 +374,7 @@ export default function SetupWizard() {
           <button
             onClick={() => (step < STEPS.length - 2 ? setStep(step + 1) : handleFinish())}
             disabled={saving}
-            className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-2.5 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
+            className="flex-1 bg-brand hover:bg-brand-soft text-white font-bold text-sm py-2.5 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
           >
             {saving ? "Saving..." : step === STEPS.length - 2 ? "Finish" : "Next"}
             {!saving && <FiArrowRight className="text-sm" />}

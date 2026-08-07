@@ -6,33 +6,58 @@ import {
   FiCopy,
   FiGlobe,
   FiAlertTriangle,
+  FiRefreshCw,
 } from "react-icons/fi";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import { getShopId } from "../../lib/shop";
-import { PROVISIONER_URL } from "../../lib/constants";
+import { startDeploy, pollDeploy } from "../../lib/deployClient";
+import { buildProvisionerPayload } from "../../data/storefrontBlueprints";
 
 const steps = [
   { key: "shop", label: "Locating your shop" },
-  { key: "provision", label: "Creating your storefront" },
-  { key: "deploy", label: "Deploying to Vercel" },
-  { key: "domain", label: "Setting up domain" },
+  { key: "provision", label: "Creating your storefront", event: "render" },
+  { key: "deploy", label: "Deploying to Vercel", event: "deploy" },
+  { key: "domain", label: "Setting up domain", event: "domain" },
 ];
+
+const RUNNING_STATUS = { render: ["rendering"], deploy: ["deploying"], domain: ["domain"] };
+
+function deriveStepStatus(job, step) {
+  if (step.key === "shop") return "done";
+  if (!job) return "queued";
+
+  const events = job.events || [];
+  const latest = events.filter((e) => e.event === step.event);
+  if (latest.some((e) => e.status === "done")) return "done";
+  if (latest.some((e) => e.status === "current")) return "current";
+  if (RUNNING_STATUS[step.event]?.includes(job.status)) return "current";
+  if (step.event === "render" && job.status === "queued") return "current";
+  return "queued";
+}
+
+function deriveStatuses(job) {
+  const next = {};
+  for (const step of steps) next[step.key] = deriveStepStatus(job, step);
+  return next;
+}
 
 export default function DeployProgressModal({
   onClose,
   subdomain,
   templateId,
   onComplete,
-  onRetry,
   shopId: shopIdProp,
   sections,
+  shopSettings,
 }) {
   const trapRef = useFocusTrap(true);
   const [status, setStatus] = useState({});
   const [done, setDone] = useState(false);
   const [error, setError] = useState(null);
+  const [timedOut, setTimedOut] = useState(false);
   const [result, setResult] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const started = useRef(false);
 
   useEffect(() => {
@@ -55,68 +80,71 @@ export default function DeployProgressModal({
       try {
         setStatus({ shop: "current" });
 
-        const shopId = shopIdProp || await getShopId();
+        const shopId = shopIdProp || (await getShopId());
         if (!shopId) throw new Error("Could not determine shop ID — try signing out and back in");
 
+        if (cancelled) return;
+        setStatus({ shop: "done" });
+
         const finalSubdomain = subdomain.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 40);
-
-        if (cancelled) return;
-        setStatus((prev) => ({ ...prev, shop: "done", provision: "current" }));
-
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 180000);
-
-        const payload = {
-          shop_id: shopId,
-          template_id: sections ? "custom" : templateId || "classic",
+        const payload = buildProvisionerPayload({
+          shopId,
+          templateId: templateId || "classic",
           subdomain: finalSubdomain,
-        }
-        if (sections && sections.length > 0) {
-          payload.sections = sections
-        }
-
-        const res = await fetch(`${PROVISIONER_URL}/provision`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-          signal: controller.signal,
+          sections,
+          shopSettings: shopSettings || {},
         });
 
-        clearTimeout(timeout);
-
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.error || `Server responded with ${res.status}`);
+        let jobId = null;
+        try {
+          const startedDeploy = await startDeploy(payload);
+          jobId = startedDeploy.job_id;
+        } catch (err) {
+          // 409 with a job_id means a deploy for this shop is already in flight — resume it.
+          if (err.resume && err.data?.job_id) {
+            jobId = err.data.job_id;
+          } else {
+            throw err;
+          }
         }
+        if (!jobId) throw new Error("Provisioner did not return a job — try again");
 
-        const data = await res.json();
+        if (cancelled) return;
+        setStatus((prev) => ({ ...prev, provision: "current" }));
+
+        const { result: deployResult } = await pollDeploy({
+          shopId,
+          onUpdate: (job) => setStatus(deriveStatuses(job)),
+        });
 
         if (cancelled) return;
 
-        setStatus({
-          shop: "done",
-          provision: "done",
-          deploy: "done",
-          domain: "done",
-        });
-
-        setResult(data);
+        setResult(deployResult);
+        setStatus({ shop: "done", provision: "done", deploy: "done", domain: "done" });
         await new Promise((r) => setTimeout(r, 600));
         setDone(true);
       } catch (err) {
         if (cancelled) return;
-        if (err.name === "AbortError") {
-          setError("Request timed out — the provisioner may be waking up. Try again.");
-        } else {
-          setError(err.message);
-        }
+        setTimedOut(Boolean(err.timedOut));
+        setError(err.message || "Deployment failed");
       }
     })();
 
     return () => { cancelled = true; };
-  }, [subdomain, templateId, shopIdProp, sections]);
+  }, [attempt, subdomain, templateId, shopIdProp, sections, shopSettings]);
 
-  const displayUrl = `https://${result?.domain || `${subdomain}.keel.framestudio.co.ke`}`;
+  const resultDomain = result?.domain || `${subdomain}.keel.framestudio.co.ke`;
+  const displayUrl = result?.url || `https://${resultDomain}`;
+
+  function handleRetry() {
+    setError(null);
+    setTimedOut(false);
+    setStatus({});
+    setDone(false);
+    setResult(null);
+    started.current = false;
+    setAttempt((a) => a + 1);
+  }
 
   async function handleCopy() {
     try {
@@ -132,8 +160,8 @@ export default function DeployProgressModal({
     const s = status[key];
     if (s === "current") {
       return (
-        <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center">
-          <FiLoader size={16} className="animate-spin text-blue-600 dark:text-blue-400" />
+        <div className="w-8 h-8 rounded-full bg-brand-muted flex items-center justify-center">
+          <FiLoader size={16} className="animate-spin text-brand" />
         </div>
       );
     }
@@ -145,8 +173,8 @@ export default function DeployProgressModal({
       );
     }
     return (
-      <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center">
-        <span className="w-3 h-3 rounded-full border-2 border-gray-300 dark:border-slate-600" />
+      <div className="w-8 h-8 rounded-full bg-surface-2 dark:bg-white/5 flex items-center justify-center">
+        <span className="w-3 h-3 rounded-full border-2 border-border-strong" />
       </div>
     );
   }
@@ -161,7 +189,7 @@ export default function DeployProgressModal({
         role="dialog"
         aria-modal="true"
         aria-label={done ? "Deployment complete" : "Deploying storefront"}
-        className="bg-white dark:bg-[#16213e] rounded-xl shadow-xl w-full max-w-lg overflow-hidden"
+        className="bg-surface-1 rounded-xl shadow-xl w-full max-w-lg overflow-hidden"
       >
         {/* Step indicator */}
         <div className="flex items-center gap-2 px-5 pt-5 pb-0">
@@ -170,8 +198,8 @@ export default function DeployProgressModal({
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-all ${
                   s < 3 || done
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 dark:bg-white/10 text-gray-400 dark:text-slate-500"
+                    ? "bg-brand text-white"
+                    : "bg-surface-2 dark:bg-white/10 text-text-faint"
                 }`}
               >
                 {s < 3 ? <FiCheckCircle size={14} /> : done ? <FiCheckCircle size={14} /> : 3}
@@ -179,8 +207,8 @@ export default function DeployProgressModal({
               <span
                 className={`text-xs hidden sm:block ${
                   s < 3 || done
-                    ? "text-blue-600 dark:text-blue-400 font-medium"
-                    : "text-gray-400 dark:text-slate-500"
+                    ? "text-brand font-medium"
+                    : "text-text-faint"
                 }`}
               >
                 {s === 1 ? "Template" : s === 2 ? "Configure" : "Deploy"}
@@ -189,8 +217,8 @@ export default function DeployProgressModal({
                 <div
                   className={`flex-1 h-px mx-1 ${
                     s < 3
-                      ? "bg-blue-600"
-                      : "bg-gray-200 dark:bg-white/10"
+                      ? "bg-brand"
+                      : "bg-surface-2 dark:bg-white/10"
                   }`}
                 />
               )}
@@ -200,15 +228,15 @@ export default function DeployProgressModal({
 
         {/* Header */}
         <div className="px-5 pt-4 pb-3">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-text-primary flex items-center gap-2">
             {error ? (
               <>
-                <FiAlertTriangle className="text-red-500" size={22} />
-                Deployment Failed
+                <FiAlertTriangle className="text-danger" size={22} />
+                {timedOut ? "Still Building" : "Deployment Failed"}
               </>
             ) : done ? (
               <>
-                <FiCheckCircle className="text-green-500" size={22} />
+                <FiCheckCircle className="text-success" size={22} />
                 Deployment Complete
               </>
             ) : (
@@ -216,8 +244,13 @@ export default function DeployProgressModal({
             )}
           </h2>
           {!done && !error && (
-            <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+            <p className="text-sm text-text-muted mt-1">
               Building and deploying — this usually takes 1-2 minutes
+            </p>
+          )}
+          {timedOut && (
+            <p className="text-sm text-text-muted mt-1">
+              Your storefront keeps building in the background. Refresh the page in a minute to see it.
             </p>
           )}
         </div>
@@ -231,17 +264,17 @@ export default function DeployProgressModal({
                 <p
                   className={`text-sm ${
                     status[s.key] === "done"
-                      ? "text-gray-800 dark:text-white font-medium"
+                      ? "text-text-primary font-medium"
                       : status[s.key] === "current"
-                      ? "text-blue-600 dark:text-blue-400 font-medium"
-                      : "text-gray-400 dark:text-slate-500"
+                      ? "text-brand font-medium"
+                      : "text-text-faint"
                   }`}
                 >
                   {s.label}
                 </p>
               </div>
               {status[s.key] === "done" && (
-                <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                <span className="text-xs text-success font-medium">
                   Done
                 </span>
               )}
@@ -251,18 +284,27 @@ export default function DeployProgressModal({
 
         {/* Error state */}
         {error && (
-          <div className="mx-5 mb-3 p-4 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-500/10 dark:to-rose-500/5 rounded-xl border border-red-200 dark:border-red-500/20">
+          <div className="mx-5 mb-3 p-4 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-500/10 dark:to-rose-500/5 rounded-xl border border-danger">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                <FiAlertTriangle size={18} className="text-red-600 dark:text-red-400" />
+              <div className="w-10 h-10 rounded-full bg-danger-muted flex items-center justify-center flex-shrink-0">
+                <FiAlertTriangle size={18} className="text-danger" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-red-800 dark:text-red-300">
-                  Something went wrong
+                <p className="text-sm font-semibold text-danger-700 text-danger">
+                  {timedOut
+                    ? "Taking longer than expected"
+                    : error.includes("fetch") || error.includes("NetworkError") || error.includes("Failed to fetch")
+                    ? "Provisioner unreachable"
+                    : "Something went wrong"}
                 </p>
-                <p className="text-sm text-red-600 dark:text-red-400 mt-1 leading-relaxed">
+                <p className="text-sm text-danger mt-1 leading-relaxed">
                   {error}
                 </p>
+                {!timedOut && (error.includes("fetch") || error.includes("NetworkError") || error.includes("Failed to fetch")) && (
+                  <p className="text-xs text-danger mt-2">
+                    Make sure the provisioner service is running. If this persists, check Railway dashboard.
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -270,13 +312,13 @@ export default function DeployProgressModal({
 
         {/* Success state */}
         {done && !error && (
-          <div className="mx-5 mb-3 p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/5 rounded-xl border border-green-200 dark:border-green-500/20">
+          <div className="mx-5 mb-3 p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/5 rounded-xl border border-success dark:border-green-500/20">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center flex-shrink-0 shadow-sm">
                 <FiGlobe size={18} className="text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-green-800 dark:text-green-300">
+                <p className="text-sm font-semibold text-success-700 text-success">
                   Your storefront is live
                 </p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -284,14 +326,14 @@ export default function DeployProgressModal({
                     href={displayUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-mono flex items-center gap-1"
+                    className="text-sm text-brand hover:underline font-mono flex items-center gap-1"
                   >
                     {displayUrl}
                     <FiExternalLink size={13} />
                   </a>
                   <button
                     onClick={handleCopy}
-                    className="flex items-center gap-1 px-2 py-0.5 text-xs rounded bg-white dark:bg-white/10 border border-gray-200 dark:border-white/20 hover:bg-gray-50 dark:hover:bg-white/20 transition-colors text-gray-600 dark:text-slate-400"
+                    className="flex items-center gap-1 px-2 py-0.5 text-xs rounded bg-surface-1 dark:bg-white/10 border border-border-subtle dark:border-white/20 hover:bg-surface-2 dark:hover:bg-white/20 transition-colors text-text-body"
                   >
                     {copied ? "Copied!" : <FiCopy size={12} />}
                     {!copied && "Copy"}
@@ -303,20 +345,21 @@ export default function DeployProgressModal({
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-5 py-4 border-t border-gray-100 dark:border-white/10">
+        <div className="flex items-center justify-between px-5 py-4 border-t border-border-subtle">
           {error ? (
             <>
               <button
-                onClick={() => { started.current = false; onRetry?.(); }}
-                className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all active:scale-[0.97] shadow-sm"
+                onClick={handleRetry}
+                className="flex items-center gap-1.5 px-6 py-2 text-sm font-medium text-white bg-brand rounded-lg hover:bg-brand-strong transition-all active:scale-[0.97] shadow-sm"
               >
-                Try Again
+                <FiRefreshCw size={14} />
+                Retry
               </button>
               <button
                 onClick={onClose}
-                className="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 transition-colors"
+                className="text-sm text-text-muted hover:text-text-body dark:hover:text-text-body transition-colors"
               >
-                Cancel
+                {timedOut ? "Close" : "Cancel"}
               </button>
             </>
           ) : done ? (
@@ -325,17 +368,21 @@ export default function DeployProgressModal({
                 href={displayUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-blue-600 border border-blue-200 dark:border-blue-500/30 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-brand border border-brand-soft rounded-lg hover:bg-brand-muted transition-colors"
               >
                 <FiExternalLink size={14} />
                 View Storefront
               </a>
               <button
                 onClick={() => {
-                  onComplete({ url: displayUrl, domain: result?.domain || `${subdomain}.keel.framestudio.co.ke`, subdomain });
+                  onComplete({
+                    url: displayUrl,
+                    domain: resultDomain,
+                    subdomain,
+                  });
                   onClose();
                 }}
-                className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all active:scale-[0.97] shadow-sm"
+                className="px-6 py-2 text-sm font-medium text-white bg-brand rounded-lg hover:bg-brand-strong transition-all active:scale-[0.97] shadow-sm"
               >
                 Done
               </button>
@@ -343,7 +390,7 @@ export default function DeployProgressModal({
           ) : (
             <button
               onClick={onClose}
-              className="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 transition-colors"
+              className="text-sm text-text-muted hover:text-text-body dark:hover:text-text-body transition-colors"
             >
               Close
             </button>

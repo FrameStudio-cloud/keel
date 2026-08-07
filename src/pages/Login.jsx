@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase, authSignUp, authLogin, authResetPassword, authUpdatePassword } from "../lib/supabase";
 import { AuthContext } from "../context/AuthContext";
@@ -61,7 +61,7 @@ export default function Login() {
           await supabase.from("store_settings").insert({
             shop_id: shopData.id,
             store_name: shopName,
-            theme: "light",
+            theme: "keel-light",
           });
 
           await supabase.from("users").insert({
@@ -368,7 +368,7 @@ export default function Login() {
         <meta name="description" content="Sign in to Keel or create a free account. Manage your inventory, sales, and reports from one dashboard." />
         <meta property="og:title" content="Sign In — Keel" />
         <meta property="og:description" content="Sign in to Keel or create a free account. Manage your inventory, sales, and reports from one dashboard." />
-        <meta property="og:url" content="https://keel-nu.vercel.app/login" />
+        <meta property="og:url" content="https://keel.framestudio.co.ke/login" />
       </Helmet>
 
       <div className="min-h-screen flex bg-slate-100 dark:bg-[#1a1a2e]">
@@ -381,10 +381,10 @@ export default function Login() {
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
 
           <div className="relative z-10 flex flex-col items-center px-12 max-w-lg">
-            <div className="flex items-center gap-2.5 mb-6">
+            <Link to="/" className="flex items-center gap-2.5 mb-6 hover:opacity-80 transition-opacity" aria-label="Keel homepage">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">K</div>
               <span className="text-white font-bold text-xl tracking-tight">Keel</span>
-            </div>
+            </Link>
 
             <div className="w-full mb-8 rounded-2xl overflow-hidden shadow-2xl shadow-black/40 border border-white/10">
               <img
@@ -414,11 +414,11 @@ export default function Login() {
           <div className="w-full max-w-sm">
 
             {/* Mobile brand */}
-            <div className="flex flex-col items-center lg:hidden mb-8">
+            <Link to="/" className="flex flex-col items-center lg:hidden mb-8 hover:opacity-80 transition-opacity" aria-label="Keel homepage">
               <img src="/keel-icon.webp" alt="Keel" className="w-10 h-10 mb-3" />
               <h2 className="text-slate-900 dark:text-white font-bold text-xl">Keel</h2>
               <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Manage your shop from one place</p>
-            </div>
+            </Link>
 
             {/* Desktop heading */}
             <div className="hidden lg:block mb-7">
@@ -439,22 +439,24 @@ export default function Login() {
             </div>
 
             {/* Mobile heading */}
-            <div className="text-center lg:hidden mb-6">
-              <h2 className="text-slate-900 dark:text-white font-bold text-lg">
-                {mode === "check_email" ? "Check your email" : mode === "reset_password" ? "Reset your password" : mode === "reset_done" ? "Password updated" : mode === "signup" ? "Create Your Shop" : "Welcome to Keel"}
-              </h2>
-              <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
-                {mode === "login"
-                  ? "Sign in to manage your shop"
-                  : mode === "signup"
-                  ? "Set up your shop in seconds"
-                  : mode === "check_email"
-                  ? "We sent you an email with instructions"
-                  : mode === "reset_done"
-                  ? "You can now sign in with your new password"
-                  : "Enter a new password for your account"}
-              </p>
-            </div>
+            {mode !== "login" && (
+              <div className="text-center lg:hidden mb-6">
+                <h2 className="text-slate-900 dark:text-white font-bold text-lg">
+                  {mode === "check_email" ? "Check your email" : mode === "reset_password" ? "Reset your password" : mode === "reset_done" ? "Password updated" : mode === "signup" ? "Create Your Shop" : "Welcome to Keel"}
+                </h2>
+                <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
+                  {mode === "login"
+                    ? "Sign in to manage your shop"
+                    : mode === "signup"
+                    ? "Set up your shop in seconds"
+                    : mode === "check_email"
+                    ? "We sent you an email with instructions"
+                    : mode === "reset_done"
+                    ? "You can now sign in with your new password"
+                    : "Enter a new password for your account"}
+                </p>
+              </div>
+            )}
 
             {formContent}
 

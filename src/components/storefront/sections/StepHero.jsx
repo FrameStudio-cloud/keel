@@ -4,7 +4,7 @@ import { SECTION_OPTIONS } from "../../../data/storefrontBlueprints";
 export default function StepHero({ value, onChange }) {
   return (
     <div>
-      <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
+      <p className="text-sm text-text-muted mb-6">
         Pick the main hero section — this is the first thing visitors see.
       </p>
       <div className="grid sm:grid-cols-3 gap-4">

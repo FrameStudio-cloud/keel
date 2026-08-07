@@ -1,1 +1,1 @@
--- Applied via remote
+ALTER TABLE public.chat_config ADD COLUMN IF NOT EXISTS plan_tier text DEFAULT 'free'::text;

@@ -88,8 +88,8 @@ export default function ContentLibrary({ onUseTemplate }) {
               onClick={() => setPlatformFilter(p)}
               className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-all ${
                 platformFilter === p
-                  ? "bg-blue-50 dark:bg-blue-500/10 border-blue-300 dark:border-blue-500/30 text-blue-700 dark:text-blue-400"
-                  : "border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.05]"
+                  ? "bg-brand-muted border-brand-soft text-brand"
+                  : "border-border-subtle text-text-muted hover:bg-surface-2"
               }`}
             >
               {p}
@@ -98,26 +98,26 @@ export default function ContentLibrary({ onUseTemplate }) {
         </div>
         <button
           onClick={() => setShowSaveModal(true)}
-          className="flex items-center gap-1.5 text-xs font-medium bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all"
+          className="flex items-center gap-1.5 text-xs font-medium bg-brand text-white px-3 py-1.5 rounded-lg hover:bg-brand-strong transition-all"
         >
           <FiSave size={14} /> New template
         </button>
       </div>
 
       <div className="relative mb-3">
-        <FiSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <FiSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-faint" />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search templates..."
-          className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 dark:border-white/10 rounded-lg bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+          className="w-full pl-8 pr-3 py-2 text-sm border border-border-subtle rounded-lg bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
         />
       </div>
 
       {loading ? (
         <div className="flex flex-col gap-2">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="rounded-xl border border-gray-100 dark:border-white/5 p-3">
+            <div key={i} className="rounded-xl border border-border-subtle dark:border-border-subtle p-3">
               <Skeleton className="h-3 w-24 mb-2" />
               <Skeleton className="h-3 w-full mb-1" />
               <Skeleton className="h-3 w-2/3" />
@@ -128,30 +128,30 @@ export default function ContentLibrary({ onUseTemplate }) {
         <>
           {templates.length > 0 && (
             <div className="flex flex-col gap-2 mb-6">
-              <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+              <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
                 Saved templates
               </h4>
               {filteredTemplates.map((t) => {
                 const platformDot =
-                  t.platform === "Instagram" ? "bg-pink-500"
-                    : t.platform === "TikTok" ? "bg-gray-900 dark:bg-gray-100"
-                      : t.platform === "WhatsApp" ? "bg-green-500" : "bg-gray-300";
+                  t.platform === "Instagram" ? "bg-chart-5"
+                    : t.platform === "TikTok" ? "bg-gray-900 dark:bg-surface-2"
+                      : t.platform === "WhatsApp" ? "bg-green-500" : "bg-surface-3";
 
                 return (
-                  <div key={t.id} className="rounded-xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#16213e] p-3">
+                  <div key={t.id} className="rounded-xl border border-border-subtle dark:border-border-subtle bg-surface-1 p-3">
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-2">
                         {t.platform && <span className={`w-2 h-2 rounded-full ${platformDot}`} />}
-                        <span className="text-xs font-medium text-gray-800 dark:text-gray-100">{t.name}</span>
+                        <span className="text-xs font-medium text-text-primary">{t.name}</span>
                       </div>
                       <button
                         onClick={() => handleCopy(t)}
-                        className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                        className="flex items-center gap-1 text-xs text-brand hover:underline"
                       >
                         {copiedId === t.id ? <><FiCheck size={12} /> Copied</> : <><FiCopy size={12} /> Use</>}
                       </button>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed">{t.caption_template}</p>
+                    <p className="text-xs text-text-muted leading-relaxed">{t.caption_template}</p>
                   </div>
                 );
               })}
@@ -160,40 +160,40 @@ export default function ContentLibrary({ onUseTemplate }) {
 
           {filteredRecentPosts.length > 0 && (
             <div>
-              <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+              <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
                 Reuse from past posts
               </h4>
               <div className="flex flex-col gap-2">
                 {filteredRecentPosts.map((p) => (
-                  <div key={p.id} className="rounded-xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#16213e] p-3">
+                  <div key={p.id} className="rounded-xl border border-border-subtle dark:border-border-subtle bg-surface-1 p-3">
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
                         <span className={`w-2 h-2 rounded-full ${
-                          p.platform === "Instagram" ? "bg-pink-500"
-                            : p.platform === "TikTok" ? "bg-gray-900 dark:bg-gray-100"
-                              : p.platform === "WhatsApp" ? "bg-green-500" : "bg-gray-300"
+                          p.platform === "Instagram" ? "bg-chart-5"
+                            : p.platform === "TikTok" ? "bg-gray-900 dark:bg-surface-2"
+                              : p.platform === "WhatsApp" ? "bg-green-500" : "bg-surface-3"
                         }`} />
-                        <span className="text-xs text-gray-500 dark:text-slate-400">{p.platform}</span>
+                        <span className="text-xs text-text-muted">{p.platform}</span>
                         {p.post_type && p.post_type !== "custom" && (
-                          <span className="text-[10px] uppercase text-gray-400 dark:text-slate-500">{p.post_type.replace(/_/g, " ")}</span>
+                          <span className="text-[10px] uppercase text-text-faint">{p.post_type.replace(/_/g, " ")}</span>
                         )}
                       </div>
                       <div className="flex gap-2">
                         <button
                           onClick={() => onUseTemplate(p.caption || "")}
-                          className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                          className="text-xs text-brand hover:underline flex items-center gap-1"
                         >
                           <FiCopy size={11} /> Use
                         </button>
                         <button
                           onClick={() => openSaveFromPost(p)}
-                          className="text-xs text-gray-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400"
+                          className="text-xs text-text-faint hover:text-brand"
                         >
                           <FiSave size={11} />
                         </button>
                       </div>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-slate-400 leading-relaxed truncate">
+                    <p className="text-xs text-text-muted leading-relaxed truncate">
                       {p.caption?.slice(0, 120)}
                     </p>
                   </div>
@@ -204,7 +204,7 @@ export default function ContentLibrary({ onUseTemplate }) {
 
           {filteredTemplates.length === 0 && filteredRecentPosts.length === 0 && (
             <div className="text-center py-8">
-              <p className="text-sm text-gray-400 dark:text-slate-500">
+              <p className="text-sm text-text-faint">
                 {(platformFilter !== "All" || search)
                   ? "No templates match your filter."
                   : "No templates yet. Save your first one!"}
@@ -231,33 +231,33 @@ function SaveTemplateModal({ form, onChange, onSave, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div ref={trapRef} className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-100 dark:border-white/10 p-6 w-full max-w-md mx-4" role="dialog" aria-modal="true" aria-label="Save as template">
+      <div ref={trapRef} className="bg-surface-1 rounded-2xl border border-border-subtle p-6 w-full max-w-md mx-4" role="dialog" aria-modal="true" aria-label="Save as template">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-medium text-gray-800 dark:text-white">Save as template</h2>
-          <button onClick={onClose} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 text-lg" aria-label="Close"><FiX /></button>
+          <h2 className="text-sm font-medium text-text-primary">Save as template</h2>
+          <button onClick={onClose} className="text-text-faint hover:text-text-body text-lg" aria-label="Close"><FiX /></button>
         </div>
         <div className="flex flex-col gap-3">
           <div>
-            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Template name</label>
+            <label className="text-xs text-text-faint mb-1 block">Template name</label>
             <input
               value={form.name}
               onChange={(e) => onChange({ ...form, name: e.target.value })}
               placeholder="e.g. Weekend Sale"
-              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+              className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
             />
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex-1">
-              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Platform</label>
-              <select value={form.platform} onChange={(e) => onChange({ ...form, platform: e.target.value })} className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400">
+              <label className="text-xs text-text-faint mb-1 block">Platform</label>
+              <select value={form.platform} onChange={(e) => onChange({ ...form, platform: e.target.value })} className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand">
                 <option>Instagram</option>
                 <option>TikTok</option>
                 <option>WhatsApp</option>
               </select>
             </div>
             <div className="flex-1">
-              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Post type</label>
-              <select value={form.post_type} onChange={(e) => onChange({ ...form, post_type: e.target.value })} className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400">
+              <label className="text-xs text-text-faint mb-1 block">Post type</label>
+              <select value={form.post_type} onChange={(e) => onChange({ ...form, post_type: e.target.value })} className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand">
                 <option value="product_showcase">Product Showcase</option>
                 <option value="sale">Sale Announcement</option>
                 <option value="new_arrival">New Arrival</option>
@@ -269,19 +269,19 @@ function SaveTemplateModal({ form, onChange, onSave, onClose }) {
             </div>
           </div>
           <div>
-            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">Caption template</label>
+            <label className="text-xs text-text-faint mb-1 block">Caption template</label>
             <textarea
               value={form.caption}
               onChange={(e) => onChange({ ...form, caption: e.target.value })}
               rows={3}
               placeholder="Use {product}, {price}, {stock} as placeholders"
-              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 resize-none"
+              className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand resize-none"
             />
           </div>
         </div>
         <div className="flex gap-2 mt-4">
-          <button onClick={onClose} className="flex-1 border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 text-sm py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all">Cancel</button>
-          <button onClick={onSave} disabled={!form.name || !form.caption} className="flex-1 bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50">Save</button>
+          <button onClick={onClose} className="flex-1 border border-border-subtle text-text-muted text-sm py-2 rounded-lg hover:bg-surface-2 transition-all">Cancel</button>
+          <button onClick={onSave} disabled={!form.name || !form.caption} className="flex-1 bg-brand text-white text-sm py-2 rounded-lg hover:bg-brand-strong transition-all disabled:opacity-50">Save</button>
         </div>
       </div>
     </div>

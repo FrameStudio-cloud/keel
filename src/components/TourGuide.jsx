@@ -146,7 +146,7 @@ export default function TourGuide() {
         <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
           <div
             ref={tooltipRef}
-            className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-5 w-full max-w-sm shadow-2xl pointer-events-auto"
+            className="bg-surface-1 border border-border-subtle rounded-2xl p-5 w-full max-w-sm shadow-2xl pointer-events-auto"
           >
             <TourContent current={current} step={step} steps={steps} isLast={isLast} onNext={next} onSkip={dismiss} />
           </div>
@@ -154,17 +154,17 @@ export default function TourGuide() {
       ) : (
         <div
           ref={tooltipRef}
-          className="absolute bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-2xl p-5 w-full max-w-sm shadow-2xl pointer-events-auto"
+          className="absolute bg-surface-1 border border-border-subtle rounded-2xl p-5 w-full max-w-sm shadow-2xl pointer-events-auto"
           style={{ top: pos.top, left: pos.left }}
         >
           {pos.side === "top" && (
             <div className="absolute top-0 -translate-y-full" style={{ left: pos.arrowLeft }}>
-              <div className="border-8 border-transparent border-b-white dark:border-b-[#16213e]" />
+              <div className="border-8 border-transparent border-b-surface-1" />
             </div>
           )}
           {pos.side === "bottom" && (
             <div className="absolute bottom-0 translate-y-full" style={{ left: pos.arrowLeft }}>
-              <div className="border-8 border-transparent border-t-white dark:border-t-[#16213e]" />
+              <div className="border-8 border-transparent border-t-surface-1" />
             </div>
           )}
           <TourContent current={current} step={step} steps={steps} isLast={isLast} onNext={next} onSkip={dismiss} />
@@ -179,16 +179,16 @@ function TourContent({ current, step, steps, isLast, onNext, onSkip }) {
     <>
       <div className="flex items-center gap-1 mb-4">
         {steps.map((_, i) => (
-          <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= step ? "bg-blue-600" : "bg-slate-200 dark:bg-white/10"}`} />
+          <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= step ? "bg-brand" : "bg-surface-2"}`} />
         ))}
       </div>
-      <h2 className="text-slate-900 dark:text-white font-bold text-base mb-1.5">{current.title}</h2>
-      <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">{current.text}</p>
+      <h2 className="text-text-primary font-bold text-base mb-1.5">{current.title}</h2>
+      <p className="text-text-body text-sm mb-4">{current.text}</p>
       <div className="flex gap-2">
-        <button onClick={onSkip} className="flex-1 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 text-sm py-2 rounded-xl hover:text-slate-900 dark:text-white transition-colors">
+        <button onClick={onSkip} className="flex-1 border border-border-subtle text-text-body text-sm py-2 rounded-xl hover:text-text-primary transition-colors">
           Skip
         </button>
-        <button onClick={onNext} className="flex-1 bg-blue-600 text-white font-bold text-sm py-2 rounded-xl hover:bg-blue-500 transition-all flex items-center justify-center gap-1.5">
+        <button onClick={onNext} className="flex-1 bg-brand text-white font-bold text-sm py-2 rounded-xl hover:bg-brand-soft transition-all flex items-center justify-center gap-1.5">
           {isLast ? (
             <><FiCheck size={14} /> Got it</>
           ) : (

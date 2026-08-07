@@ -6,6 +6,7 @@ import { useFocusTrap } from "../../hooks/useFocusTrap";
 import { useSettings } from "../../hooks/useSettings";
 import { isFeatureAccessible } from "../../lib/tiers";
 import { aiGenerateVariants } from "../../lib/ai";
+import { track } from "../../lib/posthog";
 
 const PLATFORMS = ["Instagram", "TikTok", "WhatsApp"];
 const POST_TYPES = [
@@ -150,6 +151,13 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
     onAdded();
     onClose();
     setLoading(false);
+
+    track("publish_post", {
+      platform: form.platform,
+      post_type: form.post_type || "custom",
+      is_broadcast: form.is_broadcast || false,
+      has_product: !!form.product_id,
+    });
   }
 
   const product = products.find((x) => x.id === form.product_id);
@@ -158,18 +166,18 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div
         ref={trapRef}
-        className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-100 dark:border-white/10 p-6 w-full max-w-lg mx-4"
+        className="bg-surface-1 rounded-2xl border border-border-subtle p-6 w-full max-w-lg mx-4"
         role="dialog"
         aria-modal="true"
         aria-label={editPost ? "Edit post" : "Plan a post"}
       >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-sm font-medium text-gray-800 dark:text-white">
+          <h2 className="text-sm font-medium text-text-primary">
             {editPost ? "Edit post" : "Plan a post"}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 dark:text-slate-500 hover:text-gray-600 text-lg"
+            className="text-text-faint hover:text-text-body text-lg"
             aria-label="Close"
           >
             <FiX />
@@ -188,8 +196,8 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
                 }
                 className={`flex-1 text-xs font-medium py-2 rounded-lg border transition-all ${
                   form.platform === p
-                    ? "bg-blue-50 dark:bg-blue-500/10 border-blue-300 dark:border-blue-500/30 text-blue-700 dark:text-blue-400"
-                    : "border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.05]"
+                    ? "bg-brand-muted border-brand-soft text-brand"
+                    : "border-border-subtle text-text-muted hover:bg-surface-2"
                 }`}
               >
                 {p}
@@ -199,14 +207,14 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
 
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex-1">
-              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+              <label className="text-xs text-text-faint mb-1 block">
                 Link to product
               </label>
               <select
                 name="product_id"
                 value={form.product_id}
                 onChange={handleChange}
-                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
               >
                 <option value="">None</option>
                 {products.map((p) => (
@@ -217,14 +225,14 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
               </select>
             </div>
             <div className="flex-1">
-              <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+              <label className="text-xs text-text-faint mb-1 block">
                 Post type
               </label>
               <select
                 name="post_type"
                 value={form.post_type}
                 onChange={handleChange}
-                className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+                className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
               >
                 {POST_TYPES.map((t) => (
                   <option key={t.value} value={t.value}>
@@ -237,7 +245,7 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
 
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-xs text-gray-400 dark:text-slate-500">
+              <label className="text-xs text-text-faint">
                 Caption
               </label>
               <div className="flex gap-2 flex-wrap">
@@ -245,7 +253,7 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
                   type="button"
                   onClick={fillCaptionFromProduct}
                   disabled={!form.product_id}
-                  className="text-xs text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-40 disabled:no-underline flex items-center gap-1"
+                  className="text-xs text-brand hover:underline disabled:opacity-40 disabled:no-underline flex items-center gap-1"
                 >
                   <FiZap size={12} /> Suggest
                 </button>
@@ -254,13 +262,13 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
                     type="button"
                     onClick={handleAiGenerate}
                     disabled={!form.product_id || aiLoading}
-                    className="text-xs text-purple-600 dark:text-purple-400 hover:underline disabled:opacity-40 disabled:no-underline flex items-center gap-1"
+                    className="text-xs text-chart-4 hover:underline disabled:opacity-40 disabled:no-underline flex items-center gap-1"
                   >
                     <FiCpu size={12} /> {aiLoading ? "Generating..." : "AI Generate"}
                   </button>
                 ) : (
                   <span
-                    className="text-xs text-gray-300 dark:text-slate-600 flex items-center gap-1 cursor-not-allowed select-none"
+                    className="text-xs text-text-faint dark:text-text-body flex items-center gap-1 cursor-not-allowed select-none"
                     title="AI Caption Generator — Pro feature"
                   >
                     <FiLock size={10} />
@@ -270,7 +278,7 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
                 <button
                   type="button"
                   onClick={insertHashtags}
-                  className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                  className="text-xs text-brand hover:underline"
                 >
                   + Hashtags
                 </button>
@@ -282,15 +290,15 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
               onChange={handleChange}
               placeholder="Write your post caption..."
               rows={4}
-              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400 resize-none"
+              className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand resize-none"
             />
-            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1 text-right">
+            <p className="text-xs text-text-faint mt-1 text-right">
               {form.caption.length} chars
             </p>
           </div>
 
           <div>
-            <label className="text-xs text-gray-400 dark:text-slate-500 mb-1 block">
+            <label className="text-xs text-text-faint mb-1 block">
               Schedule date & time
             </label>
             <input
@@ -298,18 +306,18 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
               value={form.scheduled_at}
               onChange={handleChange}
               type="datetime-local"
-              className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] text-gray-800 dark:text-white focus:outline-none focus:border-blue-400"
+              className="w-full border border-border-subtle rounded-lg px-3 py-2 text-sm bg-surface-1 text-text-primary focus:outline-none focus:border-brand"
             />
           </div>
 
           {form.platform === "WhatsApp" && (
-            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-300 cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-text-body cursor-pointer">
               <input
                 type="checkbox"
                 name="is_broadcast"
                 checked={form.is_broadcast}
                 onChange={handleChange}
-                className="rounded border-gray-300 dark:border-white/20"
+                className="rounded border-border-strong"
               />
               Send as WhatsApp broadcast
             </label>
@@ -318,22 +326,22 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
 
         {isFeatureAccessible("social_ai", planTier) && aiVariants.length > 0 && (
           <div className="mt-3 space-y-2">
-            <p className="text-xs font-semibold text-purple-600 dark:text-purple-400">AI Variants</p>
+            <p className="text-xs font-semibold text-chart-4">AI Variants</p>
             {aiVariants.map((v, i) => (
               <button
                 key={i}
                 onClick={() => setForm((prev) => ({ ...prev, caption: v }))}
-                className="w-full text-left p-2 rounded-lg border border-purple-200 dark:border-purple-500/20 bg-purple-50 dark:bg-purple-500/5 text-xs text-gray-600 dark:text-slate-300 hover:bg-purple-100 dark:hover:bg-purple-500/10 transition-all"
+                className="w-full text-left p-2 rounded-lg border border-chart-4/40 bg-chart-4/10 text-xs text-text-body hover:bg-chart-4/10 transition-all"
               >
-                <span className="text-[10px] font-mono text-purple-400 mr-1">V{i + 1}:</span> {v}
+                <span className="text-[10px] font-mono text-chart-4 mr-1">V{i + 1}:</span> {v}
               </button>
             ))}
           </div>
         )}
 
         {product && (
-          <div className="mt-3 p-3 rounded-lg bg-gray-50 dark:bg-white/[0.03] border border-gray-100 dark:border-white/5 text-xs text-gray-500 dark:text-slate-400">
-            <span className="font-medium text-gray-700 dark:text-gray-200">
+          <div className="mt-3 p-3 rounded-lg bg-surface-2 dark:bg-white/[0.03] border border-border-subtle dark:border-border-subtle text-xs text-text-muted">
+            <span className="font-medium text-text-body">
               {product.name}
             </span>{" "}
             — KSh {(product.price || 0).toLocaleString()} · {product.stock ?? 0} in stock
@@ -344,14 +352,14 @@ export default function PostComposer({ onClose, onAdded, editPost, initialCaptio
         <div className="flex gap-2 mt-5">
           <button
             onClick={onClose}
-            className="flex-1 border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 text-sm py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+            className="flex-1 border border-border-subtle text-text-muted text-sm py-2 rounded-lg hover:bg-surface-2 transition-all"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={loading || !form.caption}
-            className="flex-1 bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50"
+            className="flex-1 bg-brand text-white text-sm py-2 rounded-lg hover:bg-brand-strong transition-all disabled:opacity-50"
           >
             {loading ? "Saving..." : editPost ? "Update" : "Schedule"}
           </button>

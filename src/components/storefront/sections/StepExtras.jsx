@@ -14,7 +14,7 @@ export default function StepExtras({ value, onChange }) {
 
   return (
     <div>
-      <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
+      <p className="text-sm text-text-muted mb-6">
         Toggle additional features and sections on or off.
       </p>
       <div className="space-y-3">
@@ -26,20 +26,20 @@ export default function StepExtras({ value, onChange }) {
               onClick={() => toggle(item.key)}
               className={`w-full text-left rounded-xl border-2 transition-all duration-200 p-4 ${
                 isOn
-                  ? "border-blue-500 ring-2 ring-blue-500/20 bg-blue-50 dark:bg-blue-500/10"
-                  : "border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20 bg-white dark:bg-[#16213e]"
+                  ? "border-brand ring-2 ring-brand/20 bg-brand-muted"
+                  : "border-border-subtle hover:border-border-strong dark:hover:border-white/20 bg-surface-1"
               }`}
             >
               <div className="flex items-center justify-between gap-4">
                 <div className="min-w-0">
-                  <h3 className="text-sm font-semibold text-gray-800 dark:text-white">
+                  <h3 className="text-sm font-semibold text-text-primary">
                     {item.label}
                   </h3>
-                  <p className="mt-0.5 text-xs text-gray-500 dark:text-slate-400">
+                  <p className="mt-0.5 text-xs text-text-muted">
                     {item.desc}
                   </p>
                 </div>
-                <div className={`flex-shrink-0 transition-colors ${isOn ? "text-blue-600" : "text-gray-300 dark:text-slate-600"}`}>
+                <div className={`flex-shrink-0 transition-colors ${isOn ? "text-brand" : "text-text-faint dark:text-text-body"}`}>
                   {isOn ? <FiToggleRight size={24} /> : <FiToggleLeft size={24} />}
                 </div>
               </div>

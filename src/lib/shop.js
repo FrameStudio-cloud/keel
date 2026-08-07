@@ -12,7 +12,7 @@ export async function getShopId() {
   if (currentShopId) return currentShopId;
   if (pendingPromise) return pendingPromise;
 
-  pendingPromise = (async () => {
+  const thisPromise = (async () => {
     const session = getPersistedSession();
     const userId = session?.user?.id ?? null;
     if (!userId) return null;
@@ -24,12 +24,16 @@ export async function getShopId() {
       .maybeSingle();
 
     if (data) {
-      currentShopId = data.shop_id;
+      if (pendingPromise === thisPromise) {
+        currentShopId = data.shop_id;
+      }
       return data.shop_id;
     }
 
     return null;
   })();
+
+  pendingPromise = thisPromise;
 
   try {
     return await pendingPromise;

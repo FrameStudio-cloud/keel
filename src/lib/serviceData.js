@@ -136,7 +136,7 @@ export async function createOrder({ customerName, customerPhone, items, notes, t
 
   if (orderError) throw orderError;
 
-  const orderItems = items.filter((i) => i.service_id).map((i) => ({
+  const orderItems = items.filter((i) => i.service_id || i.service_name).map((i) => ({
     order_id: order.id,
     service_name: i.service_name,
     service_price: i.service_price,
@@ -295,7 +295,6 @@ export async function fetchServiceRevenue() {
   const paymentData = Object.entries(methodMap).map(([method, amount]) => ({
     name: method,
     value: amount,
-    color: { Cash: "#10b981", "M-Pesa": "#3b82f6", Card: "#8b5cf6", "Bank Transfer": "#f59e0b" }[method] || "#6b7280",
   }));
 
   return { revenue, transactions: completed.length, paymentData };

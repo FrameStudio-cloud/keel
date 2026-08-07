@@ -48,7 +48,7 @@ export default function StockHistory() {
           ))}
         </div>
       ) : movements.length === 0 ? (
-        <div className="text-center py-16 text-slate-600 dark:text-slate-400">
+        <div className="text-center py-16 text-text-body">
           <p className="text-sm">No stock movements recorded yet.</p>
         </div>
       ) : (
@@ -57,13 +57,13 @@ export default function StockHistory() {
             {movements.map((movement) => (
               <div
                 key={movement.id}
-                className="bg-white dark:bg-[#16213e] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 flex items-center justify-between"
+                className="bg-surface-1 border border-border-subtle rounded-xl px-4 py-3 flex items-center justify-between"
               >
                 <div>
-                  <p className="text-slate-900 dark:text-white text-sm font-medium">
+                  <p className="text-text-primary text-sm font-medium">
                     {movement.product_name}
                   </p>
-                  <p className="text-slate-600 dark:text-slate-400 text-xs mt-0.5">
+                  <p className="text-text-body text-xs mt-0.5">
                     {movement.reason}
                   </p>
                 </div>
@@ -71,14 +71,14 @@ export default function StockHistory() {
                   <span
                     className={`text-sm font-bold ${
                       movement.change > 0
-                        ? "text-green-400"
-                        : "text-red-400"
+                        ? "text-success"
+                        : "text-danger"
                     }`}
                   >
                     {movement.change > 0 ? "+" : ""}
                     {movement.change}
                   </span>
-                  <p className="text-xs text-slate-400 dark:text-slate-500">
+                  <p className="text-xs text-text-faint">
                     {new Date(movement.created_at).toLocaleDateString("en-KE", {
                       day: "numeric",
                       month: "short",
@@ -90,25 +90,25 @@ export default function StockHistory() {
               </div>
             ))}
           </div>
-          <div className="hidden sm:block bg-white dark:bg-[#16213e] rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
+          <div className="hidden sm:block bg-surface-1 rounded-xl border border-border-subtle overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#1a1a2e]">
-                  <th className="px-4 py-3 text-xs font-semibold text-left text-slate-600 dark:text-slate-400 uppercase">Product</th>
-                  <th className="px-4 py-3 text-xs font-semibold text-left text-slate-600 dark:text-slate-400 uppercase">Reason</th>
-                  <th className="px-4 py-3 text-xs font-semibold text-right text-slate-600 dark:text-slate-400 uppercase">Qty</th>
-                  <th className="px-4 py-3 text-xs font-semibold text-right text-slate-600 dark:text-slate-400 uppercase">Date</th>
+                <tr className="border-b border-border-subtle bg-surface-2">
+                  <th className="px-4 py-3 text-xs font-semibold text-left text-text-body uppercase">Product</th>
+                  <th className="px-4 py-3 text-xs font-semibold text-left text-text-body uppercase">Reason</th>
+                  <th className="px-4 py-3 text-xs font-semibold text-right text-text-body uppercase">Qty</th>
+                  <th className="px-4 py-3 text-xs font-semibold text-right text-text-body uppercase">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {movements.map((movement, i) => (
-                  <tr key={movement.id} className={`border-b border-white/5 hover:bg-black/[0.03] dark:hover:bg-white/[0.05] transition-colors ${i === movements.length - 1 ? "border-0" : ""}`}>
-                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">{movement.product_name}</td>
-                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400 text-xs capitalize">{movement.reason}</td>
-                    <td className={`px-4 py-3 text-right font-bold text-sm ${movement.change > 0 ? "text-green-400" : "text-red-400"}`}>
+                  <tr key={movement.id} className={`border-b border-border-subtle hover:bg-surface-2 transition-colors ${i === movements.length - 1 ? "border-0" : ""}`}>
+                    <td className="px-4 py-3 font-medium text-text-primary">{movement.product_name}</td>
+                    <td className="px-4 py-3 text-text-body text-xs capitalize">{movement.reason}</td>
+                    <td className={`px-4 py-3 text-right font-bold text-sm ${movement.change > 0 ? "text-success" : "text-danger"}`}>
                       {movement.change > 0 ? "+" : ""}{movement.change}
                     </td>
-                    <td className="px-4 py-3 text-right text-xs text-slate-400 dark:text-slate-500">
+                    <td className="px-4 py-3 text-right text-xs text-text-faint">
                       {new Date(movement.created_at).toLocaleDateString("en-KE", {
                         day: "numeric",
                         month: "short",

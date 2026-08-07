@@ -6,11 +6,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { FiX, FiExternalLink, FiInfo, FiAlertTriangle, FiAlertOctagon, FiTag, FiTool, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 const variantConfig = {
-  info: { gradient: "linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%)", icon: FiInfo },
-  warning: { gradient: "linear-gradient(135deg, #92400e 0%, #d97706 100%)", icon: FiAlertTriangle },
-  alert: { gradient: "linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%)", icon: FiAlertOctagon },
-  sale: { gradient: "linear-gradient(135deg, #14532d 0%, #16a34a 100%)", icon: FiTag },
-  maintenance: { gradient: "linear-gradient(135deg, #1e293b 0%, #475569 100%)", icon: FiTool },
+  info: { gradient: "var(--background-image-gradient-brand)", icon: FiInfo },
+  warning: { gradient: "var(--background-image-gradient-warning)", icon: FiAlertTriangle },
+  alert: { gradient: "var(--background-image-gradient-danger)", icon: FiAlertOctagon },
+  sale: { gradient: "var(--background-image-gradient-accent)", icon: FiTag },
+  maintenance: { gradient: "var(--background-image-gradient-maintenance)", icon: FiTool },
 };
 
 export default function AnnouncementBanner() {
@@ -129,7 +129,7 @@ export default function AnnouncementBanner() {
             <button
               key={i}
               onClick={() => goTo(i)}
-              className={`rounded-full transition-all ${i === current ? "w-5 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/40 hover:bg-white/70"}`}
+              className={`rounded-full transition-all ${i === current ? "w-5 h-1.5 bg-surface-1" : "w-1.5 h-1.5 bg-white/40 hover:bg-white/70"}`}
               aria-label={`Go to announcement ${i + 1}`}
             />
           ))}

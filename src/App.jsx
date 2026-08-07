@@ -43,14 +43,20 @@ const Finance = lazy(() => import("./pages/Finance"));
 const Reports = lazy(() => import("./pages/Reports"));
 const Marketing = lazy(() => import("./pages/Marketing"));
 const Storefront = lazy(() => import("./pages/Storefront"));
+const Integrations = lazy(() => import("./pages/Integrations"));
+const IntegrationDetail = lazy(() => import("./pages/IntegrationDetail"));
+const Inbox = lazy(() => import("./pages/Inbox"));
 const PublicProduct = lazy(() => import("./pages/PublicProduct"));
 const Terms = lazy(() => import("./pages/Terms"));
+const Privacy = lazy(() => import("./pages/Privacy"));
 const UseCases = lazy(() => import("./pages/UseCases"));
 const AboutFramestudio = lazy(() => import("./pages/AboutFramestudio"));
 const Features = lazy(() => import("./pages/Features"));
 const Help = lazy(() => import("./pages/Help"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
+const Docs = lazy(() => import("./pages/Docs"));
+const DocsArticle = lazy(() => import("./pages/DocsArticle"));
 const Orders = lazy(() => import("./pages/Orders"));
 const Customers = lazy(() => import("./pages/Customers"));
 const Services = lazy(() => import("./pages/Services"));
@@ -105,6 +111,7 @@ function AppRoutes() {
       <TourGuide />
       <Routes>
         <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/use-cases" element={<UseCases />} />
         <Route path="/about" element={<AboutFramestudio />} />
         <Route path="/features" element={<Features />} />
@@ -126,9 +133,15 @@ function AppRoutes() {
         <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
         <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
         <Route path="/storefront" element={<ProtectedRoute><Storefront /></ProtectedRoute>} />
+        <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
+        <Route path="/integrations/:slug" element={<ProtectedRoute><IntegrationDetail /></ProtectedRoute>} />
+        <Route path="/inbox" element={<ProtectedRoute><Inbox /></ProtectedRoute>} />
+        <Route path="/bots" element={<Navigate to="/integrations" replace />} />
         <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
         <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
         <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
+        <Route path="/docs" element={<ProtectedRoute><Docs /></ProtectedRoute>} />
+        <Route path="/docs/:slug" element={<ProtectedRoute><DocsArticle /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>

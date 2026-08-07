@@ -10,7 +10,7 @@ export default function AboutFramestudio() {
         <meta name="description" content="Framestudio builds Keel — a simple, mobile-first business dashboard for Kenyan shop owners. Based in Thika, Kenya." />
         <meta property="og:title" content="About — Keel by Framestudio" />
         <meta property="og:description" content="Framestudio builds Keel — a simple, mobile-first business dashboard for Kenyan shop owners. Based in Thika, Kenya." />
-        <meta property="og:url" content="https://keel-nu.vercel.app/about" />
+        <meta property="og:url" content="https://keel.framestudio.co.ke/about" />
       </Helmet>
     <div className="min-h-screen bg-slate-100 dark:bg-[#1a1a2e] text-slate-900 dark:text-white">
       <div className="max-w-3xl mx-auto px-4 py-8">

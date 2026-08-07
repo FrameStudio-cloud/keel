@@ -168,7 +168,7 @@ export default function Queue() {
         <p>Schedule and manage your social media posts across platforms.</p>
       </ContextTip>
 
-      <div className="flex gap-1 mb-4 border-b border-gray-100 dark:border-white/5 pb-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="flex gap-1 mb-4 border-b border-border-subtle dark:border-border-subtle pb-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {TABS.map((tab) => {
           const active = activeTab === tab.key;
           return (
@@ -177,8 +177,8 @@ export default function Queue() {
               onClick={() => setActiveTab(tab.key)}
               className={`shrink-0 flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-all ${
                 active
-                  ? "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400"
-                  : "text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-gray-200"
+                  ? "bg-brand-muted text-brand"
+                  : "text-text-muted hover:text-text-body"
               }`}
             >
               <tab.icon size={14} />
@@ -213,7 +213,7 @@ export default function Queue() {
       {activeTab === "timeline" && (
         <>
           <div className="flex justify-between items-center mb-3">
-            <p className="text-sm font-medium text-gray-800 dark:text-white">
+            <p className="text-sm font-medium text-text-primary">
               {total} {total === 1 ? "post" : "posts"}
             </p>
           </div>
@@ -221,7 +221,7 @@ export default function Queue() {
           {loading ? (
             <div className="flex flex-col gap-3">
               {[...Array(2)].map((_, i) => (
-                <div key={i} className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 p-4 space-y-3">
+                <div key={i} className="bg-surface-1 rounded-xl border border-border-subtle p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Skeleton className="w-5 h-5 rounded-full" />
@@ -233,7 +233,7 @@ export default function Queue() {
                     <Skeleton className="h-3 w-full" />
                     <Skeleton className="h-3 w-4/5" />
                   </div>
-                  <div className="flex gap-4 pt-2 border-t border-gray-100 dark:border-white/10">
+                  <div className="flex gap-4 pt-2 border-t border-border-subtle">
                     <Skeleton className="h-3 w-10" />
                     <Skeleton className="h-3 w-14" />
                     <Skeleton className="h-3 w-10" />

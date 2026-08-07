@@ -4,15 +4,16 @@ import { GoGraph } from "react-icons/go";
 import { FaBoxOpen } from "react-icons/fa";
 import { FcSalesPerformance } from "react-icons/fc";
 import { MdOutlineQueue, MdOutlineReceiptLong } from "react-icons/md";
-import { IoGlobeOutline, IoSettingsOutline, IoPersonOutline, IoTimeOutline, IoWalletOutline, IoStatsChartOutline, IoMegaphoneOutline, IoStorefrontOutline, IoPeopleOutline, IoGridOutline } from "react-icons/io5";
-import { BsBuildingsFill } from "react-icons/bs";
+import { IoExtensionPuzzleOutline, IoGlobeOutline, IoSettingsOutline, IoPersonOutline, IoTimeOutline, IoWalletOutline, IoStatsChartOutline, IoMegaphoneOutline, IoStorefrontOutline, IoPeopleOutline, IoGridOutline, IoChatbubblesOutline, IoHelpCircleOutline } from "react-icons/io5";
 import { useSettings } from "../../hooks/useSettings";
 import { useLowStockCount } from "../../hooks/useQueries";
+import { useWhatsAppUnreadCount } from "../../hooks/useWhatsAppInbox";
 import { SERVICE_CATEGORIES } from "../../lib/constants";
 
 export default function Sidebar({ open, onClose }) {
   const { storeName, logoUrl, businessCategory } = useSettings();
   const { data: lowStockCount = 0 } = useLowStockCount();
+  const { data: unreadCount = 0 } = useWhatsAppUnreadCount();
   const navRef = useRef(null);
 
   const isService = SERVICE_CATEGORIES.includes(businessCategory);
@@ -43,6 +44,13 @@ export default function Sidebar({ open, onClose }) {
         { label: "Website", icon: <IoGlobeOutline />, path: "/website" },
         ...(isService ? [] : [{ label: "Storefront", icon: <IoStorefrontOutline />, path: "/storefront" }]),
         ...(isService ? [] : [{ label: "Marketing", icon: <IoMegaphoneOutline />, path: "/marketing" }]),
+      ],
+    },
+    {
+      label: "Connect",
+      items: [
+        { label: "Integrations", icon: <IoExtensionPuzzleOutline />, path: "/integrations" },
+        { label: "Inbox", icon: <IoChatbubblesOutline />, path: "/inbox", badge: unreadCount },
       ],
     },
     {
@@ -82,7 +90,7 @@ export default function Sidebar({ open, onClose }) {
 
       <aside
         className={`
-          w-56 h-screen bg-white dark:bg-[#16213e] border-r border-gray-100 dark:border-white/10
+          w-56 h-screen bg-surface-1 border-r border-border-subtle
           flex flex-col flex-shrink-0 overflow-hidden
           fixed lg:static z-40 inset-y-0 left-0
           transition-transform duration-200
@@ -90,15 +98,17 @@ export default function Sidebar({ open, onClose }) {
         `}
       >
       {/* Logo */}
-      <div className="h-14 flex items-center gap-3 px-4 border-b border-gray-100 dark:border-white/10">
-        <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center text-white text-sm">
-          <BsBuildingsFill />
-        </div>
+      <NavLink
+        to="/"
+        onClick={onClose}
+        className="h-14 flex items-center gap-3 px-4 border-b border-border-subtle hover:bg-surface-2 transition-colors"
+      >
+        <img src="/keel-icon.webp" alt="Keel" className="w-7 h-7 object-contain" />
         <div>
-          <p className="text-sm font-medium text-gray-800 dark:text-white">Keel</p>
-          <p className="text-xs text-gray-400 dark:text-slate-500">Shop Manager</p>
+          <p className="text-[15px] font-semibold text-text-primary">Keel</p>
+          <p className="text-xs text-text-faint">Shop Manager</p>
         </div>
-      </div>
+      </NavLink>
 
       {/* Nav */}
       <nav ref={navRef} className="flex-1 p-3 flex flex-col gap-1 overflow-y-auto">
@@ -106,7 +116,7 @@ export default function Sidebar({ open, onClose }) {
           <div key={group.label}>
             <p
               data-tour={`group-${group.label}`}
-              className={`text-xs font-medium text-gray-400 dark:text-slate-500 px-2 pb-1 uppercase tracking-wider ${gi === 0 ? "pt-2" : "pt-4"}`}
+              className={`text-xs font-medium text-text-faint px-2 pb-1 uppercase tracking-wider ${gi === 0 ? "pt-2" : "pt-4"}`}
             >
               {group.label}
             </p>
@@ -121,23 +131,28 @@ export default function Sidebar({ open, onClose }) {
                   `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
                   ${
                     isActive
-                      ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium"
-                      : "text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.05] hover:text-gray-800 dark:hover:text-white"
+                      ? "bg-brand-muted text-brand font-medium"
+                      : "text-text-muted hover:bg-surface-2 hover:text-text-primary"
                   }`
                 }
               >
                 <span>{item.icon}</span>
                 <span className="flex-1">{item.label}</span>
                 {item.label === "Inventory" && lowStockCount > 0 && (
-                  <span className="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 leading-none">
+                  <span className="bg-danger text-danger-contrast text-xs rounded-full px-1.5 py-0.5 leading-none">
                     {lowStockCount}
+                  </span>
+                )}
+                {item.badge > 0 && (
+                  <span className="bg-brand text-brand-contrast text-xs rounded-full px-1.5 py-0.5 leading-none">
+                    {item.badge > 99 ? "99+" : item.badge}
                   </span>
                 )}
               </NavLink>
             ))}
           </div>
         ))}
-        <p className="text-xs font-medium text-gray-400 dark:text-slate-500 px-2 pt-4 pb-1 uppercase tracking-wider">
+        <p className="text-xs font-medium text-text-faint px-2 pt-4 pb-1 uppercase tracking-wider">
           Other
         </p>
 
@@ -150,8 +165,8 @@ export default function Sidebar({ open, onClose }) {
             `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
             ${
               isActive
-                ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium"
-                : "text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.05] hover:text-gray-800 dark:hover:text-white"
+                ? "bg-brand-muted text-brand font-medium"
+                : "text-text-muted hover:bg-surface-2 hover:text-text-primary"
             }`
           }
         >
@@ -167,20 +182,37 @@ export default function Sidebar({ open, onClose }) {
             `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
             ${
               isActive
-                ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium"
-                : "text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.05] hover:text-gray-800 dark:hover:text-white"
+                ? "bg-brand-muted text-brand font-medium"
+                : "text-text-muted hover:bg-surface-2 hover:text-text-primary"
             }`
           }
         >
           <IoPersonOutline />
           <span className="flex-1">Profile</span>
         </NavLink>
+        <NavLink
+          key="/docs"
+          to="/docs"
+          onClick={onClose}
+          data-tour="nav-Docs"
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
+            ${
+              isActive
+                ? "bg-brand-muted text-brand font-medium"
+                : "text-text-muted hover:bg-surface-2 hover:text-text-primary"
+            }`
+          }
+        >
+          <IoHelpCircleOutline />
+          <span className="flex-1">Help & Docs</span>
+        </NavLink>
       </nav>
 
       {/* User */}
-      <div className="p-3 border-t border-gray-100 dark:border-white/10">
-        <div className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] cursor-pointer">
-          <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-medium shrink-0 overflow-hidden">
+      <div className="p-3 border-t border-border-subtle">
+        <div className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-2 cursor-pointer">
+          <div className="w-7 h-7 rounded-full bg-brand flex items-center justify-center text-brand-contrast text-xs font-medium shrink-0 overflow-hidden">
             {logoUrl ? (
               <img src={logoUrl} alt="" className="w-full h-full object-cover" />
             ) : (
@@ -188,7 +220,7 @@ export default function Sidebar({ open, onClose }) {
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-800 dark:text-white truncate">
+            <p className="text-sm font-medium text-text-primary truncate">
               {storeName || "My Store"}
             </p>
           </div>

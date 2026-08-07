@@ -56,16 +56,16 @@ export default function Customers() {
     <PageLayout title="Customers" searchQuery={searchQuery} setSearchQuery={setSearchQuery}>
       <Helmet><title>Customers — Keel</title></Helmet>
 
-      <p className="text-sm text-gray-400 dark:text-slate-500 mb-4">{customers.length} customers — auto-saved from orders</p>
+      <p className="text-sm text-text-faint mb-4">{customers.length} customers — auto-saved from orders</p>
 
       <ContextTip tipKey="customers" title="Customers">
         Customers are automatically saved when you create an order. Come here to view order history, edit details, or delete customer records.
       </ContextTip>
 
-      <div className="bg-white dark:bg-[#16213e] rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden">
+      <div className="bg-surface-1 rounded-xl border border-border-subtle overflow-hidden">
         {loading ? (
           <div className="space-y-1 p-3">
-            {[...Array(3)].map((_, i) => <div key={i} className="h-16 bg-slate-50 dark:bg-[#1a1a2e] rounded-xl animate-pulse" />)}
+            {[...Array(3)].map((_, i) => <div key={i} className="h-16 bg-surface-2 rounded-xl animate-pulse" />)}
           </div>
         ) : filtered.length === 0 ? (
           <EmptyState
@@ -78,65 +78,65 @@ export default function Customers() {
             {filtered.map((c) => {
               const expanded = expandedId === c.id;
               return (
-                <div key={c.id} className="bg-slate-50 dark:bg-[#1a1a2e] rounded-xl">
+                <div key={c.id} className="bg-surface-2 rounded-xl">
                   <div
                     onClick={() => setExpandedId(expanded ? null : c.id)}
                     className="flex items-center gap-3 px-4 py-3 cursor-pointer active:scale-[0.99] transition-transform"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-500/10 flex items-center justify-center flex-shrink-0">
-                      <FiUsers className="text-purple-600 dark:text-purple-400" size={16} />
+                    <div className="w-9 h-9 rounded-lg bg-chart-4/10 flex items-center justify-center flex-shrink-0">
+                      <FiUsers className="text-chart-4" size={16} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-slate-900 dark:text-white text-sm font-medium truncate">{c.name}</p>
-                      <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
+                      <p className="text-text-primary text-sm font-medium truncate">{c.name}</p>
+                      <div className="flex items-center gap-2 text-xs text-text-faint">
                         <FiPhone size={10} />
                         <span>{c.phone}</span>
                       </div>
                     </div>
                     <div className="text-right text-xs shrink-0">
-                      <p className="text-gray-500 dark:text-slate-400">{c.total_orders} orders</p>
-                      <p className="text-blue-600 dark:text-blue-400 font-medium">{formatPrice(c.total_spent)}</p>
+                      <p className="text-text-muted">{c.total_orders} orders</p>
+                      <p className="text-brand font-medium">{formatPrice(c.total_spent)}</p>
                     </div>
-                    <span className="text-gray-300 dark:text-slate-600">
+                    <span className="text-text-faint dark:text-text-body">
                       {expanded ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
                     </span>
                   </div>
 
                   {expanded && (
-                    <div className="px-4 pb-3 pt-0 border-t border-gray-100 dark:border-white/5">
+                    <div className="px-4 pb-3 pt-0 border-t border-border-subtle dark:border-border-subtle">
                       <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                        <div className="bg-white dark:bg-[#16213e] rounded-lg px-3 py-2">
-                          <p className="text-gray-400 dark:text-slate-500">Phone</p>
-                          <p className="text-gray-700 dark:text-slate-300 font-medium">{c.phone}</p>
+                        <div className="bg-surface-1 rounded-lg px-3 py-2">
+                          <p className="text-text-faint">Phone</p>
+                          <p className="text-text-body font-medium">{c.phone}</p>
                         </div>
-                        <div className="bg-white dark:bg-[#16213e] rounded-lg px-3 py-2">
-                          <p className="text-gray-400 dark:text-slate-500">Email</p>
-                          <p className="text-gray-700 dark:text-slate-300 font-medium">{c.email || "—"}</p>
+                        <div className="bg-surface-1 rounded-lg px-3 py-2">
+                          <p className="text-text-faint">Email</p>
+                          <p className="text-text-body font-medium">{c.email || "—"}</p>
                         </div>
-                        <div className="bg-white dark:bg-[#16213e] rounded-lg px-3 py-2">
-                          <p className="text-gray-400 dark:text-slate-500">Total orders</p>
-                          <p className="text-gray-700 dark:text-slate-300 font-medium">{c.total_orders}</p>
+                        <div className="bg-surface-1 rounded-lg px-3 py-2">
+                          <p className="text-text-faint">Total orders</p>
+                          <p className="text-text-body font-medium">{c.total_orders}</p>
                         </div>
-                        <div className="bg-white dark:bg-[#16213e] rounded-lg px-3 py-2">
-                          <p className="text-gray-400 dark:text-slate-500">Total spent</p>
-                          <p className="text-blue-600 dark:text-blue-400 font-medium">{formatPrice(c.total_spent)}</p>
+                        <div className="bg-surface-1 rounded-lg px-3 py-2">
+                          <p className="text-text-faint">Total spent</p>
+                          <p className="text-brand font-medium">{formatPrice(c.total_spent)}</p>
                         </div>
                       </div>
                       {c.notes && (
-                        <div className="mt-2 bg-amber-50 dark:bg-amber-500/10 rounded-lg px-3 py-2 text-xs text-amber-700 dark:text-amber-300">
+                        <div className="mt-2 bg-warning-muted rounded-lg px-3 py-2 text-xs text-accent-300">
                           <span className="font-medium">Note:</span> {c.notes}
                         </div>
                       )}
                       <div className="flex gap-2 mt-3">
                         <button
                           onClick={(e) => { e.stopPropagation(); setEditing(c); }}
-                          className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-all"
+                          className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-border-subtle text-text-muted rounded-lg hover:bg-surface-2 transition-all"
                         >
                           <FiEdit2 size={12} /> Edit
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); handleDelete(c.id); }}
-                          className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-red-200 dark:border-red-500/20 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
+                          className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-danger text-danger rounded-lg hover:bg-danger-muted transition-all"
                         >
                           <FiTrash2 size={12} /> Delete
                         </button>

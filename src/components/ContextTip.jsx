@@ -112,7 +112,7 @@ export default function ContextTip({ tipKey, targetSelector, title, children }) 
   return (
     <div
       ref={tipRef}
-      className="fixed z-40 bg-blue-600 text-white rounded-xl p-4 shadow-xl max-w-xs"
+      className="fixed z-40 bg-brand text-white rounded-xl p-4 shadow-xl max-w-xs"
       style={{ top: pos.top, left: pos.left }}
     >
       {pos.side === "top" && (
@@ -120,7 +120,7 @@ export default function ContextTip({ tipKey, targetSelector, title, children }) 
           className="absolute top-0 -translate-y-full"
           style={{ left: pos.arrowLeft }}
         >
-          <div className="border-8 border-transparent border-b-blue-600" />
+          <div className="border-8 border-transparent border-b-brand" />
         </div>
       )}
       {pos.side === "bottom" && (
@@ -128,7 +128,7 @@ export default function ContextTip({ tipKey, targetSelector, title, children }) 
           className="absolute bottom-0 translate-y-full"
           style={{ left: pos.arrowLeft }}
         >
-          <div className="border-8 border-transparent border-t-blue-600" />
+          <div className="border-8 border-transparent border-t-brand" />
         </div>
       )}
       <button
@@ -140,7 +140,7 @@ export default function ContextTip({ tipKey, targetSelector, title, children }) 
         <FiX size={14} />
       </button>
       {title && (
-        <p className="text-xs font-bold uppercase tracking-wider text-blue-200 mb-1">{title}</p>
+        <p className="text-xs font-bold uppercase tracking-wider text-brand-200 mb-1">{title}</p>
       )}
       <div className="text-sm leading-relaxed text-white/90">{children}</div>
       <button

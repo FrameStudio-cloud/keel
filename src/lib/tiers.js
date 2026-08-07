@@ -1,6 +1,7 @@
 const FEATURE_TIERS = {
   social_ai:       "pro",
   website:         "pro",
+  whatsapp_bot:    "pro",
   storefront:      "beta",
   reports_pnl:     "pro",
   finance_mpesa:   "pro",
@@ -44,6 +45,12 @@ export const FEATURE_PREVIEW = {
     { icon: "FiGlobe",        title: "Custom Subdomain",        desc: "Get your own subdomain — no domain purchase needed" },
     { icon: "FiUploadCloud",  title: "One-Click Deploy",        desc: "Deploy to Vercel with a single click, zero config" },
     { icon: "FiSliders",      title: "Section Builder",         desc: "Pick which sections appear on your catalogue site" },
+  ],
+  whatsapp_bot: [
+    { icon: "FiMessageCircle", title: "Instant Auto-Replies",   desc: "Answer customers on WhatsApp 24/7 without lifting a finger" },
+    { icon: "FiZap",           title: "Live Inventory Answers", desc: "Share real prices and stock straight from your catalogue" },
+    { icon: "FiSend",          title: "Trilingual Replies",     desc: "Understands English, Swahili and Sheng — automatically" },
+    { icon: "FiSmartphone",    title: "Runs on Your Number",    desc: "No extra app — the bot lives on your existing WhatsApp number" },
   ],
   reports_pnl: [
     { icon: "FiBarChart2",    title: "P&L Bar Charts",    desc: "Visual profit-and-loss charts with week/month toggle" },
@@ -156,5 +163,9 @@ export const FEATURE_META = {
   settings_export: {
     title: "Data Export",
     description: "Export all your business data as a JSON backup file.",
+  },
+  whatsapp_bot: {
+    title: "WhatsApp Bot",
+    description: "An automatic assistant that answers customer questions on WhatsApp — prices, stock, hours and more.",
   },
 };
