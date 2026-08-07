@@ -2,14 +2,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { FiClock, FiArrowLeft, FiArrowRight } from "react-icons/fi";
-import posts from "../data/blog.json";
 import PostCover from "../components/blog/PostCover";
 import { formatBlogDate, readingTime, kicker } from "../lib/blog";
+import { useFramestudioBlogs } from "../lib/framestudioBlog";
 
 export default function BlogPost() {
   const { slug } = useParams();
   const [progress, setProgress] = useState(0);
   const articleRef = useRef(null);
+  const { posts, loading } = useFramestudioBlogs();
 
   const post = posts.find((p) => p.slug === slug);
   const postIndex = posts.findIndex((p) => p.slug === slug);
@@ -47,7 +48,7 @@ export default function BlogPost() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-700 dark:text-blue-400">
             The Keel Journal
           </p>
-          <h1 className="font-serif text-3xl font-semibold text-stone-900 dark:text-white">Story not found</h1>
+          <h1 className="font-serif text-3xl font-semibold text-stone-900 dark:text-white">{loading ? "Loading…" : "Story not found"}</h1>
           <Link
             to="/blog"
             className="inline-flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-blue-700 dark:text-blue-400 hover:underline"

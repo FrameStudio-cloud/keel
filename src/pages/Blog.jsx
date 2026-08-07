@@ -5,9 +5,9 @@ import { FiSearch, FiClock, FiArrowRight, FiExternalLink } from "react-icons/fi"
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import posts from "../data/blog.json";
 import PostCover from "../components/blog/PostCover";
 import { formatBlogDate, readingTime, kicker } from "../lib/blog";
+import { useFramestudioBlogs } from "../lib/framestudioBlog";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,12 +27,13 @@ export default function Blog() {
   const [query, setQuery] = useState("");
   const [activeTag, setActiveTag] = useState("all");
   const pageRef = useRef(null);
+  const { posts, loading } = useFramestudioBlogs();
 
   const categories = useMemo(() => {
     const set = new Set();
     posts.forEach((p) => (p.tags || []).forEach((t) => set.add(t)));
     return ["all", ...Array.from(set)];
-  }, []);
+  }, [posts]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -46,7 +47,7 @@ export default function Blog() {
         (p.tags || []).some((t) => t.toLowerCase().includes(q))
       );
     });
-  }, [query, activeTag]);
+  }, [query, activeTag, posts]);
 
   const featured = filtered[0];
   const rest = filtered.slice(1);
@@ -56,6 +57,19 @@ export default function Blog() {
     month: "long",
     year: "numeric",
   });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f7f6f2] dark:bg-[#0e1220] flex items-center justify-center px-4">
+        <div className="text-center space-y-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-700 dark:text-blue-400">
+            The Keel Journal
+          </p>
+          <h1 className="font-serif text-3xl font-semibold text-stone-900 dark:text-white">Loading the journal…</h1>
+        </div>
+      </div>
+    );
+  }
 
   useGSAP(() => {
     const mm = gsap.matchMedia();

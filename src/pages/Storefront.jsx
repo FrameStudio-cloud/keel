@@ -11,6 +11,9 @@ import DeployProgressModal from "../components/storefront/DeployProgressModal";
 import { getShopId } from "../lib/shop";
 import { supabase } from "../lib/supabase";
 import { PROVISIONER_URL } from "../lib/constants";
+import { provisionerHeaders } from "../lib/provisioner";
+import { startDeploy, pollDeploy } from "../lib/deployClient";
+import { fetchTemplateManifest } from "../lib/templateRegistry";
 import { blueprintToSectionIds, getDefaultBlueprint, buildProvisionerPayload } from "../data/storefrontBlueprints";
 
 export default function Storefront() {
@@ -51,11 +54,14 @@ export default function Storefront() {
   }
 
   useEffect(() => {
+    fetchTemplateManifest();
     (async () => {
       try {
         const shopId = await getShopId();
         if (!shopId) return;
-        const res = await fetch(`${PROVISIONER_URL}/status?shop_id=${shopId}`);
+        const res = await fetch(`${PROVISIONER_URL}/status?shop_id=${shopId}`, {
+          headers: provisionerHeaders(),
+        });
         if (res.ok) {
           const data = await res.json();
           if (data.deployed) {
@@ -121,7 +127,10 @@ export default function Storefront() {
     const shopId = await getShopId();
     if (!shopId) return;
     try {
-      await fetch(`${PROVISIONER_URL}/delete/${shopId}`, { method: "DELETE" });
+      await fetch(`${PROVISIONER_URL}/delete/${shopId}`, {
+        method: "DELETE",
+        headers: provisionerHeaders(),
+      });
     } catch {
       // best-effort
     }
@@ -134,36 +143,39 @@ export default function Storefront() {
     setRedeploying(true);
     setRedeployMessage("Rebuilding catalogue...");
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000);
       const payload = buildProvisionerPayload({
         shopId,
         templateId: deployment.templateId || "classic",
         subdomain: deployment.subdomain,
         shopSettings,
-      })
-      const res = await fetch(`${PROVISIONER_URL}/provision`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
       });
-      clearTimeout(timeoutId);
-      if (res.ok) {
-        const result = await res.json();
+      let jobId = null;
+      try {
+        const started = await startDeploy(payload);
+        jobId = started.job_id;
+      } catch (err) {
+        if (err.resume && err.data?.job_id) jobId = err.data.job_id;
+        else throw err;
+      }
+      if (!jobId) throw new Error("Provisioner did not return a job");
+
+      const { result } = await pollDeploy({ shopId });
+      if (result) {
         setDeployment((prev) => ({
           ...prev,
-          domain: result.domain,
+          domain: result.domain || prev.domain,
+          url: result.url || prev.url,
         }));
-        setDeployedAt(new Date().toISOString());
-        setRedeployMessage("Catalogue updated!");
-        refreshStats();
-      } else {
-        try { const err = await res.json(); setRedeployMessage(err.error || `Update failed (${res.status})`); }
-        catch { setRedeployMessage(`Update failed (${res.status})`); }
       }
+      setDeployedAt(new Date().toISOString());
+      setRedeployMessage("Catalogue updated!");
+      refreshStats();
     } catch (err) {
-      setRedeployMessage(err?.name === "AbortError" ? "Request timed out — the provisioner may be waking up. Try again." : `Error: ${err?.message || "Unknown"}`);
+      setRedeployMessage(
+        err?.timedOut
+          ? "Rebuild is running in the background — refresh the page in a minute to see it."
+          : `Error: ${err?.message || "Unknown"}`
+      );
     }
     setRedeploying(false);
   }
@@ -187,6 +199,7 @@ export default function Storefront() {
       <div className="max-w-5xl mx-auto">
         {view === "landing" && (
           <StorefrontLanding
+            businessCategory={businessCategory}
             deployment={deployment}
             stats={stats}
             redeploying={redeploying}

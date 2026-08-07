@@ -10,15 +10,36 @@ import {
 } from "react-icons/fi";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import { getShopId } from "../../lib/shop";
-import { PROVISIONER_URL } from "../../lib/constants";
+import { startDeploy, pollDeploy } from "../../lib/deployClient";
 import { buildProvisionerPayload } from "../../data/storefrontBlueprints";
 
 const steps = [
   { key: "shop", label: "Locating your shop" },
-  { key: "provision", label: "Creating your storefront" },
-  { key: "deploy", label: "Deploying to Vercel" },
-  { key: "domain", label: "Setting up domain" },
+  { key: "provision", label: "Creating your storefront", event: "render" },
+  { key: "deploy", label: "Deploying to Vercel", event: "deploy" },
+  { key: "domain", label: "Setting up domain", event: "domain" },
 ];
+
+const RUNNING_STATUS = { render: ["rendering"], deploy: ["deploying"], domain: ["domain"] };
+
+function deriveStepStatus(job, step) {
+  if (step.key === "shop") return "done";
+  if (!job) return "queued";
+
+  const events = job.events || [];
+  const latest = events.filter((e) => e.event === step.event);
+  if (latest.some((e) => e.status === "done")) return "done";
+  if (latest.some((e) => e.status === "current")) return "current";
+  if (RUNNING_STATUS[step.event]?.includes(job.status)) return "current";
+  if (step.event === "render" && job.status === "queued") return "current";
+  return "queued";
+}
+
+function deriveStatuses(job) {
+  const next = {};
+  for (const step of steps) next[step.key] = deriveStepStatus(job, step);
+  return next;
+}
 
 export default function DeployProgressModal({
   onClose,
@@ -33,8 +54,10 @@ export default function DeployProgressModal({
   const [status, setStatus] = useState({});
   const [done, setDone] = useState(false);
   const [error, setError] = useState(null);
+  const [timedOut, setTimedOut] = useState(false);
   const [result, setResult] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const started = useRef(false);
 
   useEffect(() => {
@@ -57,67 +80,71 @@ export default function DeployProgressModal({
       try {
         setStatus({ shop: "current" });
 
-        const shopId = shopIdProp || await getShopId();
+        const shopId = shopIdProp || (await getShopId());
         if (!shopId) throw new Error("Could not determine shop ID — try signing out and back in");
 
-        const finalSubdomain = subdomain.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 40);
-
         if (cancelled) return;
-        setStatus((prev) => ({ ...prev, shop: "done", provision: "current" }));
+        setStatus({ shop: "done" });
 
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 180000);
-
+        const finalSubdomain = subdomain.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 40);
         const payload = buildProvisionerPayload({
           shopId,
           templateId: templateId || "classic",
           subdomain: finalSubdomain,
           sections,
           shopSettings: shopSettings || {},
-        })
-
-        const res = await fetch(`${PROVISIONER_URL}/provision`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-          signal: controller.signal,
         });
 
-        clearTimeout(timeout);
-
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.error || `Server responded with ${res.status}`);
+        let jobId = null;
+        try {
+          const startedDeploy = await startDeploy(payload);
+          jobId = startedDeploy.job_id;
+        } catch (err) {
+          // 409 with a job_id means a deploy for this shop is already in flight — resume it.
+          if (err.resume && err.data?.job_id) {
+            jobId = err.data.job_id;
+          } else {
+            throw err;
+          }
         }
+        if (!jobId) throw new Error("Provisioner did not return a job — try again");
 
-        const data = await res.json();
+        if (cancelled) return;
+        setStatus((prev) => ({ ...prev, provision: "current" }));
+
+        const { result: deployResult } = await pollDeploy({
+          shopId,
+          onUpdate: (job) => setStatus(deriveStatuses(job)),
+        });
 
         if (cancelled) return;
 
-        setStatus({
-          shop: "done",
-          provision: "done",
-          deploy: "done",
-          domain: "done",
-        });
-
-        setResult(data);
+        setResult(deployResult);
+        setStatus({ shop: "done", provision: "done", deploy: "done", domain: "done" });
         await new Promise((r) => setTimeout(r, 600));
         setDone(true);
       } catch (err) {
         if (cancelled) return;
-        if (err.name === "AbortError") {
-          setError("Request timed out — the provisioner may be waking up. Try again.");
-        } else {
-          setError(err.message);
-        }
+        setTimedOut(Boolean(err.timedOut));
+        setError(err.message || "Deployment failed");
       }
     })();
 
     return () => { cancelled = true; };
-  }, [subdomain, templateId, shopIdProp, sections, shopSettings]);
+  }, [attempt, subdomain, templateId, shopIdProp, sections, shopSettings]);
 
-  const displayUrl = `https://${result?.domain || `${subdomain}.keel.framestudio.co.ke`}`;
+  const resultDomain = result?.domain || `${subdomain}.keel.framestudio.co.ke`;
+  const displayUrl = result?.url || `https://${resultDomain}`;
+
+  function handleRetry() {
+    setError(null);
+    setTimedOut(false);
+    setStatus({});
+    setDone(false);
+    setResult(null);
+    started.current = false;
+    setAttempt((a) => a + 1);
+  }
 
   async function handleCopy() {
     try {
@@ -205,7 +232,7 @@ export default function DeployProgressModal({
             {error ? (
               <>
                 <FiAlertTriangle className="text-danger" size={22} />
-                Deployment Failed
+                {timedOut ? "Still Building" : "Deployment Failed"}
               </>
             ) : done ? (
               <>
@@ -219,6 +246,11 @@ export default function DeployProgressModal({
           {!done && !error && (
             <p className="text-sm text-text-muted mt-1">
               Building and deploying — this usually takes 1-2 minutes
+            </p>
+          )}
+          {timedOut && (
+            <p className="text-sm text-text-muted mt-1">
+              Your storefront keeps building in the background. Refresh the page in a minute to see it.
             </p>
           )}
         </div>
@@ -259,8 +291,8 @@ export default function DeployProgressModal({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-danger-700 text-danger">
-                  {error.includes("timed out") || error.includes("timeout")
-                    ? "Request timed out"
+                  {timedOut
+                    ? "Taking longer than expected"
                     : error.includes("fetch") || error.includes("NetworkError") || error.includes("Failed to fetch")
                     ? "Provisioner unreachable"
                     : "Something went wrong"}
@@ -268,12 +300,7 @@ export default function DeployProgressModal({
                 <p className="text-sm text-danger mt-1 leading-relaxed">
                   {error}
                 </p>
-                {(error.includes("timed out") || error.includes("timeout")) && (
-                  <p className="text-xs text-danger mt-2">
-                    The provisioner may be waking from sleep. Click Retry to try again.
-                  </p>
-                )}
-                {(error.includes("fetch") || error.includes("NetworkError") || error.includes("Failed to fetch")) && (
+                {!timedOut && (error.includes("fetch") || error.includes("NetworkError") || error.includes("Failed to fetch")) && (
                   <p className="text-xs text-danger mt-2">
                     Make sure the provisioner service is running. If this persists, check Railway dashboard.
                   </p>
@@ -322,7 +349,7 @@ export default function DeployProgressModal({
           {error ? (
             <>
               <button
-                onClick={() => { setError(null); setStatus({}); started.current = false; setDone(false); }}
+                onClick={handleRetry}
                 className="flex items-center gap-1.5 px-6 py-2 text-sm font-medium text-white bg-brand rounded-lg hover:bg-brand-strong transition-all active:scale-[0.97] shadow-sm"
               >
                 <FiRefreshCw size={14} />
@@ -332,7 +359,7 @@ export default function DeployProgressModal({
                 onClick={onClose}
                 className="text-sm text-text-muted hover:text-text-body dark:hover:text-text-body transition-colors"
               >
-                Cancel
+                {timedOut ? "Close" : "Cancel"}
               </button>
             </>
           ) : done ? (
@@ -348,7 +375,11 @@ export default function DeployProgressModal({
               </a>
               <button
                 onClick={() => {
-                  onComplete({ url: displayUrl, domain: result?.domain || `${subdomain}.keel.framestudio.co.ke`, subdomain });
+                  onComplete({
+                    url: displayUrl,
+                    domain: resultDomain,
+                    subdomain,
+                  });
                   onClose();
                 }}
                 className="px-6 py-2 text-sm font-medium text-white bg-brand rounded-lg hover:bg-brand-strong transition-all active:scale-[0.97] shadow-sm"

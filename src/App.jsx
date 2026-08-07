@@ -55,6 +55,8 @@ const Features = lazy(() => import("./pages/Features"));
 const Help = lazy(() => import("./pages/Help"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
+const Docs = lazy(() => import("./pages/Docs"));
+const DocsArticle = lazy(() => import("./pages/DocsArticle"));
 const Orders = lazy(() => import("./pages/Orders"));
 const Customers = lazy(() => import("./pages/Customers"));
 const Services = lazy(() => import("./pages/Services"));
@@ -138,6 +140,8 @@ function AppRoutes() {
         <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
         <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
         <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
+        <Route path="/docs" element={<ProtectedRoute><Docs /></ProtectedRoute>} />
+        <Route path="/docs/:slug" element={<ProtectedRoute><DocsArticle /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>

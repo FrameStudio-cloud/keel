@@ -1,3 +1,5 @@
+import { resolveProvisionerTemplateId } from "../lib/templateRegistry";
+
 // ── SECTION OPTIONS (shared by all templates) ──
 export const SECTION_OPTIONS = {
   navbar: [
@@ -98,7 +100,7 @@ const TEMPLATES_DATA = {
     uiLibrary: { id: "cite_ui", components: { hero: "Hero", card: "CatalogueCard", grid: "CatalogueGrid", navbar: "Navbar", footer: "Footer" } },
     themeCapabilities: "basic",
     toolchain: { ui: "heroui", icons: "lucide", fonts: ["Inter", "Outfit"] },
-    provisionerTemplateId: "fashion",
+    provisionerTemplateId: "clothing",
   },
   minimal: {
     id: "minimal",
@@ -155,6 +157,34 @@ const TEMPLATES_DATA = {
     themeCapabilities: "full",
     toolchain: { ui: "heroui", icons: "lucide", fonts: ["Inter", "Outfit"] },
     provisionerTemplateId: "bold",
+  },
+  modern: {
+    id: "modern",
+    name: "Modern",
+    tagline: "Clean, minimal, editorial — a premium feel for any shop",
+    description: "The Modern template brings a premium, editorial look to your storefront: glass-morphism navigation, a Ken Burns hero slideshow, scroll-reveal animations, and a refined product grid with hover reveals. Typography uses Sora + Inter for a contemporary, high-end feel.",
+    highlights: [
+      "Glass-morphism sticky navigation that adapts on scroll",
+      "Ken Burns hero slideshow with slow-zoom imagery",
+      "Scroll-reveal animations throughout the page",
+      "Refined product grid with hover-to-view reveals",
+      "Editorial about section and clean minimal footer",
+      "Product detail pages with specs, includes, and WhatsApp ordering",
+    ],
+    screenshots: [
+      { label: "Homepage", desc: "Editorial homepage with glass nav, Ken Burns hero, and refined product grid", file: "/templates/modern-homepage.png" },
+      { label: "Product Detail", desc: "Clean product page with specs, includes, and WhatsApp ordering", file: "/templates/modern-product-detail.png" },
+    ],
+    shopTypes: ["general", "electronics", "electricals", "clothing", "wigs", "shoes", "bags", "beauty", "health", "groceries", "furniture", "stationery", "books", "toys", "sports", "automotive"],
+    defaultBlueprint: {
+      navbar: "transparent", hero: "slideshow", catalogue: "grid", footer: "4-column",
+      extras: { announcements: true, whatsapp: true, about: true, backToTop: true },
+    },
+    customizableSections: ["navbar", "hero", "catalogue", "footer", "extras"],
+    uiLibrary: { id: "cite_ui", components: { hero: "Hero", card: "CatalogueCard", grid: "CatalogueGrid", navbar: "Navbar", footer: "Footer" } },
+    themeCapabilities: "full",
+    toolchain: { ui: "cite_ui", icons: "lucide", fonts: ["Sora", "Inter"] },
+    provisionerTemplateId: "modern",
   },
 }
 
@@ -223,6 +253,8 @@ export function getTemplatesForShopType(category) {
   return Object.values(TEMPLATES_DATA).filter(t => t.shopTypes.includes(category))
 }
 
+// ── PROVISIONER ID RESOLUTION ──
+
 // Convert a blueprint object to an ordered array of section IDs for the provisioner API
 export function blueprintToSectionIds(blueprint) {
   if (!blueprint) return []
@@ -242,9 +274,10 @@ export function blueprintToSectionIds(blueprint) {
 // Build the full payload to send to the provisioner, including brand colors + UI library info
 export function buildProvisionerPayload({ shopId, templateId, subdomain, sections, shopSettings }) {
   const template = getTemplateById(templateId)
+  const provisionerId = resolveProvisionerTemplateId(templateId, template.provisionerTemplateId || templateId)
   const payload = {
     shop_id: shopId,
-    template_id: sections ? "custom" : template.provisionerTemplateId || templateId,
+    template_id: sections ? "custom" : provisionerId,
     subdomain: subdomain.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 40),
   }
   if (sections?.length > 0) payload.sections = sections

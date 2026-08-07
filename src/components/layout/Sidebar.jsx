@@ -4,7 +4,7 @@ import { GoGraph } from "react-icons/go";
 import { FaBoxOpen } from "react-icons/fa";
 import { FcSalesPerformance } from "react-icons/fc";
 import { MdOutlineQueue, MdOutlineReceiptLong } from "react-icons/md";
-import { IoExtensionPuzzleOutline, IoGlobeOutline, IoSettingsOutline, IoPersonOutline, IoTimeOutline, IoWalletOutline, IoStatsChartOutline, IoMegaphoneOutline, IoStorefrontOutline, IoPeopleOutline, IoGridOutline, IoChatbubblesOutline } from "react-icons/io5";
+import { IoExtensionPuzzleOutline, IoGlobeOutline, IoSettingsOutline, IoPersonOutline, IoTimeOutline, IoWalletOutline, IoStatsChartOutline, IoMegaphoneOutline, IoStorefrontOutline, IoPeopleOutline, IoGridOutline, IoChatbubblesOutline, IoHelpCircleOutline } from "react-icons/io5";
 import { useSettings } from "../../hooks/useSettings";
 import { useLowStockCount } from "../../hooks/useQueries";
 import { useWhatsAppUnreadCount } from "../../hooks/useWhatsAppInbox";
@@ -189,6 +189,23 @@ export default function Sidebar({ open, onClose }) {
         >
           <IoPersonOutline />
           <span className="flex-1">Profile</span>
+        </NavLink>
+        <NavLink
+          key="/docs"
+          to="/docs"
+          onClick={onClose}
+          data-tour="nav-Docs"
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
+            ${
+              isActive
+                ? "bg-brand-muted text-brand font-medium"
+                : "text-text-muted hover:bg-surface-2 hover:text-text-primary"
+            }`
+          }
+        >
+          <IoHelpCircleOutline />
+          <span className="flex-1">Help & Docs</span>
         </NavLink>
       </nav>
 
